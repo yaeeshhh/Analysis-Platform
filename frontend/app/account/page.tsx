@@ -187,10 +187,10 @@ export default function AccountPage() {
         actions={
           user ? (
             <div className="flex flex-wrap gap-3">
-              <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+              <ScrollIntentLink href="/history" className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82">
                 Review saved history
               </ScrollIntentLink>
-              <ScrollIntentLink href="/batch" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+              <ScrollIntentLink href="/batch" className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82">
                 Open uploads page
               </ScrollIntentLink>
             </div>
@@ -205,13 +205,49 @@ export default function AccountPage() {
 
         {!loading && user ? (
           <>
-            {/* ─── Phone: tappable section list ─── */}
-            <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
+            {/* ─── Phone: inline info + tappable section list ─── */}
+            <div className="phone-only space-y-3">
+              {/* Inline account summary */}
+              <div className="mobile-inline-stats">
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{user.username || "—"}</span>
+                  <span className="mobile-inline-stat-label">Username</span>
+                </div>
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">
+                    {rememberStatus.available
+                      ? rememberStatus.enabled
+                        ? `${rememberStatus.daysRemaining}d`
+                        : "Off"
+                      : "N/A"}
+                  </span>
+                  <span className="mobile-inline-stat-label">Remember</span>
+                </div>
+              </div>
+
+              <div className="mobile-detail-row">
+                <span className="mobile-detail-label">Email</span>
+                <span className="mobile-detail-value">{user.email}</span>
+              </div>
+              <div className="mobile-detail-row">
+                <span className="mobile-detail-label">Member since</span>
+                <span className="mobile-detail-value">{formatDate(user.created_at)}</span>
+              </div>
+              <div className="mobile-detail-row">
+                <span className="mobile-detail-label">Status</span>
+                <span className="mobile-detail-value">
+                  <span className="info-chip"><span className="pulse-dot" />{user.is_active ? "Active" : "Inactive"}</span>
+                </span>
+              </div>
+
+              <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
+            </div>
 
             {/* ─── Desktop: flowing sections ─── */}
             <section id="account-first-block" className="tablet-up route-scroll-target space-y-0">
-              <section className="flow-section">
+              <section className="flow-section section-glow">
                 <p className="flow-section-label">Account snapshot</p>
+                <div className="accent-bar" />
                 <div className="stat-row mt-3">
                   <div className="stat-row-item">
                     <p className="stat-row-value">{user.username || "Not set"}</p>
@@ -255,7 +291,7 @@ export default function AccountPage() {
                           <p className="list-row-hint">{item.detail}</p>
                         </div>
                         <span className={`shrink-0 text-xs ${item.destructive ? "text-[#ffb4ba]/60" : "text-white/30"}`}>
-                          {item.destructive ? "Danger" : "›"}
+                          {item.destructive ? <span className="danger-label"><span className="text-[#ff8c8c]/70">Danger</span></span> : "›"}
                         </span>
                       </button>
                     ))}
@@ -362,7 +398,7 @@ function AccountMobileSections({
                   <p className="mt-1 text-sm leading-6 text-white/50">{item.detail}</p>
                 </div>
                 <span className={`shrink-0 text-xs ${item.destructive ? "text-[#ffb4ba]/60" : "text-white/30"}`}>
-                  {item.destructive ? "Danger" : "›"}
+                  {item.destructive ? <span className="danger-label"><span className="text-[#ff8c8c]/70">Danger</span></span> : "›"}
                 </span>
               </div>
             </button>

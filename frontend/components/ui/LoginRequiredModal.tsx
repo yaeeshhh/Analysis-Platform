@@ -795,11 +795,11 @@ export default function LoginRequiredModal({
         <h2 className="text-2xl font-semibold tracking-tight text-white">{title}</h2>
         <p className="mt-3 text-sm leading-7 text-white/65">{message}</p>
 
-        <div className="mt-4 inline-flex rounded-full border border-white/10 bg-white/5 p-1">
+        <div className="mt-4 inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
           {mode === "login" && loginStep !== "identifier" ? (
             <span
               aria-current="page"
-              className="rounded-full bg-white px-4 py-1.5 text-sm font-medium text-black"
+              className="rounded-lg bg-white px-4 py-1.5 text-sm font-medium text-black"
             >
               Log in
             </span>
@@ -807,7 +807,7 @@ export default function LoginRequiredModal({
             <button
               type="button"
               onClick={() => switchMode("login")}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
                 mode === "login" ? "bg-white text-black" : "text-white/75"
               }`}
             >
@@ -818,7 +818,7 @@ export default function LoginRequiredModal({
             <button
               type="button"
               onClick={() => switchMode("signup")}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
                 mode === "signup" ? "bg-white text-black" : "text-white/75"
               }`}
             >
@@ -1193,7 +1193,7 @@ export default function LoginRequiredModal({
                 setInvalidPasswordAttempts(0);
               }}
               disabled={loading}
-              className="inline-flex rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
             >
               Back
             </button>
@@ -1213,7 +1213,7 @@ export default function LoginRequiredModal({
                 setError("");
               }}
               disabled={loading || signupVerifying}
-              className="inline-flex rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
             >
               Back
             </button>
@@ -1247,7 +1247,7 @@ export default function LoginRequiredModal({
                   signupOtpCode.trim().length !== 6 ||
                   !signupOtpFormatValid))
             }
-            className="inline-flex rounded-full bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
+            className="inline-flex rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
           >
             {loading
               ? mode === "login"

@@ -268,6 +268,48 @@ export default function HistoryPage() {
 
         {!loading ? (
           <section className="space-y-4">
+            {/* Phone: inline stats + search + section list */}
+            <div className="phone-only space-y-3">
+              <div className="mobile-inline-stats">
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{analyses.length}</span>
+                  <span className="mobile-inline-stat-label">Total runs</span>
+                </div>
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{filteredAnalyses.length}</span>
+                  <span className="mobile-inline-stat-label">Filtered</span>
+                </div>
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{analyses.filter(a => a.experiment_count > 0).length}</span>
+                  <span className="mobile-inline-stat-label">With ML</span>
+                </div>
+              </div>
+
+              {/* Inline search on phone */}
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search runs..."
+                className="w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+              />
+
+              {/* Most recent run card */}
+              {filteredAnalyses[0] ? (
+                <div className="border-b border-white/6 pb-3">
+                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Most recent</p>
+                  <p className="mt-1 font-medium text-white">{filteredAnalyses[0].overview.dataset_name}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className="info-chip">{filteredAnalyses[0].overview.row_count?.toLocaleString() ?? "—"} rows</span>
+                    <span className="info-chip">{filteredAnalyses[0].overview.column_count ?? "—"} cols</span>
+                    {filteredAnalyses[0].experiment_count > 0 && (
+                      <span className="info-chip"><span className="pulse-dot" />{filteredAnalyses[0].experiment_count} ML</span>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
             <HistoryMobileSections
               analyses={analyses}
               filteredAnalyses={filteredAnalyses}
@@ -282,9 +324,9 @@ export default function HistoryPage() {
               onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
             />
 
-            <section id="history-first-block" className="flow-section tablet-up route-scroll-target">
+            <section id="history-first-block" className="flow-section tablet-up route-scroll-target section-glow">
               <div className="flex items-baseline justify-between gap-4">
-                <p className="flow-section-label">Archive search</p>
+                <p className="flow-section-label"><span className="pulse-dot mr-2" />Archive search</p>
                 <span className="text-xs text-white/40">{filteredAnalyses.length} of {analyses.length} run{analyses.length === 1 ? "" : "s"}</span>
               </div>
               <p className="mt-2 text-sm leading-6 text-white/55">Find a run by dataset name or summary, then narrow by readiness or ML status.</p>
@@ -297,7 +339,7 @@ export default function HistoryPage() {
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Search by dataset, summary, or status"
-                    className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+                    className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
                   />
                 </label>
 
@@ -306,7 +348,7 @@ export default function HistoryPage() {
                   <select
                     value={readinessFilter}
                     onChange={(event) => setReadinessFilter(event.target.value as ReadinessFilter)}
-                    className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+                    className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
                   >
                     <option value="all" className="bg-[#08131e] text-white">All runs</option>
                     <option value="ml-ready" className="bg-[#08131e] text-white">ML-ready only</option>
@@ -319,7 +361,7 @@ export default function HistoryPage() {
                   <select
                     value={mlFilter}
                     onChange={(event) => setMlFilter(event.target.value as MlFilter)}
-                    className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+                    className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
                   >
                     <option value="all" className="bg-[#08131e] text-white">All runs</option>
                     <option value="with-ml" className="bg-[#08131e] text-white">With ML runs</option>
@@ -345,14 +387,14 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => { void handleOpenAnalysisPopup(analysis); }}
-                      className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]"
+                      className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]"
                     >
                       Open
                     </button>
                     <button
                       type="button"
                       onClick={() => { void downloadAnalysisReport(analysis.id); }}
-                      className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                      className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
                     >
                       Report
                     </button>
@@ -361,14 +403,14 @@ export default function HistoryPage() {
                         <button
                           type="button"
                           onClick={() => { void downloadMlExperimentReport(analysis.id, analysis.latest_experiment!); }}
-                          className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                          className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
                         >
                           ML report
                         </button>
                         <button
                           type="button"
                           onClick={() => { void downloadMlExperimentSummary(analysis.id, analysis.latest_experiment!); }}
-                          className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                          className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
                         >
                           ML summary
                         </button>
@@ -377,7 +419,7 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => setDeleteTargetId(analysis.id)}
-                      className="rounded-full border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
+                      className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
                     >
                       Delete
                     </button>
@@ -486,7 +528,7 @@ export default function HistoryPage() {
               <button
                 type="button"
                 onClick={() => setDeleteTargetId(null)}
-                className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/82"
+                className="rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/82"
               >
                 Cancel
               </button>
@@ -496,7 +538,7 @@ export default function HistoryPage() {
                   void handleDeleteAnalysis();
                 }}
                 disabled={deleteBusy}
-                className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {deleteBusy ? "Deleting..." : "Delete saved run"}
               </button>
@@ -564,7 +606,7 @@ function HistoryMobileSections({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by dataset, summary, or status"
-            className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+            className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
           />
         </label>
 
@@ -573,7 +615,7 @@ function HistoryMobileSections({
           <select
             value={readinessFilter}
             onChange={(e) => setReadinessFilter(e.target.value as ReadinessFilter)}
-            className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+            className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
           >
             <option value="all">All runs</option>
             <option value="ml-ready">ML-ready only</option>
@@ -586,7 +628,7 @@ function HistoryMobileSections({
           <select
             value={mlFilter}
             onChange={(e) => setMlFilter(e.target.value as MlFilter)}
-            className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+            className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
           >
             <option value="all">All runs</option>
             <option value="with-ml">With ML runs</option>
@@ -637,21 +679,21 @@ function HistoryMobileSections({
           <button
             type="button"
             onClick={() => onOpenPopup(a)}
-            className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
+            className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
           >
             Open saved run
           </button>
           <button
             type="button"
             onClick={() => onDownloadReport(a.id)}
-            className="rounded-full border border-white/10 px-5 py-3 text-sm text-white/70"
+            className="rounded-lg border border-white/10 px-5 py-3 text-sm text-white/70"
           >
             Download report
           </button>
           <button
             type="button"
             onClick={() => onDeleteRun(a.id)}
-            className="rounded-full border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
+            className="rounded-lg border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
           >
             Delete saved run
           </button>

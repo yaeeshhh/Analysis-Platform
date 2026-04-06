@@ -704,7 +704,7 @@ export default function MLTab({
                         {new Date(experiment.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <span className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-white/55">
+                    <span className="rounded-lg border border-white/10 px-2 py-1 text-[11px] text-white/55">
                       {selected ? "Current result" : "Saved result"}
                     </span>
                   </div>
@@ -716,7 +716,7 @@ export default function MLTab({
                         onClick={() => {
                           void handleOpenExperiment(experiment, "downloads");
                         }}
-                        className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82"
+                        className="rounded-lg border border-white/12 px-4 py-2 text-sm text-white/82"
                       >
                         Open run
                       </button>
@@ -726,7 +726,7 @@ export default function MLTab({
                       onClick={() => {
                         void handleExperimentDownload(mode, experiment, "report", "downloads");
                       }}
-                      className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82"
+                      className="rounded-lg border border-white/12 px-4 py-2 text-sm text-white/82"
                     >
                       Download report
                     </button>
@@ -735,7 +735,7 @@ export default function MLTab({
                       onClick={() => {
                         void handleExperimentDownload(mode, experiment, "summary", "downloads");
                       }}
-                      className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82"
+                      className="rounded-lg border border-white/12 px-4 py-2 text-sm text-white/82"
                     >
                       Download summary
                     </button>
@@ -745,7 +745,7 @@ export default function MLTab({
                         void handleDeleteSavedExperiment(mode, experiment);
                       }}
                       disabled={deletingExperimentId === experiment.id}
-                      className="rounded-full border border-[#5a2328] bg-[#2a1215] px-4 py-2 text-sm font-medium text-[#ffb4ba] disabled:cursor-not-allowed disabled:opacity-55"
+                      className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-4 py-2 text-sm font-medium text-[#ffb4ba] disabled:cursor-not-allowed disabled:opacity-55"
                     >
                       {deletingExperimentId === experiment.id ? "Deleting..." : "Delete run"}
                     </button>
@@ -830,7 +830,7 @@ export default function MLTab({
                   type="button"
                   key={mode}
                   onClick={() => setActiveLab(mode)}
-                  className={`rounded-full px-4 py-2 text-sm transition ${
+                  className={`rounded-lg px-4 py-2 text-sm transition ${
                     active
                       ? "bg-white text-[#11273b]"
                       : "border border-white/12 bg-white/5 text-white/75 hover:bg-white/10"
@@ -905,7 +905,7 @@ export default function MLTab({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <p className="min-w-0 break-words font-medium text-white">{recommendation.column}</p>
-                        <span className="shrink-0 rounded-full border border-white/10 px-2 py-1 text-xs text-white/65">
+                        <span className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/65">
                           {(recommendation.score * 100).toFixed(1)}%
                         </span>
                       </div>
@@ -1013,7 +1013,7 @@ export default function MLTab({
                           setBusy(null);
                         }
                       }}
-                      className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:cursor-not-allowed disabled:opacity-55"
+                      className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:cursor-not-allowed disabled:opacity-55"
                     >
                       {busy === "supervised" ? "Benchmarking..." : "Run supervised benchmark"}
                     </button>
@@ -1029,7 +1029,7 @@ export default function MLTab({
                               "controls"
                             );
                           }}
-                          className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+                          className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
                         >
                           Download report
                         </button>
@@ -1043,7 +1043,7 @@ export default function MLTab({
                               "controls"
                             );
                           }}
-                          className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+                          className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
                         >
                           Download summary
                         </button>
@@ -1165,7 +1165,7 @@ export default function MLTab({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Model score scale</p>
                 {metricChart.metricKey ? (
-                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/55">
+                  <span className="rounded-lg border border-white/10 px-3 py-1 text-xs text-white/55">
                     {metricChart.metricLabel}
                   </span>
                 ) : null}
@@ -1273,7 +1273,7 @@ export default function MLTab({
                           {metrics.map(([key, value]) => (
                             <div
                               key={`${result.model}-${key}`}
-                              className="rounded-full border border-white/10 px-3 py-2 text-xs text-white/76"
+                              className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/76"
                             >
                               {formatMetricLabel(key)} {formatDisplayNumber(value, 4)}
                             </div>
@@ -1305,7 +1305,7 @@ export default function MLTab({
                           key={`${slice.feature}-${row.label}`}
                           className="grid gap-2 rounded-xl border border-white/8 px-3 py-3 text-sm text-white/72 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                         >
-                          <span className="min-w-0 rounded-full border border-white/10 px-3 py-1 text-white/78">
+                          <span className="min-w-0 rounded-lg border border-white/10 px-3 py-1 text-white/78">
                             {formatSliceLabel(row.label)}
                           </span>
                           <span className="text-right text-white/64">
@@ -1371,7 +1371,7 @@ export default function MLTab({
                       setClusterInput(nextValue);
                     }
                   }}
-                  className="mt-auto w-full rounded-full border border-white/12 bg-[#0b1117] px-4 py-3 text-center text-sm text-white outline-none"
+                  className="mt-auto w-full rounded-lg border border-white/12 bg-[#0b1117] px-4 py-3 text-center text-sm text-white outline-none"
                 />
               </label>
             </div>
@@ -1424,7 +1424,7 @@ export default function MLTab({
                     setBusy(null);
                   }
                 }}
-                className="rounded-full bg-[#7ad6ff] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="rounded-lg bg-[#7ad6ff] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {busy === "unsupervised" ? "Running..." : "Run unsupervised analysis"}
               </button>
@@ -1440,7 +1440,7 @@ export default function MLTab({
                         "controls"
                       );
                     }}
-                    className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+                    className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
                   >
                     Download report
                   </button>
@@ -1454,7 +1454,7 @@ export default function MLTab({
                         "controls"
                       );
                     }}
-                    className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+                    className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
                   >
                     Download summary
                   </button>
@@ -1592,7 +1592,7 @@ export default function MLTab({
                 <div key={item.row} className="border-b border-white/6 pb-3 text-sm text-white/72">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium text-white">Row {item.row}</p>
-                    <span className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-white/50">
+                    <span className="rounded-lg border border-white/10 px-2 py-1 text-[11px] text-white/50">
                       {formatClusterLabel(item.cluster)}
                     </span>
                   </div>
@@ -1650,7 +1650,7 @@ export default function MLTab({
                   setDeleteDialogError("");
                 }}
                 disabled={!!deletingExperimentId}
-                className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/82 disabled:cursor-not-allowed disabled:opacity-55"
+                className="rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/82 disabled:cursor-not-allowed disabled:opacity-55"
               >
                 Cancel
               </button>
@@ -1660,7 +1660,7 @@ export default function MLTab({
                   void confirmDeleteSavedExperiment();
                 }}
                 disabled={!!deletingExperimentId}
-                className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {deletingExperimentId ? "Deleting..." : "Delete saved run"}
               </button>

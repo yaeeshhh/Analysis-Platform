@@ -38,16 +38,16 @@ export default function AppShell({
       <section className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 mobile-shell-body">
         {/* Desktop sticky nav — tablet+ only */}
         <div className="tablet-up">
-          <Suspense fallback={<div className="mb-6 h-16 border-b border-white/6" />}>
+          <Suspense fallback={<div className="h-12 border-b border-white/6" />}>
             <TopNav />
           </Suspense>
         </div>
 
         {/* Desktop hero — hidden on phone, visible on tablet+ */}
-        <div className={`page-hero tablet-up mb-6`}>
+        <div className={`page-hero tablet-up mb-4 mt-6`}>
           <div className="page-hero-copy">
             <span className="hero-pill">{eyebrow}</span>
-            <TitleTag className="page-title">{title}</TitleTag>
+            <TitleTag className="page-title" style={{ fontSize: "clamp(1.3rem, 2.2vw, 1.8rem)" }}>{title}</TitleTag>
             <div className="page-description">{description}</div>
             {actions ? <div className="page-actions">{actions}</div> : null}
           </div>

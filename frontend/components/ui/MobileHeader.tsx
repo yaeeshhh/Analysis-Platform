@@ -7,7 +7,7 @@ export default function MobileHeader() {
     <header className="mobile-header phone-only">
       <BrandMark compact withCopy={false} />
       <span className="mobile-header-title">Analysis Studio</span>
-      <Suspense fallback={<div className="h-9 w-16 rounded-full border border-white/10 bg-white/5" />}>
+      <Suspense fallback={<div className="h-9 w-16 rounded-lg border border-white/10 bg-white/5" />}>
         <ProfileMenu />
       </Suspense>
     </header>
