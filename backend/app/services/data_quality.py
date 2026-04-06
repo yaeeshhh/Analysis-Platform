@@ -35,10 +35,12 @@ def analyze_data_quality(frame: pd.DataFrame) -> dict[str, Any]:
             )
 
         unique_count = int(non_null.nunique(dropna=True))
-        if unique_count <= 1:
+        is_constant = unique_count <= 1
+        if is_constant:
             constant_columns.append(str(column))
 
-        if len(non_null) > 0:
+        # Only flag near-constant if not already flagged as constant.
+        if not is_constant and len(non_null) > 0:
             top_frequency = float(non_null.astype(str).value_counts(normalize=True, dropna=False).iloc[0])
             if 0.95 <= top_frequency < 1.0:
                 near_constant_columns.append(
@@ -53,7 +55,8 @@ def analyze_data_quality(frame: pd.DataFrame) -> dict[str, Any]:
             numeric_columns.append(str(column))
             numeric = pd.to_numeric(series, errors="coerce")
             valid = numeric.dropna()
-            if len(valid) >= 4:
+            # Need at least 10 values for IQR to be statistically meaningful.
+            if len(valid) >= 10:
                 q1 = float(valid.quantile(0.25))
                 q3 = float(valid.quantile(0.75))
                 iqr = q3 - q1
@@ -92,7 +95,7 @@ def analyze_data_quality(frame: pd.DataFrame) -> dict[str, Any]:
     high_correlations: list[dict[str, Any]] = []
     if len(numeric_columns) >= 2:
         numeric_frame = frame[numeric_columns].apply(pd.to_numeric, errors="coerce")
-        corr = numeric_frame.corr(numeric_only=True)
+        corr = numeric_frame.corr()
         for i, col_a in enumerate(corr.columns):
             for col_b in corr.columns[i + 1 :]:
                 value = corr.loc[col_a, col_b]
@@ -122,10 +125,13 @@ def analyze_data_quality(frame: pd.DataFrame) -> dict[str, Any]:
 
     # Use severity-weighted penalties so wide datasets with many mildly noisy columns
     # do not collapse to zero purely because several fields share the same issue type.
+    # Constant column penalty is proportional to share of total columns to avoid
+    # over-penalising legitimate sparse one-hot datasets.
+    constant_column_share = len(constant_columns) / max(1, column_count)
     penalties = {
         "missing": (max_missing_pct * 25.0) + (total_missing_pct * 20.0),
         "duplicates": min(duplicate_pct * 40.0, 20.0),
-        "constant": min(len(constant_columns) * 8.0, 16.0),
+        "constant": min(constant_column_share * 20.0, 16.0),
         "near_constant": min(len(near_constant_columns) * 1.5, 12.0),
         "high_cardinality": min(len(high_cardinality_columns) * 2.0, 12.0),
         "invalid_numeric": invalid_numeric_penalty,
