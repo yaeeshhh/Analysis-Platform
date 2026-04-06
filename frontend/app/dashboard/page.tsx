@@ -249,15 +249,74 @@ export default function DashboardPage() {
 
         {!loading ? (
           <>
-            {/* ─── Phone: tappable list → slides ─── */}
-            <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
+            {/* ─── Phone: inline content + tappable list → slides ─── */}
+            <div className="phone-only space-y-4">
+              {/* Quick stats strip */}
+              <div className="mobile-inline-stats">
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{analyses.length}</span>
+                  <span className="mobile-inline-stat-label">Saved runs</span>
+                </div>
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{mlReadyRuns}</span>
+                  <span className="mobile-inline-stat-label">ML-ready</span>
+                </div>
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{totalExperiments}</span>
+                  <span className="mobile-inline-stat-label">ML runs</span>
+                </div>
+              </div>
+
+              {/* Latest run info */}
+              {latest ? (
+                <div className="border-b border-white/6 pb-4">
+                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Latest run</p>
+                  <p className="mt-1 font-medium text-white">{latest.overview.dataset_name}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className="info-chip">
+                      <span className="pulse-dot" />
+                      {latest.overview.row_count?.toLocaleString() ?? "—"} rows
+                    </span>
+                    <span className="info-chip">{latest.overview.column_count ?? "—"} cols</span>
+                    <span className="info-chip">{latest.insights.modeling_readiness.is_ready ? "ML Ready" : "EDA only"}</span>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <ScrollIntentLink href={`/analysis?analysisId=${latest.id}`} className="flex-1 rounded-lg bg-[#ffb079] px-4 py-2.5 text-center text-sm font-semibold text-[#11273b]">
+                      Open run
+                    </ScrollIntentLink>
+                    <ScrollIntentLink href="/batch" className="flex-1 rounded-lg border border-white/12 px-4 py-2.5 text-center text-sm text-white/70">
+                      Uploads
+                    </ScrollIntentLink>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-b border-white/6 pb-4 text-center">
+                  <p className="text-sm text-white/45">No saved analysis yet</p>
+                  <ScrollIntentLink href="/batch" className="mt-2 inline-block rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
+                    Upload first dataset
+                  </ScrollIntentLink>
+                </div>
+              )}
+
+              {/* Quick links */}
+              <div className="flex flex-wrap gap-2 pb-2">
+                <ScrollIntentLink href="/batch" className="info-chip">Uploads →</ScrollIntentLink>
+                <ScrollIntentLink href="/analysis" className="info-chip">Analysis →</ScrollIntentLink>
+                <ScrollIntentLink href="/history" className="info-chip">History →</ScrollIntentLink>
+                <ScrollIntentLink href="/account" className="info-chip">Account →</ScrollIntentLink>
+              </div>
+
+              {/* Section list for deeper drill-down */}
+              <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
+            </div>
 
             {/* ─── Desktop: clean flowing sections ─── */}
             <div className="tablet-up space-y-0">
 
               {/* Workflow */}
-              <section className="flow-section">
+              <section className="flow-section section-glow">
                 <p className="flow-section-label">Recommended workflow</p>
+                <div className="accent-bar" />
                 <div className="mt-4 grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
                   {workflowSteps.map((step, i) => (
                     <div key={step.title}>
@@ -274,7 +333,7 @@ export default function DashboardPage() {
               {/* Studio pages */}
               <section className="flow-section">
                 <div className="flex items-baseline justify-between gap-4">
-                  <p className="flow-section-label">Studio pages</p>
+                  <p className="flow-section-label"><span className="pulse-dot mr-2" />Studio pages</p>
                   <ScrollIntentLink href="/history" className="inline-tag">
                     Open history archive
                   </ScrollIntentLink>
@@ -351,8 +410,9 @@ export default function DashboardPage() {
               </section>
 
               {/* Features */}
-              <section className="flow-section">
+              <section className="flow-section section-glow">
                 <p className="flow-section-label">How features work</p>
+                <div className="accent-bar" />
                 <div className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-2 xl:grid-cols-3">
                   {featureMechanics.map((item) => (
                     <div key={item.title}>
@@ -367,10 +427,10 @@ export default function DashboardPage() {
               {/* Quick actions strip */}
               <section className="flow-section">
                 <div className="flex flex-wrap items-center gap-4">
-                  <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
+                  <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
                     {latest ? "Open latest run" : "Open uploads page"}
                   </ScrollIntentLink>
-                  <ScrollIntentLink href="/history" className="rounded-full border border-white/10 px-5 py-2.5 text-sm text-white/70">
+                  <ScrollIntentLink href="/history" className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70">
                     View saved history
                   </ScrollIntentLink>
                   <p className="text-sm text-white/40">
@@ -415,6 +475,7 @@ function DashboardMobileSections({
       accent: "#7ad6ff",
       content: (
         <div className="space-y-3">
+          <div className="mini-bar"><div className="mini-bar-fill" style={{ width: "100%", background: "linear-gradient(90deg, var(--accent-cool), var(--accent-warm))" }} /></div>
           {workflowSteps.map((step, i) => (
             <div key={step.title} className="border-b border-white/6 pb-3 last:border-0">
               <p className="flex items-baseline gap-2 text-sm font-semibold text-white">
@@ -455,7 +516,7 @@ function DashboardMobileSections({
       accent: "#8bf1a8",
       content: (
         <div>
-          <ScrollIntentLink href="/analysis" className="mb-3 block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+          <ScrollIntentLink href="/analysis" className="mb-3 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
             Open analysis workspace
           </ScrollIntentLink>
           {analysisTabCards.map((item) => (
@@ -474,7 +535,7 @@ function DashboardMobileSections({
       accent: "#ffd76d",
       content: (
         <div>
-          <ScrollIntentLink href="/history" className="mb-3 block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+          <ScrollIntentLink href="/history" className="mb-3 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
             Open history tools
           </ScrollIntentLink>
           {historyFeatureCards.map((item) => (
@@ -483,10 +544,15 @@ function DashboardMobileSections({
               <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
             </div>
           ))}
-          <div className="mt-3 flex gap-4 text-sm text-white/50">
-            <span>{analyses.length} saved run{analyses.length === 1 ? "" : "s"}</span>
-            <span>·</span>
-            <span>{totalExperiments} ML run{totalExperiments === 1 ? "" : "s"}</span>
+          <div className="mobile-inline-stats mt-3">
+            <div className="mobile-inline-stat">
+              <span className="mobile-inline-stat-value">{analyses.length}</span>
+              <span className="mobile-inline-stat-label">Saved runs</span>
+            </div>
+            <div className="mobile-inline-stat">
+              <span className="mobile-inline-stat-value">{totalExperiments}</span>
+              <span className="mobile-inline-stat-label">ML runs</span>
+            </div>
           </div>
         </div>
       ),
@@ -520,10 +586,10 @@ function DashboardMobileSections({
               ? `${latest.overview.dataset_name} is the most recent saved run. Open Uploads to review quick quality signals or open Analysis to continue through the full report.`
               : "No saved analysis yet. Open Uploads to upload the first CSV."}
           </p>
-          <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+          <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
             {latest ? "Open latest run" : "Open uploads page"}
           </ScrollIntentLink>
-          <ScrollIntentLink href="/history" className="block rounded-full border border-white/12 px-5 py-3 text-center text-sm text-white/82">
+          <ScrollIntentLink href="/history" className="block rounded-lg border border-white/12 px-5 py-3 text-center text-sm text-white/82">
             View saved history
           </ScrollIntentLink>
         </div>

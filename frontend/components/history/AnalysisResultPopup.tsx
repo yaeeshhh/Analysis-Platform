@@ -54,7 +54,7 @@ function SectionFrame({ id, title, children }: { id: string; title: string; chil
   return (
     <section id={`history-popup-${id}`} className="popup-section-target space-y-3">
       <div className="flex items-center gap-3">
-        <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white/46">
+        <span className="rounded-lg border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white/46">
           {title}
         </span>
       </div>
@@ -153,7 +153,7 @@ export default function AnalysisResultPopup({
                 <button
                   type="button"
                   onClick={onDownloadReport}
-                  className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+                  className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
                 >
                   Download report
                 </button>
@@ -161,7 +161,7 @@ export default function AnalysisResultPopup({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
+                className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
               >
                 Close run
               </button>

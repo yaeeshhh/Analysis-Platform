@@ -381,11 +381,11 @@ function AnalysisPageContent() {
                   {placeholderState.description}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
+                  <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
                     {placeholderState.primaryLabel}
                   </ScrollIntentLink>
                   {placeholderState.secondaryHref && placeholderState.secondaryLabel ? (
-                    <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-full border border-white/10 px-5 py-2.5 text-sm text-white/70">
+                    <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70">
                       {placeholderState.secondaryLabel}
                     </ScrollIntentLink>
                   ) : null}

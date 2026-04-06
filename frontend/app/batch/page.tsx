@@ -220,10 +220,10 @@ export default function BatchPage() {
         stats={stats}
         actions={
           <div className="flex flex-wrap gap-3">
-            <ScrollIntentLink href="/analysis" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+            <ScrollIntentLink href="/analysis" className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82">
               Open analysis workspace
             </ScrollIntentLink>
-            <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+            <ScrollIntentLink href="/history" className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82">
               Open history
             </ScrollIntentLink>
           </div>
@@ -249,10 +249,10 @@ export default function BatchPage() {
 
         {!loading ? (
           <section id="batch-primary-section" className="route-scroll-target space-y-4">
-            {/* ─── Phone: upload form + section list ─── */}
+            {/* ─── Phone: upload form + inline info + section list ─── */}
             <div className="phone-only space-y-3">
               <div className="flex flex-col gap-3">
-                <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/8 px-4 py-3 text-sm font-medium text-white transition">
+                <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/8 px-4 py-3 text-sm font-medium text-white transition">
                   <input
                     type="file"
                     accept=".csv,text/csv"
@@ -265,11 +265,54 @@ export default function BatchPage() {
                   type="button"
                   disabled={!selectedFile || uploadBusy}
                   onClick={() => { void handleUpload(); }}
-                  className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:opacity-60"
+                  className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:opacity-60"
                 >
                   {uploadBusy ? "Processing..." : "Process dataset"}
                 </button>
               </div>
+
+              {/* Inline stats strip */}
+              <div className="mobile-inline-stats">
+                <div className="mobile-inline-stat">
+                  <span className="mobile-inline-stat-value">{analyses.length}</span>
+                  <span className="mobile-inline-stat-label">Saved runs</span>
+                </div>
+                {selectedAnalysis ? (
+                  <>
+                    <div className="mobile-inline-stat">
+                      <span className="mobile-inline-stat-value">{selectedAnalysis.overview.row_count?.toLocaleString() ?? "—"}</span>
+                      <span className="mobile-inline-stat-label">Rows</span>
+                    </div>
+                    <div className="mobile-inline-stat">
+                      <span className="mobile-inline-stat-value">{selectedAnalysis.overview.column_count ?? "—"}</span>
+                      <span className="mobile-inline-stat-label">Columns</span>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+
+              {/* Current selection summary */}
+              {selectedAnalysis ? (
+                <div className="border-b border-white/6 pb-3">
+                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Active dataset</p>
+                  <p className="mt-1 font-medium text-white">{selectedAnalysis.overview.dataset_name}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className="info-chip">
+                      <span className="pulse-dot" />
+                      {selectedAnalysis.insights.modeling_readiness.is_ready ? "ML Ready" : "EDA only"}
+                    </span>
+                    {selectedAnalysis.overview.total_missing_values > 0 && (
+                      <span className="info-chip">{selectedAnalysis.overview.total_missing_values} missing</span>
+                    )}
+                    {selectedAnalysis.overview.duplicate_row_count > 0 && (
+                      <span className="info-chip">{selectedAnalysis.overview.duplicate_row_count} dups</span>
+                    )}
+                  </div>
+                  <ScrollIntentLink href={`/analysis?analysisId=${selectedAnalysis.id}`} className="mt-3 block rounded-lg bg-[#ffb079] px-4 py-2.5 text-center text-sm font-semibold text-[#11273b]">
+                    Open analysis
+                  </ScrollIntentLink>
+                </div>
+              ) : null}
 
               <BatchMobileSections
                 analyses={analyses}
@@ -299,12 +342,13 @@ export default function BatchPage() {
 
             <div className="tablet-up space-y-0">
               {/* Upload section */}
-              <section className="flow-section">
+              <section className="flow-section section-glow">
                 <p className="flow-section-label">Dataset upload</p>
+                <div className="accent-bar" />
                 <p className="mt-2 text-sm leading-6 text-white/55">Upload a CSV to create a saved analysis run. Missing values, duplicates, and structure are checked automatically.</p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10">
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10">
                     <input
                       type="file"
                       accept=".csv,text/csv"
@@ -317,7 +361,7 @@ export default function BatchPage() {
                     type="button"
                     disabled={!selectedFile || uploadBusy}
                     onClick={() => { void handleUpload(); }}
-                    className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {uploadBusy ? "Processing dataset..." : "Process dataset"}
                   </button>
@@ -325,7 +369,7 @@ export default function BatchPage() {
                     type="button"
                     disabled={!selectedAnalysis}
                     onClick={() => setConfirmAction("selected")}
-                    className="rounded-full border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba] transition hover:bg-[#2a1215] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba] transition hover:bg-[#2a1215] disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     Delete current
                   </button>
@@ -333,7 +377,7 @@ export default function BatchPage() {
                     type="button"
                     disabled={!selectedAnalysis}
                     onClick={handleClearCurrentSelection}
-                    className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     Clear selection
                   </button>
@@ -382,14 +426,14 @@ export default function BatchPage() {
                         href={`/analysis?analysisId=${selectedAnalysis.id}`}
                         targetId="analysis-workspace-navigation"
                         onClick={() => setCurrentAnalysisSelection(selectedAnalysis.id)}
-                        className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]"
+                        className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]"
                       >
                         Open analysis overview
                       </ScrollIntentLink>
                       <button
                         type="button"
                         onClick={() => { void downloadAnalysisReport(selectedAnalysis.id); }}
-                        className="rounded-full border border-white/10 px-5 py-2.5 text-sm text-white/70"
+                        className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70"
                       >
                         Download report
                       </button>
@@ -485,7 +529,7 @@ export default function BatchPage() {
               <button
                 type="button"
                 onClick={() => setConfirmAction(null)}
-                className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/82"
+                className="rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/82"
               >
                 Cancel
               </button>
@@ -495,7 +539,7 @@ export default function BatchPage() {
                   void handleConfirmClear();
                 }}
                 disabled={clearBusy}
-                className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {clearBusy ? "Deleting..." : "Delete current dataset"}
               </button>
@@ -579,14 +623,14 @@ function BatchMobileSections({
             href={`/analysis?analysisId=${selectedAnalysis.id}`}
             targetId="analysis-workspace-navigation"
             onClick={() => setSelection(selectedAnalysis.id)}
-            className="mt-4 block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]"
+            className="mt-4 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]"
           >
             Open analysis overview
           </ScrollIntentLink>
           <button
             type="button"
             onClick={() => setConfirmAction("selected")}
-            className="mt-2 w-full rounded-full border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
+            className="mt-2 w-full rounded-lg border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
           >
             Delete current dataset
           </button>
@@ -628,7 +672,7 @@ function BatchMobileSections({
             <button
               type="button"
               onClick={handleClearCurrentSelection}
-              className="w-full rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+              className="w-full rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
             >
               Clear current selection
             </button>

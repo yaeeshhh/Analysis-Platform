@@ -103,7 +103,7 @@ export default function ProfileMenu() {
 
   if (loading) {
     return (
-      <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70">
+      <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70">
         Profile
       </div>
     );
@@ -133,7 +133,7 @@ export default function ProfileMenu() {
 
           setMenuOpen((previous) => !previous);
         }}
-        className="max-w-[12rem] rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+        className="max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
       >
         <span className="block truncate">{user ? user.username || "Profile" : "Log in"}</span>
       </button>
@@ -152,7 +152,7 @@ export default function ProfileMenu() {
                 href="/account"
                 targetId="account-first-block"
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+                className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
               >
                 Account center
               </ScrollIntentLink>
@@ -160,7 +160,7 @@ export default function ProfileMenu() {
                 href="/batch"
                 targetId="batch-primary-section"
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+                className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
               >
                 Upload studio
               </ScrollIntentLink>
@@ -168,7 +168,7 @@ export default function ProfileMenu() {
                 href="/history"
                 targetId="history-first-block"
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+                className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
               >
                 History archive
               </ScrollIntentLink>
@@ -178,7 +178,7 @@ export default function ProfileMenu() {
               onClick={() => {
                 void handleLogout();
               }}
-              className="w-full rounded-full border border-[#5a2328] bg-[#2a1215] px-4 py-2.5 text-left text-sm font-medium text-[#ff8b94] transition hover:bg-[#34171b]"
+              className="w-full rounded-lg border border-[#5a2328] bg-[#2a1215] px-4 py-2.5 text-left text-sm font-medium text-[#ff8b94] transition hover:bg-[#34171b]"
             >
               Log out
             </button>

@@ -135,7 +135,7 @@ function DialogShell({
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="self-end rounded-full border border-white/10 bg-white/5 p-2 text-white/55 transition hover:bg-white/10 hover:text-white sm:self-auto"
+            className="self-end rounded-lg border border-white/10 bg-white/5 p-2 text-white/55 transition hover:bg-white/10 hover:text-white sm:self-auto"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6 6 18M6 6l12 12" />
@@ -166,7 +166,7 @@ function FooterActions({
       <button
         type="button"
         onClick={onClose}
-        className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-medium leading-5 text-white/82 transition hover:bg-white/10 md:w-auto"
+        className="w-full rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-medium leading-5 text-white/82 transition hover:bg-white/10 md:w-auto"
       >
         Cancel
       </button>
@@ -176,7 +176,7 @@ function FooterActions({
           void onConfirm();
         }}
         disabled={disabled}
-        className={`w-full rounded-full px-5 py-3 text-center text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-55 md:min-w-[12rem] md:w-auto ${
+        className={`w-full rounded-lg px-5 py-3 text-center text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-55 md:min-w-[12rem] md:w-auto ${
           destructive
             ? "border border-[#5a2328] bg-[#2a1215] text-[#ffb4ba] hover:bg-[#34171b]"
             : "bg-[#ffb079] text-[#11273b] hover:bg-[#ffc58f]"
@@ -871,9 +871,9 @@ function RememberLoginDialog({
               type="button"
               onClick={() => setDraftEnabled((current) => !current)}
               aria-pressed={draftEnabled}
-              className={`inline-flex h-6 w-11 shrink-0 items-center self-start rounded-full border transition sm:self-center ${draftEnabled ? "border-emerald-400/70 bg-emerald-500/30" : "border-white/20 bg-white/10"}`}
+              className={`inline-flex h-6 w-11 shrink-0 items-center self-start rounded-lg border transition sm:self-center ${draftEnabled ? "border-emerald-400/70 bg-emerald-500/30" : "border-white/20 bg-white/10"}`}
             >
-              <span className={`h-5 w-5 rounded-full bg-white transition ${draftEnabled ? "translate-x-5" : "translate-x-0.5"}`} />
+              <span className={`h-5 w-5 rounded-lg bg-white transition ${draftEnabled ? "translate-x-5" : "translate-x-0.5"}`} />
             </button>
           </div>
 
@@ -884,7 +884,7 @@ function RememberLoginDialog({
               type="button"
               onClick={() => setResetRequested(true)}
               disabled={!rememberStatus.available}
-              className="mt-3 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/82 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-45"
+              className="mt-3 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/82 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-45"
             >
               Reset to 30 days
             </button>

@@ -40,7 +40,7 @@ export default function PasswordChangedNoticeModal({ open, onContinue }: Props) 
           <button
             type="button"
             onClick={onContinue}
-            className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90"
+            className="inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90"
           >
             Continue
           </button>

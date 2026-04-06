@@ -244,6 +244,9 @@ body::after {
 
 .nav-surface {
   align-items: center;
+  background: linear-gradient(to bottom, rgba(9, 16, 24, 0.97), rgba(13, 20, 29, 0.94));
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  backdrop-filter: blur(14px) saturate(125%);
   border-bottom: 1px solid var(--line-soft);
   display: flex;
   flex-wrap: wrap;
@@ -267,47 +270,54 @@ body::after {
 
 .nav-link {
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 0.5rem;
   color: rgba(242, 247, 251, 0.62);
   display: flex;
   font-size: 0.82rem;
   font-weight: 600;
   justify-content: center;
   line-height: 1.15;
-  min-height: 3.1rem;
-  padding: 0.88rem 1rem;
+  min-height: 2.6rem;
+  padding: 0.6rem 1rem;
+  position: relative;
   text-align: center;
   width: 100%;
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
-    box-shadow 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
+    color 180ms ease;
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.08);
   color: var(--text-100);
-  transform: translateY(-1px);
 }
 
 .nav-link-active {
-  background: linear-gradient(135deg, rgba(127, 166, 195, 0.96), rgba(199, 168, 121, 0.88));
-  border-color: rgba(255, 255, 255, 0.24);
-  box-shadow: 0 10px 24px rgba(11, 18, 28, 0.18);
-  color: #0c1318;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-100);
+}
+
+.nav-link-active::after {
+  background: linear-gradient(90deg, var(--accent-cool), var(--accent-warm));
+  border-radius: 2px;
+  bottom: -0.75rem;
+  content: "";
+  height: 2px;
+  left: 20%;
+  position: absolute;
+  right: 20%;
 }
 
 .analysis-subnav-surface {
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 999px;
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0;
   display: inline-flex;
   min-width: 100%;
-  padding: 0.3rem;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 0.15rem 0;
+  background: transparent;
 }
 
 .analysis-subnav-track {
@@ -318,35 +328,29 @@ body::after {
 }
 
 .analysis-subnav-link {
-  border: 1px solid transparent;
-  border-radius: 999px;
-  color: rgba(242, 247, 251, 0.68);
-  font-size: 0.84rem;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: rgba(242, 247, 251, 0.58);
+  font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.15;
-  min-height: 2.85rem;
-  padding: 0.72rem 0.96rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
   white-space: nowrap;
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
-    box-shadow 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
+    color 180ms ease;
 }
 
 .analysis-subnav-link:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-100);
-  transform: translateY(-1px);
 }
 
 .analysis-subnav-link-active {
-  background: linear-gradient(135deg, rgba(127, 166, 195, 0.96), rgba(199, 168, 121, 0.88));
-  border-color: rgba(255, 255, 255, 0.24);
-  box-shadow: 0 10px 24px rgba(11, 18, 28, 0.18);
-  color: #0c1318;
+  border-bottom-color: var(--accent-cool);
+  color: var(--text-100);
 }
 
 .analysis-subnav-description {
@@ -722,7 +726,7 @@ a[class*="rounded"]:hover {
   width: 100%;
   background: rgba(13, 20, 29, 0.88);
   border: 1px solid var(--line-strong);
-  border-radius: 20px;
+  border-radius: 0.5rem;
   color: var(--text-100);
   font-size: max(16px, 0.9rem);
   padding: 0.75rem 2.5rem 0.75rem 1.1rem;
@@ -1137,11 +1141,167 @@ details.mobile-accordion > .mobile-accordion-body {
 /* Mini inline tag/pill for metadata */
 .inline-tag {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
+  border-radius: 0.5rem;
   color: var(--text-300);
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   padding: 0.25rem 0.65rem;
   white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════
+   DANGER GRADIENT LABEL
+   Red text with gradient masks fading to transparent.
+   ════════════════════════════════════════════════ */
+.danger-label {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.danger-label::before,
+.danger-label::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 140, 140, 0.35), transparent);
+  content: "";
+  flex-shrink: 0;
+  height: 1px;
+  width: 2.5rem;
+}
+
+/* ════════════════════════════════════════════════
+   VISUAL ACCENT ELEMENTS
+   Subtle decorative details for flow sections.
+   ════════════════════════════════════════════════ */
+.section-glow {
+  position: relative;
+}
+
+.section-glow::before {
+  background: radial-gradient(ellipse 60% 40% at 0% 0%, var(--glow-cool), transparent);
+  content: "";
+  height: 120px;
+  left: -2rem;
+  pointer-events: none;
+  position: absolute;
+  top: -1rem;
+  width: 180px;
+  z-index: -1;
+}
+
+.accent-bar {
+  background: linear-gradient(90deg, var(--accent-cool), var(--accent-warm));
+  border-radius: 2px;
+  height: 2px;
+  margin-top: 0.75rem;
+  width: 3rem;
+}
+
+/* Subtle shimmer keyframe for visual accents on mobile */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.pulse-dot {
+  animation: pulse-soft 3s ease-in-out infinite;
+  background: var(--accent-cool);
+  border-radius: 50%;
+  display: inline-block;
+  height: 6px;
+  width: 6px;
+}
+
+/* Mini progress bar visual */
+.mini-bar {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  height: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.mini-bar-fill {
+  border-radius: 3px;
+  height: 100%;
+  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Compact info chip for inline metadata */
+.info-chip {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.5rem;
+  color: var(--text-300);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 600;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+}
+
+/* ════════════════════════════════════════════════
+   MOBILE CONTENT ENRICHMENT
+   Inline stat strips, compact cards, popup triggers.
+   ════════════════════════════════════════════════ */
+@media (max-width: 599px) {
+  .mobile-inline-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+  }
+
+  .mobile-inline-stat {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.5rem;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 5rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .mobile-inline-stat-value {
+    color: var(--text-100);
+    font-family: var(--font-display), sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .mobile-inline-stat-label {
+    color: var(--text-300);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mobile-detail-row {
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+  }
+
+  .mobile-detail-row:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-detail-label {
+    color: var(--text-300);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .mobile-detail-value {
+    color: var(--text-100);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-align: right;
+  }
 }

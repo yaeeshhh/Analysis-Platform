@@ -40,7 +40,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
       <article className="border-b border-white/6 pb-4">
         <div className="flex flex-wrap items-center gap-2">
           {Object.entries(schema.type_counts || {}).map(([label, count]) => (
-            <span key={label} className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/68">
+            <span key={label} className="rounded-lg border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/68">
               {label}: {count}
             </span>
           ))}
@@ -51,14 +51,14 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
             <div key={group.title} className="border-b border-white/6 pb-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-medium text-white">{group.title}</p>
-                <span className="rounded-full px-3 py-1 text-[11px]" style={{ backgroundColor: `${group.tone}22`, color: group.tone }}>
+                <span className="rounded-lg px-3 py-1 text-[11px]" style={{ backgroundColor: `${group.tone}22`, color: group.tone }}>
                   {group.columns.length}
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-white/62">{group.detail}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {group.columns.slice(0, 6).map((column) => (
-                  <span key={`${group.title}-${column}`} className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1 text-xs text-white/75">
+                  <span key={`${group.title}-${column}`} className="rounded-lg border border-white/12 bg-white/[0.03] px-3 py-1 text-xs text-white/75">
                     {column}
                   </span>
                 ))}

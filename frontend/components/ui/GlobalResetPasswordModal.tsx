@@ -285,7 +285,7 @@ export default function GlobalResetPasswordModal() {
             type="button"
             onClick={closeModal}
             disabled={loading}
-            className="inline-flex rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+            className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
           >
             Cancel
           </button>
@@ -301,7 +301,7 @@ export default function GlobalResetPasswordModal() {
               !confirmPassword ||
               !passwordsMatch
             }
-            className="inline-flex rounded-full bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
+            className="inline-flex rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
           >
             {loading ? "Resetting..." : "Reset password"}
           </button>
