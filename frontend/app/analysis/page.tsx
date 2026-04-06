@@ -335,7 +335,7 @@ function AnalysisPageContent() {
             {showWorkspaceNavigation ? (
               <div id="analysis-workspace-navigation" className="route-scroll-target rounded-[28px] border border-white/10 bg-white/[0.04] p-3">
                 <p className="px-2 text-xs uppercase tracking-[0.2em] text-white/42">Report sections</p>
-                <div className="mt-3 overflow-x-auto overflow-y-visible pb-2 pt-1">
+                <div className="mt-3 scrollbar-hide overflow-x-auto overflow-y-visible pb-2 pt-1">
                   <div className="analysis-subnav-surface">
                     <div className="analysis-subnav-track">
                       {tabs.map((tab) => {

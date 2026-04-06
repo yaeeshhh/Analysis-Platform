@@ -600,4 +600,41 @@ a[class*="rounded"]:hover {
   .nav-surface {
     border-radius: 1.4rem;
   }
+
+  /* Prevent iOS Safari from zooming in on input focus */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em) !important;
+  }
+
+  /* Tighter padding on small phones */
+  .page-hero {
+    padding: 1.25rem;
+  }
+
+  .auth-panel {
+    padding: 1.25rem;
+  }
+
+  .auth-shell-copy {
+    padding: 1.5rem;
+  }
+}
+
+/* Show stat cards in 2 columns on phones before the 3-col layout kicks in at 1200px */
+@media (min-width: 480px) and (max-width: 1199px) {
+  .page-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Utility: hide scrollbars while keeping scrollability */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
