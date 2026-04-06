@@ -70,7 +70,8 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
         </div>
       </article>
 
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      {/* Tablet+: full column detail table */}
+      <article className="tablet-up rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
         <div className="mt-1 overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
             <thead>
@@ -104,6 +105,24 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
           </table>
         </div>
       </article>
+
+      {/* Phone: compact column cards (replaces the wide table) */}
+      <div className="phone-only space-y-2">
+        {schema.columns.map((column) => (
+          <div key={column.name} className="mobile-col-card">
+            <div className="mobile-col-card-header">
+              <span className="mobile-col-card-name">{column.name}</span>
+              <span className="mobile-col-card-type">{column.inferred_type}</span>
+            </div>
+            <p className="mobile-col-card-meta">
+              {column.likely_role} · {(column.missing_pct * 100).toFixed(1)}% missing · {(column.unique_pct * 100).toFixed(1)}% unique
+            </p>
+            {column.sample_values.length > 0 ? (
+              <p className="mobile-col-card-samples">{column.sample_values.slice(0, 3).join(", ")}</p>
+            ) : null}
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

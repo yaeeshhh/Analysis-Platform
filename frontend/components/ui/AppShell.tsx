@@ -36,8 +36,8 @@ export default function AppShell({
       <MobileHeader />
 
       <section className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 mobile-shell-body">
-        {/* Desktop hero — hidden on mobile to reduce scroll */}
-        <div className={`page-hero hidden md:block ${stats.length > 0 ? "md:page-hero-with-stats" : ""}`}>
+        {/* Desktop hero — hidden on phone, visible on tablet+ */}
+        <div className={`page-hero tablet-up ${stats.length > 0 ? "page-hero-with-stats" : ""}`}>
           <div className="page-hero-copy">
             <span className="hero-pill">{eyebrow}</span>
             <TitleTag className="page-title">{title}</TitleTag>
@@ -58,14 +58,14 @@ export default function AppShell({
           ) : null}
         </div>
 
-        {/* Mobile compact page label */}
-        <div className="mobile-page-label md:hidden">
+        {/* Phone-only compact page label */}
+        <div className="mobile-page-label phone-only">
           <span className="hero-pill">{eyebrow}</span>
           {actions ? <div className="page-actions mt-3">{actions}</div> : null}
         </div>
 
-        {/* Desktop sticky nav — hidden on mobile (bottom nav is used instead) */}
-        <div className="hidden md:block">
+        {/* Desktop sticky nav — tablet+ only (phone uses bottom tab bar) */}
+        <div className="tablet-up">
           <Suspense fallback={<div className="mb-8 h-16 rounded-[28px] border border-white/8 bg-white/[0.03]" />}>
             <TopNav />
           </Suspense>
