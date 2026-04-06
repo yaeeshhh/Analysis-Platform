@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
@@ -15,10 +15,22 @@ const displayFont = Space_Grotesk({
   variable: "--font-display",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#091018",
+};
+
 export const metadata: Metadata = {
   title: "Analysis Studio",
   description:
     "Analyze uploaded CSV files with automatic schema inference, quality checks, descriptive statistics, visualisations, and optional machine learning.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Analysis Studio",
+  },
 };
 
 export default function RootLayout({
