@@ -839,7 +839,12 @@ details.mobile-accordion > .mobile-accordion-body {
   }
 
   details.mobile-accordion > .mobile-accordion-body {
-    display: block;
+    display: block !important; /* pre-Chrome 120 / Firefox / Safari */
+  }
+
+  /* Chrome 120+ moved details hiding into a ::details-content pseudo-element */
+  details.mobile-accordion::details-content {
+    display: block !important;
   }
 }
 
