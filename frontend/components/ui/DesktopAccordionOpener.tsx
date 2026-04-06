@@ -2,47 +2,49 @@
 
 import { useEffect } from "react";
 
-/** Programmatically adds `open` to all .mobile-accordion <details> on desktop.
- *  CSS overrides for ::details-content are unreliable in Chrome 120+ when
- *  content-visibility is also applied. Setting the attribute directly is
- *  the only cross-browser-safe way to guarantee content stays visible. */
+/** Ensures all .mobile-accordion <details> elements have `open` on desktop.
+ *  Uses a MutationObserver so elements added after the initial render
+ *  (async data, client-side navigation, Suspense boundaries) are also handled. */
 export default function DesktopAccordionOpener() {
   useEffect(() => {
     const BREAKPOINT = 600;
+    const isDesktop = () => window.innerWidth >= BREAKPOINT;
 
-    const update = () => {
-      const isDesktop = window.innerWidth >= BREAKPOINT;
+    const openAll = () => {
+      if (!isDesktop()) return;
       document.querySelectorAll<HTMLDetailsElement>("details.mobile-accordion").forEach((el) => {
-        if (isDesktop) {
-          el.open = true;
-        } else if (!el.dataset.userOpened) {
-          el.open = false;
-        }
+        el.open = true;
       });
     };
 
-    // Track user-initiated opens on mobile so resize doesn't stomp them
-    const handleToggle = (event: Event) => {
-      const el = event.target as HTMLDetailsElement;
-      if (window.innerWidth < BREAKPOINT) {
-        if (el.open) {
-          el.dataset.userOpened = "1";
-        } else {
-          delete el.dataset.userOpened;
+    // Open everything currently in the DOM
+    openAll();
+
+    // Watch for new details elements added after initial render
+    const observer = new MutationObserver((mutations) => {
+      if (!isDesktop()) return;
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (node instanceof HTMLDetailsElement && node.classList.contains("mobile-accordion")) {
+            node.open = true;
+          } else if (node instanceof Element) {
+            node.querySelectorAll<HTMLDetailsElement>("details.mobile-accordion").forEach((el) => {
+              el.open = true;
+            });
+          }
         }
       }
-    };
+    });
 
-    document.addEventListener("toggle", handleToggle, { capture: true });
+    observer.observe(document.body, { childList: true, subtree: true });
 
-    update();
-
+    // Handle viewport resize crossing the breakpoint
     const mq = window.matchMedia(`(min-width: ${BREAKPOINT}px)`);
-    mq.addEventListener("change", update);
+    mq.addEventListener("change", openAll);
 
     return () => {
-      mq.removeEventListener("change", update);
-      document.removeEventListener("toggle", handleToggle, { capture: true });
+      observer.disconnect();
+      mq.removeEventListener("change", openAll);
     };
   }, []);
 
