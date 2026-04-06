@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg-link
+venv/
+.venv/
+.venv*/
+env/
+.env/
+pip-wheel-metadata/
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.local
+.env.production
+.env.*.local
+backend/.env
+frontend/.env*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Node.js
+node_modules/
+.npm
+.yarn-integrity
+
+# Next.js
+.next/
+frontend/.next/
+frontend/out/
+frontend/.vercel
+
+# Uploads (user-uploaded files, ephemeral)
+uploads/*
+!uploads/.gitkeep
+
+# Outputs / generated data
+outputs/
+data/processed/
+
+# Test scripts (dev-only)
+test_*.py
+diagnostic.py
+check_models.py
+
+# Misc root artifacts
+analysis_platform
+analysis_platform.db
+churn_platform
+churn_platform.db
+src/__pycache__/
+.vscode/
+
+# Logs
+*.log
+logs/
