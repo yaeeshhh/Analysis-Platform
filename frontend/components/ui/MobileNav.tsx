@@ -67,7 +67,7 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mobile-bottom-nav md:hidden">
+    <nav className="mobile-bottom-nav phone-only">
       {navItems.map((item) => {
         const active =
           pathname === item.match || pathname.startsWith(`${item.match}/`);
