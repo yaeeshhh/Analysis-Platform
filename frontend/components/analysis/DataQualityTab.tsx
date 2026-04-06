@@ -19,14 +19,14 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
     <section className="space-y-4">
       <div className="dq-summary-grid grid gap-4 md:grid-cols-4">
         {cards.map((card) => (
-          <article key={card.label} className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
+          <article key={card.label} className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.2em] text-white/45">{card.label}</p>
             <p className="mt-2 font-[family:var(--font-display)] text-3xl text-white">{card.value}</p>
           </article>
         ))}
       </div>
 
-      <article className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 text-sm leading-6 text-white/68">
+      <article className="border-b border-white/6 pb-3 text-sm leading-6 text-white/68">
         Quality score is a weighted estimate of overall dataset health. It drops for severe missingness, duplicate rows,
         constant or near-constant fields, parsing issues, strong correlations, and widespread outlier-heavy columns.
         Higher scores indicate cleaner data.
@@ -73,7 +73,7 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
           <div className="mobile-accordion-body">
             <ul className="mt-4 space-y-3 text-sm leading-6 text-white/76">
               {quality.recommendations.map((item) => (
-                <li key={item} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3">
+                <li key={item} className="border-b border-white/6 pb-3">
                   {item}
                 </li>
               ))}

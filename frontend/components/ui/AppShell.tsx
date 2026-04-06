@@ -38,13 +38,13 @@ export default function AppShell({
       <section className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 mobile-shell-body">
         {/* Desktop sticky nav — tablet+ only */}
         <div className="tablet-up">
-          <Suspense fallback={<div className="mb-6 h-16 rounded-[28px] border border-white/8 bg-white/[0.03]" />}>
+          <Suspense fallback={<div className="mb-6 h-16 border-b border-white/6" />}>
             <TopNav />
           </Suspense>
         </div>
 
         {/* Desktop hero — hidden on phone, visible on tablet+ */}
-        <div className={`page-hero tablet-up mb-6 ${stats.length > 0 ? "page-hero-with-stats" : ""}`}>
+        <div className={`page-hero tablet-up mb-6`}>
           <div className="page-hero-copy">
             <span className="hero-pill">{eyebrow}</span>
             <TitleTag className="page-title">{title}</TitleTag>
@@ -53,12 +53,11 @@ export default function AppShell({
           </div>
 
           {stats.length > 0 ? (
-            <div className="page-stat-grid">
+            <div className="stat-row mt-4">
               {stats.map((stat) => (
-                <div key={`${stat.label}-${stat.value}`} className="page-stat-card">
-                  <p className="page-stat-label">{stat.label}</p>
-                  <p className="page-stat-value">{stat.value}</p>
-                  {stat.hint ? <p className="page-stat-hint">{stat.hint}</p> : null}
+                <div key={`${stat.label}-${stat.value}`} className="stat-row-item">
+                  <p className="stat-row-value">{stat.value}</p>
+                  <p className="stat-row-label">{stat.label}</p>
                 </div>
               ))}
             </div>

@@ -170,29 +170,29 @@ export default function AnalysisResultPopup({
 
           {report ? (
             <div className="mt-4 grid gap-3 md:grid-cols-4 xl:grid-cols-6">
-              <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/42">Saved</p>
                 <p className="mt-2 text-sm font-medium text-white">{savedAt ? formatDate(savedAt) : "Saved run"}</p>
               </div>
-              <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/42">Rows</p>
                 <p className="mt-2 text-sm font-medium text-white">{report.overview.row_count.toLocaleString()}</p>
               </div>
-              <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/42">Columns</p>
                 <p className="mt-2 text-sm font-medium text-white">{report.overview.column_count.toLocaleString()}</p>
               </div>
-              <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/42">Quality score</p>
                 <p className="mt-2 text-sm font-medium text-white">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
               </div>
-              <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/42">Readiness</p>
                 <p className="mt-2 text-sm font-medium text-white">
                   {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                 </p>
               </div>
-              <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/42">ML runs</p>
                 <p className="mt-2 text-sm font-medium text-white">{report.ml_experiments.length}</p>
               </div>
@@ -223,25 +223,25 @@ export default function AnalysisResultPopup({
 
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
           {loading ? (
-            <div className="rounded-[28px] border border-white/10 bg-white/[0.04] px-5 py-10 text-center text-sm text-white/55">
+            <div className="py-10 text-center text-sm text-white/55">
               Loading saved run details...
             </div>
           ) : null}
 
           {!loading && error ? (
-            <div className="rounded-[24px] border border-[#ff8c8c]/30 bg-[#ff8c8c]/10 px-5 py-4 text-sm text-[#ffe1e1]">
+            <div className="border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffe1e1]">
               {error}
             </div>
           ) : null}
 
           {!loading && !error && !report ? (
-            <div className="rounded-[28px] border border-dashed border-white/12 px-5 py-10 text-center text-sm text-white/48">
+            <div className="py-10 text-center text-sm text-white/48">
               Pick a saved run from History to open the popup.
             </div>
           ) : null}
 
           {!loading && !error && report && !ready ? (
-            <div className="rounded-[28px] border border-[#ffb079]/25 bg-[#ffb079]/10 px-5 py-6 text-sm text-[#ffe7d7]">
+            <div className="border-l-2 border-[#ffb079]/40 pl-4 text-sm text-[#ffe7d7]">
               <p className="font-semibold text-white">This saved run is missing part of the report.</p>
               <p className="mt-2 leading-6 text-white/72">
                 The history popup loaded the record, but the full section stack is not available for this run. Download the saved report to view the readable text summary.

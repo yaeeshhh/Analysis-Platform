@@ -28,7 +28,7 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
             {correlations.map((item) => (
-              <div key={`${item.x}-${item.y}`} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+              <div key={`${item.x}-${item.y}`} className="border-b border-white/6 pb-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-medium text-white">{item.x} ↔ {item.y}</p>
                   <span className="text-xs text-white/50">corr {item.value.toFixed(3)}</span>
@@ -42,7 +42,7 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
               </div>
             ))}
             {correlations.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+              <div className="py-5 text-sm text-white/48">
                 Not enough numeric fields are available to surface strong correlation signals.
               </div>
             ) : null}
@@ -61,7 +61,7 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
           <div className="mobile-accordion-body">
             <div className="mt-4 space-y-3">
               {skewedFields.map((item) => (
-                <div key={item.column} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3">
+                <div key={item.column} className="border-b border-white/6 pb-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium text-white">{item.column}</p>
                     <span className="text-xs text-white/50">skew {item.skew.toFixed(2)}</span>
@@ -86,7 +86,7 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
           <div className="mobile-accordion-body">
             <div className="mt-4 space-y-3">
               {dominantCategories.map((item) => (
-                <div key={item.column} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3">
+                <div key={item.column} className="border-b border-white/6 pb-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium text-white">{item.column}</p>
                     <span className="text-xs text-white/50">{item.unique_count} unique</span>

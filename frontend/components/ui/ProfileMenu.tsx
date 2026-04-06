@@ -139,7 +139,7 @@ export default function ProfileMenu() {
       </button>
 
       {menuOpen && user ? (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[280px] rounded-[22px] border border-white/10 bg-[#111821]/96 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)]">
+        <div className="absolute right-0 top-full z-50 mt-2 w-[280px] rounded-xl border border-white/10 bg-[#111821]/96 p-4">
           <div className="space-y-4">
             <div className="rounded-[18px] border border-white/10 bg-black/10 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-white/42">Signed in</p>

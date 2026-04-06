@@ -320,13 +320,13 @@ function AnalysisPageContent() {
         stats={stats}
       >
         {error ? (
-          <div className="rounded-[24px] border border-[#ff8c8c]/30 bg-[#ff8c8c]/10 px-5 py-4 text-sm text-[#ffe1e1]">
+          <div className="border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffe1e1]">
             {error}
           </div>
         ) : null}
 
         {loading ? (
-          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] px-5 py-10 text-center text-sm text-white/55">
+          <div className="py-10 text-center text-sm text-white/55">
             Loading analysis workspace...
           </div>
         ) : null}
@@ -339,8 +339,8 @@ function AnalysisPageContent() {
             ) : null}
 
             {showWorkspaceNavigation ? (
-              <div id="analysis-workspace-navigation" className="tablet-up route-scroll-target rounded-[28px] border border-white/10 bg-white/[0.04] p-3">
-                <p className="px-2 text-xs uppercase tracking-[0.2em] text-white/42">Report sections</p>
+              <div id="analysis-workspace-navigation" className="tablet-up route-scroll-target border-b border-white/6 pb-4">
+                <p className="px-1 text-xs uppercase tracking-[0.2em] text-white/42">Report sections</p>
 
                 {/* Tablet+: horizontal scroll tab bar */}
                 <div className="mt-3 scrollbar-hide overflow-x-auto overflow-y-visible pb-2 pt-1">
@@ -367,25 +367,25 @@ function AnalysisPageContent() {
                   </div>
                 </div>
 
-                <p className="analysis-subnav-description px-2 pt-3 text-sm leading-6 text-white/58">{activeTabDescription}</p>
+                <p className="analysis-subnav-description px-1 pt-3 text-sm leading-6 text-white/50">{activeTabDescription}</p>
               </div>
             ) : null}
 
             {placeholderState ? (
-              <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">{placeholderState.eyebrow}</p>
-                <h2 className="mt-2 font-[family:var(--font-display)] text-2xl text-white">
+              <article className="flow-section">
+                <p className="flow-section-label">{placeholderState.eyebrow}</p>
+                <p className="mt-2 font-[family:var(--font-display)] text-xl font-bold text-white">
                   {placeholderState.title}
-                </h2>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-white/66">
+                </p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
                   {placeholderState.description}
                 </p>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]">
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
                     {placeholderState.primaryLabel}
                   </ScrollIntentLink>
                   {placeholderState.secondaryHref && placeholderState.secondaryLabel ? (
-                    <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+                    <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-full border border-white/10 px-5 py-2.5 text-sm text-white/70">
                       {placeholderState.secondaryLabel}
                     </ScrollIntentLink>
                   ) : null}
@@ -473,11 +473,10 @@ function AnalysisPageContent() {
         ) : null}
 
         {!loading && report && !hasRenderableReport ? (
-          <div className="rounded-[28px] border border-[#ffb079]/25 bg-[#ffb079]/10 px-5 py-6 text-sm text-[#ffe7d7]">
+          <div className="border-l-2 border-[#ffb079]/40 pl-4 text-sm text-white/60">
             <p className="font-semibold text-white">This saved analysis is incomplete.</p>
-            <p className="mt-2 leading-6 text-white/72">
-              The record loaded successfully, but it does not include the full report structure required by the
-              current analysis workspace. Re-stage the dataset from Uploads or inspect the archived copy from History.
+            <p className="mt-1 leading-6">
+              The record loaded, but the full report structure is not ready. Re-stage the dataset from Uploads or inspect the archived copy from History.
             </p>
           </div>
         ) : null}

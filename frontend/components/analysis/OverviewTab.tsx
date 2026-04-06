@@ -41,7 +41,7 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             {headlineFindings.length > 0 ? (
               <div className="mt-4 space-y-3">
                 {headlineFindings.map((finding) => (
-                  <div key={finding} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm leading-6 text-white/72">
+                  <div key={finding} className="border-b border-white/6 pb-3 text-sm leading-6 text-white/72">
                     {finding}
                   </div>
                 ))}
@@ -60,7 +60,7 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
           <div className="mobile-accordion-body">
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {posture.map((item) => (
-                <div key={item.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+                <div key={item.title} className="border-b border-white/6 pb-3">
                   <p className="text-sm font-medium text-white">{item.title}</p>
                   <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                 </div>
@@ -72,7 +72,7 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
 
       <div className="grid gap-4 md:grid-cols-4">
         {stats.map((stat) => (
-          <article key={stat.label} className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
+          <article key={stat.label} className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.2em] text-white/45">{stat.label}</p>
             <p className="mt-2 font-[family:var(--font-display)] text-3xl text-white">{stat.value}</p>
           </article>
@@ -113,19 +113,19 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
           </summary>
           <div className="mobile-accordion-body">
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">Overview and Insights</p>
               <p className="mt-2 text-sm leading-6 text-white/62">Start here to understand the dataset in plain language before moving into technical detail.</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">Schema and Quality</p>
               <p className="mt-2 text-sm leading-6 text-white/62">Use these tabs to validate types, roles, missingness, and cleanup work before trusting conclusions.</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">Statistics and Relationships</p>
               <p className="mt-2 text-sm leading-6 text-white/62">Move here when you want detailed summaries, patterns, and stronger structural signals.</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">ML Lab</p>
               <p className="mt-2 text-sm leading-6 text-white/62">Use ML last, after the data looks clean enough and the target or exploration goal is clear.</p>
             </div>

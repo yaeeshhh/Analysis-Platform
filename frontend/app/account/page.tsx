@@ -198,7 +198,7 @@ export default function AccountPage() {
         }
       >
         {loading ? (
-          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] px-5 py-10 text-center text-sm text-white/55">
+          <div className="py-10 text-center text-sm text-white/55">
             Loading account tools...
           </div>
         ) : null}
@@ -208,88 +208,66 @@ export default function AccountPage() {
             {/* ─── Phone: tappable section list ─── */}
             <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
 
-            {/* ─── Desktop: existing card layout ─── */}
-            <section id="account-first-block" className="route-scroll-target">
-              <details className="mobile-accordion tablet-up">
-                <summary>
-                  <div className="min-w-0">
-                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Account snapshot</span>
-                    <p className="mobile-accordion-hint">Username, email, member since, and remembered login status</p>
+            {/* ─── Desktop: flowing sections ─── */}
+            <section id="account-first-block" className="tablet-up route-scroll-target space-y-0">
+              <section className="flow-section">
+                <p className="flow-section-label">Account snapshot</p>
+                <div className="stat-row mt-3">
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{user.username || "Not set"}</p>
+                    <p className="stat-row-label">Username</p>
                   </div>
-                </summary>
-                <div className="mobile-accordion-body">
-                <div className="mt-5 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/42">Username</p>
-                    <p className="mt-3 text-lg font-medium text-white">{user.username || "Not set"}</p>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value break-all">{user.email}</p>
+                    <p className="stat-row-label">Email</p>
                   </div>
-                  <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/42">Email</p>
-                    <p className="mt-3 break-all text-lg font-medium text-white">{user.email}</p>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{formatDate(user.created_at)}</p>
+                    <p className="stat-row-label">Member since</p>
                   </div>
-                  <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/42">Member since</p>
-                    <p className="mt-3 text-lg font-medium text-white">{formatDate(user.created_at)}</p>
-                  </div>
-                  <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/42">Remembered login</p>
-                    <p className="mt-3 text-lg font-medium text-white">
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">
                       {rememberStatus.available
                         ? rememberStatus.enabled
-                          ? `Enabled for ${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"}`
-                          : "Available but disabled"
-                        : "Not configured"}
+                          ? `${rememberStatus.daysRemaining}d`
+                          : "Off"
+                        : "N/A"}
                     </p>
-                  </div>
+                    <p className="stat-row-label">Remembered login</p>
                   </div>
                 </div>
-              </details>
-            </section>
+              </section>
 
-            <section className="space-y-4">
               {toolGroups.map((group) => (
-                <details
-                  key={group.title}
-                  className="mobile-accordion tablet-up"
-                >
-                  <summary>
-                    <div className="min-w-0">
-                      <span className="text-xs uppercase tracking-[0.24em]" style={{ color: group.accent }}>{group.title}</span>
-                      <p className="mobile-accordion-hint">{group.description}</p>
-                    </div>
-                  </summary>
-                  <div className="mobile-accordion-body">
-                  <div className="mt-5 grid gap-3">
+                <section key={group.title} className="flow-section">
+                  <p className="flow-section-label" style={{ color: group.accent }}>{group.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-white/50">{group.description}</p>
+                  <div className="mt-3">
                     {group.items.map((item) => (
                       <button
                         key={item.key}
                         type="button"
-                        onClick={() => {
-                          setActiveDialog(item.key);
-                        }}
-                        className={`w-full rounded-[20px] border p-4 text-left transition ${item.destructive ? "border-[#5a2328] bg-[#2a1215] hover:bg-[#34171b]" : "border-white/10 bg-black/10 hover:bg-white/[0.06]"}`}
+                        onClick={() => { setActiveDialog(item.key); }}
+                        className={`list-row w-full text-left ${item.destructive ? "hover:bg-[#2a1215]/50" : ""}`}
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <p className={`font-medium ${item.destructive ? "text-[#ffb4ba]" : "text-white"}`}>{item.title}</p>
-                            <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-                          </div>
-                          <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.14em] ${item.destructive ? "border-[#8a3941] text-[#ffb4ba]" : "border-white/12 text-white/52"}`}>
-                            {item.destructive ? "Danger" : "Open"}
-                          </span>
+                        <div className="list-row-content">
+                          <p className={`list-row-title ${item.destructive ? "text-[#ffb4ba]" : ""}`}>{item.title}</p>
+                          <p className="list-row-hint">{item.detail}</p>
                         </div>
+                        <span className={`shrink-0 text-xs ${item.destructive ? "text-[#ffb4ba]/60" : "text-white/30"}`}>
+                          {item.destructive ? "Danger" : "›"}
+                        </span>
                       </button>
                     ))}
                   </div>
-                </div>
-                </details>
+                </section>
               ))}
             </section>
           </>
         ) : null}
 
         {!loading && !user ? (
-          <div className="rounded-[28px] border border-dashed border-white/12 px-5 py-10 text-center text-sm text-white/52">
+          <div className="py-10 text-center text-sm text-white/45">
             Sign in to manage profile details, remembered login, and saved analysis data.
           </div>
         ) : null}
@@ -342,7 +320,7 @@ function AccountMobileSections({
       hint: user.email,
       accent: "#7ad6ff",
       content: (
-        <div className="space-y-3">
+        <div className="space-y-0">
           {[
             { label: "Username", value: user.username || "Not set" },
             { label: "Email", value: user.email },
@@ -356,9 +334,9 @@ function AccountMobileSections({
                 : "Not configured",
             },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <div key={stat.label} className="border-b border-white/6 py-3 last:border-0">
               <p className="text-[0.65rem] uppercase tracking-wider text-white/42">{stat.label}</p>
-              <p className="mt-2 text-base font-medium text-white">{stat.value}</p>
+              <p className="mt-1 text-base font-medium text-white">{stat.value}</p>
             </div>
           ))}
         </div>
@@ -376,15 +354,15 @@ function AccountMobileSections({
               key={item.key}
               type="button"
               onClick={() => setActiveDialog(item.key)}
-              className={`w-full rounded-2xl border p-4 text-left ${item.destructive ? "border-[#5a2328] bg-[#2a1215]" : "border-white/10 bg-white/[0.04]"}`}
+              className={`w-full border-b border-white/6 py-3 text-left last:border-0 ${item.destructive ? "" : ""}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className={`font-medium ${item.destructive ? "text-[#ffb4ba]" : "text-white"}`}>{item.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
+                  <p className="mt-1 text-sm leading-6 text-white/50">{item.detail}</p>
                 </div>
-                <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.14em] ${item.destructive ? "border-[#8a3941] text-[#ffb4ba]" : "border-white/12 text-white/52"}`}>
-                  {item.destructive ? "Danger" : "Open"}
+                <span className={`shrink-0 text-xs ${item.destructive ? "text-[#ffb4ba]/60" : "text-white/30"}`}>
+                  {item.destructive ? "Danger" : "›"}
                 </span>
               </div>
             </button>

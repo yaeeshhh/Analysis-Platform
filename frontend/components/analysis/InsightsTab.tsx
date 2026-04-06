@@ -18,7 +18,7 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
           <p className="mt-3 text-base leading-7 text-white/82">{insights.summary}</p>
           <div className="mt-5 space-y-3">
             {insights.findings.map((finding) => (
-              <div key={finding} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm leading-6 text-white/74">
+              <div key={finding} className="border-b border-white/6 pb-3 text-sm leading-6 text-white/74">
                 {finding}
               </div>
             ))}
@@ -36,12 +36,12 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
             {insights.recommended_next_steps.map((item) => (
-              <div key={item} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm leading-6 text-white/74">
+              <div key={item} className="border-b border-white/6 pb-3 text-sm leading-6 text-white/74">
                 {item}
               </div>
             ))}
           </div>
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/10 p-4">
+          <div className="mt-5 border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.2em] text-white/45">Modeling readiness</p>
             <p className="mt-2 text-lg font-semibold text-white">
               {insights.modeling_readiness.is_ready ? "Ready for optional ML" : "EDA-first recommended"}

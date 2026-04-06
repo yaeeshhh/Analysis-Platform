@@ -789,7 +789,7 @@ export default function LoginRequiredModal({
       onClick={dismissModal}
     >
       <div
-        className="w-full max-w-md rounded-[24px] border border-white/10 bg-[#15151a] p-6 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+        className="w-full max-w-md rounded-xl border border-white/10 bg-[#15151a] p-6 text-white"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-2xl font-semibold tracking-tight text-white">{title}</h2>

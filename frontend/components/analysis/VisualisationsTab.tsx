@@ -186,7 +186,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/12 text-sm text-white/48">
+            <div className="flex h-full items-center justify-center border border-dashed border-white/8 text-sm text-white/48">
               No numeric data available for histogram output.
             </div>
           )}
@@ -230,7 +230,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/12 text-sm text-white/48">
+            <div className="flex h-full items-center justify-center border border-dashed border-white/8 text-sm text-white/48">
               No categorical data available for category distribution output.
             </div>
           )}
@@ -253,7 +253,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         />
         <div className="mt-4 space-y-3">
           {boxplots.map((item) => (
-            <div key={item.column} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div key={item.column} className="border-b border-white/6 pb-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-medium text-white">{item.column}</p>
                 <span className="text-xs text-white/50">{item.outlier_count} outliers</span>
@@ -320,7 +320,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+            <div className="py-5 text-sm text-white/48">
               Not enough numeric columns are available for a correlation heatmap.
             </div>
           )}
@@ -343,7 +343,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         />
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {pairwiseScatter.map((plot) => (
-            <div key={`${plot.x}-${plot.y}`} className="min-w-0 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div key={`${plot.x}-${plot.y}`} className="min-w-0 border-b border-white/6 pb-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-medium text-white">{plot.x} vs {plot.y}</p>
                 <span className="text-xs text-white/50">corr {plot.correlation.toFixed(3)}</span>
@@ -374,7 +374,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           ))}
           {pairwiseScatter.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/12 px-4 py-6 text-sm text-white/48 lg:col-span-2">
+            <div className="py-6 text-sm text-white/48 lg:col-span-2">
               Not enough correlated numeric pairs were available to build scatter plots.
             </div>
           ) : null}
@@ -397,7 +397,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         />
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           {driftChecks.map((item) => (
-            <div key={`${item.kind}-${item.column}`} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div key={`${item.kind}-${item.column}`} className="border-b border-white/6 pb-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-medium text-white">{item.column}</p>
                 <span className="text-xs text-white/50">change {item.change_score.toFixed(2)}</span>
@@ -414,7 +414,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           ))}
           {driftChecks.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/12 px-4 py-6 text-sm text-white/48 lg:col-span-2">
+            <div className="py-6 text-sm text-white/48 lg:col-span-2">
               There was not enough data to compare early and late slices of the dataset for drift.
             </div>
           ) : null}
