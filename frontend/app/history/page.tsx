@@ -249,19 +249,19 @@ export default function HistoryPage() {
         stats={stats}
       >
         {error ? (
-          <div className="rounded-[24px] border border-[#ff8c8c]/30 bg-[#ff8c8c]/10 px-5 py-4 text-sm text-[#ffe1e1]">
+          <div className="border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffe1e1]">
             {error}
           </div>
         ) : null}
 
         {notice ? (
-          <div className="rounded-[24px] border border-[#224c37] bg-[#13241c] px-5 py-4 text-sm text-[#a5f5c7]">
+          <div className="border-l-2 border-[#5ae681]/30 pl-4 text-sm text-[#a5f5c7]">
             {notice}
           </div>
         ) : null}
 
         {loading ? (
-          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] px-5 py-10 text-center text-sm text-white/55">
+          <div className="py-10 text-center text-sm text-white/55">
             Loading history...
           </div>
         ) : null}
@@ -282,25 +282,15 @@ export default function HistoryPage() {
               onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
             />
 
-            <details id="history-first-block" className="mobile-accordion tablet-up route-scroll-target">
-              <summary>
-                <div className="min-w-0">
-                  <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archive search</span>
-                  <p className="mobile-accordion-hint">Search and filter saved runs by name, readiness, or ML status</p>
-                </div>
-              </summary>
-              <div className="mobile-accordion-body">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <p className="max-w-3xl text-sm leading-6 text-white/64">
-                  Find an older run by dataset name or summary, then narrow the list by modeling readiness or whether ML experiments were saved with it.
-                </p>
-                <div className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/55">
-                  {filteredAnalyses.length} of {analyses.length} run{analyses.length === 1 ? "" : "s"} shown
-                </div>
+            <section id="history-first-block" className="flow-section tablet-up route-scroll-target">
+              <div className="flex items-baseline justify-between gap-4">
+                <p className="flow-section-label">Archive search</p>
+                <span className="text-xs text-white/40">{filteredAnalyses.length} of {analyses.length} run{analyses.length === 1 ? "" : "s"}</span>
               </div>
+              <p className="mt-2 text-sm leading-6 text-white/55">Find a run by dataset name or summary, then narrow by readiness or ML status.</p>
 
-              <div className="mt-5 grid gap-3 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.75fr)_minmax(0,0.75fr)]">
-                <label className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.75fr)_minmax(0,0.75fr)]">
+                <label className="block">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">Search runs</p>
                   <input
                     type="text"
@@ -311,7 +301,7 @@ export default function HistoryPage() {
                   />
                 </label>
 
-                <label className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                <label className="block">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">Readiness</p>
                   <select
                     value={readinessFilter}
@@ -324,7 +314,7 @@ export default function HistoryPage() {
                   </select>
                 </label>
 
-                <label className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                <label className="block">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">ML history</p>
                   <select
                     value={mlFilter}
@@ -337,136 +327,104 @@ export default function HistoryPage() {
                   </select>
                 </label>
               </div>
-            </div>
-            </details>
+            </section>
 
             {filteredAnalyses.map((analysis) => (
-              <details key={analysis.id} className="mobile-accordion tablet-up">
-                <summary>
-                  <div className="min-w-0">
-                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Run #{analysis.id} — {analysis.overview.dataset_name}</span>
-                    <p className="mobile-accordion-hint">Summary, dates, and actions for this saved analysis run</p>
-                  </div>
-                </summary>
-                <div className="mobile-accordion-body">
-                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="mt-2 break-words font-[family:var(--font-display)] text-2xl text-white">
-                        {analysis.overview.dataset_name}
-                      </h2>
-                      <p className="mt-1 text-sm text-white/44">Saved {formatDate(analysis.saved_at)}</p>
-                      <p className="mt-3 max-w-4xl text-sm leading-6 text-white/68">{analysis.insights.summary}</p>
-                    </div>
-
-                    <div className="grid w-full gap-2 sm:grid-cols-2 xl:w-[520px] xl:grid-cols-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void handleOpenAnalysisPopup(analysis);
-                      }}
-                      className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
-                    >
-                      Open saved run
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void downloadAnalysisReport(analysis.id);
-                      }}
-                      className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
-                    >
-                      Download report
-                    </button>
-                    {analysis.latest_experiment ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void downloadMlExperimentReport(analysis.id, analysis.latest_experiment!);
-                        }}
-                        className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
-                      >
-                        Download latest ML report
-                      </button>
-                    ) : (
-                      <div className="rounded-full border border-dashed border-white/12 px-5 py-3 text-center text-sm text-white/40">
-                        No ML report saved
-                      </div>
-                    )}
-                    {analysis.latest_experiment ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void downloadMlExperimentSummary(analysis.id, analysis.latest_experiment!);
-                        }}
-                        className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
-                      >
-                        Download latest ML summary
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTargetId(analysis.id)}
-                        className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba]"
-                      >
-                        Delete saved run
-                      </button>
-                    )}
-                    {analysis.latest_experiment ? (
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTargetId(analysis.id)}
-                        className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba] sm:col-span-2"
-                      >
-                        Delete saved run
-                      </button>
-                    ) : null}
-                    </div>
-                  </div>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/72">
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/42">Rows</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{analysis.overview.row_count.toLocaleString()}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/72">
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/42">Columns</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{analysis.overview.column_count}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/72">
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/42">Status</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{analysis.status}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/72">
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/42">Readiness</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">
-                      {analysis.insights.modeling_readiness.is_ready ? "ML" : "EDA"}
+              <section key={analysis.id} className="flow-section tablet-up">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="flow-section-label">Run #{analysis.id}</p>
+                    <p className="mt-1 font-[family:var(--font-display)] text-xl font-bold text-white">
+                      {analysis.overview.dataset_name}
                     </p>
+                    <p className="mt-1 text-xs text-white/40">Saved {formatDate(analysis.saved_at)}</p>
+                    <p className="mt-2 max-w-4xl text-sm leading-6 text-white/55">{analysis.insights.summary}</p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/72">
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/42">ML experiments</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{analysis.experiment_count}</p>
+
+                  <div className="flex flex-wrap gap-2 xl:w-auto xl:shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => { void handleOpenAnalysisPopup(analysis); }}
+                      className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]"
+                    >
+                      Open
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { void downloadAnalysisReport(analysis.id); }}
+                      className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                    >
+                      Report
+                    </button>
+                    {analysis.latest_experiment ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => { void downloadMlExperimentReport(analysis.id, analysis.latest_experiment!); }}
+                          className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                        >
+                          ML report
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { void downloadMlExperimentSummary(analysis.id, analysis.latest_experiment!); }}
+                          className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                        >
+                          ML summary
+                        </button>
+                      </>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setDeleteTargetId(analysis.id)}
+                      className="rounded-full border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
+                    >
+                      Delete
+                    </button>
                   </div>
+                </div>
+
+                <div className="stat-row mt-3">
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{analysis.overview.row_count.toLocaleString()}</p>
+                    <p className="stat-row-label">Rows</p>
                   </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{analysis.overview.column_count}</p>
+                    <p className="stat-row-label">Columns</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{analysis.status}</p>
+                    <p className="stat-row-label">Status</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{analysis.insights.modeling_readiness.is_ready ? "ML" : "EDA"}</p>
+                    <p className="stat-row-label">Readiness</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{analysis.experiment_count}</p>
+                    <p className="stat-row-label">ML experiments</p>
+                  </div>
+                </div>
 
                 {analysis.latest_experiment ? (
-                  <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/68">
-                    <p className="text-xs uppercase tracking-[0.16em] text-white/42">Latest ML run</p>
-                    <p className="mt-2">{analysis.latest_experiment.summary}</p>
-                  </div>
+                  <p className="mt-2 text-sm text-white/50">
+                    <span className="text-xs uppercase tracking-wider text-white/35">Latest ML:</span>{" "}
+                    {analysis.latest_experiment.summary}
+                  </p>
                 ) : null}
-                </div>
-              </details>
+              </section>
             ))}
 
             {analyses.length === 0 ? (
-              <div className="rounded-[28px] border border-dashed border-white/12 px-5 py-10 text-center text-sm text-white/48">
-                No analysis history yet. The page stays empty until the first dataset is uploaded from Uploads, then saved runs and ML downloads appear here.
+              <div className="py-10 text-center text-sm text-white/40">
+                No analysis history yet. Upload a dataset from the Uploads page to get started.
               </div>
             ) : null}
 
             {analyses.length > 0 && filteredAnalyses.length === 0 ? (
-              <div className="rounded-[28px] border border-dashed border-white/12 px-5 py-10 text-center text-sm text-white/48">
-                No saved runs matched the current search and filters. Adjust the query, readiness, or ML filter to widen the list.
+              <div className="py-10 text-center text-sm text-white/40">
+                No saved runs match the current filters. Adjust the search, readiness, or ML filter.
               </div>
             ) : null}
           </section>
@@ -516,7 +474,7 @@ export default function HistoryPage() {
       {deleteTargetId ? (
         <div className="fixed inset-0 z-[130] flex items-center justify-center bg-[#04090d]/75 p-4 backdrop-blur-md" onMouseDown={() => setDeleteTargetId(null)}>
           <div
-            className="w-full max-w-lg rounded-[28px] border border-[#5a2328] bg-[#111821]/95 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.45)]"
+            className="w-full max-w-lg rounded-xl border border-[#5a2328]/60 bg-[#111821]/95 p-6"
             onMouseDown={(event) => event.stopPropagation()}
           >
             <p className="text-xs uppercase tracking-[0.24em] text-[#ffb4ba]">Delete run</p>
@@ -595,11 +553,11 @@ function HistoryMobileSections({
     accent: "#7ad6ff",
     content: (
       <div className="space-y-4">
-        <p className="text-sm leading-6 text-white/64">
-          Find an older run by dataset name or summary, then narrow the list by readiness or ML status.
+        <p className="text-sm leading-6 text-white/55">
+          Find an older run by dataset name or summary, then narrow by readiness or ML status.
         </p>
 
-        <label className="block rounded-2xl border border-white/10 bg-black/10 p-4">
+        <label className="block">
           <p className="text-xs uppercase tracking-[0.14em] text-white/42">Search runs</p>
           <input
             type="text"
@@ -610,7 +568,7 @@ function HistoryMobileSections({
           />
         </label>
 
-        <label className="block rounded-2xl border border-white/10 bg-black/10 p-4">
+        <label className="block">
           <p className="text-xs uppercase tracking-[0.14em] text-white/42">Readiness</p>
           <select
             value={readinessFilter}
@@ -623,7 +581,7 @@ function HistoryMobileSections({
           </select>
         </label>
 
-        <label className="block rounded-2xl border border-white/10 bg-black/10 p-4">
+        <label className="block">
           <p className="text-xs uppercase tracking-[0.14em] text-white/42">ML history</p>
           <select
             value={mlFilter}
@@ -645,34 +603,34 @@ function HistoryMobileSections({
     hint: `${formatDate(a.saved_at)} · ${a.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"} · ${a.experiment_count} ML`,
     accent: a.insights.modeling_readiness.is_ready ? "#5ae681" : "#ffb079",
     content: (
-      <div className="space-y-4">
-        <p className="text-sm text-white/44">Saved {formatDate(a.saved_at)}</p>
-        <p className="text-sm leading-6 text-white/68">{a.insights.summary}</p>
+      <div className="space-y-3">
+        <p className="text-sm text-white/40">Saved {formatDate(a.saved_at)}</p>
+        <p className="text-sm leading-6 text-white/55">{a.insights.summary}</p>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
-            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Rows</p>
-            <p className="mt-1 text-lg font-semibold text-white">{a.overview.row_count.toLocaleString()}</p>
+        <div className="stat-row">
+          <div className="stat-row-item">
+            <p className="stat-row-value">{a.overview.row_count.toLocaleString()}</p>
+            <p className="stat-row-label">Rows</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
-            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Columns</p>
-            <p className="mt-1 text-lg font-semibold text-white">{a.overview.column_count}</p>
+          <div className="stat-row-item">
+            <p className="stat-row-value">{a.overview.column_count}</p>
+            <p className="stat-row-label">Columns</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
-            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Status</p>
-            <p className="mt-1 text-lg font-semibold text-white">{a.status}</p>
+          <div className="stat-row-item">
+            <p className="stat-row-value">{a.status}</p>
+            <p className="stat-row-label">Status</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
-            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">ML runs</p>
-            <p className="mt-1 text-lg font-semibold text-white">{a.experiment_count}</p>
+          <div className="stat-row-item">
+            <p className="stat-row-value">{a.experiment_count}</p>
+            <p className="stat-row-label">ML runs</p>
           </div>
         </div>
 
         {a.latest_experiment ? (
-          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-sm text-white/68">
-            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Latest ML run</p>
-            <p className="mt-1">{a.latest_experiment.summary}</p>
-          </div>
+          <p className="text-sm text-white/50">
+            <span className="text-xs uppercase tracking-wider text-white/35">Latest ML:</span>{" "}
+            {a.latest_experiment.summary}
+          </p>
         ) : null}
 
         <div className="flex flex-col gap-2 pt-1">
@@ -686,14 +644,14 @@ function HistoryMobileSections({
           <button
             type="button"
             onClick={() => onDownloadReport(a.id)}
-            className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+            className="rounded-full border border-white/10 px-5 py-3 text-sm text-white/70"
           >
             Download report
           </button>
           <button
             type="button"
             onClick={() => onDeleteRun(a.id)}
-            className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba]"
+            className="rounded-full border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
           >
             Delete saved run
           </button>
@@ -704,7 +662,7 @@ function HistoryMobileSections({
 
   if (analyses.length === 0) {
     return (
-      <div className="phone-only rounded-2xl border border-dashed border-white/12 px-4 py-8 text-center text-sm text-white/48">
+      <div className="phone-only py-8 text-center text-sm text-white/40">
         No analysis history yet.
       </div>
     );

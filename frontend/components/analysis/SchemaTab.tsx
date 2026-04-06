@@ -37,7 +37,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
 
   return (
     <section className="space-y-4">
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <article className="border-b border-white/6 pb-4">
         <div className="flex flex-wrap items-center gap-2">
           {Object.entries(schema.type_counts || {}).map(([label, count]) => (
             <span key={label} className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/68">
@@ -48,7 +48,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
 
         <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
           {groups.map((group) => (
-            <div key={group.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div key={group.title} className="border-b border-white/6 pb-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-medium text-white">{group.title}</p>
                 <span className="rounded-full px-3 py-1 text-[11px]" style={{ backgroundColor: `${group.tone}22`, color: group.tone }}>
@@ -71,7 +71,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
       </article>
 
       {/* Tablet+: full column detail table */}
-      <article className="tablet-up rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <article className="tablet-up border-b border-white/6 pb-4">
         <div className="mt-1 overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
             <thead>

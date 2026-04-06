@@ -446,7 +446,7 @@ export default function MLTab({
     }
 
     return (
-      <div className="mt-4 rounded-[20px] border border-[#ff8c8c]/30 bg-[#ff8c8c]/10 px-4 py-3 text-sm text-[#ffd8d8]">
+      <div className="mt-4 border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffd8d8]">
         {message}
       </div>
     );
@@ -591,7 +591,7 @@ export default function MLTab({
     const selectedId = mode === "supervised" ? currentSupervisedExperiment?.id : currentUnsupervisedExperiment?.id;
 
     return (
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <article className="border-b border-white/6 pb-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">
@@ -618,7 +618,7 @@ export default function MLTab({
         </div>
 
         {items.length === 0 ? (
-          <div className="mt-4 rounded-[22px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+          <div className="mt-4 py-5 text-sm text-white/48">
             No saved {mode} runs yet.
           </div>
         ) : (
@@ -634,7 +634,7 @@ export default function MLTab({
                     onClick={() => {
                       void handleOpenExperiment(experiment, "saved");
                     }}
-                    className={`snap-start rounded-[22px] border p-4 text-left transition ${
+                    className={`snap-start border-b border-white/6 p-4 text-left transition ${
                       selected
                         ? "border-[#7ad6ff]/55 bg-[#7ad6ff]/10"
                         : "border-white/10 bg-black/10 hover:bg-white/[0.06]"
@@ -670,7 +670,7 @@ export default function MLTab({
     const selectedId = mode === "supervised" ? currentSupervisedExperiment?.id : currentUnsupervisedExperiment?.id;
 
     return (
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <article className="border-b border-white/6 pb-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">
@@ -696,7 +696,7 @@ export default function MLTab({
               const selected = experiment.id === selectedId;
 
               return (
-                <div key={`${mode}-${experiment.id}`} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                <div key={`${mode}-${experiment.id}`} className="border-b border-white/6 pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-medium capitalize text-white">{experiment.type} run</p>
@@ -755,7 +755,7 @@ export default function MLTab({
             })}
           </div>
         ) : (
-          <div className="mt-4 rounded-[22px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+          <div className="mt-4 py-5 text-sm text-white/48">
             Run this lab once to save report and summary downloads here.
           </div>
         )}
@@ -777,25 +777,25 @@ export default function MLTab({
         </summary>
         <div className="mobile-accordion-body">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+          <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#7ad6ff]">ML Lab</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
               This lab runs only on the dataset you uploaded for this report.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+          <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#ffb079]">Unsupervised mode</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
               Use clustering and anomaly detection when you want patterns without picking a target column.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+          <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#8bf1a8]">Supervised mode</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
               Pick a target column and compare baseline models.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+          <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#d7b7ff]">Runtime guardrails</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
               Sampling and rare-category compression help wide datasets stay responsive.
@@ -806,7 +806,7 @@ export default function MLTab({
       </details>
 
       {busy ? (
-        <div className="rounded-[24px] border border-[#7ad6ff]/25 bg-[#7ad6ff]/10 px-5 py-4 text-sm text-[#dff7ff]">
+        <div className="border-l-2 border-[#7ad6ff]/30 pl-4 text-sm text-[#dff7ff]">
           <p className="font-medium text-white">
             {busy === "supervised" ? "Running supervised benchmark" : "Running unsupervised analysis"}
           </p>
@@ -814,7 +814,7 @@ export default function MLTab({
         </div>
       ) : null}
 
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <article className="border-b border-white/6 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Experiment mode</p>
@@ -863,7 +863,7 @@ export default function MLTab({
               <div className="mt-4 overflow-x-auto pb-2">
                 <div className={sliderTrackClassName}>
                   {methodGuideCards.map((item) => (
-                    <div key={item.name} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                    <div key={item.name} className="border-b border-white/6 pb-3">
                       <p className="font-medium text-white">{item.name}</p>
                       <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                     </div>
@@ -874,7 +874,7 @@ export default function MLTab({
           </details>
 
           <div className="space-y-4">
-            <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start border-b border-white/6 pb-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-[#ffcfaa]">Target recommendations</p>
@@ -897,7 +897,7 @@ export default function MLTab({
                       type="button"
                       key={recommendation.column}
                       onClick={() => setTargetColumn(recommendation.column)}
-                      className={`rounded-[22px] border p-4 text-left transition ${
+                      className={`border-b border-white/6 pb-3 text-left transition ${
                         targetColumn === recommendation.column
                           ? "border-[#ffb079]/45 bg-[#ffb079]/10"
                           : "border-white/10 bg-black/10 hover:bg-white/[0.06]"
@@ -916,14 +916,14 @@ export default function MLTab({
                     </button>
                   ))}
                   {visibleTargetRecommendations.length === 0 ? (
-                    <div className="rounded-[22px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+                    <div className="py-5 text-sm text-white/48">
                       No strong target recommendations were inferred for this dataset.
                     </div>
                   ) : null}
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[22px] border border-white/10 bg-black/10 p-4 text-sm text-white/70">
+              <div className="mt-5 border-b border-white/6 pb-3 text-sm text-white/70">
                 <p className="font-medium text-white">Selected target guidance</p>
                 <p className="mt-2 text-[#ffcfaa]">
                   {activeRecommendation?.verdict || "Pick a target column to see its fit."}
@@ -935,7 +935,7 @@ export default function MLTab({
               </div>
             </article>
 
-            <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Supervised benchmark</p>
               <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">
                 Choose a target and start a fresh benchmark
@@ -946,7 +946,7 @@ export default function MLTab({
                 <select
                   value={targetColumn}
                   onChange={(event) => setTargetColumn(event.target.value)}
-                  className="w-full rounded-2xl border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+                  className="w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
                 >
                   <option value="" className="bg-[#08131e] text-white">
                     Select target column
@@ -958,7 +958,7 @@ export default function MLTab({
                   ))}
                 </select>
 
-                <div className="rounded-[22px] border border-white/10 bg-black/10 p-4 text-sm text-white/70">
+                <div className="border-b border-white/6 pb-3 text-sm text-white/70">
                   <p className="font-medium text-white">Current selection</p>
                   <p className="mt-2 text-white">{targetColumn || "No target selected yet."}</p>
                   <p className="mt-2 leading-6 text-white/60">
@@ -970,7 +970,7 @@ export default function MLTab({
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                <div className="border-b border-white/6 pb-3">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">Run setup</p>
                   <p className="mt-2 text-sm leading-6 text-white/60">
                     Launch a new supervised benchmark from the selected target, while the pinned downloads stay attached to the currently opened saved run.
@@ -1075,7 +1075,7 @@ export default function MLTab({
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {supervisedFailureFactors.map((item) => (
-                  <div key={item.title} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                  <div key={item.title} className="border-b border-white/6 pb-3">
                     <p className="font-medium text-white">{item.title}</p>
                     <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                   </div>
@@ -1088,28 +1088,28 @@ export default function MLTab({
             id={SUPERVISED_RESULTS_TARGET_ID}
             className="route-scroll-target grid items-start gap-4 lg:grid-cols-2"
           >
-            <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Benchmark summary</p>
               <p className="mt-3 text-sm leading-6 text-white/62">{supervisedNarratives.summary}</p>
               {supervised ? (
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                  <div className="border-b border-white/6 pb-3">
                     <p className="text-xs uppercase tracking-[0.14em] text-white/42">Best model</p>
                     <p className="mt-2 text-lg font-medium text-white">{supervised.best_model}</p>
                   </div>
-                  <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                  <div className="border-b border-white/6 pb-3">
                     <p className="text-xs uppercase tracking-[0.14em] text-white/42">Rows used</p>
                     <p className="mt-2 text-lg font-medium text-white">
                       {supervised.diagnostics.rows_used.toLocaleString()}
                     </p>
                   </div>
-                  <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                  <div className="border-b border-white/6 pb-3">
                     <p className="text-xs uppercase tracking-[0.14em] text-white/42">Feature mix</p>
                     <p className="mt-2 text-lg font-medium text-white">
                       {supervised.diagnostics.numeric_features} numeric • {supervised.diagnostics.categorical_features} categorical
                     </p>
                   </div>
-                  <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                  <div className="border-b border-white/6 pb-3">
                     <p className="text-xs uppercase tracking-[0.14em] text-white/42">Target cardinality</p>
                     <p className="mt-2 text-lg font-medium text-white">
                       {supervised.diagnostics.target_cardinality}
@@ -1117,7 +1117,7 @@ export default function MLTab({
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 rounded-[20px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+                <div className="mt-4 py-5 text-sm text-white/48">
                   Run or open a saved supervised benchmark to populate this summary.
                 </div>
               )}
@@ -1137,12 +1137,12 @@ export default function MLTab({
               ) : null}
             </article>
 
-            <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Prediction review</p>
               <p className="mt-3 text-sm leading-6 text-white/62">{supervisedNarratives.predictions}</p>
               <div className="mt-4 space-y-3">
                 {supervised?.predictions_preview?.slice(0, 5).map((item, index) => (
-                  <div key={index} className="rounded-[20px] border border-white/10 bg-black/10 p-4 text-sm text-white/72">
+                  <div key={index} className="border-b border-white/6 pb-3 text-sm text-white/72">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium text-white">Sample {index + 1}</p>
                       <span className="text-xs text-white/50">
@@ -1152,7 +1152,7 @@ export default function MLTab({
                   </div>
                 ))}
                 {!supervised?.predictions_preview?.length ? (
-                  <div className="rounded-[20px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+                  <div className="py-5 text-sm text-white/48">
                     Held-out prediction samples appear here after a supervised benchmark completes.
                   </div>
                 ) : null}
@@ -1161,7 +1161,7 @@ export default function MLTab({
           </div>
 
           <div className="grid items-start gap-4 lg:grid-cols-2">
-            <article className="min-w-0 self-start overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start overflow-hidden border-b border-white/6 pb-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Model score scale</p>
                 {metricChart.metricKey ? (
@@ -1172,7 +1172,7 @@ export default function MLTab({
               </div>
               <p className="mt-3 text-sm leading-6 text-white/62">{supervisedNarratives.comparison}</p>
               {metricChart.data.length ? (
-                <div className="mt-4 rounded-[20px] border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/68">
+                <div className="mt-4 border-b border-white/6 pb-3 text-sm text-white/68">
                   Scale: 100% marks the strongest model for {metricChart.metricLabel}. Raw values range from {formatDisplayNumber(metricChart.rawMinimum, 4)} to {formatDisplayNumber(metricChart.rawMaximum, 4)}.
                 </div>
               ) : null}
@@ -1202,18 +1202,18 @@ export default function MLTab({
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/12 text-sm text-white/48">
+                  <div className="flex h-full items-center justify-center border border-dashed border-white/8 text-sm text-white/48">
                     Run or open a supervised benchmark to compare normalized model scores.
                   </div>
                 )}
               </div>
             </article>
 
-            <article className="min-w-0 self-start overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start overflow-hidden border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Feature importance scale</p>
               <p className="mt-3 text-sm leading-6 text-white/62">{supervisedNarratives.featureChart}</p>
               {featureChartData.length ? (
-                <div className="mt-4 rounded-[20px] border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/68">
+                <div className="mt-4 border-b border-white/6 pb-3 text-sm text-white/68">
                   Scale: 100% marks the strongest feature in the selected run. Raw importances range from {formatDisplayNumber(Math.min(...featureChartData.map((item) => item.raw)), 4)} to {formatDisplayNumber(featureMaximum, 4)}.
                 </div>
               ) : null}
@@ -1243,7 +1243,7 @@ export default function MLTab({
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/12 text-sm text-white/48">
+                  <div className="flex h-full items-center justify-center border border-dashed border-white/8 text-sm text-white/48">
                     Run or open a supervised benchmark to see normalized feature importance.
                   </div>
                 )}
@@ -1251,7 +1251,7 @@ export default function MLTab({
             </article>
           </div>
 
-          <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Model comparison</p>
             <p className="mt-3 text-sm leading-6 text-white/62">
               Model cards stay in one horizontal block so wide metric sets slide instead of stretching the page.
@@ -1262,7 +1262,7 @@ export default function MLTab({
                   {supervised.model_comparison.map((result) => {
                     const metrics = Object.entries(result.metrics).slice(0, 4);
                     return (
-                      <div key={result.model} className="w-[280px] rounded-[22px] border border-white/10 bg-black/10 p-4">
+                      <div key={result.model} className="w-[280px] border-b border-white/6 pb-3">
                         <div className="flex items-center justify-between gap-3">
                           <p className="font-medium text-white">{result.model}</p>
                           <span className="text-[11px] uppercase tracking-[0.14em] text-white/42">
@@ -1285,18 +1285,18 @@ export default function MLTab({
                 </div>
               </div>
             ) : (
-              <div className="mt-4 rounded-[20px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+              <div className="mt-4 py-5 text-sm text-white/48">
                 Open a supervised result to compare model scores here.
               </div>
             )}
           </article>
 
           {supervised?.target_feature_slices?.length ? (
-            <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Target vs feature slices</p>
               <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">
                 {supervised.target_feature_slices.map((slice) => (
-                  <div key={slice.feature} className="min-w-0 rounded-2xl border border-white/10 bg-black/10 p-4">
+                  <div key={slice.feature} className="min-w-0 border-b border-white/6 pb-3">
                     <p className="font-medium text-white">{slice.feature}</p>
                     <p className="mt-1 text-sm text-white/58">{slice.summary}</p>
                     <div className="mt-3 space-y-2">
@@ -1325,7 +1325,7 @@ export default function MLTab({
         </>
       ) : (
         <>
-          <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Unsupervised guide</p>
               <span className="text-xs text-white/50">Slide to review the method cards</span>
@@ -1333,7 +1333,7 @@ export default function MLTab({
             <div className="mt-4 overflow-x-auto pb-2">
               <div className={sliderTrackClassName}>
                 {unsupervisedGuide.map((item) => (
-                  <div key={item.name} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                  <div key={item.name} className="border-b border-white/6 pb-3">
                     <p className="font-medium text-white">{item.name}</p>
                     <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                   </div>
@@ -1342,7 +1342,7 @@ export default function MLTab({
             </div>
           </article>
 
-          <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Clustering and anomaly scan</p>
             <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">
               Configure and run a clustering scan
@@ -1350,13 +1350,13 @@ export default function MLTab({
             <p className="mt-2 text-sm leading-6 text-white/65">{capabilities.unsupervised.reason}</p>
 
             <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px] lg:items-stretch">
-              <div className="flex h-full min-h-[124px] flex-col rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <div className="flex h-full min-h-[124px] flex-col border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.14em] text-white/42">Cluster count</p>
                 <p className="mt-2 text-sm leading-6 text-white/60">
                   Start with three broad segments, then raise the count only when you need a finer split of the numeric patterns.
                 </p>
               </div>
-              <label className="flex h-full min-h-[124px] flex-col rounded-[22px] border border-white/10 bg-black/10 p-4">
+              <label className="flex h-full min-h-[124px] flex-col border-b border-white/6 pb-3">
                 <p className="text-xs uppercase tracking-[0.14em] text-white/42">Segments</p>
                 <input
                   type="number"
@@ -1471,11 +1471,11 @@ export default function MLTab({
             id={UNSUPERVISED_RESULTS_TARGET_ID}
             className="route-scroll-target grid items-start gap-4 lg:grid-cols-2"
           >
-            <article className="min-w-0 self-start overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start overflow-hidden border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Cluster distribution</p>
               <p className="mt-3 text-sm leading-6 text-white/62">{unsupervisedNarratives.clusterChart}</p>
               {clusterChartData.length ? (
-                <div className="mt-4 rounded-[20px] border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/68">
+                <div className="mt-4 border-b border-white/6 pb-3 text-sm text-white/68">
                   Scale: bars show each cluster as a share of scanned rows. Raw cluster counts range from {formatDisplayNumber(Math.min(...clusterChartData.map((item) => item.count)))} to {formatDisplayNumber(Math.max(...clusterChartData.map((item) => item.count)))}.
                 </div>
               ) : null}
@@ -1499,18 +1499,18 @@ export default function MLTab({
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/12 text-sm text-white/48">
+                  <div className="flex h-full items-center justify-center border border-dashed border-white/8 text-sm text-white/48">
                     Run or open an unsupervised scan to see normalized segment distribution.
                   </div>
                 )}
               </div>
             </article>
 
-            <article className="min-w-0 self-start overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+            <article className="min-w-0 self-start overflow-hidden border-b border-white/6 pb-4">
               <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Anomaly severity scale</p>
               <p className="mt-3 text-sm leading-6 text-white/62">{unsupervisedNarratives.anomalies}</p>
               {anomalyChartData.length ? (
-                <div className="mt-4 rounded-[20px] border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/68">
+                <div className="mt-4 border-b border-white/6 pb-3 text-sm text-white/68">
                   Scale: 100% marks the strongest anomaly in the visible preview. Raw anomaly scores range from {formatDisplayNumber(anomalyMinimum, 4)} to {formatDisplayNumber(anomalyMaximum, 4)}.
                 </div>
               ) : null}
@@ -1540,7 +1540,7 @@ export default function MLTab({
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/12 text-sm text-white/48">
+                  <div className="flex h-full items-center justify-center border border-dashed border-white/8 text-sm text-white/48">
                     Run or open an unsupervised scan to compare anomaly severity.
                   </div>
                 )}
@@ -1548,24 +1548,24 @@ export default function MLTab({
             </article>
           </div>
 
-          <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Scan summary</p>
             <p className="mt-3 text-sm leading-6 text-white/62">{unsupervisedNarratives.summary}</p>
             {unsupervised ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                <div className="border-b border-white/6 pb-3">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">Clusters</p>
                   <p className="mt-2 text-lg font-medium text-white">{unsupervised.cluster_count}</p>
                 </div>
-                <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                <div className="border-b border-white/6 pb-3">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">Anomalies</p>
                   <p className="mt-2 text-lg font-medium text-white">{unsupervised.anomaly_count}</p>
                 </div>
-                <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                <div className="border-b border-white/6 pb-3">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">Numeric fields used</p>
                   <p className="mt-2 text-lg font-medium text-white">{unsupervised.used_numeric_columns.length}</p>
                 </div>
-                <div className="rounded-[20px] border border-white/10 bg-black/10 p-4">
+                <div className="border-b border-white/6 pb-3">
                   <p className="text-xs uppercase tracking-[0.14em] text-white/42">PCA variance</p>
                   <p className="mt-2 text-lg font-medium text-white">
                     {unsupervised.pca_explained_variance.map((value) => `${(value * 100).toFixed(1)}%`).join(" • ")}
@@ -1573,23 +1573,23 @@ export default function MLTab({
                 </div>
               </div>
             ) : (
-              <div className="mt-4 rounded-[20px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48">
+              <div className="mt-4 py-5 text-sm text-white/48">
                 Run or open a saved unsupervised scan to populate this summary.
               </div>
             )}
 
             {busiestCluster ? (
-              <div className="mt-4 rounded-[20px] border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/68">
+              <div className="mt-4 border-b border-white/6 pb-3 text-sm text-white/68">
                 Largest segment: <span className="font-medium text-white">{formatClusterLabel(busiestCluster.cluster)}</span> with {busiestCluster.count.toLocaleString()} rows.
               </div>
             ) : null}
           </article>
 
-          <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Top anomaly candidates</p>
             <div className="mt-4 grid items-start gap-3 xl:grid-cols-3">
               {anomalies.map((item) => (
-                <div key={item.row} className="rounded-[20px] border border-white/10 bg-black/10 p-4 text-sm text-white/72">
+                <div key={item.row} className="border-b border-white/6 pb-3 text-sm text-white/72">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium text-white">Row {item.row}</p>
                     <span className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-white/50">
@@ -1602,7 +1602,7 @@ export default function MLTab({
                 </div>
               ))}
               {!anomalies.length ? (
-                <div className="rounded-[20px] border border-dashed border-white/12 px-4 py-5 text-sm text-white/48 xl:col-span-3">
+                <div className="py-5 text-sm text-white/48 xl:col-span-3">
                   The strongest anomaly candidates will appear here after a scan completes.
                 </div>
               ) : null}
@@ -1625,7 +1625,7 @@ export default function MLTab({
           }}
         >
           <div
-            className="w-full max-w-lg rounded-[28px] border border-[#5a2328] bg-[#111821]/95 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.45)]"
+            className="w-full max-w-lg rounded-xl border border-[#5a2328]/60 bg-[#111821]/95 p-6"
             onMouseDown={(event) => event.stopPropagation()}
           >
             <p className="text-xs uppercase tracking-[0.24em] text-[#ffb4ba]">Delete ML run</p>
@@ -1637,7 +1637,7 @@ export default function MLTab({
             </p>
 
             {deleteDialogError ? (
-              <div className="mt-4 rounded-[20px] border border-[#ff8c8c]/30 bg-[#ff8c8c]/10 px-4 py-3 text-sm text-[#ffd8d8]">
+              <div className="mt-4 border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffd8d8]">
                 {deleteDialogError}
               </div>
             ) : null}

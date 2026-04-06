@@ -236,13 +236,13 @@ export default function DashboardPage() {
         stats={stats}
       >
         {error ? (
-          <div className="rounded-[24px] border border-[#ff8c8c]/30 bg-[#ff8c8c]/10 px-5 py-4 text-sm text-[#ffe1e1]">
+          <div className="border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffe1e1]">
             {error}
           </div>
         ) : null}
 
         {loading ? (
-          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] px-5 py-10 text-center text-sm text-white/55">
+          <div className="py-10 text-center text-sm text-white/40">
             Loading dashboard...
           </div>
         ) : null}
@@ -252,226 +252,135 @@ export default function DashboardPage() {
             {/* ─── Phone: tappable list → slides ─── */}
             <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
 
-            {/* ─── Desktop: existing card layout ─── */}
-            <details className="mobile-accordion tablet-up">
-              <summary>
-                <div className="min-w-0">
-                  <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Recommended workflow</span>
-                  <p className="mobile-accordion-hint">Four steps from upload through analysis to ML review</p>
-                </div>
-              </summary>
-              <div className="mobile-accordion-body">
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                {workflowSteps.map((step) => (
-                  <div key={step.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
-                    <p className="font-medium text-white">{step.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-white/64">{step.detail}</p>
-                  </div>
-                ))}
-              </div>
-              </div>
-            </details>
+            {/* ─── Desktop: clean flowing sections ─── */}
+            <div className="tablet-up space-y-0">
 
-            <details className="mobile-accordion tablet-up">
-              <summary>
-                <div className="min-w-0">
-                  <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Studio pages</span>
-                  <p className="mobile-accordion-hint">Direct links to Uploads, Analysis, History, and Account</p>
+              {/* Workflow */}
+              <section className="flow-section">
+                <p className="flow-section-label">Recommended workflow</p>
+                <div className="mt-4 grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
+                  {workflowSteps.map((step, i) => (
+                    <div key={step.title}>
+                      <p className="flex items-baseline gap-2 text-sm font-semibold text-white">
+                        <span className="text-xs text-white/30">{i + 1}</span>
+                        {step.title}
+                      </p>
+                      <p className="mt-1.5 text-sm leading-6 text-white/55">{step.detail}</p>
+                    </div>
+                  ))}
                 </div>
-              </summary>
-              <div className="mobile-accordion-body">
-              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
-                <p className="max-w-3xl text-sm leading-6 text-white/64">
-                  Each page has a narrow role. Uploads stages or selects the current dataset, Analysis explains it, History manages archived runs, and Account handles access plus cleanup.
-                </p>
-                <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
-                  Open history archive
-                </ScrollIntentLink>
-              </div>
-              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                {destinationCards.map((item) => (
-                  <ScrollIntentLink
-                    key={`${item.href}-${item.title}`}
-                    href={item.href}
-                    className="flex h-full flex-col rounded-2xl border border-white/10 bg-black/10 p-4 transition hover:bg-white/[0.06]"
-                  >
-                    <p className="font-medium text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
-                    <p className="mt-auto pt-4 text-sm font-medium text-[#ffcfaa]">{item.cta}</p>
+              </section>
+
+              {/* Studio pages */}
+              <section className="flow-section">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="flow-section-label">Studio pages</p>
+                  <ScrollIntentLink href="/history" className="inline-tag">
+                    Open history archive
                   </ScrollIntentLink>
-                ))}
-              </div>
-              </div>
-            </details>
-
-            <details className="mobile-accordion tablet-up">
-              <summary>
-                <div className="min-w-0">
-                  <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Analysis tabs</span>
-                  <p className="mobile-accordion-hint">What each of the 8 tabs in the Analysis workspace shows</p>
                 </div>
-              </summary>
-              <div className="mobile-accordion-body">
-              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
-                <p className="max-w-3xl text-sm leading-6 text-white/64">
-                  After a dataset is uploaded, the Analysis workspace becomes the detailed report surface. These tabs are ordered to move from explanation first to detail later.
-                </p>
-                <ScrollIntentLink href="/analysis" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
-                  Open analysis workspace
-                </ScrollIntentLink>
-              </div>
-              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                {analysisTabCards.map((item) => (
-                  <div key={item.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
-                    <p className="font-medium text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
-                  </div>
-                ))}
-              </div>
-              </div>
-            </details>
-
-            <details className="mobile-accordion tablet-up">
-              <summary>
-                <div className="min-w-0">
-                  <span className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">History archive</span>
-                  <p className="mobile-accordion-hint">Tools for reopening, searching, and downloading past analysis runs</p>
+                <div className="mt-3">
+                  {destinationCards.map((item) => (
+                    <ScrollIntentLink
+                      key={`${item.href}-${item.title}`}
+                      href={item.href}
+                      className="list-row group"
+                    >
+                      <div className="list-row-content">
+                        <p className="list-row-title">{item.title}</p>
+                        <p className="list-row-hint">{item.detail}</p>
+                      </div>
+                      <span className="text-sm text-white/30 transition group-hover:text-[#ffcfaa]">{item.cta} →</span>
+                    </ScrollIntentLink>
+                  ))}
                 </div>
-              </summary>
-              <div className="mobile-accordion-body">
-              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
-                <p className="max-w-3xl text-sm leading-6 text-white/64">
-                  History is its own archive surface, not another Analysis tab. It owns saved-run search, detached popup reopening, archived downloads, and pruning old ML runs without replacing the current dataset in Analysis.
-                </p>
-                <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
-                  Open history tools
-                </ScrollIntentLink>
-              </div>
+              </section>
 
-              <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(320px,0.82fr)]">
-                <article className="rounded-[26px] border border-white/10 bg-black/10 p-5">
-                  <p className="text-sm leading-6 text-white/68">
-                    Use History when you need to recover earlier work, compare past runs without disturbing the current dataset, or manage saved ML artifacts at the archive level instead of rerunning the lab.
-                  </p>
-                  <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {/* Analysis tabs */}
+              <section className="flow-section">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="flow-section-label">Analysis tabs</p>
+                  <ScrollIntentLink href="/analysis" className="inline-tag">
+                    Open analysis workspace
+                  </ScrollIntentLink>
+                </div>
+                <div className="mt-4 grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
+                  {analysisTabCards.map((item) => (
+                    <div key={item.title}>
+                      <p className="text-sm font-semibold text-white">{item.title}</p>
+                      <p className="mt-1.5 text-sm leading-6 text-white/55">{item.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* History archive */}
+              <section className="flow-section">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="flow-section-label">History archive</p>
+                  <ScrollIntentLink href="/history" className="inline-tag">
+                    Open history
+                  </ScrollIntentLink>
+                </div>
+                <div className="mt-3 grid gap-6 xl:grid-cols-[1fr_auto]">
+                  <div>
                     {historyFeatureCards.map((item) => (
-                      <div key={item.title} className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
-                        <p className="font-medium text-white">{item.title}</p>
-                        <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
+                      <div key={item.title} className="list-row">
+                        <div className="list-row-content">
+                          <p className="list-row-title">{item.title}</p>
+                          <p className="list-row-hint">{item.detail}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
-                </article>
-
-                <article className="rounded-[26px] border border-white/10 bg-black/10 p-5">
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/42">Archive snapshot</p>
-                  <div className="mt-4 grid gap-3">
-                    <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
-                      <p className="text-xs uppercase tracking-[0.14em] text-white/42">Latest saved run</p>
-                      <p className="mt-2 text-lg font-medium text-white">
-                        {latest ? latest.overview.dataset_name : "No saved runs yet"}
-                      </p>
+                  <div className="stat-row xl:flex-col xl:gap-4">
+                    <div className="stat-row-item">
+                      <p className="stat-row-value">{latest ? latest.overview.dataset_name : "—"}</p>
+                      <p className="stat-row-label">Latest run</p>
                     </div>
-                    <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
-                      <p className="text-xs uppercase tracking-[0.14em] text-white/42">Archive volume</p>
-                      <p className="mt-2 text-lg font-medium text-white">
-                        {analyses.length.toLocaleString()} saved run{analyses.length === 1 ? "" : "s"} • {totalExperiments.toLocaleString()} saved ML run{totalExperiments === 1 ? "" : "s"}
-                      </p>
+                    <div className="stat-row-item">
+                      <p className="stat-row-value">{analyses.length}</p>
+                      <p className="stat-row-label">Saved runs</p>
                     </div>
-                    <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-white/62">
-                      Browse archived results without replacing the dataset that is currently open in Analysis.
+                    <div className="stat-row-item">
+                      <p className="stat-row-value">{totalExperiments}</p>
+                      <p className="stat-row-label">ML experiments</p>
                     </div>
                   </div>
-                </article>
-              </div>
-              </div>
-            </details>
-
-            <details className="mobile-accordion tablet-up">
-              <summary>
-                <div className="min-w-0">
-                  <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">How features work</span>
-                  <p className="mobile-accordion-hint">Product map for uploads, persistence, charts, experiments, and cleanup</p>
                 </div>
-              </summary>
-              <div className="mobile-accordion-body">
-              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
-                <p className="max-w-3xl text-sm leading-6 text-white/64">
-                  Each major surface has a narrow role so the workflow stays predictable. This is the product map for uploads, persistence, charts, saved experiments, and cleanup.
-                </p>
-                <ScrollIntentLink href="/account" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
-                  Review account tools
-                </ScrollIntentLink>
-              </div>
-              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {featureMechanics.map((item) => (
-                  <article key={item.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
-                    <p className="text-xs uppercase tracking-[0.16em]" style={{ color: item.accent }}>
-                      {item.title}
-                    </p>
-                    <p className="mt-3 text-sm leading-6 text-white/66">{item.detail}</p>
-                    <div className="mt-3 rounded-[18px] border border-white/8 bg-white/[0.03] p-3 text-sm leading-6 text-white/58">
-                      {item.flow}
+              </section>
+
+              {/* Features */}
+              <section className="flow-section">
+                <p className="flow-section-label">How features work</p>
+                <div className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-2 xl:grid-cols-3">
+                  {featureMechanics.map((item) => (
+                    <div key={item.title}>
+                      <p className="text-xs font-bold uppercase tracking-wide" style={{ color: item.accent }}>{item.title}</p>
+                      <p className="mt-2 text-sm leading-6 text-white/60">{item.detail}</p>
+                      <p className="mt-1.5 text-sm leading-6 text-white/40">{item.flow}</p>
                     </div>
-                  </article>
-                ))}
-              </div>
-              </div>
-            </details>
-
-            <section className="grid gap-4 lg:grid-cols-3">
-              <details className="mobile-accordion tablet-up">
-                <summary>
-                  <div className="min-w-0">
-                    <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Persistence</span>
-                    <p className="mobile-accordion-hint">How uploads and ML experiments are saved automatically</p>
-                  </div>
-                </summary>
-                <div className="mobile-accordion-body">
-                <p className="mt-3 text-sm leading-6 text-white/68">
-                  Uploads and ML experiments are persisted automatically. Use History when you need to reopen or download older work, use Uploads when you want to change or clear the current dataset selection, and use Account when you want to clear saved runs.
-                </p>
+                  ))}
                 </div>
-              </details>
+              </section>
 
-              <details className="mobile-accordion tablet-up">
-                <summary>
-                  <div className="min-w-0">
-                    <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Overview first</span>
-                    <p className="mobile-accordion-hint">Why Overview and Insights come before the technical tabs</p>
-                  </div>
-                </summary>
-                <div className="mobile-accordion-body">
-                <p className="mt-3 text-sm leading-6 text-white/68">
-                  Overview surfaces the headline findings first, then the technical tabs provide the evidence and detail behind them.
-                </p>
-                </div>
-              </details>
-
-              <details className="mobile-accordion tablet-up">
-                <summary>
-                  <div className="min-w-0">
-                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Latest saved run</span>
-                    <p className="mobile-accordion-hint">Quick link to the most recently saved dataset or the uploads page</p>
-                  </div>
-                </summary>
-                <div className="mobile-accordion-body">
-                <p className="mt-3 text-sm leading-6 text-white/68">
-                  {latest
-                    ? `${latest.overview.dataset_name} is the most recent saved run. Open Uploads to review quick quality signals or open Analysis to continue through the full report.`
-                    : "No saved analysis yet. Open Uploads to upload the first CSV."}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]">
+              {/* Quick actions strip */}
+              <section className="flow-section">
+                <div className="flex flex-wrap items-center gap-4">
+                  <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="rounded-full bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
                     {latest ? "Open latest run" : "Open uploads page"}
                   </ScrollIntentLink>
-                  <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82">
+                  <ScrollIntentLink href="/history" className="rounded-full border border-white/10 px-5 py-2.5 text-sm text-white/70">
                     View saved history
                   </ScrollIntentLink>
+                  <p className="text-sm text-white/40">
+                    {latest
+                      ? `${latest.overview.dataset_name} is the most recent saved run.`
+                      : "No saved analysis yet — upload a CSV to get started."}
+                  </p>
                 </div>
-                </div>
-              </details>
-            </section>
+              </section>
+            </div>
           </>
         ) : null}
       </AppShell>
@@ -506,10 +415,13 @@ function DashboardMobileSections({
       accent: "#7ad6ff",
       content: (
         <div className="space-y-3">
-          {workflowSteps.map((step) => (
-            <div key={step.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="font-medium text-white">{step.title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/64">{step.detail}</p>
+          {workflowSteps.map((step, i) => (
+            <div key={step.title} className="border-b border-white/6 pb-3 last:border-0">
+              <p className="flex items-baseline gap-2 text-sm font-semibold text-white">
+                <span className="text-xs text-white/30">{i + 1}</span>
+                {step.title}
+              </p>
+              <p className="mt-1 text-sm leading-6 text-white/55">{step.detail}</p>
             </div>
           ))}
         </div>
@@ -521,16 +433,16 @@ function DashboardMobileSections({
       hint: "Direct links to Uploads, Analysis, History, and Account",
       accent: "#ffb079",
       content: (
-        <div className="space-y-3">
+        <div>
           {destinationCards.map((item) => (
             <ScrollIntentLink
               key={`${item.href}-${item.title}`}
               href={item.href}
-              className="block rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+              className="block border-b border-white/6 py-3 last:border-0"
             >
-              <p className="font-medium text-white">{item.title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
-              <p className="mt-3 text-sm font-medium text-[#ffcfaa]">{item.cta}</p>
+              <p className="text-sm font-semibold text-white">{item.title}</p>
+              <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
+              <p className="mt-1 text-sm font-medium text-[#ffcfaa]">{item.cta} →</p>
             </ScrollIntentLink>
           ))}
         </div>
@@ -542,14 +454,14 @@ function DashboardMobileSections({
       hint: "What each of the 8 tabs in the Analysis workspace shows",
       accent: "#8bf1a8",
       content: (
-        <div className="space-y-3">
-          <ScrollIntentLink href="/analysis" className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+        <div>
+          <ScrollIntentLink href="/analysis" className="mb-3 block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
             Open analysis workspace
           </ScrollIntentLink>
           {analysisTabCards.map((item) => (
-            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="font-medium text-white">{item.title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
+            <div key={item.title} className="border-b border-white/6 py-3 last:border-0">
+              <p className="text-sm font-semibold text-white">{item.title}</p>
+              <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
             </div>
           ))}
         </div>
@@ -561,21 +473,20 @@ function DashboardMobileSections({
       hint: "Tools for reopening, searching, and downloading past runs",
       accent: "#ffd76d",
       content: (
-        <div className="space-y-3">
-          <ScrollIntentLink href="/history" className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+        <div>
+          <ScrollIntentLink href="/history" className="mb-3 block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
             Open history tools
           </ScrollIntentLink>
           {historyFeatureCards.map((item) => (
-            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="font-medium text-white">{item.title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
+            <div key={item.title} className="border-b border-white/6 py-3 last:border-0">
+              <p className="text-sm font-semibold text-white">{item.title}</p>
+              <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
             </div>
           ))}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-white/42">Archive volume</p>
-            <p className="mt-2 text-lg font-medium text-white">
-              {analyses.length.toLocaleString()} saved run{analyses.length === 1 ? "" : "s"} • {totalExperiments.toLocaleString()} ML run{totalExperiments === 1 ? "" : "s"}
-            </p>
+          <div className="mt-3 flex gap-4 text-sm text-white/50">
+            <span>{analyses.length} saved run{analyses.length === 1 ? "" : "s"}</span>
+            <span>·</span>
+            <span>{totalExperiments} ML run{totalExperiments === 1 ? "" : "s"}</span>
           </div>
         </div>
       ),
@@ -586,12 +497,12 @@ function DashboardMobileSections({
       hint: "Product map for uploads, persistence, charts, experiments, and cleanup",
       accent: "#d7b7ff",
       content: (
-        <div className="space-y-3">
+        <div>
           {featureMechanics.map((item) => (
-            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-xs uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.title}</p>
-              <p className="mt-3 text-sm leading-6 text-white/66">{item.detail}</p>
-              <p className="mt-2 text-sm leading-6 text-white/50">{item.flow}</p>
+            <div key={item.title} className="border-b border-white/6 py-3 last:border-0">
+              <p className="text-xs font-bold uppercase tracking-wide" style={{ color: item.accent }}>{item.title}</p>
+              <p className="mt-2 text-sm leading-6 text-white/60">{item.detail}</p>
+              <p className="mt-1 text-sm leading-6 text-white/40">{item.flow}</p>
             </div>
           ))}
         </div>

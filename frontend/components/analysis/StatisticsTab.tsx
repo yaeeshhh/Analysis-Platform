@@ -21,7 +21,7 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
             {statistics.numeric_summary.slice(0, 8).map((item) => (
-              <div key={item.column} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+              <div key={item.column} className="border-b border-white/6 pb-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-medium text-white">{item.column}</p>
                   <span className="text-xs text-white/45">skew {metric(item.skew)}</span>
@@ -48,7 +48,7 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
             {statistics.categorical_summary.slice(0, 8).map((item) => (
-              <div key={item.column} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+              <div key={item.column} className="border-b border-white/6 pb-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-medium text-white">{item.column}</p>
                   <span className="text-xs text-white/45">{item.unique_count} unique</span>

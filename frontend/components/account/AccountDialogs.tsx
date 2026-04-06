@@ -122,7 +122,7 @@ function DialogShell({
       onMouseDown={onClose}
     >
       <div
-        className={`w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-[24px] border border-white/12 bg-[#111821]/95 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:max-h-[calc(100vh-2rem)] sm:rounded-[30px] sm:p-6`}
+        className={`w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-xl border border-white/10 bg-[#111821]/95 p-4 sm:max-h-[calc(100vh-2rem)] sm:rounded-xl sm:p-6`}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
@@ -411,7 +411,7 @@ function IdentityChangeDialog({
       description={`Update your ${label.toLowerCase()} here.`}
     >
       <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+        <div className="border-b border-white/6 pb-3">
           <p className="text-xs uppercase tracking-[0.18em] text-white/42">Current {label.toLowerCase()}</p>
           <p className="mt-3 break-all text-lg font-medium text-white">{currentValue || "Not set"}</p>
           <p className="mt-3 text-sm leading-6 text-white/60">
@@ -419,7 +419,7 @@ function IdentityChangeDialog({
           </p>
         </div>
 
-        <div className="space-y-3 rounded-[22px] border border-white/10 bg-black/10 p-4">
+        <div className="space-y-3 border-b border-white/6 pb-3">
           <input
             type={field === "email" ? "email" : "text"}
             value={value}
@@ -649,7 +649,7 @@ function PasswordChangeDialog({
       description="Update your password here."
     >
       <div className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+        <div className="border-b border-white/6 pb-3">
           <p className="text-xs uppercase tracking-[0.18em] text-white/42">Security notes</p>
           <div className="mt-4 space-y-3 text-sm leading-6 text-white/64">
             <p>Password updates require the current password to avoid accidental changes.</p>
@@ -658,7 +658,7 @@ function PasswordChangeDialog({
           </div>
         </div>
 
-        <div className="space-y-3 rounded-[22px] border border-white/10 bg-black/10 p-4">
+        <div className="space-y-3 border-b border-white/6 pb-3">
           <div className="relative">
             <input
               type={showCurrentPassword ? "text" : "password"}
@@ -847,7 +847,7 @@ function RememberLoginDialog({
       maxWidthClassName="max-w-3xl"
     >
       <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+        <div className="border-b border-white/6 pb-3">
           <p className="text-xs uppercase tracking-[0.18em] text-white/42">Current state</p>
           <p className="mt-3 text-lg font-medium text-white">
             {rememberStatus.available
@@ -861,7 +861,7 @@ function RememberLoginDialog({
           </p>
         </div>
 
-        <div className="space-y-4 rounded-[22px] border border-white/10 bg-black/10 p-4">
+        <div className="space-y-4 border-b border-white/6 pb-3">
           <div className="flex flex-col gap-3 rounded-[18px] border border-white/10 bg-[#15151a] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div>
               <p className="text-sm font-medium text-white">Keep this browser remembered</p>
@@ -949,7 +949,7 @@ function ConfirmDangerDialog({
 
   return (
     <DialogShell open={open} onClose={onClose} eyebrow={eyebrow} title={title} description={description}>
-      <div className="rounded-[22px] border border-[#5a2328] bg-[#171013] p-5 text-sm leading-6 text-white/72">
+      <div className="border-l-2 border-[#5a2328]/60 pl-4 text-sm leading-6 text-white/72">
         This action is independent from the rest of the account tools and only affects the data described above.
       </div>
       <StatusBlock error={error} />
@@ -1070,7 +1070,7 @@ function DeleteAccountDialog({
       title="Permanently remove this account"
       description="Delete your account here."
     >
-      <div className="rounded-[22px] border border-[#5a2328] bg-[#171013] p-5 text-sm leading-6 text-white/72">
+      <div className="border-l-2 border-[#5a2328]/60 pl-4 text-sm leading-6 text-white/72">
         <p>This removes saved runs, remembered login records, and verification history.</p>
         {armed && !challengeToken ? (
           <p className="mt-3 text-[#ffb4ba]">Confirm once more to start the email-verification process.</p>
@@ -1078,7 +1078,7 @@ function DeleteAccountDialog({
       </div>
 
       {challengeToken ? (
-        <div className="space-y-3 rounded-[22px] border border-[#5a2328] bg-[#2a1215] px-4 py-4">
+        <div className="space-y-3 border-l-2 border-[#5a2328]/60 pl-4">
           <p className="text-sm text-white/78">
             {otpSent
               ? `Enter the 6-digit code sent to ${maskEmailAddress(codeSentTo || user.email)}.`

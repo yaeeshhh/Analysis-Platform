@@ -10,7 +10,7 @@ export default function PasswordChangedNoticeModal({ open, onContinue }: Props) 
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]">
-      <div className="w-full max-w-md rounded-[24px] border border-white/10 bg-[#15151a] p-6 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+      <div className="w-full max-w-md rounded-xl border border-white/10 bg-[#15151a] p-6 text-white">
         <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15">
           <svg
             viewBox="0 0 24 24"
