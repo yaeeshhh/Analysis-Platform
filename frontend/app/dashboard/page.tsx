@@ -248,8 +248,14 @@ export default function DashboardPage() {
 
         {!loading ? (
           <>
-            <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-              <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Recommended workflow</p>
+            <details className="mobile-accordion">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Recommended workflow</span>
+                  <p className="mobile-accordion-hint">Four steps from upload through analysis to ML review</p>
+                </div>
+              </summary>
+              <div className="mobile-accordion-body">
               <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 {workflowSteps.map((step) => (
                   <div key={step.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
@@ -258,16 +264,21 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </section>
+              </div>
+            </details>
 
-            <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Studio pages</p>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
-                    Each page has a narrow role. Uploads stages or selects the current dataset, Analysis explains it, History manages archived runs, and Account handles access plus cleanup.
-                  </p>
+            <details className="mobile-accordion">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Studio pages</span>
+                  <p className="mobile-accordion-hint">Direct links to Uploads, Analysis, History, and Account</p>
                 </div>
+              </summary>
+              <div className="mobile-accordion-body">
+              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
+                <p className="max-w-3xl text-sm leading-6 text-white/64">
+                  Each page has a narrow role. Uploads stages or selects the current dataset, Analysis explains it, History manages archived runs, and Account handles access plus cleanup.
+                </p>
                 <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
                   Open history archive
                 </ScrollIntentLink>
@@ -285,16 +296,21 @@ export default function DashboardPage() {
                   </ScrollIntentLink>
                 ))}
               </div>
-            </section>
+              </div>
+            </details>
 
-            <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Analysis tabs</p>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
-                    After a dataset is uploaded, the Analysis workspace becomes the detailed report surface. These tabs are ordered to move from explanation first to detail later.
-                  </p>
+            <details className="mobile-accordion">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Analysis tabs</span>
+                  <p className="mobile-accordion-hint">What each of the 8 tabs in the Analysis workspace shows</p>
                 </div>
+              </summary>
+              <div className="mobile-accordion-body">
+              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
+                <p className="max-w-3xl text-sm leading-6 text-white/64">
+                  After a dataset is uploaded, the Analysis workspace becomes the detailed report surface. These tabs are ordered to move from explanation first to detail later.
+                </p>
                 <ScrollIntentLink href="/analysis" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
                   Open analysis workspace
                 </ScrollIntentLink>
@@ -307,16 +323,21 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </section>
+              </div>
+            </details>
 
-            <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">History archive</p>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
-                    History is its own archive surface, not another Analysis tab. It owns saved-run search, detached popup reopening, archived downloads, and pruning old ML runs without replacing the current dataset in Analysis.
-                  </p>
+            <details className="mobile-accordion">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">History archive</span>
+                  <p className="mobile-accordion-hint">Tools for reopening, searching, and downloading past analysis runs</p>
                 </div>
+              </summary>
+              <div className="mobile-accordion-body">
+              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
+                <p className="max-w-3xl text-sm leading-6 text-white/64">
+                  History is its own archive surface, not another Analysis tab. It owns saved-run search, detached popup reopening, archived downloads, and pruning old ML runs without replacing the current dataset in Analysis.
+                </p>
                 <ScrollIntentLink href="/history" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
                   Open history tools
                 </ScrollIntentLink>
@@ -358,16 +379,21 @@ export default function DashboardPage() {
                   </div>
                 </article>
               </div>
-            </section>
+              </div>
+            </details>
 
-            <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">How features work</p>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
-                    Each major surface has a narrow role so the workflow stays predictable. This is the product map for uploads, persistence, charts, saved experiments, and cleanup.
-                  </p>
+            <details className="mobile-accordion">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">How features work</span>
+                  <p className="mobile-accordion-hint">Product map for uploads, persistence, charts, experiments, and cleanup</p>
                 </div>
+              </summary>
+              <div className="mobile-accordion-body">
+              <div className="mt-0 flex flex-wrap items-start justify-between gap-3">
+                <p className="max-w-3xl text-sm leading-6 text-white/64">
+                  Each major surface has a narrow role so the workflow stays predictable. This is the product map for uploads, persistence, charts, saved experiments, and cleanup.
+                </p>
                 <ScrollIntentLink href="/account" className="rounded-full border border-white/12 px-4 py-2 text-sm text-white/82">
                   Review account tools
                 </ScrollIntentLink>
@@ -385,25 +411,46 @@ export default function DashboardPage() {
                   </article>
                 ))}
               </div>
-            </section>
+              </div>
+            </details>
 
             <section className="grid gap-4 lg:grid-cols-3">
-              <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Persistence</p>
+              <details className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Persistence</span>
+                    <p className="mobile-accordion-hint">How uploads and ML experiments are saved automatically</p>
+                  </div>
+                </summary>
+                <div className="mobile-accordion-body">
                 <p className="mt-3 text-sm leading-6 text-white/68">
                   Uploads and ML experiments are persisted automatically. Use History when you need to reopen or download older work, use Uploads when you want to change or clear the current dataset selection, and use Account when you want to clear saved runs.
                 </p>
-              </article>
+                </div>
+              </details>
 
-              <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Overview first</p>
+              <details className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Overview first</span>
+                    <p className="mobile-accordion-hint">Why Overview and Insights come before the technical tabs</p>
+                  </div>
+                </summary>
+                <div className="mobile-accordion-body">
                 <p className="mt-3 text-sm leading-6 text-white/68">
                   Overview surfaces the headline findings first, then the technical tabs provide the evidence and detail behind them.
                 </p>
-              </article>
+                </div>
+              </details>
 
-              <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Latest saved run</p>
+              <details className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Latest saved run</span>
+                    <p className="mobile-accordion-hint">Quick link to the most recently saved dataset or the uploads page</p>
+                  </div>
+                </summary>
+                <div className="mobile-accordion-body">
                 <p className="mt-3 text-sm leading-6 text-white/68">
                   {latest
                     ? `${latest.overview.dataset_name} is the most recent saved run. Open Uploads to review quick quality signals or open Analysis to continue through the full report.`
@@ -417,7 +464,8 @@ export default function DashboardPage() {
                     View saved history
                   </ScrollIntentLink>
                 </div>
-              </article>
+                </div>
+              </details>
             </section>
           </>
         ) : null}

@@ -103,8 +103,14 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
 
   return (
     <section className="grid gap-4 lg:grid-cols-2">
-      <article className="min-w-0 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</p>
+      <details className="mobile-accordion min-w-0">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
+            <p className="mobile-accordion-hint">Columns with the highest missing-value share</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">Columns with the highest missing share</h3>
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.missingness}</p>
         <ChartGuide
@@ -140,10 +146,17 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </article>
+        </div>
+      </details>
 
-      <article className="min-w-0 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Distribution</p>
+      <details className="mobile-accordion min-w-0">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Distribution</span>
+            <p className="mobile-accordion-hint">Value distribution histogram for the most numeric-dense column</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">{histogram ? `${histogram.column} histogram` : "No numeric histogram available"}</h3>
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.histogram}</p>
         <ChartGuide
@@ -178,10 +191,17 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           )}
         </div>
-      </article>
+        </div>
+      </details>
 
-      <article className="min-w-0 rounded-[28px] border border-white/10 bg-white/[0.04] p-5 lg:col-span-2">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Top categories</p>
+      <details className="mobile-accordion min-w-0 lg:col-span-2">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Top categories</span>
+            <p className="mobile-accordion-hint">Most frequent category values for the highest-cardinality column</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">{categories ? `${categories.column} category distribution` : "No categorical chart available"}</h3>
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.category}</p>
         <ChartGuide
@@ -215,10 +235,17 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           )}
         </div>
-      </article>
+        </div>
+      </details>
 
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Boxplot summary</p>
+      <details className="mobile-accordion">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Boxplot summary</span>
+            <p className="mobile-accordion-hint">Quartiles, median, and outlier counts for each numeric column</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.boxplots}</p>
         <ChartGuide
           description={guides.boxplots.description}
@@ -238,10 +265,17 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
           ))}
           {boxplots.length === 0 ? <p className="text-sm text-white/50">No boxplot-ready numeric fields detected.</p> : null}
         </div>
-      </article>
+        </div>
+      </details>
 
-      <article className="min-w-0 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Correlation heatmap</p>
+      <details className="mobile-accordion min-w-0">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Correlation heatmap</span>
+            <p className="mobile-accordion-hint">Pearson correlations between all numeric column pairs</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.correlationHeatmap}</p>
         <ChartGuide
           description={guides.correlationHeatmap.description}
@@ -291,10 +325,17 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           )}
         </div>
-      </article>
+        </div>
+      </details>
 
-      <article className="min-w-0 rounded-[28px] border border-white/10 bg-white/[0.04] p-5 lg:col-span-2">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Pairwise scatter</p>
+      <details className="mobile-accordion min-w-0 lg:col-span-2">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Pairwise scatter</span>
+            <p className="mobile-accordion-hint">Scatter plots for the most strongly correlated numeric pairs</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.pairwiseScatter}</p>
         <ChartGuide
           description={guides.pairwiseScatter.description}
@@ -338,10 +379,17 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           ) : null}
         </div>
-      </article>
+        </div>
+      </details>
 
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 lg:col-span-2">
-        <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Drift checks</p>
+      <details className="mobile-accordion lg:col-span-2">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Drift checks</span>
+            <p className="mobile-accordion-hint">Early-vs-late row slice comparison to flag distributional drift</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <p className="mt-3 text-sm leading-6 text-white/62">{narratives.driftChecks}</p>
         <ChartGuide
           description={guides.driftChecks.description}
@@ -371,7 +419,8 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             </div>
           ) : null}
         </div>
-      </article>
+        </div>
+      </details>
     </section>
   );
 }

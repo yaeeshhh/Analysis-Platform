@@ -267,8 +267,14 @@ export default function BatchPage() {
             ) : null}
 
             <div className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
-              <article className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Dataset upload</p>
+              <details className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Dataset upload</span>
+                    <p className="mobile-accordion-hint">Upload a CSV to create a new analysis run and view initial validation check results</p>
+                  </div>
+                </summary>
+                <div className="mobile-accordion-body">
                 <h2 className="mt-2 font-[family:var(--font-display)] text-2xl text-white">
                   Upload and Validate Dataset
                 </h2>
@@ -338,16 +344,21 @@ export default function BatchPage() {
                     Clear dataset
                   </button>
                 </div>
-              </article>
+                </div>
+              </details>
 
-              <article className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Selected dataset</p>
-                    <h2 className="mt-2 font-[family:var(--font-display)] text-xl text-white">
-                      {selectedAnalysis ? selectedAnalysis.overview.dataset_name : "No saved run selected"}
-                    </h2>
+              <details className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Selected dataset</span>
+                    <p className="mobile-accordion-hint">Quick quality summary for the currently staged dataset</p>
                   </div>
+                </summary>
+                <div className="mobile-accordion-body">
+                <div className="flex items-start justify-between gap-4">
+                  <h2 className="mt-2 font-[family:var(--font-display)] text-xl text-white">
+                    {selectedAnalysis ? selectedAnalysis.overview.dataset_name : "No saved run selected"}
+                  </h2>
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/55">
                     {analyses.length} saved run{analyses.length === 1 ? "" : "s"}
                   </span>
@@ -420,15 +431,22 @@ export default function BatchPage() {
                     </p>
                     {selectedFile ? <p className="mt-3 text-[#ffcfaa]">Ready to analyze: {selectedFile.name}</p> : null}
                   </div>
-                )}
-              </article>
+                )}  
+                </div>
+              </details>
             </div>
 
-            <article className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
+            <details className="mobile-accordion">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Saved runs</span>
+                  <p className="mobile-accordion-hint">All previous uploads — tap to select one as the current dataset</p>
+                </div>
+              </summary>
+              <div className="mobile-accordion-body">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Saved runs</p>
-                  <h2 className="mt-2 font-[family:var(--font-display)] text-xl text-white">Recent datasets</h2>
+                  <h2 className="mt-0 font-[family:var(--font-display)] text-xl text-white">Recent datasets</h2>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
                     Select a saved run to inspect its quick summary here, or open it in Analysis when you need the full tabbed report.
                   </p>
@@ -497,8 +515,8 @@ export default function BatchPage() {
                   </div>
                 ) : null}
               </div>
-
-            </article>
+              </div>
+            </details>
           </section>
         ) : null}
       </AppShell>

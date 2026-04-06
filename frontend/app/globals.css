@@ -827,7 +827,7 @@ details.mobile-accordion > .mobile-accordion-body {
   padding: 0 1.25rem 1.25rem;
 }
 
-/* Desktop: summary is a plain label, no chevron, no tap-to-collapse */
+/* Desktop: summary is a plain label, no chevron, no tap-to-collapse; body always visible */
 @media (min-width: 600px) {
   details.mobile-accordion > summary {
     cursor: default;
@@ -836,6 +836,10 @@ details.mobile-accordion > .mobile-accordion-body {
 
   details.mobile-accordion > summary::after {
     display: none;
+  }
+
+  details.mobile-accordion > .mobile-accordion-body {
+    display: block;
   }
 }
 
