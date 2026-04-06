@@ -1,6 +1,6 @@
 const LOCAL_API_BASE_URL = "http://localhost:8000";
 const PRODUCTION_API_BASE_URL =
-  "https://analysis-platform-production.up.railway.app";
+  "https://analysis-studio.up.railway.app";
 
 function isLocalHost(hostname: string): boolean {
   return hostname === "localhost" || hostname === "127.0.0.1";
