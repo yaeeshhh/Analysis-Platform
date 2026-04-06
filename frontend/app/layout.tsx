@@ -3,6 +3,7 @@ import { Manrope, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import GlobalOverlays from "@/components/ui/GlobalOverlays";
+import DesktopAccordionOpener from "@/components/ui/DesktopAccordionOpener";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body suppressHydrationWarning className="antialiased">
         {children}
+        <DesktopAccordionOpener />
         <Suspense fallback={null}>
           <GlobalOverlays />
         </Suspense>
