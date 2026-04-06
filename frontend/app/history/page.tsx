@@ -267,14 +267,18 @@ export default function HistoryPage() {
 
         {!loading ? (
           <section className="space-y-4">
-            <article id="history-first-block" className="route-scroll-target rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archive search</p>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
-                    Find an older run by dataset name or summary, then narrow the list by modeling readiness or whether ML experiments were saved with it.
-                  </p>
+            <details id="history-first-block" className="mobile-accordion route-scroll-target">
+              <summary>
+                <div className="min-w-0">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archive search</span>
+                  <p className="mobile-accordion-hint">Search and filter saved runs by name, readiness, or ML status</p>
                 </div>
+              </summary>
+              <div className="mobile-accordion-body">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <p className="max-w-3xl text-sm leading-6 text-white/64">
+                  Find an older run by dataset name or summary, then narrow the list by modeling readiness or whether ML experiments were saved with it.
+                </p>
                 <div className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/55">
                   {filteredAnalyses.length} of {analyses.length} run{analyses.length === 1 ? "" : "s"} shown
                 </div>
@@ -318,21 +322,28 @@ export default function HistoryPage() {
                   </select>
                 </label>
               </div>
-            </article>
+            </div>
+            </details>
 
             {filteredAnalyses.map((analysis) => (
-              <article key={analysis.id} className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Run #{analysis.id}</p>
-                    <h2 className="mt-2 break-words font-[family:var(--font-display)] text-2xl text-white">
-                      {analysis.overview.dataset_name}
-                    </h2>
-                    <p className="mt-1 text-sm text-white/44">Saved {formatDate(analysis.saved_at)}</p>
-                    <p className="mt-3 max-w-4xl text-sm leading-6 text-white/68">{analysis.insights.summary}</p>
+              <details key={analysis.id} className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Run #{analysis.id} — {analysis.overview.dataset_name}</span>
+                    <p className="mobile-accordion-hint">Summary, dates, and actions for this saved analysis run</p>
                   </div>
+                </summary>
+                <div className="mobile-accordion-body">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h2 className="mt-2 break-words font-[family:var(--font-display)] text-2xl text-white">
+                        {analysis.overview.dataset_name}
+                      </h2>
+                      <p className="mt-1 text-sm text-white/44">Saved {formatDate(analysis.saved_at)}</p>
+                      <p className="mt-3 max-w-4xl text-sm leading-6 text-white/68">{analysis.insights.summary}</p>
+                    </div>
 
-                  <div className="grid w-full gap-2 sm:grid-cols-2 xl:w-[520px] xl:grid-cols-2">
+                    <div className="grid w-full gap-2 sm:grid-cols-2 xl:w-[520px] xl:grid-cols-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -394,10 +405,10 @@ export default function HistoryPage() {
                         Delete saved run
                       </button>
                     ) : null}
+                    </div>
                   </div>
-                </div>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                   <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/72">
                     <p className="text-xs uppercase tracking-[0.18em] text-white/42">Rows</p>
                     <p className="mt-2 text-2xl font-semibold text-white">{analysis.overview.row_count.toLocaleString()}</p>
@@ -420,7 +431,7 @@ export default function HistoryPage() {
                     <p className="text-xs uppercase tracking-[0.18em] text-white/42">ML experiments</p>
                     <p className="mt-2 text-2xl font-semibold text-white">{analysis.experiment_count}</p>
                   </div>
-                </div>
+                  </div>
 
                 {analysis.latest_experiment ? (
                   <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/68">
@@ -428,7 +439,8 @@ export default function HistoryPage() {
                     <p className="mt-2">{analysis.latest_experiment.summary}</p>
                   </div>
                 ) : null}
-              </article>
+                </div>
+              </details>
             ))}
 
             {analyses.length === 0 ? (

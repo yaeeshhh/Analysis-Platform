@@ -768,7 +768,14 @@ export default function MLTab({
   return (
     <>
       <section className="space-y-4">
-      <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <details className="mobile-accordion">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Lab overview</span>
+            <p className="mobile-accordion-hint">Modes, runtime guardrails, and what this ML lab runs on</p>
+          </div>
+        </summary>
+        <div className="mobile-accordion-body">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
             <p className="text-xs uppercase tracking-[0.16em] text-[#7ad6ff]">ML Lab</p>
@@ -795,7 +802,8 @@ export default function MLTab({
             </p>
           </div>
         </div>
-      </article>
+        </div>
+      </details>
 
       {busy ? (
         <div className="rounded-[24px] border border-[#7ad6ff]/25 bg-[#7ad6ff]/10 px-5 py-4 text-sm text-[#dff7ff]">
@@ -838,27 +846,32 @@ export default function MLTab({
 
       {activeLab === "supervised" ? (
         <>
-          <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Method guide</p>
-                <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">
+          <details className="mobile-accordion min-w-0 self-start">
+            <summary>
+              <div className="min-w-0">
+                <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Method guide</span>
+                <p className="mobile-accordion-hint">Supported supervised models and what each one is best for</p>
+              </div>
+            </summary>
+            <div className="mobile-accordion-body">
+              <div className="flex flex-wrap items-center justify-between gap-3 mt-2">
+                <h3 className="font-[family:var(--font-display)] text-xl text-white">
                   Supported supervised models
                 </h3>
+                <span className="text-xs text-white/50">Slide to review the method cards</span>
               </div>
-              <span className="text-xs text-white/50">Slide to review the method cards</span>
-            </div>
-            <div className="mt-4 overflow-x-auto pb-2">
-              <div className={sliderTrackClassName}>
-                {methodGuideCards.map((item) => (
-                  <div key={item.name} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
-                    <p className="font-medium text-white">{item.name}</p>
-                    <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-                  </div>
-                ))}
+              <div className="mt-4 overflow-x-auto pb-2">
+                <div className={sliderTrackClassName}>
+                  {methodGuideCards.map((item) => (
+                    <div key={item.name} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                      <p className="font-medium text-white">{item.name}</p>
+                      <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </article>
+          </details>
 
           <div className="space-y-4">
             <article className="min-w-0 self-start rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
@@ -1046,25 +1059,30 @@ export default function MLTab({
 
           {renderSavedRunsBlock("supervised", supervisedExperiments)}
 
-          <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">Score interpretation</p>
-                <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">
+          <details className="mobile-accordion">
+            <summary>
+              <div className="min-w-0">
+                <span className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">Score interpretation</span>
+                <p className="mobile-accordion-hint">Why low scores usually reflect data difficulty, not model failure</p>
+              </div>
+            </summary>
+            <div className="mobile-accordion-body">
+              <div className="flex flex-wrap items-center justify-between gap-3 mt-2">
+                <h3 className="font-[family:var(--font-display)] text-xl text-white">
                   Low scores usually reflect data difficulty
                 </h3>
+                <span className="text-xs text-white/50">These notes update with the active supervised run</span>
               </div>
-              <span className="text-xs text-white/50">These notes update with the active supervised run</span>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {supervisedFailureFactors.map((item) => (
+                  <div key={item.title} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
+                    <p className="font-medium text-white">{item.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {supervisedFailureFactors.map((item) => (
-                <div key={item.title} className="rounded-[22px] border border-white/10 bg-black/10 p-4">
-                  <p className="font-medium text-white">{item.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-                </div>
-              ))}
-            </div>
-          </article>
+          </details>
 
           <div
             id={SUPERVISED_RESULTS_TARGET_ID}

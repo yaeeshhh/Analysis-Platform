@@ -29,31 +29,45 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
   return (
     <section className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</p>
-          <p className="mt-3 text-base leading-7 text-white/82">{insights.summary}</p>
-          {headlineFindings.length > 0 ? (
-            <div className="mt-4 space-y-3">
-              {headlineFindings.map((finding) => (
-                <div key={finding} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm leading-6 text-white/72">
-                  {finding}
+        <details className="mobile-accordion">
+          <summary>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
+              <p className="mobile-accordion-hint">AI-generated summary and top findings for this dataset</p>
+            </div>
+          </summary>
+          <div className="mobile-accordion-body">
+            <p className="mt-3 text-base leading-7 text-white/82">{insights.summary}</p>
+            {headlineFindings.length > 0 ? (
+              <div className="mt-4 space-y-3">
+                {headlineFindings.map((finding) => (
+                  <div key={finding} className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm leading-6 text-white/72">
+                    {finding}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </details>
+
+        <details className="mobile-accordion">
+          <summary>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</span>
+              <p className="mobile-accordion-hint">Shape, size, type mix, and structural character of the dataset</p>
+            </div>
+          </summary>
+          <div className="mobile-accordion-body">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {posture.map((item) => (
+                <div key={item.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+                  <p className="text-sm font-medium text-white">{item.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                 </div>
               ))}
             </div>
-          ) : null}
-        </article>
-
-        <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {posture.map((item) => (
-              <div key={item.title} className="rounded-2xl border border-white/10 bg-black/10 p-4">
-                <p className="text-sm font-medium text-white">{item.title}</p>
-                <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-              </div>
-            ))}
           </div>
-        </article>
+        </details>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -66,26 +80,39 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</p>
-          <div className="mt-4 space-y-3">
-            {typeMix.map((item) => (
-              <div key={item.label}>
-                <div className="flex items-center justify-between gap-3 text-sm text-white/78">
-                  <span>{item.label}</span>
-                  <span>{item.count} columns</span>
+        <details className="mobile-accordion">
+          <summary>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</span>
+              <p className="mobile-accordion-hint">Proportion of numeric, categorical, and other column types</p>
+            </div>
+          </summary>
+          <div className="mobile-accordion-body">
+            <div className="mt-4 space-y-3">
+              {typeMix.map((item) => (
+                <div key={item.label}>
+                  <div className="flex items-center justify-between gap-3 text-sm text-white/78">
+                    <span>{item.label}</span>
+                    <span>{item.count} columns</span>
+                  </div>
+                  <div className="mt-2 h-2 rounded-full bg-white/8">
+                    <div className="h-2 rounded-full bg-[#7ad6ff]" style={{ width: `${Math.min(item.pct, 100)}%` }} />
+                  </div>
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-white/8">
-                  <div className="h-2 rounded-full bg-[#7ad6ff]" style={{ width: `${Math.min(item.pct, 100)}%` }} />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </article>
+        </details>
 
-        <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Reading order</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <details className="mobile-accordion">
+          <summary>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Reading order</span>
+              <p className="mobile-accordion-hint">Recommended tab order from plain-language summary through to ML Lab</p>
+            </div>
+          </summary>
+          <div className="mobile-accordion-body">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
               <p className="text-sm font-medium text-white">Overview and Insights</p>
               <p className="mt-2 text-sm leading-6 text-white/62">Start here to understand the dataset in plain language before moving into technical detail.</p>
@@ -102,18 +129,20 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
               <p className="text-sm font-medium text-white">ML Lab</p>
               <p className="mt-2 text-sm leading-6 text-white/62">Use ML last, after the data looks clean enough and the target or exploration goal is clear.</p>
             </div>
+            </div>
           </div>
-        </article>
+        </details>
       </div>
 
-      <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Raw data</p>
-            <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">First 20 rows</h3>
+      <details className="mobile-accordion">
+        <summary>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Raw data</span>
+            <p className="mobile-accordion-hint">First 20 rows of the uploaded dataset</p>
           </div>
-        </div>
-
+        </summary>
+        <div className="mobile-accordion-body">
+        <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">First 20 rows</h3>
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
             <thead>
@@ -138,7 +167,8 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      </details>
     </section>
   );
 }

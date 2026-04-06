@@ -205,8 +205,14 @@ export default function AccountPage() {
         {!loading && user ? (
           <>
             <section id="account-first-block" className="route-scroll-target">
-              <article className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Account snapshot</p>
+              <details className="mobile-accordion">
+                <summary>
+                  <div className="min-w-0">
+                    <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Account snapshot</span>
+                    <p className="mobile-accordion-hint">Username, email, member since, and remembered login status</p>
+                  </div>
+                </summary>
+                <div className="mobile-accordion-body">
                 <div className="mt-5 grid gap-3 md:grid-cols-2">
                   <div className="rounded-[22px] border border-white/10 bg-black/10 p-4">
                     <p className="text-xs uppercase tracking-[0.14em] text-white/42">Username</p>
@@ -230,18 +236,24 @@ export default function AccountPage() {
                         : "Not configured"}
                     </p>
                   </div>
+                  </div>
                 </div>
-              </article>
+              </details>
             </section>
 
             <section className="space-y-4">
               {toolGroups.map((group) => (
-                <article
+                <details
                   key={group.title}
-                  className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6"
+                  className="mobile-accordion"
                 >
-                  <p className="text-xs uppercase tracking-[0.24em]" style={{ color: group.accent }}>{group.title}</p>
-                  <p className="mt-3 text-sm leading-6 text-white/64">{group.description}</p>
+                  <summary>
+                    <div className="min-w-0">
+                      <span className="text-xs uppercase tracking-[0.24em]" style={{ color: group.accent }}>{group.title}</span>
+                      <p className="mobile-accordion-hint">{group.description}</p>
+                    </div>
+                  </summary>
+                  <div className="mobile-accordion-body">
                   <div className="mt-5 grid gap-3">
                     {group.items.map((item) => (
                       <button
@@ -264,7 +276,8 @@ export default function AccountPage() {
                       </button>
                     ))}
                   </div>
-                </article>
+                </div>
+                </details>
               ))}
             </section>
           </>
