@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
+import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   deleteAnalysis,
@@ -248,6 +249,40 @@ export default function BatchPage() {
 
         {!loading ? (
           <section id="batch-primary-section" className="route-scroll-target space-y-4">
+            {/* ─── Phone: upload form + section list ─── */}
+            <div className="phone-only space-y-3">
+              <div className="flex flex-col gap-3">
+                <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/8 px-4 py-3 text-sm font-medium text-white transition">
+                  <input
+                    type="file"
+                    accept=".csv,text/csv"
+                    className="hidden"
+                    onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+                  />
+                  {selectedFile ? selectedFile.name : "Choose dataset CSV"}
+                </label>
+                <button
+                  type="button"
+                  disabled={!selectedFile || uploadBusy}
+                  onClick={() => { void handleUpload(); }}
+                  className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:opacity-60"
+                >
+                  {uploadBusy ? "Processing..." : "Process dataset"}
+                </button>
+              </div>
+
+              <BatchMobileSections
+                analyses={analyses}
+                selectedAnalysis={selectedAnalysis}
+                selectedFile={selectedFile}
+                handleSelectSavedUpload={handleSelectSavedUpload}
+                handleClearCurrentSelection={handleClearCurrentSelection}
+                setConfirmAction={setConfirmAction}
+                setCurrentAnalysisSelection={setCurrentAnalysisSelection}
+              />
+            </div>
+
+            {/* ─── Desktop: existing card layout ─── */}
             {!analyses.length && !selectedFile ? (
               <div className="rounded-[28px] border border-dashed border-[#7ad6ff]/30 bg-[#7ad6ff]/10 px-5 py-6 text-sm text-[#def7ff]">
                 <p className="font-semibold text-white">No dataset is staged yet.</p>
@@ -267,7 +302,7 @@ export default function BatchPage() {
             ) : null}
 
             <div className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
-              <details className="mobile-accordion">
+              <details className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Dataset upload</span>
@@ -347,7 +382,7 @@ export default function BatchPage() {
                 </div>
               </details>
 
-              <details className="mobile-accordion">
+              <details className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Selected dataset</span>
@@ -436,7 +471,7 @@ export default function BatchPage() {
               </details>
             </div>
 
-            <details className="mobile-accordion">
+            <details className="mobile-accordion tablet-up">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Saved runs</span>
@@ -579,4 +614,117 @@ export default function BatchPage() {
       />
     </>
   );
+}
+
+/* ── Phone-only section list for batch page ── */
+function BatchMobileSections({
+  analyses,
+  selectedAnalysis,
+  selectedFile,
+  handleSelectSavedUpload,
+  handleClearCurrentSelection,
+  setConfirmAction,
+  setCurrentAnalysisSelection: setSelection,
+}: {
+  analyses: AnalysisListItem[];
+  selectedAnalysis: AnalysisListItem | null;
+  selectedFile: File | null;
+  handleSelectSavedUpload: (id: number) => void;
+  handleClearCurrentSelection: () => void;
+  setConfirmAction: (action: ConfirmAction) => void;
+  setCurrentAnalysisSelection: (id: number) => void;
+}) {
+  const sections: MobileSection[] = [
+    {
+      id: "selected",
+      title: selectedAnalysis ? selectedAnalysis.overview.dataset_name : "Selected dataset",
+      hint: selectedAnalysis
+        ? `${selectedAnalysis.overview.total_missing_values.toLocaleString()} missing • ${selectedAnalysis.overview.duplicate_row_count.toLocaleString()} dups`
+        : "No dataset selected yet",
+      accent: "#8bf1a8",
+      content: selectedAnalysis ? (
+        <div className="space-y-3">
+          <p className="text-sm leading-6 text-white/66">{selectedAnalysis.insights.summary}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+              <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Missing</p>
+              <p className="mt-1 text-lg font-semibold text-white">{selectedAnalysis.overview.total_missing_values.toLocaleString()}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+              <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Duplicates</p>
+              <p className="mt-1 text-lg font-semibold text-white">{selectedAnalysis.overview.duplicate_row_count.toLocaleString()}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+              <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Columns</p>
+              <p className="mt-1 text-lg font-semibold text-white">{selectedAnalysis.overview.column_count.toLocaleString()}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+              <p className="text-[0.65rem] uppercase tracking-wider text-white/42">ML runs</p>
+              <p className="mt-1 text-lg font-semibold text-white">{selectedAnalysis.experiment_count}</p>
+            </div>
+          </div>
+          <ScrollIntentLink
+            href={`/analysis?analysisId=${selectedAnalysis.id}`}
+            targetId="analysis-workspace-navigation"
+            onClick={() => setSelection(selectedAnalysis.id)}
+            className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]"
+          >
+            Open analysis overview
+          </ScrollIntentLink>
+          <button
+            type="button"
+            onClick={() => setConfirmAction("selected")}
+            className="w-full rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba]"
+          >
+            Delete current dataset
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <p className="text-sm leading-6 text-white/60">
+            {selectedFile ? `Ready to analyze: ${selectedFile.name}` : "Upload a CSV or pick a saved run to see dataset info here."}
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: "runs",
+      title: "Saved runs",
+      hint: `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}`,
+      accent: "#ffb079",
+      content: (
+        <div className="space-y-3">
+          {analyses.length === 0 ? (
+            <p className="text-sm text-white/50">No saved runs yet. Upload a CSV to create the first one.</p>
+          ) : null}
+          {analyses.map((analysis) => {
+            const selected = analysis.id === selectedAnalysis?.id;
+            return (
+              <button
+                key={analysis.id}
+                type="button"
+                onClick={() => handleSelectSavedUpload(analysis.id)}
+                className={`w-full rounded-2xl border p-4 text-left ${selected ? "border-[#7ad6ff]/60 bg-[#7ad6ff]/10" : "border-white/10 bg-white/[0.04]"}`}
+              >
+                <p className="truncate font-semibold text-white">{analysis.overview.dataset_name || analysis.source_filename}</p>
+                <p className="mt-1 text-xs text-white/45">Saved {formatDate(analysis.saved_at)}</p>
+                <p className="mt-2 text-sm leading-6 text-white/60">{analysis.insights.summary}</p>
+              </button>
+            );
+          })}
+          {selectedAnalysis ? (
+            <button
+              type="button"
+              onClick={handleClearCurrentSelection}
+              className="w-full rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+            >
+              Clear current selection
+            </button>
+          ) : null}
+        </div>
+      ),
+    },
+  ];
+
+  return <MobileSectionList sections={sections} />;
 }
