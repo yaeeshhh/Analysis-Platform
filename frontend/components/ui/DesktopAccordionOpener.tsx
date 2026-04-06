@@ -17,6 +17,12 @@ export default function DesktopAccordionOpener() {
       });
     };
 
+    const closeAll = () => {
+      document.querySelectorAll<HTMLDetailsElement>("details.mobile-accordion").forEach((el) => {
+        el.open = false;
+      });
+    };
+
     // Open everything currently in the DOM
     openAll();
 
@@ -38,13 +44,13 @@ export default function DesktopAccordionOpener() {
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // Handle viewport resize crossing the breakpoint
+    // Handle viewport resize crossing the breakpoint — open on desktop, close on mobile
     const mq = window.matchMedia(`(min-width: ${BREAKPOINT}px)`);
-    mq.addEventListener("change", openAll);
+    mq.addEventListener("change", (e) => { if (e.matches) { openAll(); } else { closeAll(); } });
 
     return () => {
       observer.disconnect();
-      mq.removeEventListener("change", openAll);
+      mq.removeEventListener("change", (e) => { if (e.matches) { openAll(); } else { closeAll(); } });
     };
   }, []);
 
