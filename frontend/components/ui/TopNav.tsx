@@ -17,7 +17,7 @@ export default function TopNav() {
   const pathname = usePathname();
 
   const linkClass = (match: string) =>
-    `nav-link min-w-0 w-full ${
+    `nav-link md:w-full ${
       pathname === match || pathname.startsWith(`${match}/`)
         ? "nav-link-active"
         : ""
@@ -34,7 +34,7 @@ export default function TopNav() {
           </div>
         </div>
 
-        <div className="nav-links-scroll order-3 w-full md:order-none md:flex-1">
+        <div className="nav-links-scroll md:flex-1">
           <div className="nav-links-track">
             {navItems.map((item) => (
               <ScrollIntentLink
@@ -50,7 +50,7 @@ export default function TopNav() {
           </div>
         </div>
 
-        <div className="order-2 shrink-0 md:order-none">
+        <div className="shrink-0">
           <ProfileMenu />
         </div>
       </div>

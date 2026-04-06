@@ -597,8 +597,42 @@ a[class*="rounded"]:hover {
     line-height: 0.98;
   }
 
+  /* Single-row compact nav: brand | scrollable links | profile */
   .nav-surface {
     border-radius: 1.4rem;
+    flex-wrap: nowrap;
+    gap: 0.6rem;
+    padding: 0.65rem;
+  }
+
+  .nav-links-scroll {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .nav-links-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Horizontal single row of pill links instead of a grid */
+  .nav-links-track {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3rem;
+    grid-template-columns: unset;
+    min-width: max-content;
+    width: auto;
+  }
+
+  .nav-link {
+    min-height: 2.4rem;
+    min-width: unset;
+    padding: 0.5rem 0.85rem;
+    white-space: nowrap;
+    width: auto;
   }
 
   /* Prevent iOS Safari from zooming in on input focus */
