@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,22 +7,14 @@ from .core.database import Base, SessionLocal, engine
 from .core.config import settings
 from . import models
 
-logger = logging.getLogger(__name__)
-
 # Create all tables
-try:
-    Base.metadata.create_all(bind=engine)
-except Exception as exc:
-    logger.error("Failed to create tables: %s", exc)
+Base.metadata.create_all(bind=engine)
 
 from .api.routes.analysis import router as analysis_router
 from .services.analysis_runs import retire_legacy_batch_tables
 
-try:
-    with SessionLocal() as db:
-        retire_legacy_batch_tables(db)
-except Exception as exc:
-    logger.error("Failed to run startup migration: %s", exc)
+with SessionLocal() as db:
+    retire_legacy_batch_tables(db)
 
 app = FastAPI(title="Universal Data Analysis API")
 
