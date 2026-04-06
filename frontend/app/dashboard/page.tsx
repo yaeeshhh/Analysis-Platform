@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
+import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
 import { AnalysisListItem } from "@/lib/analysisTypes";
@@ -248,7 +249,11 @@ export default function DashboardPage() {
 
         {!loading ? (
           <>
-            <details className="mobile-accordion">
+            {/* ─── Phone: tappable list → slides ─── */}
+            <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
+
+            {/* ─── Desktop: existing card layout ─── */}
+            <details className="mobile-accordion tablet-up">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Recommended workflow</span>
@@ -267,7 +272,7 @@ export default function DashboardPage() {
               </div>
             </details>
 
-            <details className="mobile-accordion">
+            <details className="mobile-accordion tablet-up">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Studio pages</span>
@@ -299,7 +304,7 @@ export default function DashboardPage() {
               </div>
             </details>
 
-            <details className="mobile-accordion">
+            <details className="mobile-accordion tablet-up">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Analysis tabs</span>
@@ -326,7 +331,7 @@ export default function DashboardPage() {
               </div>
             </details>
 
-            <details className="mobile-accordion">
+            <details className="mobile-accordion tablet-up">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">History archive</span>
@@ -382,7 +387,7 @@ export default function DashboardPage() {
               </div>
             </details>
 
-            <details className="mobile-accordion">
+            <details className="mobile-accordion tablet-up">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">How features work</span>
@@ -415,7 +420,7 @@ export default function DashboardPage() {
             </details>
 
             <section className="grid gap-4 lg:grid-cols-3">
-              <details className="mobile-accordion">
+              <details className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Persistence</span>
@@ -429,7 +434,7 @@ export default function DashboardPage() {
                 </div>
               </details>
 
-              <details className="mobile-accordion">
+              <details className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Overview first</span>
@@ -443,7 +448,7 @@ export default function DashboardPage() {
                 </div>
               </details>
 
-              <details className="mobile-accordion">
+              <details className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Latest saved run</span>
@@ -481,4 +486,139 @@ export default function DashboardPage() {
       />
     </>
   );
+}
+
+/* ── Phone-only sections list ── */
+function DashboardMobileSections({
+  analyses,
+  latest,
+  totalExperiments,
+}: {
+  analyses: AnalysisListItem[];
+  latest: AnalysisListItem | null;
+  totalExperiments: number;
+}) {
+  const sections: MobileSection[] = [
+    {
+      id: "workflow",
+      title: "Recommended workflow",
+      hint: "Four steps from upload through analysis to ML review",
+      accent: "#7ad6ff",
+      content: (
+        <div className="space-y-3">
+          {workflowSteps.map((step) => (
+            <div key={step.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="font-medium text-white">{step.title}</p>
+              <p className="mt-2 text-sm leading-6 text-white/64">{step.detail}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "pages",
+      title: "Studio pages",
+      hint: "Direct links to Uploads, Analysis, History, and Account",
+      accent: "#ffb079",
+      content: (
+        <div className="space-y-3">
+          {destinationCards.map((item) => (
+            <ScrollIntentLink
+              key={`${item.href}-${item.title}`}
+              href={item.href}
+              className="block rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+            >
+              <p className="font-medium text-white">{item.title}</p>
+              <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
+              <p className="mt-3 text-sm font-medium text-[#ffcfaa]">{item.cta}</p>
+            </ScrollIntentLink>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "tabs",
+      title: "Analysis tabs",
+      hint: "What each of the 8 tabs in the Analysis workspace shows",
+      accent: "#8bf1a8",
+      content: (
+        <div className="space-y-3">
+          <ScrollIntentLink href="/analysis" className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+            Open analysis workspace
+          </ScrollIntentLink>
+          {analysisTabCards.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="font-medium text-white">{item.title}</p>
+              <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "history",
+      title: "History archive",
+      hint: "Tools for reopening, searching, and downloading past runs",
+      accent: "#ffd76d",
+      content: (
+        <div className="space-y-3">
+          <ScrollIntentLink href="/history" className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+            Open history tools
+          </ScrollIntentLink>
+          {historyFeatureCards.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="font-medium text-white">{item.title}</p>
+              <p className="mt-2 text-sm leading-6 text-white/64">{item.detail}</p>
+            </div>
+          ))}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-white/42">Archive volume</p>
+            <p className="mt-2 text-lg font-medium text-white">
+              {analyses.length.toLocaleString()} saved run{analyses.length === 1 ? "" : "s"} • {totalExperiments.toLocaleString()} ML run{totalExperiments === 1 ? "" : "s"}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "features",
+      title: "How features work",
+      hint: "Product map for uploads, persistence, charts, experiments, and cleanup",
+      accent: "#d7b7ff",
+      content: (
+        <div className="space-y-3">
+          {featureMechanics.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-xs uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.title}</p>
+              <p className="mt-3 text-sm leading-6 text-white/66">{item.detail}</p>
+              <p className="mt-2 text-sm leading-6 text-white/50">{item.flow}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "latest",
+      title: "Latest saved run",
+      hint: latest ? latest.overview.dataset_name : "No saved analyses yet",
+      accent: "#7ad6ff",
+      content: (
+        <div className="space-y-3">
+          <p className="text-sm leading-6 text-white/68">
+            {latest
+              ? `${latest.overview.dataset_name} is the most recent saved run. Open Uploads to review quick quality signals or open Analysis to continue through the full report.`
+              : "No saved analysis yet. Open Uploads to upload the first CSV."}
+          </p>
+          <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="block rounded-full bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
+            {latest ? "Open latest run" : "Open uploads page"}
+          </ScrollIntentLink>
+          <ScrollIntentLink href="/history" className="block rounded-full border border-white/12 px-5 py-3 text-center text-sm text-white/82">
+            View saved history
+          </ScrollIntentLink>
+        </div>
+      ),
+    },
+  ];
+
+  return <MobileSectionList sections={sections} />;
 }

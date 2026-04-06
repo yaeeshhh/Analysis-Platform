@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import GlobalOverlays from "@/components/ui/GlobalOverlays";
 import DesktopAccordionOpener from "@/components/ui/DesktopAccordionOpener";
+import { MobileSlideProvider } from "@/components/ui/MobileSlideProvider";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -46,7 +47,9 @@ export default function RootLayout({
       className={`${bodyFont.variable} ${displayFont.variable}`}
     >
       <body suppressHydrationWarning className="antialiased">
-        {children}
+        <MobileSlideProvider>
+          {children}
+        </MobileSlideProvider>
         <DesktopAccordionOpener />
         <Suspense fallback={null}>
           <GlobalOverlays />
