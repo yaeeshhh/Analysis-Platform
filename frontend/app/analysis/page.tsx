@@ -31,6 +31,7 @@ import {
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import { triggerNavigationScroll, useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
+import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
 type AnalysisTabKey =
   | "overview"
@@ -332,31 +333,17 @@ function AnalysisPageContent() {
 
         {!loading ? (
           <>
+            {/* Phone: tappable section list for each tab */}
+            {showWorkspaceNavigation && hasRenderableReport && report ? (
+              <AnalysisMobileSections report={report} refreshAnalyses={refreshAnalyses} />
+            ) : null}
+
             {showWorkspaceNavigation ? (
-              <div id="analysis-workspace-navigation" className="route-scroll-target rounded-[28px] border border-white/10 bg-white/[0.04] p-3">
+              <div id="analysis-workspace-navigation" className="tablet-up route-scroll-target rounded-[28px] border border-white/10 bg-white/[0.04] p-3">
                 <p className="px-2 text-xs uppercase tracking-[0.2em] text-white/42">Report sections</p>
 
-                {/* Phone: dropdown select */}
-                <div className="phone-only mt-3">
-                  <select
-                    value={visibleTab}
-                    onChange={(e) => handleTabChange(e.target.value as AnalysisTabKey)}
-                    className="mobile-tab-select"
-                  >
-                    {tabs.map((tab) => (
-                      <option
-                        key={tab.key}
-                        value={tab.key}
-                        disabled={tab.key !== "overview" && !hasRenderableReport}
-                      >
-                        {tab.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 {/* Tablet+: horizontal scroll tab bar */}
-                <div className="tablet-up mt-3 scrollbar-hide overflow-x-auto overflow-y-visible pb-2 pt-1">
+                <div className="mt-3 scrollbar-hide overflow-x-auto overflow-y-visible pb-2 pt-1">
                   <div className="analysis-subnav-surface">
                     <div className="analysis-subnav-track">
                       {tabs.map((tab) => {
@@ -406,6 +393,8 @@ function AnalysisPageContent() {
               </article>
             ) : null}
 
+            {/* Inline tab content — tablet+ only (phone uses slide pages) */}
+            <div className="tablet-up">
             {visibleTab === "overview" && hasRenderableReport && report ? (
               <OverviewTab
                 overview={report.overview}
@@ -479,6 +468,7 @@ function AnalysisPageContent() {
                 }}
               />
             ) : null}
+            </div>
           </>
         ) : null}
 
@@ -517,4 +507,119 @@ export default function AnalysisPage() {
       <AnalysisPageContent />
     </Suspense>
   );
+}
+
+/* ────────────────── Phone-only analysis tab slides ────────────────── */
+
+const tabAccents: Record<AnalysisTabKey, string> = {
+  overview: "#7ad6ff",
+  insights: "#ffb079",
+  schema: "#a78bfa",
+  quality: "#5ae681",
+  statistics: "#fbbf24",
+  relationships: "#f472b6",
+  visualisations: "#38bdf8",
+  ml: "#c084fc",
+};
+
+function AnalysisMobileSections({
+  report,
+  refreshAnalyses,
+}: {
+  report: AnalysisReport;
+  refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
+}) {
+  const sections: MobileSection[] = [
+    {
+      id: "analysis-overview",
+      title: "Overview",
+      hint: `${report.overview.row_count.toLocaleString()} rows · ${report.overview.column_count} columns`,
+      accent: tabAccents.overview,
+      content: (
+        <OverviewTab
+          overview={report.overview}
+          schema={report.schema}
+          quality={report.quality}
+          insights={report.insights}
+        />
+      ),
+    },
+    {
+      id: "analysis-insights",
+      title: "Insights",
+      hint: report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first",
+      accent: tabAccents.insights,
+      content: <InsightsTab insights={report.insights} />,
+    },
+    {
+      id: "analysis-schema",
+      title: "Schema",
+      hint: `${report.schema.columns.length} columns profiled`,
+      accent: tabAccents.schema,
+      content: <SchemaTab schema={report.schema} />,
+    },
+    {
+      id: "analysis-quality",
+      title: "Data Quality",
+      hint: `Score ${calculateQualityScore(report.overview, report.quality).toFixed(1)}`,
+      accent: tabAccents.quality,
+      content: <DataQualityTab overview={report.overview} quality={report.quality} />,
+    },
+    {
+      id: "analysis-statistics",
+      title: "Statistics",
+      hint: `${report.statistics.numeric_summary.length} numeric · ${report.statistics.categorical_summary.length} categorical`,
+      accent: tabAccents.statistics,
+      content: <StatisticsTab statistics={report.statistics} />,
+    },
+    {
+      id: "analysis-relationships",
+      title: "Relationships",
+      hint: "Structural patterns and correlations",
+      accent: tabAccents.relationships,
+      content: <RelationshipsTab schema={report.schema} statistics={report.statistics} />,
+    },
+    {
+      id: "analysis-visualisations",
+      title: "Charts",
+      hint: "Visual summaries from the current run",
+      accent: tabAccents.visualisations,
+      content: <VisualisationsTab visualisations={report.visualisations} />,
+    },
+    {
+      id: "analysis-ml",
+      title: "ML Lab",
+      hint: `${report.ml_experiments.length} experiment${report.ml_experiments.length === 1 ? "" : "s"} saved`,
+      accent: tabAccents.ml,
+      content: (
+        <MLTab
+          key={`mobile-${report.analysis_id}:${report.ml_experiments.map((e) => e.id).join("|")}`}
+          analysisId={report.analysis_id}
+          capabilities={report.ml_capabilities}
+          experiments={report.ml_experiments || []}
+          initialUnsupervised={report.ml_results.unsupervised}
+          initialSupervised={report.ml_results.supervised}
+          onRunUnsupervised={async (nClusters) => {
+            const result = await runUnsupervisedAnalysis(report.analysis_id, nClusters);
+            await refreshAnalyses(report.analysis_id);
+            notifyAnalysesChanged();
+            return result;
+          }}
+          onRunSupervised={async (targetColumn) => {
+            const result = await runSupervisedAnalysis(report.analysis_id, targetColumn);
+            await refreshAnalyses(report.analysis_id);
+            notifyAnalysesChanged();
+            return result;
+          }}
+          onDeleteExperiment={async (experiment) => {
+            await deleteMlExperiment(report.analysis_id, experiment);
+            await refreshAnalyses(report.analysis_id, "ml");
+            notifyAnalysesChanged();
+          }}
+        />
+      ),
+    },
+  ];
+
+  return <MobileSectionList sections={sections} />;
 }

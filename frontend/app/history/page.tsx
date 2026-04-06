@@ -26,6 +26,7 @@ import {
 import { formatDate } from "@/lib/helpers";
 import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
+import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
 type ReadinessFilter = "all" | "ml-ready" | "eda-first";
 type MlFilter = "all" | "with-ml" | "without-ml";
@@ -267,7 +268,21 @@ export default function HistoryPage() {
 
         {!loading ? (
           <section className="space-y-4">
-            <details id="history-first-block" className="mobile-accordion route-scroll-target">
+            <HistoryMobileSections
+              analyses={analyses}
+              filteredAnalyses={filteredAnalyses}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              readinessFilter={readinessFilter}
+              setReadinessFilter={setReadinessFilter}
+              mlFilter={mlFilter}
+              setMlFilter={setMlFilter}
+              onOpenPopup={handleOpenAnalysisPopup}
+              onDeleteRun={setDeleteTargetId}
+              onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
+            />
+
+            <details id="history-first-block" className="mobile-accordion tablet-up route-scroll-target">
               <summary>
                 <div className="min-w-0">
                   <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archive search</span>
@@ -326,7 +341,7 @@ export default function HistoryPage() {
             </details>
 
             {filteredAnalyses.map((analysis) => (
-              <details key={analysis.id} className="mobile-accordion">
+              <details key={analysis.id} className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Run #{analysis.id} — {analysis.overview.dataset_name}</span>
@@ -542,4 +557,158 @@ export default function HistoryPage() {
       />
     </>
   );
+}
+
+/* ────────────────── Phone-only slide sections ────────────────── */
+
+type HistoryMobileSectionsProps = {
+  analyses: AnalysisListItem[];
+  filteredAnalyses: AnalysisListItem[];
+  searchQuery: string;
+  setSearchQuery: (v: string) => void;
+  readinessFilter: ReadinessFilter;
+  setReadinessFilter: (v: ReadinessFilter) => void;
+  mlFilter: MlFilter;
+  setMlFilter: (v: MlFilter) => void;
+  onOpenPopup: (a: AnalysisListItem) => void;
+  onDeleteRun: (id: number) => void;
+  onDownloadReport: (id: number) => void;
+};
+
+function HistoryMobileSections({
+  analyses,
+  filteredAnalyses,
+  searchQuery,
+  setSearchQuery,
+  readinessFilter,
+  setReadinessFilter,
+  mlFilter,
+  setMlFilter,
+  onOpenPopup,
+  onDeleteRun,
+  onDownloadReport,
+}: HistoryMobileSectionsProps) {
+  const searchSection: MobileSection = {
+    id: "history-search",
+    title: "Search & filters",
+    hint: `${filteredAnalyses.length} of ${analyses.length} runs shown`,
+    accent: "#7ad6ff",
+    content: (
+      <div className="space-y-4">
+        <p className="text-sm leading-6 text-white/64">
+          Find an older run by dataset name or summary, then narrow the list by readiness or ML status.
+        </p>
+
+        <label className="block rounded-2xl border border-white/10 bg-black/10 p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-white/42">Search runs</p>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by dataset, summary, or status"
+            className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+          />
+        </label>
+
+        <label className="block rounded-2xl border border-white/10 bg-black/10 p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-white/42">Readiness</p>
+          <select
+            value={readinessFilter}
+            onChange={(e) => setReadinessFilter(e.target.value as ReadinessFilter)}
+            className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+          >
+            <option value="all">All runs</option>
+            <option value="ml-ready">ML-ready only</option>
+            <option value="eda-first">EDA-first only</option>
+          </select>
+        </label>
+
+        <label className="block rounded-2xl border border-white/10 bg-black/10 p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-white/42">ML history</p>
+          <select
+            value={mlFilter}
+            onChange={(e) => setMlFilter(e.target.value as MlFilter)}
+            className="mt-2 w-full rounded-full border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+          >
+            <option value="all">All runs</option>
+            <option value="with-ml">With ML runs</option>
+            <option value="without-ml">Without ML runs</option>
+          </select>
+        </label>
+      </div>
+    ),
+  };
+
+  const runSections: MobileSection[] = filteredAnalyses.map((a) => ({
+    id: `history-run-${a.id}`,
+    title: a.overview.dataset_name,
+    hint: `${formatDate(a.saved_at)} · ${a.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"} · ${a.experiment_count} ML`,
+    accent: a.insights.modeling_readiness.is_ready ? "#5ae681" : "#ffb079",
+    content: (
+      <div className="space-y-4">
+        <p className="text-sm text-white/44">Saved {formatDate(a.saved_at)}</p>
+        <p className="text-sm leading-6 text-white/68">{a.insights.summary}</p>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
+            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Rows</p>
+            <p className="mt-1 text-lg font-semibold text-white">{a.overview.row_count.toLocaleString()}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
+            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Columns</p>
+            <p className="mt-1 text-lg font-semibold text-white">{a.overview.column_count}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
+            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Status</p>
+            <p className="mt-1 text-lg font-semibold text-white">{a.status}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-center">
+            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">ML runs</p>
+            <p className="mt-1 text-lg font-semibold text-white">{a.experiment_count}</p>
+          </div>
+        </div>
+
+        {a.latest_experiment ? (
+          <div className="rounded-xl border border-white/10 bg-black/10 p-3 text-sm text-white/68">
+            <p className="text-[0.65rem] uppercase tracking-wider text-white/42">Latest ML run</p>
+            <p className="mt-1">{a.latest_experiment.summary}</p>
+          </div>
+        ) : null}
+
+        <div className="flex flex-col gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => onOpenPopup(a)}
+            className="rounded-full bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
+          >
+            Open saved run
+          </button>
+          <button
+            type="button"
+            onClick={() => onDownloadReport(a.id)}
+            className="rounded-full border border-white/12 px-5 py-3 text-sm text-white/82"
+          >
+            Download report
+          </button>
+          <button
+            type="button"
+            onClick={() => onDeleteRun(a.id)}
+            className="rounded-full border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba]"
+          >
+            Delete saved run
+          </button>
+        </div>
+      </div>
+    ),
+  }));
+
+  if (analyses.length === 0) {
+    return (
+      <div className="phone-only rounded-2xl border border-dashed border-white/12 px-4 py-8 text-center text-sm text-white/48">
+        No analysis history yet.
+      </div>
+    );
+  }
+
+  return <MobileSectionList sections={[searchSection, ...runSections]} />;
 }

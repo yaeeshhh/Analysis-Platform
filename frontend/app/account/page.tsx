@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
+import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   getRememberStatus,
@@ -204,8 +205,12 @@ export default function AccountPage() {
 
         {!loading && user ? (
           <>
+            {/* ─── Phone: tappable section list ─── */}
+            <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
+
+            {/* ─── Desktop: existing card layout ─── */}
             <section id="account-first-block" className="route-scroll-target">
-              <details className="mobile-accordion">
+              <details className="mobile-accordion tablet-up">
                 <summary>
                   <div className="min-w-0">
                     <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Account snapshot</span>
@@ -245,7 +250,7 @@ export default function AccountPage() {
               {toolGroups.map((group) => (
                 <details
                   key={group.title}
-                  className="mobile-accordion"
+                  className="mobile-accordion tablet-up"
                 >
                   <summary>
                     <div className="min-w-0">
@@ -318,4 +323,76 @@ export default function AccountPage() {
       />
     </>
   );
+}
+
+/* ── Phone-only account sections ── */
+function AccountMobileSections({
+  user,
+  rememberStatus,
+  setActiveDialog,
+}: {
+  user: User;
+  rememberStatus: RememberStatus;
+  setActiveDialog: (key: AccountDialogKey) => void;
+}) {
+  const sections: MobileSection[] = [
+    {
+      id: "snapshot",
+      title: "Account snapshot",
+      hint: user.email,
+      accent: "#7ad6ff",
+      content: (
+        <div className="space-y-3">
+          {[
+            { label: "Username", value: user.username || "Not set" },
+            { label: "Email", value: user.email },
+            { label: "Member since", value: formatDate(user.created_at) },
+            {
+              label: "Remembered login",
+              value: rememberStatus.available
+                ? rememberStatus.enabled
+                  ? `Enabled for ${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"}`
+                  : "Available but disabled"
+                : "Not configured",
+            },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-[0.65rem] uppercase tracking-wider text-white/42">{stat.label}</p>
+              <p className="mt-2 text-base font-medium text-white">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    ...toolGroups.map((group) => ({
+      id: group.title,
+      title: group.title,
+      hint: group.description,
+      accent: group.accent,
+      content: (
+        <div className="space-y-3">
+          {group.items.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setActiveDialog(item.key)}
+              className={`w-full rounded-2xl border p-4 text-left ${item.destructive ? "border-[#5a2328] bg-[#2a1215]" : "border-white/10 bg-white/[0.04]"}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className={`font-medium ${item.destructive ? "text-[#ffb4ba]" : "text-white"}`}>{item.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
+                </div>
+                <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.14em] ${item.destructive ? "border-[#8a3941] text-[#ffb4ba]" : "border-white/12 text-white/52"}`}>
+                  {item.destructive ? "Danger" : "Open"}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      ),
+    })),
+  ];
+
+  return <MobileSectionList sections={sections} />;
 }
