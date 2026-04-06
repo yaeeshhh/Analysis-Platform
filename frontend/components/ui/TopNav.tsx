@@ -24,7 +24,7 @@ export default function TopNav() {
     }`;
 
   return (
-    <div className="sticky top-5 z-40 mt-6 mb-10">
+    <div className="sticky top-4 z-40 mb-6">
       <div className="nav-surface">
         <div className="flex min-w-0 flex-1 items-center gap-3 md:max-w-[18rem] md:flex-none md:pr-2">
           <BrandMark compact withCopy={false} />
