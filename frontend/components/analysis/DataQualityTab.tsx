@@ -33,9 +33,12 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
       </article>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <details className="mobile-accordion" open>
+        <details className="mobile-accordion">
           <summary>
-            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
+              <p className="mobile-accordion-hint">How many values are missing per column, shown as a percentage and fill bar</p>
+            </div>
           </summary>
           <div className="mobile-accordion-body">
             <div className="mt-4 space-y-3">
@@ -60,9 +63,12 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
           </div>
         </details>
 
-        <details className="mobile-accordion" open>
+        <details className="mobile-accordion">
           <summary>
-            <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Recommendations</span>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Recommendations</span>
+              <p className="mobile-accordion-hint">Suggested actions to clean and improve overall dataset quality</p>
+            </div>
           </summary>
           <div className="mobile-accordion-body">
             <ul className="mt-4 space-y-3 text-sm leading-6 text-white/76">

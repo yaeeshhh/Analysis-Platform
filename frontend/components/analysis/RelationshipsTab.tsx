@@ -18,9 +18,12 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
 
   return (
     <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-      <details className="mobile-accordion" open>
+      <details className="mobile-accordion">
         <summary>
-          <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Strongest relationships</span>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Strongest relationships</span>
+            <p className="mobile-accordion-hint">Pairs of numeric columns with the highest linear correlation</p>
+          </div>
         </summary>
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
@@ -48,9 +51,12 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
       </details>
 
       <div className="space-y-4">
-        <details className="mobile-accordion" open>
+        <details className="mobile-accordion">
           <summary>
-            <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Skewed numeric fields</span>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Skewed numeric fields</span>
+              <p className="mobile-accordion-hint">Columns with non-symmetric distributions that may need transformation</p>
+            </div>
           </summary>
           <div className="mobile-accordion-body">
             <div className="mt-4 space-y-3">
@@ -70,9 +76,12 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
           </div>
         </details>
 
-        <details className="mobile-accordion" open>
+        <details className="mobile-accordion">
           <summary>
-            <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Dominant categories</span>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Dominant categories</span>
+              <p className="mobile-accordion-hint">Categorical columns where one value appears far more than others</p>
+            </div>
           </summary>
           <div className="mobile-accordion-body">
             <div className="mt-4 space-y-3">
@@ -91,9 +100,12 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
           </div>
         </details>
 
-        <details className="mobile-accordion" open>
+        <details className="mobile-accordion">
           <summary>
-            <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Modeling signals</span>
+            <div className="min-w-0">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Modeling signals</span>
+              <p className="mobile-accordion-hint">Inferred identifier and target columns for supervised modeling</p>
+            </div>
           </summary>
           <div className="mobile-accordion-body">
             <p className="mt-3 text-sm leading-6 text-white/66">

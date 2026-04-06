@@ -11,9 +11,12 @@ function metric(value: number) {
 export default function StatisticsTab({ statistics }: StatisticsTabProps) {
   return (
     <section className="grid gap-4 lg:grid-cols-2">
-      <details className="mobile-accordion" open>
+      <details className="mobile-accordion">
         <summary>
-          <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Numeric summary</span>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Numeric summary</span>
+            <p className="mobile-accordion-hint">Mean, median, std, quartiles and skew for each numeric column</p>
+          </div>
         </summary>
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
@@ -35,9 +38,12 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
         </div>
       </details>
 
-      <details className="mobile-accordion" open>
+      <details className="mobile-accordion">
         <summary>
-          <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Categorical summary</span>
+          <div className="min-w-0">
+            <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Categorical summary</span>
+            <p className="mobile-accordion-hint">Top values and unique counts for each text or category column</p>
+          </div>
         </summary>
         <div className="mobile-accordion-body">
           <div className="mt-4 space-y-3">
