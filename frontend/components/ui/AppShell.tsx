@@ -35,35 +35,32 @@ export default function AppShell({
       {/* Mobile-only thin top header */}
       <MobileHeader />
 
-      <section className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 mobile-shell-body">
-        {/* Desktop sticky nav — tablet+ only */}
-        <div className="tablet-up">
+      {/* Desktop: combined nav + hero banner */}
+      <div className="tablet-up desktop-banner">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
           <Suspense fallback={<div className="h-12 border-b border-white/6" />}>
             <TopNav />
           </Suspense>
-        </div>
-
-        {/* Desktop hero — hidden on phone, visible on tablet+ */}
-        <div className={`page-hero tablet-up mb-4 mt-6`}>
-          <div className="page-hero-copy">
-            <span className="hero-pill">{eyebrow}</span>
-            <TitleTag className="page-title" style={{ fontSize: "clamp(1.3rem, 2.2vw, 1.8rem)" }}>{title}</TitleTag>
-            <div className="page-description">{description}</div>
-            {actions ? <div className="page-actions">{actions}</div> : null}
-          </div>
-
-          {stats.length > 0 ? (
-            <div className="stat-row mt-4">
-              {stats.map((stat) => (
-                <div key={`${stat.label}-${stat.value}`} className="stat-row-item">
-                  <p className="stat-row-value">{stat.value}</p>
-                  <p className="stat-row-label">{stat.label}</p>
-                </div>
-              ))}
+          <div className="desktop-banner-hero">
+            <div className="desktop-banner-copy">
+              <span className="hero-pill">{eyebrow}</span>
+              <TitleTag className="page-title" style={{ fontSize: "clamp(1.2rem, 2vw, 1.6rem)" }}>{title}</TitleTag>
             </div>
-          ) : null}
+            {stats.length > 0 ? (
+              <div className="stat-row desktop-banner-stats">
+                {stats.map((stat) => (
+                  <div key={`${stat.label}-${stat.value}`} className="stat-row-item">
+                    <p className="stat-row-value">{stat.value}</p>
+                    <p className="stat-row-label">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
         </div>
+      </div>
 
+      <section className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8 mobile-shell-body">
         {/* Phone-only compact page label */}
         <div className="mobile-page-label phone-only">
           <span className="hero-pill">{eyebrow}</span>

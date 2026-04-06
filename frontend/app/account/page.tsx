@@ -14,7 +14,6 @@ import {
 } from "@/lib/auth";
 import { clearCurrentAnalysisSelection, notifyAnalysesChanged } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
-import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 
 const emptyRememberStatus: RememberStatus = {
@@ -96,7 +95,7 @@ export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [rememberStatus, setRememberStatus] = useState<RememberStatus>(emptyRememberStatus);
 
-  useApplyNavigationScroll("/account", !loading);
+
 
   useEffect(() => {
     let active = true;
