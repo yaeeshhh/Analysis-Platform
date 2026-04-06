@@ -248,7 +248,7 @@ body::after {
   border-radius: 1.3rem;
   min-width: 0;
   overflow: hidden;
-  padding: 1rem 1.05rem;
+  padding: clamp(0.75rem, 1vw + 0.5rem, 1.1rem) clamp(0.8rem, 1vw + 0.5rem, 1.15rem);
   background: linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(143, 211, 193, 0.04) 48%, rgba(242, 195, 139, 0.02));
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.04),
@@ -270,7 +270,7 @@ body::after {
 
 .page-stat-value {
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(1rem, 0.92vw + 0.76rem, 1.22rem);
+  font-size: clamp(0.95rem, 1.2vw + 0.6rem, 1.22rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.18;
@@ -556,6 +556,11 @@ a[class*="rounded"]:hover {
 }
 
 @media (min-width: 1024px) {
+  .page-hero-with-stats {
+    align-items: end;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 480px);
+  }
+
   .nav-links-track {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
@@ -576,7 +581,6 @@ a[class*="rounded"]:hover {
 
 @media (min-width: 1200px) {
   .page-hero-with-stats {
-    align-items: end;
     grid-template-columns: minmax(0, 1fr) minmax(390px, 540px);
   }
 
@@ -682,6 +686,8 @@ a[class*="rounded"]:hover {
 @media (max-width: 599px) {
   .mobile-shell-body {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1rem + env(safe-area-inset-right, 0px));
     padding-top: 0.75rem;
   }
 }
@@ -700,6 +706,8 @@ a[class*="rounded"]:hover {
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 .mobile-bottom-nav-item {
@@ -740,6 +748,9 @@ a[class*="rounded"]:hover {
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 1rem;
+  padding-top: calc(0.55rem + env(safe-area-inset-top, 0px));
+  padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+  padding-right: calc(1rem + env(safe-area-inset-right, 0px));
   background: linear-gradient(to bottom, rgba(9, 16, 24, 0.97), rgba(13, 20, 29, 0.94));
   border-bottom: 1px solid var(--line-soft);
   backdrop-filter: blur(16px) saturate(125%);
