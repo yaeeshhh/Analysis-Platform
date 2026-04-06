@@ -29,7 +29,7 @@ import {
   setCurrentAnalysisSelection,
 } from "@/lib/currentAnalysis";
 import { calculateQualityScore } from "@/lib/analysisDerived";
-import { triggerNavigationScroll, useApplyNavigationScroll } from "@/lib/navigationScroll";
+import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
@@ -118,8 +118,6 @@ function AnalysisPageContent() {
       const tabQuery = nextTab !== "overview" ? `&tab=${nextTab}` : "";
       router.replace(`/analysis?analysisId=${selectedAnalysisId}${tabQuery}`, { scroll: false });
     }
-
-    triggerNavigationScroll("analysis-workspace-navigation", 0);
   }
 
   useEffect(() => {
@@ -333,9 +331,91 @@ function AnalysisPageContent() {
 
         {!loading ? (
           <>
-            {/* Phone: tappable section list for each tab */}
+            {/* Phone: dataset summary + tappable section list for each tab */}
             {showWorkspaceNavigation && hasRenderableReport && report ? (
-              <AnalysisMobileSections report={report} refreshAnalyses={refreshAnalyses} />
+              <div className="phone-only space-y-3">
+                {/* Inline dataset overview on mobile */}
+                <div className="mobile-inline-stats">
+                  <div className="mobile-inline-stat">
+                    <span className="mobile-inline-stat-value">{report.overview.row_count.toLocaleString()}</span>
+                    <span className="mobile-inline-stat-label">Rows</span>
+                  </div>
+                  <div className="mobile-inline-stat">
+                    <span className="mobile-inline-stat-value">{report.overview.column_count}</span>
+                    <span className="mobile-inline-stat-label">Columns</span>
+                  </div>
+                  <div className="mobile-inline-stat">
+                    <span className="mobile-inline-stat-value">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</span>
+                    <span className="mobile-inline-stat-label">Quality</span>
+                  </div>
+                </div>
+
+                <div className="border-b border-white/6 pb-3">
+                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Active dataset</p>
+                  <p className="mt-1 font-medium text-white">{report.overview.dataset_name}</p>
+                  <p className="mt-1.5 text-sm leading-6 text-white/55">{report.insights.summary}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className="info-chip">
+                      <span className="pulse-dot" />
+                      {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                    </span>
+                    {report.overview.total_missing_values > 0 && (
+                      <span className="info-chip">{report.overview.total_missing_values.toLocaleString()} missing</span>
+                    )}
+                    {report.overview.duplicate_row_count > 0 && (
+                      <span className="info-chip">{report.overview.duplicate_row_count.toLocaleString()} duplicates</span>
+                    )}
+                    <span className="info-chip">{report.ml_experiments.length} ML experiment{report.ml_experiments.length === 1 ? "" : "s"}</span>
+                  </div>
+                </div>
+
+                <AnalysisMobileSections report={report} refreshAnalyses={refreshAnalyses} />
+              </div>
+            ) : null}
+
+            {/* Desktop: pre-tab dataset summary */}
+            {showWorkspaceNavigation && hasRenderableReport && report ? (
+              <div className="tablet-up flow-section section-glow">
+                <p className="flow-section-label">Dataset overview</p>
+                <div className="accent-bar" />
+                <p className="mt-2 font-[family:var(--font-display)] text-lg font-bold text-white">{report.overview.dataset_name}</p>
+                <p className="mt-1.5 max-w-4xl text-sm leading-6 text-white/55">{report.insights.summary}</p>
+                <div className="stat-row mt-3">
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{report.overview.row_count.toLocaleString()}</p>
+                    <p className="stat-row-label">Rows</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{report.overview.column_count}</p>
+                    <p className="stat-row-label">Columns</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{report.overview.total_missing_values.toLocaleString()}</p>
+                    <p className="stat-row-label">Missing values</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{report.overview.duplicate_row_count.toLocaleString()}</p>
+                    <p className="stat-row-label">Duplicates</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
+                    <p className="stat-row-label">Quality score</p>
+                  </div>
+                  <div className="stat-row-item">
+                    <p className="stat-row-value">{report.ml_experiments.length}</p>
+                    <p className="stat-row-label">ML experiments</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="info-chip">
+                    <span className="pulse-dot" />
+                    {report.insights.modeling_readiness.is_ready ? "Modeling-ready" : "EDA-first recommended"}
+                  </span>
+                  {report.schema.target_candidates.length > 0 && (
+                    <span className="info-chip">{report.schema.target_candidates.length} target candidate{report.schema.target_candidates.length === 1 ? "" : "s"}</span>
+                  )}
+                </div>
+              </div>
             ) : null}
 
             {showWorkspaceNavigation ? (

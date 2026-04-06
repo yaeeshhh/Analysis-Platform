@@ -24,7 +24,6 @@ import {
   notifyAnalysesChanged,
 } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
-import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
@@ -48,7 +47,7 @@ export default function HistoryPage() {
   const [popupError, setPopupError] = useState("");
   const [popupReport, setPopupReport] = useState<AnalysisReport | null>(null);
 
-  useApplyNavigationScroll("/history", !loading);
+
 
   useEffect(() => {
     let active = true;
@@ -291,8 +290,30 @@ export default function HistoryPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search runs..."
-                className="w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+                className="w-full rounded-lg border border-white/12 bg-[#08131e] px-3 py-2 text-sm text-white outline-none placeholder:text-white/35"
               />
+
+              {/* Compact inline filters */}
+              <div className="flex gap-2">
+                <select
+                  value={readinessFilter}
+                  onChange={(e) => setReadinessFilter(e.target.value as ReadinessFilter)}
+                  className="flex-1 rounded-lg border border-white/12 bg-[#08131e] px-2 py-2 text-xs text-white outline-none [color-scheme:dark]"
+                >
+                  <option value="all">All readiness</option>
+                  <option value="ml-ready">ML-ready</option>
+                  <option value="eda-first">EDA-first</option>
+                </select>
+                <select
+                  value={mlFilter}
+                  onChange={(e) => setMlFilter(e.target.value as MlFilter)}
+                  className="flex-1 rounded-lg border border-white/12 bg-[#08131e] px-2 py-2 text-xs text-white outline-none [color-scheme:dark]"
+                >
+                  <option value="all">All ML</option>
+                  <option value="with-ml">With ML</option>
+                  <option value="without-ml">No ML</option>
+                </select>
+              </div>
 
               {/* Most recent run card */}
               {filteredAnalyses[0] ? (
@@ -311,14 +332,7 @@ export default function HistoryPage() {
             </div>
 
             <HistoryMobileSections
-              analyses={analyses}
               filteredAnalyses={filteredAnalyses}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              readinessFilter={readinessFilter}
-              setReadinessFilter={setReadinessFilter}
-              mlFilter={mlFilter}
-              setMlFilter={setMlFilter}
               onOpenPopup={handleOpenAnalysisPopup}
               onDeleteRun={setDeleteTargetId}
               onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
@@ -562,83 +576,18 @@ export default function HistoryPage() {
 /* ────────────────── Phone-only slide sections ────────────────── */
 
 type HistoryMobileSectionsProps = {
-  analyses: AnalysisListItem[];
   filteredAnalyses: AnalysisListItem[];
-  searchQuery: string;
-  setSearchQuery: (v: string) => void;
-  readinessFilter: ReadinessFilter;
-  setReadinessFilter: (v: ReadinessFilter) => void;
-  mlFilter: MlFilter;
-  setMlFilter: (v: MlFilter) => void;
   onOpenPopup: (a: AnalysisListItem) => void;
   onDeleteRun: (id: number) => void;
   onDownloadReport: (id: number) => void;
 };
 
 function HistoryMobileSections({
-  analyses,
   filteredAnalyses,
-  searchQuery,
-  setSearchQuery,
-  readinessFilter,
-  setReadinessFilter,
-  mlFilter,
-  setMlFilter,
   onOpenPopup,
   onDeleteRun,
   onDownloadReport,
 }: HistoryMobileSectionsProps) {
-  const searchSection: MobileSection = {
-    id: "history-search",
-    title: "Search & filters",
-    hint: `${filteredAnalyses.length} of ${analyses.length} runs shown`,
-    accent: "#7ad6ff",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-6 text-white/55">
-          Find an older run by dataset name or summary, then narrow by readiness or ML status.
-        </p>
-
-        <label className="block">
-          <p className="text-xs uppercase tracking-[0.14em] text-white/42">Search runs</p>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by dataset, summary, or status"
-            className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
-          />
-        </label>
-
-        <label className="block">
-          <p className="text-xs uppercase tracking-[0.14em] text-white/42">Readiness</p>
-          <select
-            value={readinessFilter}
-            onChange={(e) => setReadinessFilter(e.target.value as ReadinessFilter)}
-            className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
-          >
-            <option value="all">All runs</option>
-            <option value="ml-ready">ML-ready only</option>
-            <option value="eda-first">EDA-first only</option>
-          </select>
-        </label>
-
-        <label className="block">
-          <p className="text-xs uppercase tracking-[0.14em] text-white/42">ML history</p>
-          <select
-            value={mlFilter}
-            onChange={(e) => setMlFilter(e.target.value as MlFilter)}
-            className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
-          >
-            <option value="all">All runs</option>
-            <option value="with-ml">With ML runs</option>
-            <option value="without-ml">Without ML runs</option>
-          </select>
-        </label>
-      </div>
-    ),
-  };
-
   const runSections: MobileSection[] = filteredAnalyses.map((a) => ({
     id: `history-run-${a.id}`,
     title: a.overview.dataset_name,
@@ -702,13 +651,13 @@ function HistoryMobileSections({
     ),
   }));
 
-  if (analyses.length === 0) {
+  if (filteredAnalyses.length === 0) {
     return (
-      <div className="phone-only py-8 text-center text-sm text-white/40">
-        No analysis history yet.
+      <div className="phone-only py-4 text-center text-sm text-white/40">
+        No runs match the current filters.
       </div>
     );
   }
 
-  return <MobileSectionList sections={[searchSection, ...runSections]} />;
+  return <MobileSectionList sections={runSections} />;
 }

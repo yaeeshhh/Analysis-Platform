@@ -8,7 +8,6 @@ import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
 import { AnalysisListItem } from "@/lib/analysisTypes";
 import { isAnalysisStateStorageEvent } from "@/lib/currentAnalysis";
-import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 
 const workflowSteps = [
@@ -152,7 +151,7 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [analyses, setAnalyses] = useState<AnalysisListItem[]>([]);
 
-  useApplyNavigationScroll("/dashboard", !loading);
+
 
   useEffect(() => {
     let active = true;
@@ -304,6 +303,14 @@ export default function DashboardPage() {
                 <ScrollIntentLink href="/analysis" className="info-chip">Analysis →</ScrollIntentLink>
                 <ScrollIntentLink href="/history" className="info-chip">History →</ScrollIntentLink>
                 <ScrollIntentLink href="/account" className="info-chip">Account →</ScrollIntentLink>
+              </div>
+
+              {/* Feature highlights */}
+              <div className="border-b border-white/6 pb-3">
+                <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">How it works</p>
+                <p className="mt-1.5 text-sm leading-6 text-white/55">
+                  Upload a CSV in Uploads, review the report in Analysis, and check saved runs in History. ML experiments are optional and run after the dataset looks ready.
+                </p>
               </div>
 
               {/* Section list for deeper drill-down */}

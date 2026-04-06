@@ -15,7 +15,7 @@ import {
 import { type AnalysisListItem } from "@/lib/analysisTypes";
 import { clearCurrentAnalysisSelection, getCurrentAnalysisSelection, isAnalysisStateStorageEvent, notifyAnalysesChanged, setCurrentAnalysisSelection } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
-import { queueNavigationScroll, useApplyNavigationScroll } from "@/lib/navigationScroll";
+import { queueNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 
 type ConfirmAction = "selected" | null;
@@ -34,7 +34,7 @@ export default function BatchPage() {
   const [notice, setNotice] = useState("");
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
-  useApplyNavigationScroll("/batch", !loading);
+
 
   async function refreshAnalyses(preferredId?: number | null) {
     const items = await getAnalyses();
@@ -308,9 +308,16 @@ export default function BatchPage() {
                       <span className="info-chip">{selectedAnalysis.overview.duplicate_row_count} dups</span>
                     )}
                   </div>
-                  <ScrollIntentLink href={`/analysis?analysisId=${selectedAnalysis.id}`} className="mt-3 block rounded-lg bg-[#ffb079] px-4 py-2.5 text-center text-sm font-semibold text-[#11273b]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentAnalysisSelection(selectedAnalysis.id);
+                      router.push(`/analysis?analysisId=${selectedAnalysis.id}`);
+                    }}
+                    className="mt-3 block w-full rounded-lg bg-[#ffb079] px-4 py-2.5 text-center text-sm font-semibold text-[#11273b]"
+                  >
                     Open analysis
-                  </ScrollIntentLink>
+                  </button>
                 </div>
               ) : null}
 
@@ -621,7 +628,6 @@ function BatchMobileSections({
           </div>
           <ScrollIntentLink
             href={`/analysis?analysisId=${selectedAnalysis.id}`}
-            targetId="analysis-workspace-navigation"
             onClick={() => setSelection(selectedAnalysis.id)}
             className="mt-4 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]"
           >

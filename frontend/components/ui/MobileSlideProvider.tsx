@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 type SlidePageEntry = {
   id: string;
@@ -28,6 +29,7 @@ export function useMobileSlide() {
 export function MobileSlideProvider({ children }: { children: ReactNode }) {
   const [stack, setStack] = useState<SlidePageEntry[]>([]);
   const scrollPositions = useRef<number[]>([]);
+  const pathname = usePathname();
 
   const push = useCallback((entry: SlidePageEntry) => {
     scrollPositions.current.push(window.scrollY);
@@ -45,6 +47,15 @@ export function MobileSlideProvider({ children }: { children: ReactNode }) {
       return next;
     });
   }, []);
+
+  // Close all slides on route change
+  useEffect(() => {
+    if (stack.length > 0) {
+      setStack([]);
+      scrollPositions.current = [];
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Close all slides on browser back
   useEffect(() => {

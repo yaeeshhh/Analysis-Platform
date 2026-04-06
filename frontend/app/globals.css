@@ -39,7 +39,7 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior managed by JS only where needed */
 }
 
 body {
@@ -47,6 +47,11 @@ body {
   letter-spacing: 0.01em;
   overflow-x: hidden;
   position: relative;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(127, 166, 195, 0.06), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(199, 168, 121, 0.04), transparent 40%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(146, 171, 160, 0.04), transparent 50%),
+    var(--bg-canvas);
 }
 
 body::before {
@@ -142,6 +147,76 @@ body::after {
 }
 
 .app-shell {
+  position: relative;
+}
+
+/* ════════════════════════════════════════════════
+   DESKTOP BANNER — combined nav + hero
+   Sticky, with a subtle gradient background.
+   ════════════════════════════════════════════════ */
+.desktop-banner {
+  background: linear-gradient(180deg, rgba(9, 16, 24, 0.98) 0%, rgba(13, 22, 34, 0.95) 60%, rgba(16, 26, 40, 0.88) 100%);
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
+}
+
+.desktop-banner-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.6rem 0 0.75rem;
+}
+
+.desktop-banner-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.desktop-banner-copy .page-title {
+  margin-top: 0.25rem;
+}
+
+.desktop-banner-stats {
+  gap: 1.25rem 2rem;
+  padding: 0;
+}
+
+.desktop-banner-stats .stat-row-value {
+  font-size: 0.95rem;
+}
+
+.desktop-banner-stats .stat-row-label {
+  font-size: 0.6rem;
+}
+
+/* Decorative data analytics illustration on the banner */
+.desktop-banner-hero::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 120px;
+  height: 60px;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(127, 166, 195, 0.08) 30%, rgba(199, 168, 121, 0.06) 70%, transparent 100%);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Crect x='4' y='30' width='12' height='26' rx='2' fill='white'/%3E%3Crect x='22' y='18' width='12' height='38' rx='2' fill='white'/%3E%3Crect x='40' y='8' width='12' height='48' rx='2' fill='white'/%3E%3Crect x='58' y='22' width='12' height='34' rx='2' fill='white'/%3E%3Crect x='76' y='4' width='12' height='52' rx='2' fill='white'/%3E%3Crect x='94' y='14' width='12' height='42' rx='2' fill='white'/%3E%3C/svg%3E");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Crect x='4' y='30' width='12' height='26' rx='2' fill='white'/%3E%3Crect x='22' y='18' width='12' height='38' rx='2' fill='white'/%3E%3Crect x='40' y='8' width='12' height='48' rx='2' fill='white'/%3E%3Crect x='58' y='22' width='12' height='34' rx='2' fill='white'/%3E%3Crect x='76' y='4' width='12' height='52' rx='2' fill='white'/%3E%3Crect x='94' y='14' width='12' height='42' rx='2' fill='white'/%3E%3C/svg%3E");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  pointer-events: none;
+  opacity: 0.7;
+  animation: float-subtle 6s ease-in-out infinite;
+}
+
+.desktop-banner-hero {
   position: relative;
 }
 
@@ -634,6 +709,17 @@ a[class*="rounded"]:hover {
     padding-left: calc(1rem + env(safe-area-inset-left, 0px));
     padding-right: calc(1rem + env(safe-area-inset-right, 0px));
     padding-top: 0.75rem;
+  }
+
+  .app-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 30% at 20% 0%, rgba(122, 214, 255, 0.05), transparent),
+      radial-gradient(ellipse 70% 40% at 80% 100%, rgba(199, 168, 121, 0.04), transparent);
+    pointer-events: none;
+    z-index: -1;
   }
 }
 
@@ -1162,7 +1248,7 @@ details.mobile-accordion > .mobile-accordion-body {
 
 .danger-label::before,
 .danger-label::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 140, 140, 0.35), transparent);
+  background: linear-gradient(90deg, var(--bg-canvas), rgba(255, 140, 140, 0.45) 50%, var(--bg-canvas));
   content: "";
   flex-shrink: 0;
   height: 1px;
@@ -1189,6 +1275,25 @@ details.mobile-accordion > .mobile-accordion-body {
   z-index: -1;
 }
 
+/* Data scatter decoration on glow sections */
+.section-glow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 80px;
+  height: 80px;
+  background:
+    radial-gradient(circle 2px at 20% 30%, rgba(127, 166, 195, 0.2), transparent 3px),
+    radial-gradient(circle 2px at 60% 15%, rgba(199, 168, 121, 0.18), transparent 3px),
+    radial-gradient(circle 2px at 80% 50%, rgba(146, 171, 160, 0.15), transparent 3px),
+    radial-gradient(circle 1.5px at 40% 70%, rgba(127, 166, 195, 0.12), transparent 2.5px),
+    radial-gradient(circle 1.5px at 70% 80%, rgba(199, 168, 121, 0.1), transparent 2.5px);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.8;
+}
+
 .accent-bar {
   background: linear-gradient(90deg, var(--accent-cool), var(--accent-warm));
   border-radius: 2px;
@@ -1201,6 +1306,11 @@ details.mobile-accordion > .mobile-accordion-body {
 @keyframes pulse-soft {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 .pulse-dot {
