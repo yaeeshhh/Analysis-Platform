@@ -661,11 +661,25 @@ body::after {
   justify-content: flex-start;
   min-height: 3.125rem;
   min-width: 0;
+  overflow: hidden;
   padding: 0;
   position: relative;
   text-align: left;
   transition: gap 200ms ease;
   width: 100%;
+}
+
+.desktop-sidebar-brand .brandmark-root {
+  width: 100%;
+}
+
+.desktop-sidebar-brand .brandmark-copy-title {
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .nav-brand-monogram {
