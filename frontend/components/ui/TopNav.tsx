@@ -5,8 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
 
-const SIDEBAR_STORAGE_KEY = "analysis-studio:desktop-sidebar-collapsed";
-
 const navItems = [
   { href: "/dashboard", label: "Dashboard", match: "/dashboard", icon: "dashboard" },
   { href: "/batch", label: "Uploads", match: "/batch", icon: "uploads" },
@@ -61,36 +59,9 @@ function NavIcon({ kind }: { kind: (typeof navItems)[number]["icon"] }) {
 export default function TopNav() {
   const pathname = usePathname();
   const surfaceRef = useRef<HTMLDivElement | null>(null);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
-    let frame = 0;
-
-    try {
-      const nextCollapsed = window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
-      if (nextCollapsed) {
-        frame = window.requestAnimationFrame(() => {
-          setCollapsed(true);
-        });
-      }
-    } catch {
-      // Ignore storage failures so the sidebar still works in restricted browsers.
-    }
-
-    return () => {
-      if (frame) {
-        window.cancelAnimationFrame(frame);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, collapsed ? "true" : "false");
-    } catch {
-      // Ignore storage failures so the sidebar still works in restricted browsers.
-    }
-
     const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
     if (sidebar) {
       sidebar.dataset.collapsed = collapsed ? "true" : "false";
@@ -100,30 +71,6 @@ export default function TopNav() {
       if (sidebar) {
         delete sidebar.dataset.collapsed;
       }
-    };
-  }, [collapsed]);
-
-  useEffect(() => {
-    if (collapsed) return;
-
-    const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
-    if (!sidebar) return;
-
-    const desktopMediaQuery = window.matchMedia("(min-width: 600px)");
-
-    const handleOutsideInteraction = (event: PointerEvent | FocusEvent) => {
-      if (!desktopMediaQuery.matches) return;
-      const target = event.target as Node | null;
-      if (!target || sidebar.contains(target)) return;
-      setCollapsed(true);
-    };
-
-    document.addEventListener("pointerdown", handleOutsideInteraction);
-    document.addEventListener("focusin", handleOutsideInteraction);
-
-    return () => {
-      document.removeEventListener("pointerdown", handleOutsideInteraction);
-      document.removeEventListener("focusin", handleOutsideInteraction);
     };
   }, [collapsed]);
 
@@ -138,11 +85,22 @@ export default function TopNav() {
     <div
       ref={surfaceRef}
       className={`nav-surface ${collapsed ? "nav-surface-collapsed" : ""}`}
-      onClick={(event) => {
-        if (!collapsed) return;
-        const target = event.target as HTMLElement;
-        if (target.closest("a, button")) return;
-        setCollapsed(false);
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
+      onFocusCapture={() => setCollapsed(false)}
+      onBlurCapture={(event) => {
+        const nextFocusTarget = event.relatedTarget as Node | null;
+        if (!nextFocusTarget || !event.currentTarget.contains(nextFocusTarget)) {
+          setCollapsed(true);
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        setCollapsed(true);
+        const activeElement = document.activeElement;
+        if (activeElement instanceof HTMLElement && event.currentTarget.contains(activeElement)) {
+          activeElement.blur();
+        }
       }}
     >
       <div className="desktop-sidebar-brand">

@@ -11,9 +11,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 
-MAX_UNSUPERVISED_ROWS = 6000
-MAX_UNSUPERVISED_FEATURES = 24
-MAX_UNSUPERVISED_PREVIEW_ROWS = 300
+MAX_UNSUPERVISED_ROWS = 4000
+MAX_UNSUPERVISED_FEATURES = 16
+MAX_UNSUPERVISED_PREVIEW_ROWS = 120
 
 
 def _prepare_unsupervised_frame(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, int, int]:
@@ -67,13 +67,13 @@ def run_unsupervised_analysis(frame: pd.DataFrame, n_clusters: int = 3) -> dict[
     cluster_count = max(2, min(int(n_clusters), len(numeric_frame) - 1, 8))
     kmeans = MiniBatchKMeans(
         n_clusters=cluster_count,
-        n_init=6,
+        n_init=4,
         random_state=42,
-        batch_size=min(2048, max(256, len(numeric_frame) // 4)),
+        batch_size=min(1024, max(128, len(numeric_frame) // 5)),
     )
     clusters = kmeans.fit_predict(X)
 
-    isolation = IsolationForest(contamination=0.05, n_estimators=120, n_jobs=1, random_state=42)
+    isolation = IsolationForest(contamination=0.05, n_estimators=80, n_jobs=1, random_state=42)
     anomaly_flags = isolation.fit_predict(X)
     anomaly_scores = isolation.decision_function(X)
 
@@ -82,7 +82,14 @@ def run_unsupervised_analysis(frame: pd.DataFrame, n_clusters: int = 3) -> dict[
 
     preview = []
     source_positions = {index: position for position, index in enumerate(source_frame.index)}
-    base = source_frame.astype(object).where(pd.notnull(source_frame), None).head(MAX_UNSUPERVISED_PREVIEW_ROWS).reset_index()
+    preview_rows = min(MAX_UNSUPERVISED_PREVIEW_ROWS, len(source_frame))
+    base = (
+        source_frame.astype(object)
+        .where(pd.notnull(source_frame), None)
+        .sample(n=preview_rows, random_state=42)
+        .sort_index()
+        .reset_index()
+    )
     for _, row in base.iterrows():
         source_index = int(row["index"])
         position = source_positions.get(source_index)
