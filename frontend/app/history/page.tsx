@@ -475,19 +475,19 @@ export default function HistoryPage() {
                                   {analysis.overview.row_count.toLocaleString()} rows · {analysis.overview.column_count} cols
                                 </div>
                               </td>
-                              <td>
-                                <div className="desktop-action-row">
+                              <td className="desktop-history-actions-cell">
+                                <div className="desktop-action-row desktop-history-actions">
                                   <button
                                     type="button"
                                     onClick={() => { void handleOpenAnalysisPopup(analysis); }}
-                                    className="rounded-md border border-[#7c3aed]/35 px-3 py-1.5 text-[0.72rem] text-[#d8c3ff]"
+                                    className="desktop-action-button desktop-action-button-primary rounded-md border border-[#7c3aed]/35 px-3 py-1.5 text-[0.72rem] text-[#d8c3ff]"
                                   >
                                     Open
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => { void downloadAnalysisReport(analysis.id); }}
-                                    className="rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
+                                    className="desktop-action-button rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
                                   >
                                     Report
                                   </button>
@@ -496,14 +496,14 @@ export default function HistoryPage() {
                                       <button
                                         type="button"
                                         onClick={() => { void downloadMlExperimentReport(analysis.id, analysis.latest_experiment!); }}
-                                        className="rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
+                                        className="desktop-action-button rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
                                       >
                                         ML report
                                       </button>
                                       <button
                                         type="button"
                                         onClick={() => { void downloadMlExperimentSummary(analysis.id, analysis.latest_experiment!); }}
-                                        className="rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
+                                        className="desktop-action-button rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
                                       >
                                         ML summary
                                       </button>
@@ -512,7 +512,7 @@ export default function HistoryPage() {
                                   <button
                                     type="button"
                                     onClick={() => setDeleteTargetId(analysis.id)}
-                                    className="rounded-md border border-[#5a2328]/60 px-3 py-1.5 text-[0.72rem] text-[#ffb4ba]"
+                                    className="desktop-action-button rounded-md border border-[#5a2328]/60 px-3 py-1.5 text-[0.72rem] text-[#ffb4ba]"
                                   >
                                     Delete
                                   </button>
