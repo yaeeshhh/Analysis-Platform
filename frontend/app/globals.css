@@ -7,7 +7,7 @@
   --bg-panel-strong: rgba(15, 22, 31, 0.95);
   --bg-panel-soft: rgba(19, 28, 39, 0.84);
   --glass-danger: rgba(52, 24, 26, 0.88);
-  --glass-warn: rgba(61, 42, 24, 0.88);
+  --glass-warn: rgba(29, 34, 63, 0.88);
   --glass-success: rgba(22, 43, 34, 0.88);
   --text-100: #f4f7f8;
   --text-200: #dce4ea;
@@ -16,11 +16,22 @@
   --line-strong: rgba(255, 255, 255, 0.1);
   --accent: #94aebf;
   --accent-strong: #718898;
-  --accent-warm: #c7a879;
+  --accent-warm: #9db8ff;
   --accent-cool: #7fa6c3;
   --glow-cool: rgba(127, 166, 195, 0.07);
   --glow-mint: rgba(146, 171, 160, 0.05);
-  --glow-warm: rgba(199, 168, 121, 0.05);
+  --glow-warm: rgba(157, 184, 255, 0.08);
+  --accent-cta: #9db8ff;
+  --accent-cta-hover: #b7cbff;
+  --accent-cta-ink: #0d1733;
+  --accent-cta-soft: rgba(157, 184, 255, 0.1);
+  --accent-cta-border-40: rgba(157, 184, 255, 0.4);
+  --accent-cta-border-45: rgba(157, 184, 255, 0.45);
+  --accent-cta-muted: #d6e3ff;
+  --accent-highlight: #bfb8ff;
+  --accent-highlight-soft: rgba(191, 184, 255, 0.1);
+  --accent-highlight-border: rgba(191, 184, 255, 0.2);
+  --accent-highlight-muted: #ece9ff;
   --shadow-soft: 0 16px 38px rgba(0, 0, 0, 0.18);
   --shadow-deep: 0 28px 76px rgba(0, 0, 0, 0.26);
 }
@@ -38,10 +49,6 @@ body {
   box-sizing: border-box;
 }
 
-html {
-  /* scroll-behavior managed by JS only where needed */
-}
-
 body {
   min-height: 100vh;
   letter-spacing: 0.01em;
@@ -49,7 +56,7 @@ body {
   position: relative;
   background:
     radial-gradient(ellipse 80% 50% at 10% 0%, rgba(127, 166, 195, 0.06), transparent 50%),
-    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(199, 168, 121, 0.04), transparent 40%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(157, 184, 255, 0.05), transparent 40%),
     radial-gradient(ellipse 70% 40% at 50% 100%, rgba(146, 171, 160, 0.04), transparent 50%),
     var(--bg-canvas);
 }
@@ -60,7 +67,7 @@ body::before {
   inset: -10% -10% 40% -10%;
   background:
     radial-gradient(circle at 14% 18%, rgba(146, 171, 160, 0.08), transparent 32%),
-    radial-gradient(circle at 84% 12%, rgba(199, 168, 121, 0.06), transparent 22%),
+    radial-gradient(circle at 84% 12%, rgba(191, 184, 255, 0.08), transparent 22%),
     radial-gradient(circle at 50% 0%, rgba(127, 166, 195, 0.07), transparent 30%);
   pointer-events: none;
   z-index: -2;
@@ -78,6 +85,62 @@ body::after {
   opacity: 0.08;
   pointer-events: none;
   z-index: -1;
+}
+
+[class*="text-[#ffb079]"] {
+  color: var(--accent-cta) !important;
+}
+
+[class*="text-[#ffcfaa]"] {
+  color: var(--accent-cta-muted) !important;
+}
+
+[class*="text-[#ffd76d]"] {
+  color: var(--accent-highlight) !important;
+}
+
+:is([class*="text-[#ffe7d7]"], [class*="text-[#fff2bf]"]) {
+  color: var(--accent-highlight-muted) !important;
+}
+
+[class*="bg-[#ffb079]"] {
+  background-color: var(--accent-cta) !important;
+}
+
+[class*="bg-[#ffb079]/10"] {
+  background-color: var(--accent-cta-soft) !important;
+}
+
+[class*="bg-[#ffb079]/80"] {
+  background-color: rgba(157, 184, 255, 0.8) !important;
+}
+
+[class*="hover:bg-[#ffc58f]"]:hover {
+  background-color: var(--accent-cta-hover) !important;
+}
+
+[class*="border-[#ffb079]/40"] {
+  border-color: var(--accent-cta-border-40) !important;
+}
+
+[class*="border-[#ffb079]/45"] {
+  border-color: var(--accent-cta-border-45) !important;
+}
+
+[class*="bg-[#ffd76d]/10"] {
+  background-color: var(--accent-highlight-soft) !important;
+}
+
+[class*="border-[#ffd76d]/20"] {
+  border-color: var(--accent-highlight-border) !important;
+}
+
+.text-amber-300 {
+  color: var(--accent-highlight) !important;
+}
+
+.bg-amber-400 {
+  background-color: var(--accent-cta) !important;
 }
 
 /* I reuse this minimal elevated surface for panels that need distinction */
@@ -101,16 +164,6 @@ body::after {
   border-color: var(--line-soft);
   -webkit-backdrop-filter: saturate(120%) blur(8px);
   backdrop-filter: saturate(120%) blur(8px);
-}
-
-:is(
-  [class*="bg-[#15151a]"],
-  [class*="bg-[#15151a]/90"],
-  [class*="bg-[#111116]/95"],
-  [class*="bg-[#111821]/95"],
-  [class*="bg-[#111821]/96"],
-  [class*="bg-[#09131d]/96"]
-) {
 }
 
 :is([class*="bg-[#15151a]"], [class*="bg-[#15151a]/90"]) {
@@ -1101,7 +1154,7 @@ a[class*="rounded"]:hover {
 }
 
 .mobile-bottom-nav-item-active {
-  color: #ffb079;
+  color: var(--accent-cta);
 }
 
 .mobile-bottom-nav-label {
@@ -1643,9 +1696,9 @@ details.mobile-accordion > .mobile-accordion-body {
 }
 
 .desktop-badge[data-tone="amber"] {
-  color: #fbbf24;
-  border-color: rgba(217, 119, 6, 0.24);
-  background: rgba(217, 119, 6, 0.08);
+  color: var(--accent-highlight);
+  border-color: rgba(191, 184, 255, 0.24);
+  background: rgba(191, 184, 255, 0.08);
 }
 
 .desktop-badge[data-tone="red"] {
@@ -1836,6 +1889,37 @@ details.mobile-accordion > .mobile-accordion-body {
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 0.85rem;
   padding: 0.8rem 0.85rem;
+}
+
+.history-popup-select-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.history-popup-select-label {
+  color: rgba(242, 247, 251, 0.42);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.history-popup-select {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.95rem;
+  color: var(--text-100);
+  min-height: 3rem;
+  padding: 0.8rem 1rem;
+  width: 100%;
+  color-scheme: dark;
+}
+
+.history-popup-select:focus {
+  border-color: rgba(122, 214, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(122, 214, 255, 0.22);
+  outline: none;
 }
 
 .history-popup-nav {

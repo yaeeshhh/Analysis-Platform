@@ -652,10 +652,10 @@ export default function AnalysisPage() {
 
 const tabAccents: Record<AnalysisTabKey, string> = {
   overview: "#7ad6ff",
-  insights: "#ffb079",
+  insights: "#9db8ff",
   schema: "#a78bfa",
   quality: "#5ae681",
-  statistics: "#fbbf24",
+  statistics: "#bfb8ff",
   relationships: "#f472b6",
   visualisations: "#38bdf8",
   ml: "#c084fc",

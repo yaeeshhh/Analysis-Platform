@@ -834,7 +834,7 @@ function BatchMobileSections({
       id: "runs",
       title: "Saved runs",
       hint: `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}`,
-      accent: "#ffb079",
+      accent: "#9db8ff",
       content: (
         <div className="space-y-3">
           {analyses.length === 0 ? (

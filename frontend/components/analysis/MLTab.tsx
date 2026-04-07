@@ -1239,7 +1239,7 @@ export default function MLTab({
                         cursor={{ fill: "rgba(255,255,255,0.05)" }}
                         formatter={(value) => [`${formatNormalizedPercent(Number(value))}`, "Normalized importance"]}
                       />
-                      <Bar dataKey="normalized" fill="#ffb079" radius={[0, 8, 8, 0]} minPointSize={8} isAnimationActive={false} />
+                      <Bar dataKey="normalized" fill="#9db8ff" radius={[0, 8, 8, 0]} minPointSize={8} isAnimationActive={false} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (

@@ -19,7 +19,7 @@ type VisualisationsTabProps = {
   visualisations: AnalysisVisualisations;
 };
 
-const chartPalette = ["#7ad6ff", "#ffb079", "#8bf1a8", "#ffd76d", "#d7b7ff"];
+const chartPalette = ["#7ad6ff", "#9db8ff", "#8bf1a8", "#bfb8ff", "#d7b7ff"];
 const defaultChartInitialDimension = { width: 520, height: 288 };
 const chartTick = { fill: "rgba(255,255,255,0.6)", fontSize: 11 };
 const verticalChartMargin = { top: 12, right: 18, bottom: 12, left: 12 };
@@ -182,7 +182,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
                   cursor={{ fill: "rgba(255,255,255,0.05)" }}
                   labelFormatter={(_, payload) => String(payload?.[0]?.payload?.fullLabel || "")}
                 />
-                <Bar dataKey="count" fill="#ffb079" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" fill="#9db8ff" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (

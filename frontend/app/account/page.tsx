@@ -78,7 +78,7 @@ const toolGroups: Array<{
   },
   {
     title: "Saved work",
-    accent: "#ffb079",
+    accent: "#9db8ff",
     description: "Clean up uploaded analysis runs with a distinct confirmation dialog that does not interfere with access settings.",
     items: [
       {

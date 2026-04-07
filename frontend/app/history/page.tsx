@@ -653,7 +653,7 @@ function HistoryMobileSections({
     id: `history-run-${a.id}`,
     title: a.overview.dataset_name,
     hint: `${formatDate(a.saved_at)} · ${a.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"} · ${a.experiment_count} ML`,
-    accent: a.insights.modeling_readiness.is_ready ? "#5ae681" : "#ffb079",
+    accent: a.insights.modeling_readiness.is_ready ? "#5ae681" : "#9db8ff",
     content: (
       <div className="space-y-3">
         <p className="text-sm text-white/40">Saved {formatDate(a.saved_at)}</p>
