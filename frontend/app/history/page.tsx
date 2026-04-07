@@ -432,33 +432,35 @@ export default function HistoryPage() {
                                   </div>
                                 </div>
                               </td>
-                              <td>
-                                <div className="space-y-2">
+                              <td className="desktop-history-metric-cell">
+                                <div className="desktop-history-metric">
                                   <span className="desktop-badge" data-tone={modeTone}>
                                     <span className="desktop-status-dot" />
                                     {modeLabel}
                                   </span>
-                                  <div className="text-[0.68rem] leading-5 text-white/28">
+                                  <div className="desktop-history-metric-note">
                                     {analysis.latest_experiment?.summary || "No ML experiment saved for this run."}
                                   </div>
                                 </div>
                               </td>
-                              <td>
-                                <div className="space-y-1">
+                              <td className="desktop-history-metric-cell">
+                                <div className="desktop-history-metric">
                                   <span className="desktop-badge" data-tone={readinessTone}>
                                     <span className="desktop-status-dot" />
                                     {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                                   </span>
-                                  <div className="text-[0.68rem] text-white/28">
+                                  <div className="desktop-history-metric-note">
                                     {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
                                   </div>
                                 </div>
                               </td>
-                              <td>
-                                <span className="desktop-badge" data-tone={statusTone}>
-                                  <span className="desktop-status-dot" />
-                                  {statusValue}
-                                </span>
+                              <td className="desktop-history-metric-cell">
+                                <div className="desktop-history-metric">
+                                  <span className="desktop-badge" data-tone={statusTone}>
+                                    <span className="desktop-status-dot" />
+                                    {statusValue}
+                                  </span>
+                                </div>
                               </td>
                               <td>
                                 <div className="text-sm text-white/72">{formatDate(analysis.saved_at)}</div>

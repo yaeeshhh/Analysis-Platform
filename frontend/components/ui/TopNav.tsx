@@ -120,7 +120,7 @@ export default function TopNav() {
   }, [collapsed, interactive]);
 
   const navInteractive = !collapsed && interactive;
-  const contentCollapsed = !navInteractive;
+  const contentCollapsed = collapsed;
 
   const linkClass = (match: string) =>
     `nav-link ${
