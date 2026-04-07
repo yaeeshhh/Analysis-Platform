@@ -1,23 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import {
   getRememberStatus,
   REMEMBER_LOGIN_STORAGE_KEY,
   refreshAccessToken,
+  logout,
   updateCurrentUser,
   type RememberStatus,
   type User,
 } from "@/lib/auth";
-import { getAccessToken, setAccessToken } from "@/lib/api";
+import { clearAccessToken, getAccessToken, setAccessToken } from "@/lib/api";
 import { clearCurrentAnalysisSelection, notifyAnalysesChanged } from "@/lib/currentAnalysis";
-import { formatDate } from "@/lib/helpers";
-import { resolveAuthenticatedUser } from "@/lib/session";
+import { clearUserScopedFrontendState, formatDate } from "@/lib/helpers";
+import { clearActiveAccountEmail, resolveAuthenticatedUser } from "@/lib/session";
 
 const emptyRememberStatus: RememberStatus = {
   enabled: false,
@@ -101,7 +104,34 @@ function getAccountInitials(value: string) {
   return parts.map((part) => part[0]?.toUpperCase() ?? "").join("") || "AS";
 }
 
+function AccountSlideToggle({
+  checked,
+  disabled,
+  label,
+  onToggle,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  label: string;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={disabled}
+      aria-pressed={checked}
+      aria-label={label}
+      className={`inline-flex h-6 w-11 shrink-0 items-center rounded-lg border transition disabled:cursor-not-allowed disabled:opacity-45 ${checked ? "border-emerald-400/70 bg-emerald-500/30" : "border-white/20 bg-white/10"}`}
+    >
+      <span className={`h-5 w-5 rounded-lg bg-white transition ${checked ? "translate-x-5" : "translate-x-0.5"}`} />
+    </button>
+  );
+}
+
 export default function AccountPage() {
+  const router = useRouter();
+  const suppressLoginRequiredRef = useRef(false);
   const [activeDialog, setActiveDialog] = useState<AccountDialogKey | null>(null);
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -110,10 +140,10 @@ export default function AccountPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [dobInput, setDobInput] = useState("");
+  const [profileError, setProfileError] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingTwoFactor, setSavingTwoFactor] = useState(false);
-
-
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -128,7 +158,9 @@ export default function AccountPage() {
       if (!authenticatedUser) {
         setUser(null);
         setRememberStatus(emptyRememberStatus);
-        setLoginRequired(true);
+        if (!suppressLoginRequiredRef.current) {
+          setLoginRequired(true);
+        }
         setLoading(false);
         return;
       }
@@ -222,6 +254,33 @@ export default function AccountPage() {
     }
   }
 
+  async function handleLogout() {
+    if (loggingOut) return;
+
+    suppressLoginRequiredRef.current = true;
+    setLoggingOut(true);
+    setLoginRequired(false);
+
+    const token = getAccessToken();
+
+    try {
+      if (token) {
+        await logout(token);
+      }
+    } catch {
+      // Local logout still proceeds so the account page does not keep a stale session.
+    } finally {
+      clearAccessToken();
+      clearActiveAccountEmail();
+      clearUserScopedFrontendState();
+      localStorage.setItem(LOGOUT_BROADCAST_KEY, Date.now().toString());
+      setUser(null);
+      setRememberStatus(emptyRememberStatus);
+      window.dispatchEvent(new CustomEvent("auth:logged-out"));
+      router.replace("/dashboard");
+    }
+  }
+
   return (
     <>
       <AppShell
@@ -237,6 +296,16 @@ export default function AccountPage() {
               <ScrollIntentLink href="/batch" className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82">
                 Open uploads page
               </ScrollIntentLink>
+              <button
+                type="button"
+                onClick={() => {
+                  void handleLogout();
+                }}
+                disabled={loggingOut}
+                className="rounded-lg border border-[#5a2328]/60 bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                {loggingOut ? "Logging out..." : "Log out"}
+              </button>
             </div>
           ) : undefined
         }
@@ -291,20 +360,22 @@ export default function AccountPage() {
                     ? "Password logins require an email code. Remembered-login bypass still works when available on this browser."
                     : "Password logins skip the email code. Remembered-login behavior stays unchanged."}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void handleTwoFactorToggle();
-                  }}
-                  disabled={savingTwoFactor}
-                  className="mt-3 w-full rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/82 disabled:opacity-50"
-                >
-                  {savingTwoFactor
-                    ? "Saving..."
-                    : user.two_factor_enabled
-                      ? "Disable two-factor authentication"
-                      : "Enable two-factor authentication"}
-                </button>
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-[18px] border border-white/10 bg-[#15151a] px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-white">Two-factor protection</p>
+                    <p className="mt-1 text-xs leading-5 text-white/58">
+                      {savingTwoFactor ? "Saving..." : user.two_factor_enabled ? "Enabled" : "Disabled"}
+                    </p>
+                  </div>
+                  <AccountSlideToggle
+                    checked={user.two_factor_enabled}
+                    disabled={savingTwoFactor}
+                    label={user.two_factor_enabled ? "Disable two-factor authentication" : "Enable two-factor authentication"}
+                    onToggle={() => {
+                      void handleTwoFactorToggle();
+                    }}
+                  />
+                </div>
               </div>
 
               <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
@@ -370,6 +441,7 @@ export default function AccountPage() {
                       onClick={() => {
                         setNameInput(user.full_name || "");
                         setDobInput(user.date_of_birth || "");
+                        setProfileError("");
                         setEditingName(true);
                       }}
                       className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
@@ -384,7 +456,12 @@ export default function AccountPage() {
                           id="account-full-name"
                           type="text"
                           value={nameInput}
-                          onChange={(e) => setNameInput(e.target.value)}
+                          onChange={(e) => {
+                            setNameInput(e.target.value);
+                            if (profileError) {
+                              setProfileError("");
+                            }
+                          }}
                           placeholder="Your full name"
                           disabled={savingProfile}
                           className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:border-blue-500 focus:outline-none disabled:opacity-50"
@@ -396,30 +473,47 @@ export default function AccountPage() {
                           id="account-dob"
                           type="date"
                           value={dobInput}
-                          onChange={(e) => setDobInput(e.target.value)}
+                          onChange={(e) => {
+                            setDobInput(e.target.value);
+                            if (profileError) {
+                              setProfileError("");
+                            }
+                          }}
                           disabled={savingProfile}
                           className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white focus:border-blue-500 focus:outline-none disabled:opacity-50"
                         />
                       </div>
+                      {profileError ? (
+                        <p className="text-sm text-[#ff9ca5]">{profileError}</p>
+                      ) : null}
                       <div className="flex gap-2">
                         <button
                           type="button"
                           disabled={savingProfile}
                           onClick={async () => {
+                            const trimmedName = nameInput.trim();
+
+                            if (!trimmedName) {
+                              setProfileError("Enter a full name before saving.");
+                              return;
+                            }
+
                             try {
                               setSavingProfile(true);
+                              setProfileError("");
                               const updated = await withAuthRetry((token) =>
                                 updateCurrentUser(token, {
-                                  full_name: nameInput.trim() || undefined,
+                                  full_name: trimmedName,
                                   date_of_birth: dobInput || null,
                                 })
                               );
                               setUser(updated);
                               setNameInput(updated.full_name || "");
                               setDobInput(updated.date_of_birth || "");
+                              setProfileError("");
                               setEditingName(false);
-                            } catch {
-                              // keep editing open on error
+                            } catch (error) {
+                              setProfileError(error instanceof Error ? error.message : "Failed to save your profile details.");
                             } finally {
                               setSavingProfile(false);
                             }
@@ -430,7 +524,12 @@ export default function AccountPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setEditingName(false)}
+                          onClick={() => {
+                            setEditingName(false);
+                            setNameInput(user.full_name || "");
+                            setDobInput(user.date_of_birth || "");
+                            setProfileError("");
+                          }}
                           disabled={savingProfile}
                           className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/78 disabled:opacity-50"
                         >
@@ -518,20 +617,19 @@ export default function AccountPage() {
                           : "Password logins go straight through without an email verification code. Remembered-login behavior stays unchanged."}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void handleTwoFactorToggle();
-                      }}
-                      disabled={savingTwoFactor}
-                      className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78 disabled:opacity-50"
-                    >
-                      {savingTwoFactor
-                        ? "Saving..."
-                        : user.two_factor_enabled
-                          ? "Disable"
-                          : "Enable"}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs uppercase tracking-[0.16em] text-white/32">
+                        {savingTwoFactor ? "Saving" : user.two_factor_enabled ? "On" : "Off"}
+                      </span>
+                      <AccountSlideToggle
+                        checked={user.two_factor_enabled}
+                        disabled={savingTwoFactor}
+                        label={user.two_factor_enabled ? "Disable two-factor authentication" : "Enable two-factor authentication"}
+                        onToggle={() => {
+                          void handleTwoFactorToggle();
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </section>

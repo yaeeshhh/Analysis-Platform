@@ -24,7 +24,6 @@ import {
   notifyAnalysesChanged,
 } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
-import { animateWindowScrollTo } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
@@ -47,7 +46,6 @@ export default function HistoryPage() {
   const [popupLoading, setPopupLoading] = useState(false);
   const [popupError, setPopupError] = useState("");
   const [popupReport, setPopupReport] = useState<AnalysisReport | null>(null);
-  const [showBackToTop, setShowBackToTop] = useState(false);
 
 
 
@@ -119,25 +117,6 @@ export default function HistoryPage() {
       document.body.style.overflow = previousOverflow;
     };
   }, [deleteTargetId, popupAnalysisId]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const updateBackToTopVisibility = () => {
-      setShowBackToTop(window.scrollY > 520);
-    };
-
-    updateBackToTopVisibility();
-    window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
-    window.addEventListener("resize", updateBackToTopVisibility);
-
-    return () => {
-      window.removeEventListener("scroll", updateBackToTopVisibility);
-      window.removeEventListener("resize", updateBackToTopVisibility);
-    };
-  }, []);
 
   const filteredAnalyses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -568,33 +547,6 @@ export default function HistoryPage() {
           </section>
         ) : null}
       </AppShell>
-
-      {showBackToTop && !popupAnalysisId && !deleteTargetId ? (
-        <button
-          type="button"
-          onClick={() => {
-            animateWindowScrollTo(0);
-          }}
-          className="fixed bottom-24 right-4 z-[120] inline-flex items-center gap-2 rounded-full border border-[#7ad6ff]/28 bg-[#0a1623]/92 px-4 py-3 text-sm font-semibold text-[#dff7ff] shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-md transition hover:border-[#7ad6ff]/48 hover:bg-[#102033] sm:bottom-6 sm:right-6"
-          aria-label="Back to top"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 19V5" />
-            <path d="m5 12 7-7 7 7" />
-          </svg>
-          <span className="hidden sm:inline">Top</span>
-        </button>
-      ) : null}
 
       <AnalysisResultPopup
         open={popupAnalysisId !== null}

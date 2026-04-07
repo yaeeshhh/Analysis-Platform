@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   Bar,
@@ -31,7 +31,7 @@ import {
   getMlExperimentDetail,
   isMissingAnalysisSourceError,
 } from "@/lib/analysisApi";
-import { triggerNavigationScroll } from "@/lib/navigationScroll";
+import { triggerElementNavigationScroll, triggerNavigationScroll } from "@/lib/navigationScroll";
 
 type MLTabProps = {
   analysisId: number;
@@ -355,6 +355,12 @@ export default function MLTab({
     supervised: initialSupervised?.experiment?.id ?? null,
     unsupervised: initialUnsupervised?.experiment?.id ?? null,
   });
+  const surfaceRef = useRef<HTMLElement | null>(null);
+  const [selectionFlash, setSelectionFlash] = useState<{
+    mode: LabMode;
+    id: string;
+    token: number;
+  } | null>(null);
 
   const clusters = getTopClusters(unsupervised);
   const anomalies = getTopAnomalies(unsupervised);
@@ -436,10 +442,30 @@ export default function MLTab({
   }
 
   function scrollToResultStart(mode: LabMode) {
-    triggerNavigationScroll(
-      mode === "supervised" ? SUPERVISED_RESULTS_TARGET_ID : UNSUPERVISED_RESULTS_TARGET_ID,
-      80
-    );
+    const targetId = mode === "supervised" ? SUPERVISED_RESULTS_TARGET_ID : UNSUPERVISED_RESULTS_TARGET_ID;
+    const target = typeof document !== "undefined" ? document.getElementById(targetId) : null;
+    let scrollableAncestor: HTMLElement | null = null;
+    let current = (target ?? surfaceRef.current)?.parentElement ?? null;
+
+    while (current) {
+      const overflowY = window.getComputedStyle(current).overflowY;
+      if ((overflowY === "auto" || overflowY === "scroll") && current.scrollHeight > current.clientHeight + 4) {
+        scrollableAncestor = current;
+        break;
+      }
+      current = current.parentElement;
+    }
+
+    if (scrollableAncestor) {
+      triggerElementNavigationScroll(scrollableAncestor, targetId, 80);
+      return;
+    }
+
+    triggerNavigationScroll(targetId, 80);
+  }
+
+  function flashSelectedRun(mode: LabMode, id: string) {
+    setSelectionFlash({ mode, id, token: Date.now() });
   }
 
   function renderInlineError(message: string) {
@@ -499,6 +525,20 @@ export default function MLTab({
   }, [analysisId, capabilities, experiments, initialSupervised, initialUnsupervised, targetOptions]);
 
   useEffect(() => {
+    if (!selectionFlash) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setSelectionFlash((current) =>
+        current?.token === selectionFlash.token ? null : current
+      );
+    }, 960);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [selectionFlash]);
+
+  useEffect(() => {
     if (!pendingDeleteExperiment || typeof document === "undefined") return;
 
     const previousOverflow = document.body.style.overflow;
@@ -525,11 +565,15 @@ export default function MLTab({
         setSupervised(detail.result as SupervisedResult);
         setSelectedExperimentIds((current) => ({ ...current, supervised: experiment.id }));
         setActiveLab("supervised");
+        flashSelectedRun("supervised", experiment.id);
+        scrollToResultStart("supervised");
       } else {
         setUnsupervised(detail.result as UnsupervisedResult);
         setSelectedExperimentIds((current) => ({ ...current, unsupervised: experiment.id }));
         setClusterInput(getExperimentClusterInput(experiment));
         setActiveLab("unsupervised");
+        flashSelectedRun("unsupervised", experiment.id);
+        scrollToResultStart("unsupervised");
       }
     } catch (requestError) {
       const message = requestError instanceof Error ? requestError.message : "Failed to load saved experiment.";
@@ -647,6 +691,8 @@ export default function MLTab({
             <div className={sliderTrackClassName}>
               {items.map((experiment) => {
                 const selected = experiment.id === selectedId;
+                const flashing =
+                  selectionFlash?.mode === mode && selectionFlash?.id === experiment.id;
 
                 return (
                   <button
@@ -655,11 +701,11 @@ export default function MLTab({
                     onClick={() => {
                       void handleOpenExperiment(experiment, "saved");
                     }}
-                    className={`snap-start border-b border-white/6 p-4 text-left transition ${
+                    className={`ml-run-card snap-start rounded-2xl border p-4 text-left transition ${
                       selected
                         ? "border-[#7ad6ff]/55 bg-[#7ad6ff]/10"
-                        : "border-white/10 bg-black/10 hover:bg-white/[0.06]"
-                    }`}
+                        : "border-white/10 bg-black/10 hover:border-white/16 hover:bg-white/[0.06]"
+                    } ${selected ? "ml-run-card-selected" : ""} ${flashing ? "ml-run-card-flash" : ""}`}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium capitalize text-white">{experiment.type} run</p>
@@ -788,7 +834,7 @@ export default function MLTab({
 
   return (
     <>
-      <section className="analysis-tab-surface space-y-4">
+      <section ref={surfaceRef} className="analysis-tab-surface space-y-4">
       <details className="mobile-accordion">
         <summary>
           <div className="min-w-0">
@@ -1020,6 +1066,7 @@ export default function MLTab({
                               ...current,
                               supervised: result.experiment?.id || null,
                             }));
+                            flashSelectedRun("supervised", result.experiment.id);
                           }
                           scrollToResultStart("supervised");
                         } catch (requestError) {
@@ -1431,6 +1478,7 @@ export default function MLTab({
                         ...current,
                         unsupervised: result.experiment?.id || null,
                       }));
+                      flashSelectedRun("unsupervised", result.experiment.id);
                     }
                     scrollToResultStart("unsupervised");
                   } catch (requestError) {
