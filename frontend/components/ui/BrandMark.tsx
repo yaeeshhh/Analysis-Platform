@@ -1,39 +1,86 @@
 type BrandMarkProps = {
   compact?: boolean;
   withCopy?: boolean;
+  className?: string;
 };
 
 export default function BrandMark({
   compact = false,
   withCopy = true,
+  className = "",
 }: BrandMarkProps) {
-  const iconSize = compact ? "h-10 w-10" : "h-14 w-14";
+  const showWordmark = !compact && withCopy;
+  const sizeClassName = compact
+    ? "h-11 w-11"
+    : showWordmark
+      ? "h-[10.75rem] w-[10.75rem] sm:h-[11.5rem] sm:w-[11.5rem]"
+      : "h-14 w-14";
 
   return (
-    <div className="flex items-center gap-3">
-      <div
-        className={`${iconSize} relative overflow-hidden rounded-[18px] border border-white/15 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.24),_transparent_56%),linear-gradient(145deg,_rgba(17,39,59,0.96),_rgba(8,19,30,0.86))] shadow-[0_18px_48px_rgba(0,0,0,0.32)]`}
+    <span
+      aria-label="Analysis Studio logo"
+      className={`brandmark-root inline-flex shrink-0 items-center justify-center ${className}`.trim()}
+      role="img"
+    >
+      <svg
+        viewBox="0 0 512 512"
+        className={sizeClassName}
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <div className="absolute inset-[5px] rounded-[14px] border border-white/10 bg-[linear-gradient(155deg,_rgba(122,214,255,0.22),_rgba(191,184,255,0.12)_55%,_rgba(255,255,255,0.06))]" />
-        <div className="absolute left-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-[#7ad6ff] shadow-[0_0_18px_rgba(122,214,255,0.65)]" />
-        <div className="absolute bottom-2.5 right-2.5 h-2 w-2 rounded-full bg-[#bfb8ff] shadow-[0_0_20px_rgba(191,184,255,0.55)]" />
-        <div className="absolute inset-x-2.5 bottom-3 flex items-end gap-1.5">
-          <span className="h-2.5 flex-1 rounded-full bg-[#7ad6ff]/70" />
-          <span className="h-5 flex-1 rounded-full bg-white/80" />
-          <span className="h-8 flex-1 rounded-full bg-[#bfb8ff]/80" />
-        </div>
-      </div>
+        <rect x="18" y="18" width="476" height="476" rx="72" fill="#202643" stroke="#5673FF" strokeWidth="8" />
+        <rect x="34" y="34" width="444" height="444" rx="60" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
 
-      {withCopy ? (
-        <div className="min-w-0">
-          <p className="font-[family:var(--font-display)] text-sm font-semibold uppercase tracking-[0.24em] text-white/90">
-            Analysis Studio
-          </p>
-          <p className="text-xs text-white/55">
-            Upload, profile, visualize, and model tabular data on demand.
-          </p>
-        </div>
-      ) : null}
-    </div>
+        {showWordmark ? (
+          <>
+            <rect x="128" y="228" width="52" height="104" rx="11" fill="#4357B5" />
+            <rect x="200" y="172" width="52" height="160" rx="11" fill="#4D63D8" />
+            <rect x="272" y="116" width="52" height="216" rx="11" fill="#5776FF" />
+            <rect x="344" y="200" width="52" height="132" rx="11" fill="#4357B5" />
+            <path d="M154 214L226 160L298 114L370 176" stroke="#B7C5FF" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="154" cy="214" r="10" fill="#B7C5FF" />
+            <circle cx="226" cy="160" r="10" fill="#B7C5FF" />
+            <circle cx="298" cy="114" r="10" fill="#B7C5FF" />
+            <circle cx="370" cy="176" r="10" fill="#B7C5FF" />
+            <text
+              x="256"
+              y="392"
+              fill="#F5F7FF"
+              fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+              fontSize="46"
+              fontWeight="700"
+              letterSpacing="-2.4"
+              textAnchor="middle"
+            >
+              Analysis Studio
+            </text>
+            <text
+              x="256"
+              y="435"
+              fill="#CBD3E6"
+              fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+              fontSize="18"
+              fontWeight="600"
+              letterSpacing="7.5"
+              textAnchor="middle"
+            >
+              DATA · INSIGHTS · CLARITY
+            </text>
+          </>
+        ) : (
+          <>
+            <rect x="110" y="248" width="60" height="128" rx="12" fill="#4357B5" />
+            <rect x="196" y="184" width="60" height="192" rx="12" fill="#4D63D8" />
+            <rect x="282" y="118" width="60" height="258" rx="12" fill="#5776FF" />
+            <rect x="368" y="208" width="60" height="168" rx="12" fill="#4357B5" />
+            <path d="M140 222L226 160L312 114L398 184" stroke="#B7C5FF" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="140" cy="222" r="12" fill="#B7C5FF" />
+            <circle cx="226" cy="160" r="12" fill="#B7C5FF" />
+            <circle cx="312" cy="114" r="12" fill="#B7C5FF" />
+            <circle cx="398" cy="184" r="12" fill="#B7C5FF" />
+          </>
+        )}
+      </svg>
+    </span>
   );
 }

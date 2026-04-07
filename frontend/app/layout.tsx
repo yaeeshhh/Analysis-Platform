@@ -33,6 +33,14 @@ export const metadata: Metadata = {
   title: "Analysis Studio",
   description:
     "Analyze uploaded CSV files with automatic schema inference, quality checks, descriptive statistics, visualisations, and optional machine learning.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: ["/icon.svg"],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
