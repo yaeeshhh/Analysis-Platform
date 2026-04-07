@@ -36,7 +36,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
   ];
 
   return (
-    <section className="space-y-4">
+    <section className="analysis-tab-surface space-y-4">
       <article className="border-b border-white/6 pb-4">
         <div className="flex flex-wrap items-center gap-2">
           {Object.entries(schema.type_counts || {}).map(([label, count]) => (
@@ -73,7 +73,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
       {/* Tablet+: full column detail table */}
       <article className="tablet-up border-b border-white/6 pb-4">
         <div className="mt-1 overflow-x-auto">
-          <table className="min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
+          <table className="desktop-data-table min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
             <thead>
               <tr>
                 {[

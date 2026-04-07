@@ -17,7 +17,7 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
   const dominantCategories = getDominantCategories(statistics);
 
   return (
-    <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+    <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
       <details className="mobile-accordion">
         <summary>
           <div className="min-w-0">

@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
 import BrandMark from "@/components/ui/BrandMark";
+
+const SIDEBAR_STORAGE_KEY = "analysis-studio:desktop-sidebar-collapsed";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", match: "/dashboard", icon: "dashboard" },
@@ -58,6 +61,48 @@ function NavIcon({ kind }: { kind: (typeof navItems)[number]["icon"] }) {
 
 export default function TopNav() {
   const pathname = usePathname();
+  const surfaceRef = useRef<HTMLDivElement | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+
+    try {
+      const nextCollapsed = window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+      if (nextCollapsed) {
+        frame = window.requestAnimationFrame(() => {
+          setCollapsed(true);
+        });
+      }
+    } catch {
+      // Ignore storage failures so the sidebar still works in restricted browsers.
+    }
+
+    return () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, collapsed ? "true" : "false");
+    } catch {
+      // Ignore storage failures so the sidebar still works in restricted browsers.
+    }
+
+    const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
+    if (sidebar) {
+      sidebar.dataset.collapsed = collapsed ? "true" : "false";
+    }
+
+    return () => {
+      if (sidebar) {
+        delete sidebar.dataset.collapsed;
+      }
+    };
+  }, [collapsed]);
 
   const linkClass = (match: string) =>
     `nav-link ${
@@ -67,13 +112,45 @@ export default function TopNav() {
     }`;
 
   return (
-    <div className="nav-surface">
+    <div
+      ref={surfaceRef}
+      className={`nav-surface ${collapsed ? "nav-surface-collapsed" : ""}`}
+      onClick={(event) => {
+        if (!collapsed) return;
+        const target = event.target as HTMLElement;
+        if (target.closest("a, button")) return;
+        setCollapsed(false);
+      }}
+    >
       <div className="desktop-sidebar-brand">
-        <BrandMark compact withCopy={false} />
-        <div className="nav-brand-copy">
-          <p className="nav-brand-title">Analysis Studio</p>
-          <p className="nav-brand-subtitle">Tabular analysis workspace</p>
-        </div>
+        <button
+          type="button"
+          className="desktop-sidebar-toggle"
+          onClick={() => setCollapsed((current) => !current)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M10.5 3.5L6 8l4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          className="desktop-sidebar-brand-lockup"
+          onClick={() => {
+            if (collapsed) {
+              setCollapsed(false);
+            }
+          }}
+          aria-label="Analysis Studio navigation"
+        >
+          <BrandMark compact withCopy={false} />
+          <div className="nav-brand-copy">
+            <p className="nav-brand-title">Analysis Studio</p>
+            <p className="nav-brand-subtitle">Tabular analysis workspace</p>
+          </div>
+        </button>
       </div>
 
       <p className="desktop-sidebar-label">Workspace</p>
@@ -85,6 +162,8 @@ export default function TopNav() {
               key={item.href}
               href={item.href}
               className={linkClass(item.match)}
+              title={collapsed ? item.label : undefined}
+              aria-label={collapsed ? item.label : undefined}
             >
               <span className="nav-link-icon" aria-hidden="true">
                 <NavIcon kind={item.icon} />
