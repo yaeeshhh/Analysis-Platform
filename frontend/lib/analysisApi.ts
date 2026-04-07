@@ -394,6 +394,13 @@ function normalizeAnalysisReport(value: unknown): AnalysisReport {
   };
 }
 
+export const MISSING_ANALYSIS_SOURCE_ERROR_DETAIL =
+  "The original CSV for this saved run is no longer available on the server. Re-upload the dataset to run ML again.";
+
+export function isMissingAnalysisSourceError(message: string) {
+  return message.includes(MISSING_ANALYSIS_SOURCE_ERROR_DETAIL);
+}
+
 function resolveAnalysisError(response: Response, payload: unknown, fallback: string) {
   const detail = typeof payload === "object" && payload && "detail" in payload ? String(payload.detail) : "";
 

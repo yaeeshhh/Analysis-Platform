@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   Bar,
   BarChart,
@@ -28,6 +29,7 @@ import {
   downloadMlExperimentReport,
   downloadMlExperimentSummary,
   getMlExperimentDetail,
+  isMissingAnalysisSourceError,
 } from "@/lib/analysisApi";
 import { triggerNavigationScroll } from "@/lib/navigationScroll";
 
@@ -443,6 +445,25 @@ export default function MLTab({
   function renderInlineError(message: string) {
     if (!message) {
       return null;
+    }
+
+    if (isMissingAnalysisSourceError(message)) {
+      return (
+        <div className="mt-4 rounded-2xl border border-[#ffb079]/20 bg-[#19120f]/92 p-4 text-sm text-[#ffe7d7]">
+          <p className="font-semibold text-white">This saved run can still be reviewed, but it cannot rerun ML on the server.</p>
+          <p className="mt-2 leading-6 text-white/72">
+            The archived report and any saved ML outputs remain available here. To run a fresh ML pass, upload the original CSV again in Uploads and open the new analysis run.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <ScrollIntentLink
+              href="/batch"
+              className="rounded-lg bg-[#ffb079] px-4 py-2 text-sm font-semibold text-[#11273b]"
+            >
+              Open Uploads
+            </ScrollIntentLink>
+          </div>
+        </div>
+      );
     }
 
     return (
