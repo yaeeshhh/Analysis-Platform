@@ -365,7 +365,6 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] {
-    cursor: pointer;
     width: 64px;
   }
 
@@ -1834,6 +1833,7 @@ details.mobile-accordion > .mobile-accordion-body {
   margin-top: 1rem;
 }
 
+.history-popup-header-card,
 .history-popup-stat-card,
 .history-popup-sidecard,
 .history-popup-section {
@@ -1843,18 +1843,25 @@ details.mobile-accordion > .mobile-accordion-body {
   box-shadow: var(--shadow-soft);
 }
 
+.history-popup-header-card {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+}
+
 .history-popup-stat-card {
   min-height: 5.6rem;
   padding: 0.9rem 1rem;
 }
 
 .history-popup-layout {
+  align-items: start;
   display: grid;
   gap: 1rem;
 }
 
 .history-popup-sidebar {
   display: none;
+  min-width: 0;
 }
 
 .history-popup-content {
@@ -1865,6 +1872,7 @@ details.mobile-accordion > .mobile-accordion-body {
 }
 
 .history-popup-sidecard {
+  min-width: 0;
   padding: 1rem 1.05rem;
 }
 
@@ -1888,7 +1896,12 @@ details.mobile-accordion > .mobile-accordion-body {
   background: rgba(255, 255, 255, 0.028);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 0.85rem;
+  min-width: 0;
   padding: 0.8rem 0.85rem;
+}
+
+.history-popup-sidecell p {
+  overflow-wrap: anywhere;
 }
 
 .history-popup-select-shell {
@@ -1997,7 +2010,7 @@ details.mobile-accordion > .mobile-accordion-body {
 
 @media (min-width: 1200px) {
   .history-popup-layout {
-    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-columns: minmax(220px, 252px) minmax(0, 1fr);
   }
 
   .history-popup-sidebar {
@@ -2005,8 +2018,6 @@ details.mobile-accordion > .mobile-accordion-body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    position: sticky;
-    top: 0;
   }
 }
 

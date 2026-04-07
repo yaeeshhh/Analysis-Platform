@@ -152,90 +152,90 @@ export default function AnalysisResultPopup({
         className="mx-auto flex h-full w-full max-w-[1540px] flex-col overflow-hidden rounded-[34px] border border-white/10 bg-[#09131d]/96 shadow-[0_32px_110px_rgba(0,0,0,0.52)]"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="border-b border-white/10 px-6 py-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archived report</p>
-              <h2 className="mt-2 break-words font-[family:var(--font-display)] text-3xl text-white">
-                {report ? report.overview.dataset_name : "Saved run details"}
-              </h2>
-              <p className="mt-2 max-w-4xl text-sm leading-6 text-white/64">
-                View the full saved report here without replacing the current analysis.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              {report ? (
-                <button
-                  type="button"
-                  onClick={onDownloadReport}
-                  className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
-                >
-                  Download report
-                </button>
-              ) : null}
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
-              >
-                Close run
-              </button>
-            </div>
-          </div>
-
-          {report ? (
-            <div className="history-popup-stat-grid">
-              <div className="history-popup-stat-card">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/42">Saved</p>
-                <p className="mt-2 text-sm font-medium text-white">{savedAt ? formatDate(savedAt) : "Saved run"}</p>
-              </div>
-              <div className="history-popup-stat-card">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/42">Rows</p>
-                <p className="mt-2 text-sm font-medium text-white">{report.overview.row_count.toLocaleString()}</p>
-              </div>
-              <div className="history-popup-stat-card">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/42">Columns</p>
-                <p className="mt-2 text-sm font-medium text-white">{report.overview.column_count.toLocaleString()}</p>
-              </div>
-              <div className="history-popup-stat-card">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/42">Quality score</p>
-                <p className="mt-2 text-sm font-medium text-white">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
-              </div>
-              <div className="history-popup-stat-card">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/42">Readiness</p>
-                <p className="mt-2 text-sm font-medium text-white">
-                  {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="history-popup-header-card">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archived report</p>
+                <h2 className="mt-2 break-words font-[family:var(--font-display)] text-3xl text-white">
+                  {report ? report.overview.dataset_name : "Saved run details"}
+                </h2>
+                <p className="mt-2 max-w-4xl text-sm leading-6 text-white/64">
+                  View the full saved report here without replacing the current analysis.
                 </p>
               </div>
-              <div className="history-popup-stat-card">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/42">ML runs</p>
-                <p className="mt-2 text-sm font-medium text-white">{report.ml_experiments.length}</p>
+
+              <div className="flex flex-wrap gap-3">
+                {report ? (
+                  <button
+                    type="button"
+                    onClick={onDownloadReport}
+                    className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+                  >
+                    Download report
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
+                >
+                  Close run
+                </button>
               </div>
             </div>
-          ) : null}
 
-          {report && ready ? (
-            <div className="mt-4 max-w-sm">
-              <label className="history-popup-select-shell">
-                <span className="history-popup-select-label">Jump to section</span>
-                <select
-                  value={activeSectionId}
-                  onChange={(event) => handleScrollToSection(event.target.value as PopupSectionId)}
-                  className="history-popup-select"
-                >
-                  {sections.map((section) => (
-                    <option key={`select-${section.id}`} value={section.id}>
-                      {section.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          ) : null}
-        </div>
+            {report ? (
+              <div className="history-popup-stat-grid">
+                <div className="history-popup-stat-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Saved</p>
+                  <p className="mt-2 text-sm font-medium text-white">{savedAt ? formatDate(savedAt) : "Saved run"}</p>
+                </div>
+                <div className="history-popup-stat-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Rows</p>
+                  <p className="mt-2 text-sm font-medium text-white">{report.overview.row_count.toLocaleString()}</p>
+                </div>
+                <div className="history-popup-stat-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Columns</p>
+                  <p className="mt-2 text-sm font-medium text-white">{report.overview.column_count.toLocaleString()}</p>
+                </div>
+                <div className="history-popup-stat-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Quality score</p>
+                  <p className="mt-2 text-sm font-medium text-white">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
+                </div>
+                <div className="history-popup-stat-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Readiness</p>
+                  <p className="mt-2 text-sm font-medium text-white">
+                    {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                  </p>
+                </div>
+                <div className="history-popup-stat-card">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">ML runs</p>
+                  <p className="mt-2 text-sm font-medium text-white">{report.ml_experiments.length}</p>
+                </div>
+              </div>
+            ) : null}
 
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
+            {report && ready ? (
+              <div className="mt-4 max-w-sm">
+                <label className="history-popup-select-shell">
+                  <span className="history-popup-select-label">Jump to section</span>
+                  <select
+                    value={activeSectionId}
+                    onChange={(event) => handleScrollToSection(event.target.value as PopupSectionId)}
+                    className="history-popup-select"
+                  >
+                    {sections.map((section) => (
+                      <option key={`select-${section.id}`} value={section.id}>
+                        {section.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            ) : null}
+          </div>
+
           {loading ? (
             <div className="py-10 text-center text-sm text-white/55">
               Loading saved run details...

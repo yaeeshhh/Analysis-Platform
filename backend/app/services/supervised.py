@@ -32,11 +32,16 @@ from .ml_reporting import (
 )
 
 
-MAX_SUPERVISED_ROWS = 8000
-MAX_ENCODER_CATEGORIES = 18
-RANDOM_FOREST_TREES = 96
-EXTRA_TREES = 128
+MAX_SUPERVISED_ROWS = 5000
+MAX_SUPERVISED_REPORT_ROWS = 2400
+MAX_SUPERVISED_NUMERIC_FEATURES = 18
+MAX_SUPERVISED_CATEGORICAL_FEATURES = 10
+MAX_SUPERVISED_PREVIEW_ROWS = 40
+MAX_ENCODER_CATEGORIES = 12
+RANDOM_FOREST_TREES = 72
+EXTRA_TREES = 96
 MODEL_N_JOBS = 1
+IDENTIFIER_LIKE_UNIQUE_SHARE = 0.92
 
 GENERIC_POSITIVE_LABEL_HINTS = (
     "1",
@@ -61,6 +66,20 @@ def _sample_training_frame(frame: pd.DataFrame, target_column: str, task_type: s
     sampled, _ = train_test_split(
         frame,
         train_size=MAX_SUPERVISED_ROWS,
+        random_state=42,
+        stratify=stratify,
+    )
+    return sampled.reset_index(drop=True), True
+
+
+def _sample_reporting_frame(frame: pd.DataFrame, target_column: str, task_type: str) -> tuple[pd.DataFrame, bool]:
+    if len(frame) <= MAX_SUPERVISED_REPORT_ROWS:
+        return frame.reset_index(drop=True), False
+
+    stratify = frame[target_column] if task_type == "classification" and _can_stratify(frame[target_column]) else None
+    sampled, _ = train_test_split(
+        frame,
+        train_size=MAX_SUPERVISED_REPORT_ROWS,
         random_state=42,
         stratify=stratify,
     )
@@ -104,6 +123,63 @@ def _resolve_binary_positive_label(target: pd.Series, class_labels: list[Any]) -
     return class_labels[-1]
 
 
+def _is_identifier_like_feature(series: pd.Series) -> bool:
+    non_null = series.dropna()
+    if len(non_null) < 20:
+        return False
+
+    if pd.api.types.is_numeric_dtype(non_null):
+        return False
+
+    unique_share = float(non_null.nunique(dropna=True) / max(1, len(non_null)))
+    if unique_share >= IDENTIFIER_LIKE_UNIQUE_SHARE:
+        return True
+
+    text_sample = non_null.astype(str).head(160)
+    average_length = float(text_sample.str.len().mean()) if not text_sample.empty else 0.0
+    return unique_share >= 0.55 and average_length >= 12.0
+
+
+def _select_supervised_features(
+    frame: pd.DataFrame,
+) -> tuple[pd.DataFrame, list[str], list[str], dict[str, int]]:
+    identifier_like_columns = [column for column in frame.columns if _is_identifier_like_feature(frame[column])]
+    reduced = frame.drop(columns=identifier_like_columns) if identifier_like_columns else frame.copy()
+
+    numeric_candidates = [column for column in reduced.columns if pd.api.types.is_numeric_dtype(reduced[column])]
+    categorical_candidates = [column for column in reduced.columns if column not in numeric_candidates]
+
+    selected_numeric = numeric_candidates
+    if len(selected_numeric) > MAX_SUPERVISED_NUMERIC_FEATURES:
+        selected_numeric = (
+            reduced[selected_numeric]
+            .var(skipna=True)
+            .fillna(0.0)
+            .sort_values(ascending=False)
+            .index[:MAX_SUPERVISED_NUMERIC_FEATURES]
+            .tolist()
+        )
+
+    selected_categorical = categorical_candidates
+    if len(selected_categorical) > MAX_SUPERVISED_CATEGORICAL_FEATURES:
+        selected_categorical = sorted(
+            categorical_candidates,
+            key=lambda column: (
+                -int(reduced[column].notna().sum()),
+                int(reduced[column].nunique(dropna=True)),
+                column.lower(),
+            ),
+        )[:MAX_SUPERVISED_CATEGORICAL_FEATURES]
+
+    selected_columns = selected_numeric + selected_categorical
+    trimmed = reduced.loc[:, selected_columns].copy() if selected_columns else reduced.iloc[:, 0:0].copy()
+    return trimmed, selected_numeric, selected_categorical, {
+        "dropped_identifier_like_features": int(len(identifier_like_columns)),
+        "trimmed_numeric_features": int(max(0, len(numeric_candidates) - len(selected_numeric))),
+        "trimmed_categorical_features": int(max(0, len(categorical_candidates) - len(selected_categorical))),
+    }
+
+
 def _build_supervised_warnings(
     *,
     task_type: str,
@@ -115,6 +191,11 @@ def _build_supervised_warnings(
     rows_used: int,
     test_rows: int,
     high_cardinality_features: int,
+    dropped_identifier_like_features: int,
+    trimmed_numeric_features: int,
+    trimmed_categorical_features: int,
+    reporting_sampling_applied: bool,
+    reporting_rows_used: int,
 ) -> list[str]:
     warnings: list[str] = []
 
@@ -126,6 +207,21 @@ def _build_supervised_warnings(
     if high_cardinality_features > 0:
         warnings.append(
             f"{high_cardinality_features} categorical feature(s) were compressed during encoding so rare categories do not dominate runtime or feature space."
+        )
+
+    if dropped_identifier_like_features > 0:
+        warnings.append(
+            f"Dropped {dropped_identifier_like_features} identifier-like or free-text feature(s) before training so noisy high-cardinality columns do not dominate the benchmark."
+        )
+
+    if trimmed_numeric_features > 0 or trimmed_categorical_features > 0:
+        warnings.append(
+            f"Trimmed {trimmed_numeric_features} numeric and {trimmed_categorical_features} categorical feature(s) to keep the supervised benchmark responsive on deployment."
+        )
+
+    if reporting_sampling_applied:
+        warnings.append(
+            f"Feature slices and narrative diagnostics were generated from a representative sample of {reporting_rows_used:,} rows to keep the response fast."
         )
 
     if test_rows < 120:
@@ -188,16 +284,17 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
     modeling_frame, sampling_applied = _sample_training_frame(work, target_column, task_type)
 
     y = modeling_frame[target_column]
-    X = modeling_frame.drop(columns=[target_column]).copy()
+    raw_feature_frame = modeling_frame.drop(columns=[target_column]).copy()
 
-    datetime_columns = [column for column in X.columns if np.issubdtype(X[column].dtype, np.datetime64)]
+    datetime_columns = [column for column in raw_feature_frame.columns if np.issubdtype(raw_feature_frame[column].dtype, np.datetime64)]
+    prepared_features = raw_feature_frame.copy()
     for column in datetime_columns:
-        X[column] = pd.to_datetime(X[column], errors="coerce").map(lambda value: value.toordinal() if pd.notna(value) else np.nan)
+        prepared_features[column] = pd.to_datetime(prepared_features[column], errors="coerce").map(
+            lambda value: value.toordinal() if pd.notna(value) else np.nan
+        )
 
-    X = X.loc[:, X.notna().any(axis=0)].copy()
-
-    numeric_columns = [column for column in X.columns if pd.api.types.is_numeric_dtype(X[column])]
-    categorical_columns = [column for column in X.columns if column not in numeric_columns]
+    prepared_features = prepared_features.loc[:, prepared_features.notna().any(axis=0)].copy()
+    X, numeric_columns, categorical_columns, feature_selection = _select_supervised_features(prepared_features)
     high_cardinality_features = sum(int(X[column].nunique(dropna=False)) > MAX_ENCODER_CATEGORIES for column in categorical_columns)
     if not numeric_columns and not categorical_columns:
         raise ValueError("No usable feature columns remain after excluding the target column.")
@@ -224,6 +321,7 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
                             OneHotEncoder(
                                 handle_unknown="infrequent_if_exist",
                                 max_categories=MAX_ENCODER_CATEGORIES,
+                                min_frequency=0.01,
                             ),
                         ),
                     ]
@@ -372,8 +470,9 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
         reverse=True,
     )[:15]
 
-    preview_frame = X_test.head(100).astype(object).where(pd.notnull(X_test.head(100)), None)
-    preview_predictions = best_pipeline.predict(X_test.head(100))
+    preview_base = X_test.head(MAX_SUPERVISED_PREVIEW_ROWS)
+    preview_frame = preview_base.astype(object).where(pd.notnull(preview_base), None)
+    preview_predictions = best_pipeline.predict(preview_base)
     predictions_preview = []
     for index, (_, row) in enumerate(preview_frame.iterrows()):
         predictions_preview.append(
@@ -383,6 +482,25 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
                 "prediction": preview_predictions[index].item() if hasattr(preview_predictions[index], "item") else preview_predictions[index],
             }
         )
+
+    reporting_frame = modeling_frame.loc[:, [target_column, *X.columns]].copy()
+    reporting_frame, reporting_sampling_applied = _sample_reporting_frame(reporting_frame, target_column, task_type)
+    warnings = _build_supervised_warnings(
+        task_type=task_type,
+        target=y,
+        best_model_name=best_model_name,
+        comparisons=comparisons,
+        sampling_applied=sampling_applied,
+        rows_available=int(len(work)),
+        rows_used=int(len(modeling_frame)),
+        test_rows=int(len(X_test)),
+        high_cardinality_features=int(high_cardinality_features),
+        dropped_identifier_like_features=int(feature_selection["dropped_identifier_like_features"]),
+        trimmed_numeric_features=int(feature_selection["trimmed_numeric_features"]),
+        trimmed_categorical_features=int(feature_selection["trimmed_categorical_features"]),
+        reporting_sampling_applied=bool(reporting_sampling_applied),
+        reporting_rows_used=int(len(reporting_frame)),
+    )
 
     result = {
         "task_type": task_type,
@@ -405,19 +523,9 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
             "sampling_applied": bool(sampling_applied),
             "target_cardinality": int(y.nunique(dropna=True)),
         },
-        "warnings": _build_supervised_warnings(
-            task_type=task_type,
-            target=y,
-            best_model_name=best_model_name,
-            comparisons=comparisons,
-            sampling_applied=sampling_applied,
-            rows_available=int(len(work)),
-            rows_used=int(len(modeling_frame)),
-            test_rows=int(len(X_test)),
-            high_cardinality_features=int(high_cardinality_features),
-        ),
+        "warnings": warnings,
     }
     result["metric_explanations"] = get_metric_explanations(task_type)
-    result["target_feature_slices"] = build_target_feature_slices(work, target_column, task_type)
+    result["target_feature_slices"] = build_target_feature_slices(reporting_frame, target_column, task_type)
     result["model_summary"] = build_supervised_model_summary(result)
     return result
