@@ -161,12 +161,9 @@ export default function TopNav() {
           </span>
           <div className="nav-brand-copy">
             <p className="nav-brand-title">Analysis Studio</p>
-            <p className="nav-brand-subtitle">Tabular analysis workspace</p>
           </div>
         </div>
       </div>
-
-      <p className="desktop-sidebar-label">Workspace</p>
 
       <div className={`nav-links-scroll ${contentCollapsed ? "nav-links-scroll-collapsed" : ""}`}>
         <div className={`nav-links-track ${contentCollapsed ? "nav-links-track-collapsed" : ""}`}>
