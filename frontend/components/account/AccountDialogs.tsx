@@ -46,7 +46,6 @@ export type AccountDialogKey =
   | "username"
   | "password"
   | "remember"
-  | "2fa"
   | "clear-uploads"
   | "danger";
 
@@ -904,113 +903,6 @@ function RememberLoginDialog({
   );
 }
 
-function TwoFactorWorkaroundDialog({
-  open,
-  onClose,
-  user,
-  rememberStatus,
-  onStatusUpdated,
-}: {
-  open: boolean;
-  onClose: () => void;
-  user: User;
-  rememberStatus: RememberStatus;
-  onStatusUpdated: (status: RememberStatus, notice: string) => void;
-}) {
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!open) {
-      setSaving(false);
-      setError("");
-    }
-  }, [open]);
-
-  const requiresCodeEveryLogin = !rememberStatus.available || !rememberStatus.enabled;
-
-  async function handleRequireCodeEveryLogin() {
-    const normalizedEmail = user.email.trim().toLowerCase();
-
-    try {
-      setSaving(true);
-      setError("");
-
-      if (!rememberStatus.available) {
-        onClose();
-        return;
-      }
-
-      const updated = setRememberEnabled(normalizedEmail, false);
-      if (!updated) {
-        setError("Failed to require a code on this browser.");
-        return;
-      }
-
-      const nextStatus = getRememberStatus(normalizedEmail);
-      onStatusUpdated(nextStatus, "Verification codes will be required again on this browser.");
-      onClose();
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Failed to update two-factor behavior.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <DialogShell
-      open={open}
-      onClose={onClose}
-      eyebrow="Email Code"
-      title="Two-factor login behavior"
-      description="Email verification codes already protect password logins. This control only manages whether remembered login on this browser can bypass that code step."
-      maxWidthClassName="max-w-3xl"
-    >
-      <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="border-b border-white/6 pb-3">
-          <p className="text-xs uppercase tracking-[0.18em] text-white/42">Current browser state</p>
-          <p className="mt-3 text-lg font-medium text-white">
-            {requiresCodeEveryLogin
-              ? "Verification code required on every password login"
-              : `Remembered login is bypassing the code step for ${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"}`}
-          </p>
-          <p className="mt-3 text-sm leading-6 text-white/60">
-            If you want the email code every time again on this browser, turn off remembered login here.
-          </p>
-        </div>
-
-        <div className="space-y-4 border-b border-white/6 pb-3">
-          <div className="rounded-[18px] border border-white/10 bg-[#15151a] px-4 py-4">
-            <p className="text-sm font-medium text-white">How it works</p>
-            <div className="mt-3 space-y-2 text-xs leading-5 text-white/58">
-              <p>Password login always creates an email-code challenge.</p>
-              <p>Remembered login on this browser can skip the password and code step.</p>
-              <p>Disabling remembered login here restores the email-code requirement on this browser.</p>
-            </div>
-          </div>
-
-          <div className="rounded-[18px] border border-white/10 bg-[#15151a] px-4 py-4">
-            <p className="text-sm font-medium text-white">Workaround</p>
-            <p className="mt-2 text-xs leading-5 text-white/58">
-              {requiresCodeEveryLogin
-                ? "This browser already requires the verification code again."
-                : "Disable remembered login for this browser to force the verification code again."}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <StatusBlock error={error} success={requiresCodeEveryLogin ? "No change needed on this browser." : undefined} />
-      <FooterActions
-        onClose={onClose}
-        onConfirm={handleRequireCodeEveryLogin}
-        confirmLabel={saving ? "Updating browser state..." : "Require code every login"}
-        disabled={saving || requiresCodeEveryLogin}
-      />
-    </DialogShell>
-  );
-}
-
 function ConfirmDangerDialog({
   open,
   onClose,
@@ -1280,13 +1172,6 @@ export default function AccountDialogs({
       <PasswordChangeDialog open={activeDialog === "password"} onClose={onClose} user={user} />
       <RememberLoginDialog
         open={activeDialog === "remember"}
-        onClose={onClose}
-        user={user}
-        rememberStatus={rememberStatus}
-        onStatusUpdated={onRememberStatusUpdated}
-      />
-      <TwoFactorWorkaroundDialog
-        open={activeDialog === "2fa"}
         onClose={onClose}
         user={user}
         rememberStatus={rememberStatus}

@@ -125,6 +125,7 @@ export interface User {
   username: string | null;
   full_name: string | null;
   date_of_birth: string | null;
+  two_factor_enabled: boolean;
   is_active: boolean;
   created_at: string;
 }
@@ -202,6 +203,7 @@ interface UpdateProfileRequest {
   username?: string;
   full_name?: string;
   date_of_birth?: string | null;
+  two_factor_enabled?: boolean;
   password?: string;
   current_password?: string;
 }

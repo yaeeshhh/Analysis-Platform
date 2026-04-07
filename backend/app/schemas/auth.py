@@ -22,6 +22,7 @@ class UserResponse(BaseModel):
     username: str | None
     full_name: str | None = None
     date_of_birth: str | None = None
+    two_factor_enabled: bool = True
     is_active: bool
     created_at: str
 
@@ -105,6 +106,7 @@ class UpdateProfileRequest(BaseModel):
     username: str | None = Field(default=None, max_length=100)
     full_name: str | None = Field(default=None, max_length=200)
     date_of_birth: date | None = None
+    two_factor_enabled: bool | None = None
     password: str | None = Field(default=None, min_length=8)
     current_password: str | None = None
 
