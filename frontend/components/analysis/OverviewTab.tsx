@@ -27,7 +27,7 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
   const posture = getDatasetPosture(overview, schema, quality, insights);
 
   return (
-    <section className="space-y-4">
+    <section className="analysis-tab-surface space-y-4">
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
         <details className="mobile-accordion">
           <summary>
@@ -144,7 +144,7 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
         <div className="mobile-accordion-body">
         <h3 className="mt-2 font-[family:var(--font-display)] text-xl text-white">First 20 rows</h3>
         <div className="mt-4 overflow-x-auto">
-          <table className="min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
+          <table className="analysis-preview-table desktop-data-table min-w-full border-separate border-spacing-y-2 text-sm text-white/80">
             <thead>
               <tr>
                 {previewColumns.map((column) => (

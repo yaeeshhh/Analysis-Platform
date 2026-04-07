@@ -767,7 +767,7 @@ export default function MLTab({
 
   return (
     <>
-      <section className="space-y-4">
+      <section className="analysis-tab-surface space-y-4">
       <details className="mobile-accordion">
         <summary>
           <div className="min-w-0">

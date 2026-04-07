@@ -102,7 +102,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
     : [];
 
   return (
-    <section className="grid gap-4 lg:grid-cols-2">
+    <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">
       <details className="mobile-accordion min-w-0">
         <summary>
           <div className="min-w-0">
@@ -117,7 +117,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
           description={guides.missingness.description}
           reason={guides.missingness.reason}
         />
-        <div className="mt-5 h-72 min-w-0 overflow-hidden">
+        <div className="analysis-chart-frame mt-5 h-72 min-w-0 overflow-hidden">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={defaultChartInitialDimension}>
             <BarChart data={missingness} layout="vertical" margin={verticalChartMargin}>
               <CartesianGrid stroke="rgba(255,255,255,0.08)" horizontal={false} />
@@ -163,7 +163,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
           description={guides.histogram.description}
           reason={guides.histogram.reason}
         />
-        <div className="mt-5 h-72 min-w-0 overflow-visible">
+        <div className="analysis-chart-frame mt-5 h-72 min-w-0 overflow-visible">
           {histogram ? (
             <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={defaultChartInitialDimension}>
               <BarChart data={histogramData} margin={{ top: 12, right: 12, bottom: 44, left: 8 }}>
@@ -208,7 +208,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
           description={guides.category.description}
           reason={guides.category.reason}
         />
-        <div className="mt-5 h-80 min-w-0 overflow-hidden">
+        <div className="analysis-chart-frame mt-5 h-80 min-w-0 overflow-hidden">
           {categories ? (
             <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={defaultChartInitialDimension}>
               <BarChart data={categories.values} layout="vertical" margin={verticalChartMargin}>
@@ -348,7 +348,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
                 <p className="font-medium text-white">{plot.x} vs {plot.y}</p>
                 <span className="text-xs text-white/50">corr {plot.correlation.toFixed(3)}</span>
               </div>
-              <div className="mt-4 h-64 min-w-0 overflow-hidden">
+              <div className="analysis-chart-frame mt-4 h-64 min-w-0 overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={defaultChartInitialDimension}>
                   <ScatterChart margin={{ top: 12, right: 18, bottom: 8, left: 8 }}>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" />

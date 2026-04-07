@@ -16,7 +16,7 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
   ];
 
   return (
-    <section className="space-y-4">
+    <section className="analysis-tab-surface space-y-4">
       <div className="dq-summary-grid grid gap-4 md:grid-cols-4">
         {cards.map((card) => (
           <article key={card.label} className="border-b border-white/6 pb-3">

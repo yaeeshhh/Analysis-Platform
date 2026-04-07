@@ -10,7 +10,7 @@ function metric(value: number) {
 
 export default function StatisticsTab({ statistics }: StatisticsTabProps) {
   return (
-    <section className="grid gap-4 lg:grid-cols-2">
+    <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">
       <details className="mobile-accordion">
         <summary>
           <div className="min-w-0">

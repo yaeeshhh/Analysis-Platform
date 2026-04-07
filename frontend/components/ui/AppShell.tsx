@@ -35,7 +35,7 @@ export default function AppShell({
       <MobileHeader />
 
       <div className="desktop-shell">
-        <aside className="tablet-up desktop-sidebar">
+        <aside className="tablet-up desktop-sidebar" data-desktop-sidebar="true">
           <Suspense fallback={<div className="desktop-sidebar-skeleton" />}>
             <TopNav />
           </Suspense>
