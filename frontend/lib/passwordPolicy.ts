@@ -90,8 +90,8 @@ export function getPasswordStrengthState(password: string): PasswordStrengthStat
       level: "medium",
       progressPercent: 68,
       statusMessage: "Medium password.",
-      textClassName: "text-amber-300",
-      barClassName: "bg-amber-400",
+      textClassName: "text-blue-300",
+      barClassName: "bg-blue-400",
     };
   }
 

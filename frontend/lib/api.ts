@@ -100,7 +100,12 @@ export async function fetchWithAuth(url: string, options: FetchOptions = {}) {
       headers,
     });
   } catch {
-    throw new Error("Unable to reach the API. Check that the backend server is running.");
+    const isMlRequest = /\/analysis\/[^/]+\/ml\//.test(url);
+    throw new Error(
+      isMlRequest
+        ? "Unable to reach the API. The ML run likely timed out or the backend restarted while processing it."
+        : "Unable to reach the API. Check that the backend server is running."
+    );
   }
 
   // One retry is enough here because an expired access token is the usual 401 case.

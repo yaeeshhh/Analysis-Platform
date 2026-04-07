@@ -117,7 +117,7 @@ const featureMechanics = [
   },
   {
     title: "Analysis report",
-    accent: "#ffb079",
+    accent: "#9db8ff",
     detail: "Start with the overview, then move into the deeper tabs when you want more detail.",
     flow: "Use the tabs to move from summary to tables, charts, and ML.",
   },
@@ -135,7 +135,7 @@ const featureMechanics = [
   },
   {
     title: "ML experiment lanes",
-    accent: "#ffd76d",
+    accent: "#bfb8ff",
     detail: "Run supervised and unsupervised scans, then reopen saved experiments from the same dataset.",
     flow: "Downloads stay next to the active run, while older runs stay in the saved strips.",
   },
@@ -561,7 +561,7 @@ function DashboardMobileSections({
       id: "pages",
       title: "Studio pages",
       hint: "Direct links to Uploads, Analysis, History, and Account",
-      accent: "#ffb079",
+      accent: "#9db8ff",
       content: (
         <div>
           {destinationCards.map((item) => (
@@ -601,7 +601,7 @@ function DashboardMobileSections({
       id: "history",
       title: "History archive",
       hint: "Tools for reopening, searching, and downloading past runs",
-      accent: "#ffd76d",
+      accent: "#bfb8ff",
       content: (
         <div>
           <ScrollIntentLink href="/history" className="mb-3 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">

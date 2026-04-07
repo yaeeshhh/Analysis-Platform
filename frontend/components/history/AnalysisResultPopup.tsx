@@ -121,8 +121,22 @@ export default function AnalysisResultPopup({
 
   function handleScrollToSection(sectionId: PopupSectionId) {
     setActiveSectionId(sectionId);
+    const container = scrollContainerRef.current;
     const section = document.getElementById(`history-popup-${sectionId}`);
-    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!section) {
+      return;
+    }
+
+    if (!container) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const sectionRect = section.getBoundingClientRect();
+    const nextTop = container.scrollTop + (sectionRect.top - containerRect.top) - 12;
+
+    container.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
   }
 
   if (!open) {
@@ -202,23 +216,21 @@ export default function AnalysisResultPopup({
           ) : null}
 
           {report && ready ? (
-            <div className="mt-4 overflow-x-auto overflow-y-visible pb-2 pt-1 tablet-up xl:hidden">
-              <div className="analysis-subnav-surface">
-                <div className="analysis-subnav-track">
+            <div className="mt-4 max-w-sm">
+              <label className="history-popup-select-shell">
+                <span className="history-popup-select-label">Jump to section</span>
+                <select
+                  value={activeSectionId}
+                  onChange={(event) => handleScrollToSection(event.target.value as PopupSectionId)}
+                  className="history-popup-select"
+                >
                   {sections.map((section) => (
-                    <button
-                      type="button"
-                      key={section.id}
-                      onClick={() => handleScrollToSection(section.id)}
-                      className={`analysis-subnav-link ${
-                        activeSectionId === section.id ? "analysis-subnav-link-active" : ""
-                      }`}
-                    >
+                    <option key={`select-${section.id}`} value={section.id}>
                       {section.label}
-                    </button>
+                    </option>
                   ))}
-                </div>
-              </div>
+                </select>
+              </label>
             </div>
           ) : null}
         </div>
@@ -254,24 +266,6 @@ export default function AnalysisResultPopup({
           {!loading && !error && report && ready ? (
             <div className="history-popup-layout">
               <aside className="history-popup-sidebar tablet-up">
-                <div className="history-popup-sidecard">
-                  <span className="desktop-kicker">Navigator</span>
-                  <h3 className="history-popup-sidecard-title">Move through the saved report without replacing the active analysis.</h3>
-                  <div className="history-popup-nav">
-                    {sections.map((section) => (
-                      <button
-                        type="button"
-                        key={`side-${section.id}`}
-                        onClick={() => handleScrollToSection(section.id)}
-                        className={`history-popup-nav-link ${activeSectionId === section.id ? "history-popup-nav-link-active" : ""}`}
-                      >
-                        <span className="history-popup-nav-link-label">{section.label}</span>
-                        <span className="history-popup-nav-link-note">{section.note}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="history-popup-sidecard">
                   <span className="desktop-kicker">Snapshot</span>
                   <div className="mt-4 flex flex-wrap gap-2">

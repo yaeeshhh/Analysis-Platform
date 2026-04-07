@@ -32,10 +32,11 @@ from .ml_reporting import (
 )
 
 
-MAX_SUPERVISED_ROWS = 12000
-MAX_ENCODER_CATEGORIES = 24
-RANDOM_FOREST_TREES = 180
-EXTRA_TREES = 220
+MAX_SUPERVISED_ROWS = 8000
+MAX_ENCODER_CATEGORIES = 18
+RANDOM_FOREST_TREES = 96
+EXTRA_TREES = 128
+MODEL_N_JOBS = 1
 
 GENERIC_POSITIVE_LABEL_HINTS = (
     "1",
@@ -253,7 +254,7 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
                 RandomForestClassifier(
                     n_estimators=RANDOM_FOREST_TREES,
                     random_state=42,
-                    n_jobs=-1,
+                    n_jobs=MODEL_N_JOBS,
                     min_samples_leaf=2,
                     class_weight="balanced_subsample",
                     max_features="sqrt",
@@ -264,7 +265,7 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
                 ExtraTreesClassifier(
                     n_estimators=EXTRA_TREES,
                     random_state=42,
-                    n_jobs=-1,
+                    n_jobs=MODEL_N_JOBS,
                     min_samples_leaf=1,
                     class_weight="balanced_subsample",
                     max_features="sqrt",
@@ -279,7 +280,7 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
                 RandomForestRegressor(
                     n_estimators=RANDOM_FOREST_TREES,
                     random_state=42,
-                    n_jobs=-1,
+                    n_jobs=MODEL_N_JOBS,
                     min_samples_leaf=2,
                     max_features=0.8,
                 ),
@@ -289,7 +290,7 @@ def run_supervised_analysis(frame: pd.DataFrame, target_column: str) -> dict[str
                 ExtraTreesRegressor(
                     n_estimators=EXTRA_TREES,
                     random_state=42,
-                    n_jobs=-1,
+                    n_jobs=MODEL_N_JOBS,
                     min_samples_leaf=1,
                     max_features=0.9,
                 ),

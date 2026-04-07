@@ -13,7 +13,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
       title: "Identifiers",
       detail: "Likely row keys or one-value-per-record fields.",
       columns: schema.identifier_columns,
-      tone: "#ffb079",
+      tone: "#9db8ff",
     },
     {
       title: "Target candidates",
@@ -31,7 +31,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
       title: "Categorical fields",
       detail: "Discrete values such as plan, status, region, or segment labels.",
       columns: collectColumns("categorical"),
-      tone: "#ffd76d",
+      tone: "#bfb8ff",
     },
   ];
 
