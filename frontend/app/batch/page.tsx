@@ -40,6 +40,13 @@ export default function BatchPage() {
   const [notice, setNotice] = useState("");
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
+  function clearSelectedUpload() {
+    setSelectedFile(null);
+    setResumeUploadAfterLogin(false);
+    setNotice("Selected upload cleared.");
+    setError("");
+  }
+
   async function refreshAnalyses(preferredId?: number | null) {
     const items = await getAnalyses();
     setAnalyses(items);
@@ -311,11 +318,7 @@ export default function BatchPage() {
                   Upload a CSV to create a saved analysis run and route it directly into Analysis.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {[".CSV", ".XLSX", ".JSON", ".PARQUET"].map((label) => (
-                    <span key={label} className="info-chip">
-                      {label}
-                    </span>
-                  ))}
+                  <span className="info-chip">.CSV only</span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-white/12 bg-white/5 px-4 py-2.5 text-sm text-white/82">
@@ -327,6 +330,19 @@ export default function BatchPage() {
                     />
                     {selectedFile ? "Change file" : "Browse files"}
                   </label>
+                </div>
+                <p className="mt-3 text-sm text-white/40">
+                  {selectedFile
+                    ? `Selected ${selectedFile.name}`
+                    : "CSV only • max file size 50 MB"}
+                </p>
+              </section>
+
+              <section className="border-b border-white/6 pb-4">
+                <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">
+                  Upload actions
+                </p>
+                <div className="mt-4 flex flex-col gap-2">
                   <button
                     type="button"
                     disabled={!selectedFile || uploadBusy}
@@ -335,14 +351,17 @@ export default function BatchPage() {
                     }}
                     className="rounded-lg bg-[#14b8a6] px-4 py-2.5 text-sm font-semibold text-[#052225] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {uploadBusy ? "Processing..." : "Upload file"}
+                    {uploadBusy ? "Processing..." : "Process upload"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!selectedFile || uploadBusy}
+                    onClick={clearSelectedUpload}
+                    className="rounded-lg border border-white/12 px-4 py-2.5 text-sm text-white/82 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Clear upload
                   </button>
                 </div>
-                <p className="mt-3 text-sm text-white/40">
-                  {selectedFile
-                    ? `Ready to analyse ${selectedFile.name}`
-                    : "Max file size 50 MB"}
-                </p>
               </section>
 
               {selectedAnalysis ? (
@@ -409,11 +428,9 @@ export default function BatchPage() {
                       Choose a CSV to create a saved run, inspect the first quality signals, and route the dataset directly into Analysis.
                     </p>
                     <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                      {[".CSV", ".XLSX", ".JSON", ".PARQUET"].map((label) => (
-                        <span key={label} className="desktop-badge" data-tone="teal">
-                          {label}
-                        </span>
-                      ))}
+                      <span className="desktop-badge" data-tone="teal">
+                        .CSV only
+                      </span>
                     </div>
                     <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                       <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-[#14b8a6]/35 bg-[#14b8a6]/10 px-4 py-2.5 text-sm font-semibold text-[#7ce7dd] transition hover:bg-[#14b8a6]/14">
@@ -425,6 +442,13 @@ export default function BatchPage() {
                         />
                         {selectedFile ? "Change file" : "Browse files"}
                       </label>
+                    </div>
+                    <p className="mt-4 font-[family:var(--font-mono)] text-[0.72rem] uppercase tracking-[0.14em] text-white/26">
+                      {selectedFile
+                        ? `Selected ${selectedFile.name}`
+                        : "CSV only • max file size 50 MB"}
+                    </p>
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                       <button
                         type="button"
                         disabled={!selectedFile || uploadBusy}
@@ -433,14 +457,17 @@ export default function BatchPage() {
                         }}
                         className="rounded-lg bg-[#14b8a6] px-5 py-2.5 text-sm font-semibold text-[#052225] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {uploadBusy ? "Processing dataset..." : "Upload file"}
+                        {uploadBusy ? "Processing dataset..." : "Process upload"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!selectedFile || uploadBusy}
+                        onClick={clearSelectedUpload}
+                        className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Clear upload
                       </button>
                     </div>
-                    <p className="mt-4 font-[family:var(--font-mono)] text-[0.72rem] uppercase tracking-[0.14em] text-white/26">
-                      {selectedFile
-                        ? `Ready to analyse ${selectedFile.name}`
-                        : "Max file size 50 MB"}
-                    </p>
                   </div>
                 </section>
 
@@ -454,7 +481,8 @@ export default function BatchPage() {
                     </div>
 
                     {analyses.length > 0 ? (
-                      <div className="desktop-data-table-wrap">
+                      <>
+                      <div className="desktop-data-table-wrap desktop-data-table-scroll-window">
                         <table className="desktop-data-table">
                           <thead>
                             <tr>
@@ -465,7 +493,7 @@ export default function BatchPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {analyses.slice(0, 5).map((analysis) => {
+                            {analyses.map((analysis) => {
                               const selected = analysis.id === selectedAnalysis?.id;
                               const tone = selected
                                 ? "purple"
@@ -519,6 +547,25 @@ export default function BatchPage() {
                           </tbody>
                         </table>
                       </div>
+                      {selectedAnalysis ? (
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            type="button"
+                            onClick={handleClearCurrentSelection}
+                            className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
+                          >
+                            Clear selection
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmAction("selected")}
+                            className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
+                          >
+                            Delete current
+                          </button>
+                        </div>
+                      ) : null}
+                      </>
                     ) : (
                       <div className="desktop-empty-panel !min-h-[12rem]">
                         <p className="desktop-section-title text-[1.1rem]">
@@ -623,20 +670,6 @@ export default function BatchPage() {
                             className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
                           >
                             Download report
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleClearCurrentSelection}
-                            className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
-                          >
-                            Clear selection
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setConfirmAction("selected")}
-                            className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
-                          >
-                            Delete current
                           </button>
                         </div>
                       </>
@@ -786,13 +819,6 @@ function BatchMobileSections({
           >
             Open analysis overview
           </ScrollIntentLink>
-          <button
-            type="button"
-            onClick={() => setConfirmAction("selected")}
-            className="mt-2 w-full rounded-lg border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
-          >
-            Delete current dataset
-          </button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -816,35 +842,46 @@ function BatchMobileSections({
               No saved runs yet. Upload a CSV to create the first one.
             </p>
           ) : null}
-          {analyses.map((analysis) => {
-            const selected = analysis.id === selectedAnalysis?.id;
-            return (
-              <button
-                key={analysis.id}
-                type="button"
-                onClick={() => handleSelectSavedUpload(analysis.id)}
-                className={`w-full border-b border-white/6 py-3 text-left last:border-0 ${selected ? "bg-[#7ad6ff]/5" : ""}`}
-              >
-                <p className="truncate font-semibold text-white">
-                  {analysis.overview.dataset_name || analysis.source_filename}
-                </p>
-                <p className="mt-1 text-xs text-white/45">
-                  Saved {formatDate(analysis.saved_at)}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-white/60">
-                  {analysis.insights.summary}
-                </p>
-              </button>
-            );
-          })}
+          <div className="max-h-[22rem] overflow-y-auto pr-1">
+            {analyses.map((analysis) => {
+              const selected = analysis.id === selectedAnalysis?.id;
+              return (
+                <button
+                  key={analysis.id}
+                  type="button"
+                  onClick={() => handleSelectSavedUpload(analysis.id)}
+                  className={`w-full border-b border-white/6 py-3 text-left last:border-0 ${selected ? "bg-[#7ad6ff]/5" : ""}`}
+                >
+                  <p className="truncate font-semibold text-white">
+                    {analysis.overview.dataset_name || analysis.source_filename}
+                  </p>
+                  <p className="mt-1 text-xs text-white/45">
+                    Saved {formatDate(analysis.saved_at)}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-white/60">
+                    {analysis.insights.summary}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
           {selectedAnalysis ? (
-            <button
-              type="button"
-              onClick={handleClearCurrentSelection}
-              className="w-full rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
-            >
-              Clear current selection
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleClearCurrentSelection}
+                className="w-full rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+              >
+                Clear current selection
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmAction("selected")}
+                className="w-full rounded-lg border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
+              >
+                Delete current dataset
+              </button>
+            </div>
           ) : null}
         </div>
       ),

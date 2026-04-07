@@ -338,7 +338,7 @@ body::after {
     flex-direction: column;
     gap: 0.35rem;
     justify-content: center;
-    padding: 0.55rem 0.4rem 0.6rem;
+    padding: 0.55rem 0.35rem 0.6rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-brand-lockup {
@@ -350,10 +350,10 @@ body::after {
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    max-width: 100%;
+    max-width: 3rem;
     min-height: unset;
     padding: 0;
-    width: 100%;
+    width: 3rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-brand-copy,
@@ -392,7 +392,7 @@ body::after {
     align-items: center;
     display: flex;
     justify-content: center;
-    padding: 0.55rem 0.4rem 0.65rem;
+    padding: 0.55rem 0.35rem 0.65rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-shell-sidebar {
@@ -408,9 +408,10 @@ body::after {
     gap: 0;
     justify-content: center;
     margin: 0 auto;
+    max-width: 3rem;
     min-height: unset;
     padding: 0;
-    width: 100%;
+    width: 3rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-popover-sidebar {
@@ -1663,6 +1664,12 @@ details.mobile-accordion > .mobile-accordion-body {
 
 .desktop-data-table-wrap {
   overflow-x: auto;
+}
+
+.desktop-data-table-scroll-window {
+  max-height: 20.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .desktop-data-table {

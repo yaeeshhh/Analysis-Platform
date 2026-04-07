@@ -6,7 +6,6 @@ import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
-import { getAnalyses } from "@/lib/analysisApi";
 import {
   getRememberStatus,
   REMEMBER_LOGIN_STORAGE_KEY,
@@ -107,11 +106,6 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [rememberStatus, setRememberStatus] = useState<RememberStatus>(emptyRememberStatus);
-  const [archiveStats, setArchiveStats] = useState({
-    savedRuns: 0,
-    mlExperiments: 0,
-    mlReadyRuns: 0,
-  });
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [dobInput, setDobInput] = useState("");
@@ -132,7 +126,6 @@ export default function AccountPage() {
       if (!authenticatedUser) {
         setUser(null);
         setRememberStatus(emptyRememberStatus);
-        setArchiveStats({ savedRuns: 0, mlExperiments: 0, mlReadyRuns: 0 });
         setLoginRequired(true);
         setLoading(false);
         return;
@@ -142,19 +135,6 @@ export default function AccountPage() {
       setNameInput(authenticatedUser.full_name || "");
       setDobInput(authenticatedUser.date_of_birth || "");
       setRememberStatus(getRememberStatus(authenticatedUser.email));
-
-      try {
-        const analyses = await getAnalyses();
-        if (!active) return;
-        setArchiveStats({
-          savedRuns: analyses.length,
-          mlExperiments: analyses.reduce((sum, item) => sum + item.experiment_count, 0),
-          mlReadyRuns: analyses.filter((item) => item.insights.modeling_readiness.is_ready).length,
-        });
-      } catch {
-        if (!active) return;
-        setArchiveStats({ savedRuns: 0, mlExperiments: 0, mlReadyRuns: 0 });
-      }
 
       setLoginRequired(false);
       setLoading(false);
@@ -190,34 +170,6 @@ export default function AccountPage() {
       window.removeEventListener("storage", handleStorage);
     };
   }, [user?.email]);
-
-  const usageScale = Math.max(archiveStats.savedRuns, archiveStats.mlExperiments, archiveStats.mlReadyRuns, 1);
-  const usageItems = [
-    {
-      label: "Saved runs",
-      value: archiveStats.savedRuns,
-      caption: `${archiveStats.savedRuns} current archive item${archiveStats.savedRuns === 1 ? "" : "s"}`,
-      hint: `${archiveStats.mlReadyRuns} run${archiveStats.mlReadyRuns === 1 ? "" : "s"} currently look ML-ready.`,
-      tone: "#2563eb",
-      width: (archiveStats.savedRuns / usageScale) * 100,
-    },
-    {
-      label: "ML-ready runs",
-      value: archiveStats.mlReadyRuns,
-      caption: `${archiveStats.mlReadyRuns} of ${archiveStats.savedRuns} saved run${archiveStats.savedRuns === 1 ? "" : "s"}`,
-      hint: "Use these when you want to reopen stronger candidates for optional ML.",
-      tone: "#f59e0b",
-      width: (archiveStats.mlReadyRuns / usageScale) * 100,
-    },
-    {
-      label: "Saved ML experiments",
-      value: archiveStats.mlExperiments,
-      caption: `${archiveStats.mlExperiments} stored experiment output${archiveStats.mlExperiments === 1 ? "" : "s"}`,
-      hint: "Reopen or download them from Analysis and History whenever needed.",
-      tone: "#ef4444",
-      width: (archiveStats.mlExperiments / usageScale) * 100,
-    },
-  ];
 
   return (
     <>
@@ -439,33 +391,6 @@ export default function AccountPage() {
 
               <section className="desktop-panel">
                 <div className="desktop-panel-header">
-                  <p className="desktop-panel-title">Usage snapshot</p>
-                  <span className="desktop-panel-action">Current workspace state</span>
-                </div>
-
-                <div className="space-y-5">
-                  {usageItems.map((item) => (
-                    <div key={item.label}>
-                      <div className="flex items-baseline justify-between gap-4">
-                        <span className="text-sm text-white/76">{item.label}</span>
-                        <span className="font-[family:var(--font-mono)] text-[0.72rem] uppercase tracking-[0.14em] text-white/28">
-                          {item.caption}
-                        </span>
-                      </div>
-                      <div className="mt-2 h-1.5 rounded-full bg-white/6">
-                        <div
-                          className="h-1.5 rounded-full"
-                          style={{ width: `${Math.max(item.width, item.value > 0 ? 18 : 0)}%`, background: item.tone }}
-                        />
-                      </div>
-                      <p className="mt-2 text-[0.72rem] leading-5 text-white/32">{item.hint}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="desktop-panel">
-                <div className="desktop-panel-header">
                   <p className="desktop-panel-title">Login & session</p>
                   <span className="desktop-panel-action">Browser and access controls</span>
                 </div>
@@ -495,16 +420,12 @@ export default function AccountPage() {
                       action: "Open",
                     },
                     {
-                      key: "notifications",
-                      title: "Email notifications",
-                      detail: "Completion alerts and background reminders are planned for a later release.",
-                      badge: "Coming soon",
-                    },
-                    {
                       key: "2fa",
                       title: "Two-factor authentication",
-                      detail: "A second verification step is not available yet, but the desktop layout now reserves space for it.",
-                      badge: "Planned",
+                      detail: rememberStatus.available && rememberStatus.enabled
+                        ? "Remembered login is currently bypassing the email code on this browser. Open this to require the code again."
+                        : "Email verification is already required for password logins on this browser.",
+                      action: "Open",
                     },
                   ].map((row) => (
                     <div key={row.key} className="flex items-center justify-between gap-6 py-4 first:pt-0 last:pb-0">
@@ -512,17 +433,13 @@ export default function AccountPage() {
                         <p className="text-sm font-medium text-white/82">{row.title}</p>
                         <p className="mt-1 text-sm leading-6 text-white/40">{row.detail}</p>
                       </div>
-                      {"action" in row ? (
-                        <button
-                          type="button"
-                          onClick={() => setActiveDialog(row.key as AccountDialogKey)}
-                          className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
-                        >
-                          {row.action}
-                        </button>
-                      ) : (
-                        <span className="desktop-badge" data-tone="purple">{row.badge}</span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setActiveDialog(row.key as AccountDialogKey)}
+                        className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+                      >
+                        {row.action}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -593,7 +510,6 @@ export default function AccountPage() {
         }}
         onAnalysisUploadsCleared={() => {
           clearCurrentAnalysisSelection();
-          setArchiveStats({ savedRuns: 0, mlExperiments: 0, mlReadyRuns: 0 });
           notifyAnalysesChanged();
         }}
       />
@@ -677,6 +593,31 @@ function AccountMobileSections({
         </div>
       ),
     })),
+    {
+      id: "two-factor",
+      title: "Two-factor authentication",
+      hint: rememberStatus.available && rememberStatus.enabled
+        ? "Remembered login is bypassing the email code on this browser."
+        : "Email code already applies to password login on this browser.",
+      accent: "#8bf1a8",
+      content: (
+        <button
+          type="button"
+          onClick={() => setActiveDialog("2fa")}
+          className="w-full border-b border-white/6 py-3 text-left last:border-0"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-white">Manage login code behavior</p>
+              <p className="mt-1 text-sm leading-6 text-white/50">
+                Disable remembered login on this browser if you want the code step every time again.
+              </p>
+            </div>
+            <span className="shrink-0 text-xs text-white/30">›</span>
+          </div>
+        </button>
+      ),
+    },
   ];
 
   return <MobileSectionList sections={sections} />;
