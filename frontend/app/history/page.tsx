@@ -391,8 +391,16 @@ export default function HistoryPage() {
                 </div>
 
                 {filteredAnalyses.length > 0 ? (
-                  <div className="desktop-data-table-wrap">
-                    <table className="desktop-data-table">
+                  <div className="desktop-data-table-wrap desktop-history-table-wrap">
+                    <table className="desktop-data-table desktop-history-table">
+                      <colgroup>
+                        <col className="desktop-history-table-col-run" />
+                        <col className="desktop-history-table-col-mode" />
+                        <col className="desktop-history-table-col-readiness" />
+                        <col className="desktop-history-table-col-status" />
+                        <col className="desktop-history-table-col-saved" />
+                        <col className="desktop-history-table-col-actions" />
+                      </colgroup>
                       <thead>
                         <tr>
                           <th>Run</th>
