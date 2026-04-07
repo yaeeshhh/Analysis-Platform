@@ -3,7 +3,7 @@ from typing import Generator
 from pathlib import Path
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 # Load .env from backend directory
@@ -32,6 +32,35 @@ engine = create_engine(_normalize_database_url(DATABASE_URL))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+
+def ensure_runtime_schema_compatibility() -> None:
+    required_columns = {
+        "users": {
+            "full_name": "ALTER TABLE users ADD COLUMN full_name VARCHAR(200)",
+            "date_of_birth": "ALTER TABLE users ADD COLUMN date_of_birth DATE",
+        },
+        "pending_signups": {
+            "full_name": "ALTER TABLE pending_signups ADD COLUMN full_name VARCHAR(200)",
+        },
+    }
+
+    with engine.begin() as connection:
+        inspector = inspect(connection)
+
+        for table_name, columns in required_columns.items():
+            if not inspector.has_table(table_name):
+                continue
+
+            existing_columns = {
+                column["name"] for column in inspector.get_columns(table_name)
+            }
+
+            for column_name, ddl in columns.items():
+                if column_name in existing_columns:
+                    continue
+
+                connection.execute(text(ddl))
 
 
 def get_db() -> Generator[Session, None, None]:

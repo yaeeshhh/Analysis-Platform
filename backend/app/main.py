@@ -3,12 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api.routes.health import router as health_router
 from .api.routes.auth import router as auth_router
-from .core.database import Base, SessionLocal, engine
+from .core.database import Base, SessionLocal, engine, ensure_runtime_schema_compatibility
 from .core.config import settings
 from . import models
 
 # Create all tables
 Base.metadata.create_all(bind=engine)
+ensure_runtime_schema_compatibility()
 
 from .api.routes.analysis import router as analysis_router
 from .services.analysis_runs import retire_legacy_batch_tables

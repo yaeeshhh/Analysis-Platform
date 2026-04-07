@@ -334,6 +334,7 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-brand {
+    align-items: center;
     flex-direction: column;
     gap: 0.35rem;
     justify-content: center;
@@ -348,6 +349,8 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto;
+    max-width: 100%;
     min-height: unset;
     padding: 0;
     width: 100%;
@@ -386,21 +389,25 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-profile {
+    align-items: center;
     display: flex;
     justify-content: center;
     padding: 0.55rem 0.4rem 0.65rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-shell-sidebar {
+    display: flex;
     justify-content: center;
     width: 100%;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-sidebar-button {
+    align-items: center;
     aspect-ratio: 1;
     border-radius: 0.7rem;
     gap: 0;
     justify-content: center;
+    margin: 0 auto;
     min-height: unset;
     padding: 0;
     width: 100%;
@@ -533,13 +540,19 @@ body::after {
 }
 
 .nav-brand-monogram {
+  align-items: center;
   color: var(--text-100);
+  display: inline-flex;
   font-family: var(--font-display), sans-serif;
   font-size: 1.15rem;
   font-weight: 800;
+  height: 100%;
+  justify-content: center;
   letter-spacing: -0.04em;
   line-height: 1;
+  text-align: center;
   user-select: none;
+  width: 100%;
 }
 
 .nav-links-scroll {
