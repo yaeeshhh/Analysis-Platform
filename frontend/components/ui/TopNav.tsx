@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
+import BrandMark from "@/components/ui/BrandMark";
 
 const SIDEBAR_OPEN_DELAY_MS = 220;
 
@@ -155,13 +156,8 @@ export default function TopNav() {
       }}
     >
       <div className="desktop-sidebar-brand">
-        <div className="desktop-sidebar-brand-lockup">
-          <span className="nav-brand-monogram" aria-hidden="true">
-            AS
-          </span>
-          <div className="nav-brand-copy">
-            <p className="nav-brand-title">Analysis Studio</p>
-          </div>
+        <div className="desktop-sidebar-brand-lockup justify-center">
+          <BrandMark compact={contentCollapsed} withCopy={!contentCollapsed} />
         </div>
       </div>
 
