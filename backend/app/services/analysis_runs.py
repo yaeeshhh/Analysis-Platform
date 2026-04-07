@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -43,6 +44,17 @@ class AnalysisRun:
         return self.record.stored_filename
 
     @property
+    def source_file_content(self) -> bytes | None:
+        blob = self.record.source_file_blob
+        if blob is None:
+            return None
+
+        try:
+            return gzip.decompress(blob)
+        except OSError:
+            return bytes(blob)
+
+    @property
     def status(self) -> str:
         return self.record.status
 
@@ -70,6 +82,12 @@ class AnalysisRun:
     @report_payload.setter
     def report_payload(self, value: dict[str, object]) -> None:
         self.record.report_payload = value
+
+
+def _compress_source_file_content(content: bytes | None) -> bytes | None:
+    if content is None:
+        return None
+    return gzip.compress(content)
 
 
 def _table_exists(db: Session, table_name: str) -> bool:
@@ -173,6 +191,7 @@ def create_analysis_run(
     dataset_name: str | None,
     source_filename: str,
     stored_filename: str,
+    source_file_content: bytes | None = None,
     row_count: int,
     status: str = "completed",
 ) -> AnalysisRun:
@@ -182,6 +201,7 @@ def create_analysis_run(
         display_name=dataset_name or Path(source_filename).stem,
         source_filename=source_filename,
         stored_filename=stored_filename,
+        source_file_blob=_compress_source_file_content(source_file_content),
         status=status,
         row_count=total_rows,
         processed_row_count=total_rows,
@@ -216,6 +236,13 @@ def list_analysis_runs(db: Session, *, user_id: int) -> list[AnalysisRun]:
 
 def save_analysis_report(db: Session, analysis_run: AnalysisRun, report_payload: dict[str, object]) -> None:
     analysis_run.report_payload = report_payload
+    db.add(analysis_run.record)
+    db.commit()
+    db.refresh(analysis_run.record)
+
+
+def save_analysis_source_file(db: Session, analysis_run: AnalysisRun, source_file_content: bytes) -> None:
+    analysis_run.record.source_file_blob = _compress_source_file_content(source_file_content)
     db.add(analysis_run.record)
     db.commit()
     db.refresh(analysis_run.record)

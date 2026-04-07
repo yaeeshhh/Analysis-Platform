@@ -35,19 +35,22 @@ Base = declarative_base()
 
 
 def ensure_runtime_schema_compatibility() -> None:
-    required_columns = {
-        "users": {
-            "full_name": "ALTER TABLE users ADD COLUMN full_name VARCHAR(200)",
-            "date_of_birth": "ALTER TABLE users ADD COLUMN date_of_birth DATE",
-            "two_factor_enabled": "ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN NOT NULL DEFAULT TRUE",
-        },
-        "pending_signups": {
-            "full_name": "ALTER TABLE pending_signups ADD COLUMN full_name VARCHAR(200)",
-        },
-    }
-
     with engine.begin() as connection:
         inspector = inspect(connection)
+        binary_column_type = "BYTEA" if connection.dialect.name == "postgresql" else "BLOB"
+        required_columns = {
+            "users": {
+                "full_name": "ALTER TABLE users ADD COLUMN full_name VARCHAR(200)",
+                "date_of_birth": "ALTER TABLE users ADD COLUMN date_of_birth DATE",
+                "two_factor_enabled": "ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN NOT NULL DEFAULT TRUE",
+            },
+            "pending_signups": {
+                "full_name": "ALTER TABLE pending_signups ADD COLUMN full_name VARCHAR(200)",
+            },
+            "analysis_runs": {
+                "source_file_blob": f"ALTER TABLE analysis_runs ADD COLUMN source_file_blob {binary_column_type}",
+            },
+        }
 
         for table_name, columns in required_columns.items():
             if not inspector.has_table(table_name):
