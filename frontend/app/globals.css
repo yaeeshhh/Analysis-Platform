@@ -1700,7 +1700,7 @@ a[class*="rounded"]:hover {
     display: flex;
     flex-wrap: wrap;
     gap: 0.7rem;
-    margin-top: 0.95rem;
+    margin-top: 1rem;
   }
 
   .mobile-screen-actions > * {
@@ -2137,6 +2137,63 @@ a[class*="rounded"]:hover {
   .mobile-analysis-content-panel table {
     font-size: 0.76rem;
   }
+
+  .mobile-expand-card {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1.05rem;
+    overflow: hidden;
+  }
+
+  .mobile-expand-card-header {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    display: block;
+    padding: 0.95rem 1rem;
+    text-align: left;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-expand-card-header:active {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .mobile-expand-card-body {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.95rem 1rem;
+  }
+
+  .mobile-expand-card-chevron {
+    color: rgba(242, 247, 251, 0.3);
+    flex-shrink: 0;
+    height: 1rem;
+    transition: transform 180ms ease;
+    width: 1rem;
+  }
+
+  .mobile-expand-card-chevron-open {
+    transform: rotate(180deg);
+  }
+
+  .mobile-expand-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+
+  .mobile-expand-card-actions-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .mobile-expand-card-actions-row > * {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 @media (min-width: 600px) and (max-width: 959px) {
@@ -2381,7 +2438,7 @@ details.mobile-accordion > .mobile-accordion-body {
   will-change: transform;
 }
 
-@media (max-width: 599px) {
+@media (max-width: 959px) {
   .mobile-slide-page {
     display: block;
   }

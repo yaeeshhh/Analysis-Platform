@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import { useMobileSlide } from "@/components/ui/MobileSlideProvider";
 import OverviewTab from "@/components/analysis/OverviewTab";
 import SchemaTab from "@/components/analysis/SchemaTab";
 import DataQualityTab from "@/components/analysis/DataQualityTab";
@@ -65,10 +66,6 @@ const tabDescriptions: Record<AnalysisTabKey, string> = {
   visualisations: "Charts and visual summaries generated from the current run.",
   ml: "Optional ML experiments that are saved back into the selected analysis run.",
 };
-
-function truncateText(text: string, maxLength: number) {
-  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
-}
 
 function resolveRequestedTab(requestedTab: string | null): AnalysisTabKey | null {
   switch (requestedTab) {
@@ -639,6 +636,8 @@ function AnalysisMobileSections({
   onTabChange: (nextTab: AnalysisTabKey) => void;
   refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
 }) {
+  const { push } = useMobileSlide();
+  const [datasetExpanded, setDatasetExpanded] = useState(false);
   let activeContent: React.ReactNode = null;
 
   if (activeTab === "overview") {
@@ -706,6 +705,8 @@ function AnalysisMobileSections({
     );
   }
 
+  const activeTabLabel = tabs.find((tab) => tab.key === activeTab)?.label ?? "Section";
+
   return (
     <div className="phone-only mobile-screen-stack">
       <div className="mobile-screen-stats">
@@ -735,7 +736,31 @@ function AnalysisMobileSections({
               {report.overview.dataset_name}
               {report.saved_at ? ` • saved ${formatDate(report.saved_at)}` : ""}
             </p>
-            <p className="mobile-screen-lead">{truncateText(report.insights.summary, 150)}</p>
+            <p className="mobile-screen-lead">
+              {datasetExpanded
+                ? report.insights.summary
+                : report.insights.summary.length > 120
+                  ? `${report.insights.summary.slice(0, 120)}…`
+                  : report.insights.summary}
+              {report.insights.summary.length > 120 && !datasetExpanded ? (
+                <button
+                  type="button"
+                  onClick={() => setDatasetExpanded(true)}
+                  style={{ background: "none", border: "none", color: "var(--accent-cta-muted)", cursor: "pointer", fontSize: "inherit", fontWeight: 600, marginLeft: "0.3rem", padding: 0 }}
+                >
+                  Read more
+                </button>
+              ) : null}
+              {datasetExpanded && report.insights.summary.length > 120 ? (
+                <button
+                  type="button"
+                  onClick={() => setDatasetExpanded(false)}
+                  style={{ background: "none", border: "none", color: "var(--accent-cta-muted)", cursor: "pointer", fontSize: "inherit", fontWeight: 600, marginLeft: "0.3rem", padding: 0 }}
+                >
+                  Show less
+                </button>
+              ) : null}
+            </p>
           </div>
         </div>
         <div className="mobile-screen-pills">
@@ -794,10 +819,41 @@ function AnalysisMobileSections({
             ))}
           </select>
         </div>
+        <p className="mobile-screen-lead">{tabDescriptions[activeTab]}</p>
       </section>
 
-      <section className="mobile-screen-panel mobile-analysis-content-panel">
-        {activeContent}
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Focused subpage</p>
+            <h2 className="mobile-screen-title">{activeTabLabel}</h2>
+            <p className="mobile-screen-lead">
+              Open the selected report section in a focused subpage so the analysis page stays easier to scan.
+            </p>
+          </div>
+        </div>
+        <div className="mobile-screen-actions">
+          <button
+            type="button"
+            onClick={() =>
+              push({
+                id: `analysis-${report.analysis_id}-${activeTab}`,
+                title: activeTabLabel,
+                accent: "#9db8ff",
+                content: (
+                  <div className="mobile-screen-stack">
+                    <section className="mobile-screen-panel mobile-analysis-content-panel">
+                      {activeContent}
+                    </section>
+                  </div>
+                ),
+              })
+            }
+            className="mobile-screen-button mobile-screen-button-primary"
+          >
+            Open {activeTabLabel}
+          </button>
+        </div>
       </section>
     </div>
   );
