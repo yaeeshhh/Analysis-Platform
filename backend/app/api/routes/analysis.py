@@ -20,9 +20,10 @@ from ...services.analysis_runs import (
     get_analysis_run,
     list_analysis_runs as list_saved_analysis_runs,
     save_analysis_report,
+    save_analysis_source_file,
 )
 from ...services.data_quality import analyze_data_quality
-from ...services.ingestion import load_csv_from_bytes, load_csv_from_path, preview_rows, validate_csv_filename
+from ...services.ingestion import load_csv_from_bytes, preview_rows, validate_csv_filename
 from ...services.insights import generate_insights
 from ...services.ml_reporting import (
     build_supervised_model_summary,
@@ -565,6 +566,24 @@ def _resolve_saved_path(path_value: str | None) -> Path | None:
     return path
 
 
+def _read_analysis_source_bytes(
+    analysis_run: AnalysisRun,
+    db: Session | None = None,
+) -> bytes | None:
+    stored_csv_path = UPLOADS_DIR / analysis_run.stored_filename
+    if stored_csv_path.exists():
+        try:
+            contents = stored_csv_path.read_bytes()
+        except OSError:
+            contents = None
+        else:
+            if db is not None and analysis_run.source_file_content is None:
+                save_analysis_source_file(db, analysis_run, contents)
+            return contents
+
+    return analysis_run.source_file_content
+
+
 def _get_saved_experiments(summary: object) -> list[dict[str, object]]:
     if not isinstance(summary, dict):
         return []
@@ -646,16 +665,42 @@ def _report_path_for_analysis_run(analysis_run: AnalysisRun) -> Path | None:
     return path
 
 
-def _hydrate_dynamic_ml_capabilities(analysis_run: AnalysisRun, summary: dict[str, object]) -> dict[str, object]:
+def _load_analysis_source_frame(
+    analysis_run: AnalysisRun,
+    db: Session | None = None,
+):
+    contents = _read_analysis_source_bytes(analysis_run, db=db)
+    if contents is None:
+        raise HTTPException(
+            status_code=409,
+            detail="The original CSV for this saved run is no longer available on the server. Re-upload the dataset to run ML again.",
+        )
+
+    try:
+        frame, _ = load_csv_from_bytes(contents)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="The saved dataset for this analysis could not be reloaded for ML.",
+        ) from exc
+
+    return frame
+
+
+def _hydrate_dynamic_ml_capabilities(
+    analysis_run: AnalysisRun,
+    summary: dict[str, object],
+    db: Session | None = None,
+) -> dict[str, object]:
     if not isinstance(summary, dict):
         return summary
 
-    stored_csv_path = UPLOADS_DIR / analysis_run.stored_filename
-    if not stored_csv_path.exists():
+    contents = _read_analysis_source_bytes(analysis_run, db=db)
+    if contents is None:
         return summary
 
     try:
-        frame = load_csv_from_path(stored_csv_path)
+        frame, _ = load_csv_from_bytes(contents)
     except ValueError:
         return summary
 
@@ -711,6 +756,7 @@ async def upload_analysis_csv(
         dataset_name=Path(filename).stem,
         source_filename=filename,
         stored_filename=stored_filename,
+        source_file_content=contents,
         row_count=len(frame),
         status="completed",
     )
@@ -768,7 +814,7 @@ def get_full_analysis(
     current_user: User = Depends(get_current_user),
 ):
     analysis_run = _get_analysis_run(analysis_id, db, current_user)
-    summary = _hydrate_dynamic_ml_capabilities(analysis_run, dict(analysis_run.report_payload))
+    summary = _hydrate_dynamic_ml_capabilities(analysis_run, dict(analysis_run.report_payload), db=db)
     return {
         "analysis_id": analysis_run.id,
         "display_name": analysis_run.display_name,
@@ -921,24 +967,33 @@ def run_analysis_unsupervised(
     current_user: User = Depends(get_current_user),
 ):
     analysis_run = _get_analysis_run(analysis_id, db, current_user)
-    frame = load_csv_from_path(UPLOADS_DIR / analysis_run.stored_filename)
+
     try:
+        frame = _load_analysis_source_frame(analysis_run, db=db)
         result = run_unsupervised_analysis(frame, n_clusters=body.n_clusters)
+        summary = dict(analysis_run.report_payload)
+        ml_results = dict(summary.get("ml_results") or {})
+        ml_results["unsupervised"] = result
+        summary["ml_results"] = ml_results
+        experiment = _append_experiment(
+            analysis_run,
+            summary,
+            experiment_type="unsupervised",
+            result=result,
+            parameters={"n_clusters": body.n_clusters},
+        )
+        _sync_analysis_summary(analysis_run, summary, db)
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="The unsupervised run completed, but the result could not be saved.",
+        ) from exc
 
-    summary = dict(analysis_run.report_payload)
-    ml_results = dict(summary.get("ml_results") or {})
-    ml_results["unsupervised"] = result
-    summary["ml_results"] = ml_results
-    experiment = _append_experiment(
-        analysis_run,
-        summary,
-        experiment_type="unsupervised",
-        result=result,
-        parameters={"n_clusters": body.n_clusters},
-    )
-    _sync_analysis_summary(analysis_run, summary, db)
     return {**result, "experiment": experiment}
 
 
@@ -950,35 +1005,44 @@ def run_analysis_supervised(
     current_user: User = Depends(get_current_user),
 ):
     analysis_run = _get_analysis_run(analysis_id, db, current_user)
-    frame = load_csv_from_path(UPLOADS_DIR / analysis_run.stored_filename)
+
     try:
+        frame = _load_analysis_source_frame(analysis_run, db=db)
         result = run_supervised_analysis(frame, target_column=body.target_column)
+        summary = dict(analysis_run.report_payload)
+        capabilities = dict(summary.get("ml_capabilities") or {})
+        supervised_capabilities = dict(capabilities.get("supervised") or {})
+        if not result.get("target_recommendation"):
+            target_recommendations = supervised_capabilities.get("target_recommendations") or []
+            target_recommendation = next(
+                (item for item in target_recommendations if item.get("column") == body.target_column),
+                None,
+            )
+            if target_recommendation is not None:
+                result["target_recommendation"] = target_recommendation
+
+        ml_results = dict(summary.get("ml_results") or {})
+        ml_results["supervised"] = result
+        summary["ml_results"] = ml_results
+        experiment = _append_experiment(
+            analysis_run,
+            summary,
+            experiment_type="supervised",
+            result=result,
+            parameters={"target_column": body.target_column},
+        )
+        _sync_analysis_summary(analysis_run, summary, db)
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="The supervised benchmark completed, but the result could not be saved.",
+        ) from exc
 
-    summary = dict(analysis_run.report_payload)
-    capabilities = dict(summary.get("ml_capabilities") or {})
-    supervised_capabilities = dict(capabilities.get("supervised") or {})
-    if not result.get("target_recommendation"):
-        target_recommendations = supervised_capabilities.get("target_recommendations") or []
-        target_recommendation = next(
-            (item for item in target_recommendations if item.get("column") == body.target_column),
-            None,
-        )
-        if target_recommendation is not None:
-            result["target_recommendation"] = target_recommendation
-
-    ml_results = dict(summary.get("ml_results") or {})
-    ml_results["supervised"] = result
-    summary["ml_results"] = ml_results
-    experiment = _append_experiment(
-        analysis_run,
-        summary,
-        experiment_type="supervised",
-        result=result,
-        parameters={"target_column": body.target_column},
-    )
-    _sync_analysis_summary(analysis_run, summary, db)
     return {**result, "experiment": experiment}
 
 

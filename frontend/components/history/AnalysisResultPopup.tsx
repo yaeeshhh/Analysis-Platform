@@ -264,88 +264,53 @@ export default function AnalysisResultPopup({
           ) : null}
 
           {!loading && !error && report && ready ? (
-            <div className="history-popup-layout">
-              <aside className="history-popup-sidebar tablet-up">
-                <div className="history-popup-sidecard">
-                  <span className="desktop-kicker">Snapshot</span>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="desktop-badge" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                      <span className="desktop-status-dot" />
-                      {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                    </span>
-                    <span className="desktop-badge" data-tone="purple">
-                      {report.ml_experiments.length} ML run{report.ml_experiments.length === 1 ? "" : "s"}
-                    </span>
-                  </div>
-                  <div className="history-popup-sidegrid">
-                    <div className="history-popup-sidecell">
-                      <p className="text-xs uppercase tracking-[0.16em] text-white/42">Dataset</p>
-                      <p className="mt-2 text-sm font-medium text-white">{report.overview.dataset_name}</p>
-                    </div>
-                    <div className="history-popup-sidecell">
-                      <p className="text-xs uppercase tracking-[0.16em] text-white/42">Saved</p>
-                      <p className="mt-2 text-sm font-medium text-white">{savedAt ? formatDate(savedAt) : "Saved run"}</p>
-                    </div>
-                    <div className="history-popup-sidecell">
-                      <p className="text-xs uppercase tracking-[0.16em] text-white/42">Rows</p>
-                      <p className="mt-2 text-sm font-medium text-white">{report.overview.row_count.toLocaleString()}</p>
-                    </div>
-                    <div className="history-popup-sidecell">
-                      <p className="text-xs uppercase tracking-[0.16em] text-white/42">Columns</p>
-                      <p className="mt-2 text-sm font-medium text-white">{report.overview.column_count.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              </aside>
+            <div className="history-popup-content">
+              <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows.">
+                <OverviewTab
+                  overview={report.overview}
+                  schema={report.schema}
+                  quality={report.quality}
+                  insights={report.insights}
+                />
+              </SectionFrame>
 
-              <div className="history-popup-content">
-                <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows.">
-                  <OverviewTab
-                    overview={report.overview}
-                    schema={report.schema}
-                    quality={report.quality}
-                    insights={report.insights}
-                  />
-                </SectionFrame>
+              <SectionFrame id="insights" title="Insights" note="Plain-language findings and recommended next steps.">
+                <InsightsTab insights={report.insights} />
+              </SectionFrame>
 
-                <SectionFrame id="insights" title="Insights" note="Plain-language findings and recommended next steps.">
-                  <InsightsTab insights={report.insights} />
-                </SectionFrame>
+              <SectionFrame id="schema" title="Schema" note="Column roles, inferred types, and field inventory.">
+                <SchemaTab schema={report.schema} />
+              </SectionFrame>
 
-                <SectionFrame id="schema" title="Schema" note="Column roles, inferred types, and field inventory.">
-                  <SchemaTab schema={report.schema} />
-                </SectionFrame>
+              <SectionFrame id="quality" title="Data Quality" note="Missingness, duplicates, and cleanup direction.">
+                <DataQualityTab overview={report.overview} quality={report.quality} />
+              </SectionFrame>
 
-                <SectionFrame id="quality" title="Data Quality" note="Missingness, duplicates, and cleanup direction.">
-                  <DataQualityTab overview={report.overview} quality={report.quality} />
-                </SectionFrame>
+              <SectionFrame id="statistics" title="Statistics" note="Numeric and categorical summaries for key columns.">
+                <StatisticsTab statistics={report.statistics} />
+              </SectionFrame>
 
-                <SectionFrame id="statistics" title="Statistics" note="Numeric and categorical summaries for key columns.">
-                  <StatisticsTab statistics={report.statistics} />
-                </SectionFrame>
+              <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues.">
+                <RelationshipsTab schema={report.schema} statistics={report.statistics} />
+              </SectionFrame>
 
-                <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues.">
-                  <RelationshipsTab schema={report.schema} statistics={report.statistics} />
-                </SectionFrame>
+              <SectionFrame id="visualisations" title="Charts" note="Distribution views, heatmap signals, and drift checks.">
+                <VisualisationsTab visualisations={report.visualisations} />
+              </SectionFrame>
 
-                <SectionFrame id="visualisations" title="Charts" note="Distribution views, heatmap signals, and drift checks.">
-                  <VisualisationsTab visualisations={report.visualisations} />
-                </SectionFrame>
-
-                <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details.">
-                  <MLTab
-                    key={`${report.analysis_id}:${report.ml_experiments.map((experiment) => experiment.id).join("|")}`}
-                    analysisId={report.analysis_id}
-                    capabilities={report.ml_capabilities}
-                    experiments={report.ml_experiments || []}
-                    initialUnsupervised={report.ml_results.unsupervised}
-                    initialSupervised={report.ml_results.supervised}
-                    onRunUnsupervised={onRunUnsupervised}
-                    onRunSupervised={onRunSupervised}
-                    onDeleteExperiment={onDeleteExperiment}
-                  />
-                </SectionFrame>
-              </div>
+              <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details.">
+                <MLTab
+                  key={`${report.analysis_id}:${report.ml_experiments.map((experiment) => experiment.id).join("|")}`}
+                  analysisId={report.analysis_id}
+                  capabilities={report.ml_capabilities}
+                  experiments={report.ml_experiments || []}
+                  initialUnsupervised={report.ml_results.unsupervised}
+                  initialSupervised={report.ml_results.supervised}
+                  onRunUnsupervised={onRunUnsupervised}
+                  onRunSupervised={onRunSupervised}
+                  onDeleteExperiment={onDeleteExperiment}
+                />
+              </SectionFrame>
             </div>
           ) : null}
         </div>

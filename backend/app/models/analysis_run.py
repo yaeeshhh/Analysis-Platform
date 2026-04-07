@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, LargeBinary, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,6 +15,7 @@ class AnalysisRunRecord(Base):
     display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     source_filename: Mapped[str] = mapped_column(String(255), nullable=False)
     stored_filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    source_file_blob: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="uploaded", nullable=False)
     row_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     processed_row_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
