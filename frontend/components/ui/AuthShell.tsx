@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import BackToTopButton from "@/components/ui/BackToTopButton";
 import BrandMark from "@/components/ui/BrandMark";
 
 type AuthShellSignal = {
@@ -50,6 +51,8 @@ export default function AuthShell({
 
         <div className="auth-panel">{children}</div>
       </div>
+
+      <BackToTopButton />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Suspense, type CSSProperties, type ReactNode } from "react";
+import BackToTopButton from "@/components/ui/BackToTopButton";
 import TopNav from "@/components/ui/TopNav";
 import MobileHeader from "@/components/ui/MobileHeader";
 import MobileNav from "@/components/ui/MobileNav";
@@ -82,6 +83,7 @@ export default function AppShell({
       </div>
 
       <MobileNav />
+      <BackToTopButton />
     </main>
   );
 }

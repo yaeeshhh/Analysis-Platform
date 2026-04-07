@@ -9,6 +9,7 @@ import RelationshipsTab from "@/components/analysis/RelationshipsTab";
 import SchemaTab from "@/components/analysis/SchemaTab";
 import StatisticsTab from "@/components/analysis/StatisticsTab";
 import VisualisationsTab from "@/components/analysis/VisualisationsTab";
+import BackToTopButton from "@/components/ui/BackToTopButton";
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import { AnalysisReport, MlExperimentSummary, SupervisedResult, UnsupervisedResult } from "@/lib/analysisTypes";
 import { formatDate } from "@/lib/helpers";
@@ -315,6 +316,12 @@ export default function AnalysisResultPopup({
           ) : null}
         </div>
       </div>
+
+      <BackToTopButton
+        scrollContainerRef={scrollContainerRef}
+        threshold={320}
+        className="bottom-5 right-5 z-[145] sm:bottom-6 sm:right-6"
+      />
     </div>
   );
 }

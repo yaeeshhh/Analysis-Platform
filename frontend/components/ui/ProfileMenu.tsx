@@ -12,6 +12,7 @@ import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 
 type ProfileMenuProps = {
   variant?: "default" | "sidebar";
+  onSidebarAction?: () => void;
 };
 
 function getInitials(user: User | null) {
@@ -26,7 +27,7 @@ function getInitials(user: User | null) {
     .join("") || source.charAt(0).toUpperCase();
 }
 
-export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
+export default function ProfileMenu({ variant = "default", onSidebarAction }: ProfileMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -201,23 +202,35 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
         type="button"
         onClick={() => {
           if (!user) {
+            if (isSidebar) {
+              onSidebarAction?.();
+            }
             setMenuOpen(false);
             setShowLoginModal(true);
+            return;
+          }
+
+          if (isSidebar) {
+            setMenuOpen(false);
+            onSidebarAction?.();
+            if (currentPath !== "/account") {
+              router.push("/account");
+            }
             return;
           }
 
           setMenuOpen((previous) => !previous);
         }}
         className={isSidebar ? "profile-menu-sidebar-button" : "max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"}
-        aria-haspopup="menu"
-        aria-expanded={menuOpen}
+        aria-haspopup={!isSidebar && user ? "menu" : undefined}
+        aria-expanded={!isSidebar && user ? menuOpen : undefined}
       >
         {isSidebar ? (
           <>
             <span className="profile-menu-avatar">{initials}</span>
             <span className="profile-menu-copy">
               <span className="profile-menu-name">{user ? user.full_name || user.username || "Profile" : "Log in"}</span>
-              <span className="profile-menu-subtitle">{user ? "Open account tools" : "Access saved runs"}</span>
+              <span className="profile-menu-subtitle">{user ? "Open account page" : "Access saved runs"}</span>
             </span>
           </>
         ) : (
@@ -225,7 +238,7 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
         )}
       </button>
 
-      {menuOpen && user ? (
+      {!isSidebar && menuOpen && user ? (
         <div
           ref={popoverRef}
           className={isSidebar ? "profile-menu-popover profile-menu-popover-sidebar" : "profile-menu-popover profile-menu-popover-default"}

@@ -421,7 +421,9 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-links-scroll {
-    display: none;
+    display: block;
+    overflow-y: auto;
+    padding-top: 0.15rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-label {
@@ -429,15 +431,25 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-links-track {
-    display: none;
+    display: flex;
+    gap: 0.35rem;
+    padding: 0 0.5rem 0.9rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-link {
-    display: none;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.8rem 0.55rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-link-icon {
-    display: none;
+    display: inline-flex;
+    height: 1.05rem;
+    margin: 0 auto;
+    opacity: 0.92;
+    width: 1.05rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-profile {
@@ -778,6 +790,51 @@ body::after {
   display: block;
   overflow-wrap: anywhere;
   text-wrap: balance;
+}
+
+.ml-run-card {
+  overflow: hidden;
+  position: relative;
+}
+
+.ml-run-card::after {
+  background: linear-gradient(135deg, rgba(122, 214, 255, 0.18), transparent 58%);
+  content: "";
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 200ms ease;
+}
+
+.ml-run-card-selected {
+  box-shadow: 0 16px 40px rgba(6, 12, 20, 0.28), 0 0 0 1px rgba(122, 214, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.ml-run-card-selected::after {
+  opacity: 1;
+}
+
+.ml-run-card-flash {
+  animation: ml-run-card-flash 860ms ease;
+}
+
+@keyframes ml-run-card-flash {
+  0% {
+    box-shadow: 0 0 0 rgba(122, 214, 255, 0);
+    transform: translateY(0) scale(1);
+  }
+
+  38% {
+    box-shadow: 0 22px 54px rgba(8, 18, 32, 0.34), 0 0 0 1px rgba(122, 214, 255, 0.24);
+    transform: translateY(-4px) scale(1.015);
+  }
+
+  100% {
+    box-shadow: 0 16px 40px rgba(6, 12, 20, 0.28), 0 0 0 1px rgba(122, 214, 255, 0.15);
+    transform: translateY(-2px) scale(1);
+  }
 }
 
 .nav-brand-copy,

@@ -140,6 +140,102 @@ export function animateWindowScrollTo(
   };
 }
 
+export function animateElementScrollTo(
+  element: HTMLElement,
+  targetTop: number,
+  duration = DEFAULT_SCROLL_ANIMATION_DURATION_MS
+): () => void {
+  const startingTop = element.scrollTop;
+  const clampedTarget = Math.max(0, targetTop);
+  const distance = clampedTarget - startingTop;
+
+  if (Math.abs(distance) < 2 || duration <= 0) {
+    element.scrollTo({ top: clampedTarget, behavior: "auto" });
+    return () => {};
+  }
+
+  let frameId = 0;
+  const startTime = window.performance.now();
+
+  const step = (now: number) => {
+    const elapsed = Math.min(1, (now - startTime) / duration);
+    const easedProgress = easeInOutQuad(elapsed);
+    element.scrollTo({
+      top: startingTop + distance * easedProgress,
+      behavior: "auto",
+    });
+
+    if (elapsed < 1) {
+      frameId = window.requestAnimationFrame(step);
+    }
+  };
+
+  frameId = window.requestAnimationFrame(step);
+
+  return () => {
+    window.cancelAnimationFrame(frameId);
+  };
+}
+
+export function triggerElementNavigationScroll(
+  container: HTMLElement,
+  targetId?: string | null,
+  delay = DEFAULT_NAVIGATION_SCROLL_DELAY_MS
+): () => void {
+  if (!targetId) {
+    return animateElementScrollTo(container, 0);
+  }
+
+  let intervalId: number | null = null;
+  let cancelAnimation = () => {};
+
+  const tryScrollToTarget = () => {
+    const element = document.getElementById(targetId);
+    if (!element || !container.contains(element)) {
+      return false;
+    }
+
+    const scrollMarginTop = Number.parseFloat(
+      window.getComputedStyle(element).scrollMarginTop || "0"
+    );
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    const nextTop =
+      container.scrollTop +
+      (elementRect.top - containerRect.top) -
+      (Number.isFinite(scrollMarginTop) ? scrollMarginTop : 0);
+
+    cancelAnimation();
+    cancelAnimation = animateElementScrollTo(container, nextTop);
+    return true;
+  };
+
+  const timeoutId = window.setTimeout(() => {
+    if (tryScrollToTarget()) {
+      return;
+    }
+
+    let attempts = 0;
+    intervalId = window.setInterval(() => {
+      attempts += 1;
+      if (tryScrollToTarget() || attempts >= 12) {
+        if (intervalId !== null) {
+          window.clearInterval(intervalId);
+          intervalId = null;
+        }
+      }
+    }, 120);
+  }, delay);
+
+  return () => {
+    window.clearTimeout(timeoutId);
+    cancelAnimation();
+    if (intervalId !== null) {
+      window.clearInterval(intervalId);
+    }
+  };
+}
+
 export function triggerNavigationScroll(
   targetId?: string | null,
   delay = DEFAULT_NAVIGATION_SCROLL_DELAY_MS,

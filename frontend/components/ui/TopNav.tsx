@@ -138,7 +138,7 @@ export default function TopNav() {
       </div>
 
       <div className="desktop-sidebar-profile">
-        <ProfileMenu variant="sidebar" />
+        <ProfileMenu variant="sidebar" onSidebarAction={() => setCollapsed(true)} />
       </div>
     </div>
   );
