@@ -497,7 +497,7 @@ body::after {
     align-items: center;
     display: flex;
     justify-content: center;
-    padding: 0.55rem 0.75rem 0.65rem;
+    padding: 0.95rem 0.75rem 1rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-shell-sidebar {
@@ -508,15 +508,15 @@ body::after {
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-sidebar-button {
     align-items: center;
-    aspect-ratio: 1;
+    aspect-ratio: auto;
     background: transparent;
     border-color: transparent;
-    border-radius: 0.7rem;
+    border-radius: 0.82rem;
     gap: 0;
     justify-content: center;
     margin: 0 auto;
     max-width: none;
-    min-height: unset;
+    min-height: 3.5rem;
     padding: 0;
     width: 100%;
   }
@@ -533,9 +533,9 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-avatar {
-    font-size: 0.78rem;
-    height: 1.65rem;
-    width: 1.65rem;
+    font-size: 0.8rem;
+    height: 2rem;
+    width: 2rem;
   }
 }
 
@@ -905,7 +905,7 @@ body::after {
   scroll-margin-top: 7rem;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 960px) {
   .analysis-subnav-description {
     min-height: 3rem;
   }
@@ -1113,10 +1113,7 @@ a[class*="rounded"]:hover {
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
-    border-radius 180ms ease,
-    gap 180ms ease,
-    min-height 180ms ease,
-    padding 180ms ease;
+    border-radius 180ms ease;
   width: 100%;
 }
 
@@ -1138,10 +1135,6 @@ a[class*="rounded"]:hover {
   height: 2rem;
   justify-content: center;
   position: relative;
-  transition:
-    font-size 180ms ease,
-    height 180ms ease,
-    width 180ms ease;
   width: 2rem;
   z-index: 1;
 }
@@ -1238,8 +1231,11 @@ a[class*="rounded"]:hover {
   }
 }
 
-/* Tablet + narrow desktop keeps the same sidebar layout used by full desktop */
-@media (min-width: 600px) and (max-width: 1023px) {
+/* Tablet: slightly enlarge the phone-style UI before full desktop takes over */
+@media (min-width: 600px) and (max-width: 959px) {
+  html {
+    font-size: 17px;
+  }
 }
 
 /* Prevent iOS Safari from zooming in on input focus (tablets too) */
@@ -1296,7 +1292,7 @@ a[class*="rounded"]:hover {
 }
 
 /* ── Mobile shell body: add bottom padding so content clears the bottom nav ── */
-@media (max-width: 599px) {
+@media (max-width: 959px) {
   .mobile-shell-body {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
     padding-left: calc(1rem + env(safe-area-inset-left, 0px));
@@ -1416,26 +1412,80 @@ a[class*="rounded"]:hover {
   cursor: pointer;
 }
 
+@media (min-width: 600px) and (max-width: 959px) {
+  .mobile-shell-body {
+    margin: 0 auto;
+    max-width: 52rem;
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(1.35rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1.35rem + env(safe-area-inset-right, 0px));
+    padding-top: 0.95rem;
+  }
+
+  .mobile-header {
+    gap: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    padding-left: calc(1.25rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  }
+
+  .mobile-header-title {
+    font-size: 1rem;
+  }
+
+  .mobile-page-label {
+    padding-bottom: 1rem;
+  }
+
+  .mobile-bottom-nav-item {
+    gap: 0.28rem;
+    padding: 0.78rem 0.4rem 0.72rem;
+  }
+
+  .mobile-bottom-nav-label {
+    font-size: 0.66rem;
+  }
+}
+
 /* ════════════════════════════════════════════════
    BREAKPOINT UTILITIES
-   phone-only  → visible < 600px, hidden ≥ 600px
-   tablet-up   → visible ≥ 600px, hidden < 600px
+   phone-only  → visible < 960px, hidden ≥ 960px
+   tablet-up   → visible ≥ 960px, hidden < 960px
    ════════════════════════════════════════════════ */
-@media (min-width: 600px) {
+@media (min-width: 960px) {
   .phone-only {
     display: none !important;
   }
 }
-@media (max-width: 599px) {
+@media (max-width: 959px) {
   .tablet-up {
     display: none !important;
   }
 }
 
+@media (min-width: 960px) and (max-width: 1279px) {
+  .desktop-shell {
+    --desktop-scale: clamp(0.78, calc(100vw / 1280), 1);
+    zoom: var(--desktop-scale);
+  }
+}
+
+@supports not (zoom: 1) {
+  @media (min-width: 960px) and (max-width: 1279px) {
+    .desktop-shell {
+      --desktop-scale: clamp(0.78, calc(100vw / 1280), 1);
+      transform: scale(var(--desktop-scale));
+      transform-origin: top left;
+      width: calc(100% / var(--desktop-scale));
+    }
+  }
+}
+
 /* ════════════════════════════════════════════════
    MOBILE ACCORDION (details / summary)
-   On desktop (≥ 600px): looks like a normal article card.
-   On phone (< 600px):   tappable header collapses content.
+  On desktop (≥ 960px): looks like a normal article card.
+  On phone/tablet (< 960px): tappable header collapses content.
    ════════════════════════════════════════════════ */
 
 /* Reset browser defaults for summary */
@@ -1471,7 +1521,7 @@ details.mobile-accordion > .mobile-accordion-body {
 }
 
 /* Desktop: summary is a plain label, no chevron, no tap-to-collapse; body always visible */
-@media (min-width: 600px) {
+@media (min-width: 960px) {
   details.mobile-accordion {
     background: linear-gradient(180deg, rgba(13, 18, 33, 0.98), rgba(15, 20, 35, 0.92));
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1865,8 +1915,10 @@ details.mobile-accordion > .mobile-accordion-body {
   display: inline-flex;
   font-family: var(--font-mono), monospace;
   font-size: 0.68rem;
+  flex-wrap: nowrap;
   gap: 0.4rem;
   padding: 0.4rem 0.75rem;
+  white-space: nowrap;
 }
 
 .desktop-step-pill strong {
@@ -2052,7 +2104,7 @@ details.mobile-accordion > .mobile-accordion-body {
   padding: 0.85rem;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 960px) {
   .analysis-tab-surface [class*="border-b"][class*="border-white/6"] {
     background: rgba(255, 255, 255, 0.028);
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -2379,7 +2431,7 @@ details.mobile-accordion > .mobile-accordion-body {
   margin-top: 0.1rem;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 960px) {
   .desktop-grid-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
