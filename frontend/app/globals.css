@@ -365,7 +365,7 @@ body::after {
   }
 
   .desktop-sidebar[data-collapsed="true"] {
-    width: 64px;
+    width: 72px;
   }
 
   .desktop-main {
@@ -433,21 +433,21 @@ body::after {
   .desktop-sidebar[data-collapsed="true"] .nav-links-track {
     display: flex;
     gap: 0.35rem;
-    padding: 0 0.5rem 0.9rem;
+    padding: 0 0.75rem 0.9rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-link {
     align-items: center;
     display: flex;
-    justify-content: center;
-    min-height: 3rem;
-    padding: 0.8rem 0.55rem;
+    justify-content: flex-start;
+    min-height: 2.85rem;
+    padding: 0.75rem 0.85rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-link-icon {
     display: inline-flex;
     height: 1.05rem;
-    margin: 0 auto;
+    margin: 0;
     opacity: 0.92;
     width: 1.05rem;
   }
@@ -1818,6 +1818,30 @@ details.mobile-accordion > .mobile-accordion-body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
+}
+
+.desktop-history-actions-cell {
+  min-width: 15.5rem;
+  width: 15.5rem;
+}
+
+.desktop-history-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.desktop-action-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 2.35rem;
+  text-align: center;
+  width: 100%;
+}
+
+.desktop-action-button-primary {
+  grid-column: 1 / -1;
 }
 
 .desktop-toolbar {
