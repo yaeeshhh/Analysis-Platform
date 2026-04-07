@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-lg: 60rem;
+  --breakpoint-xl: 60rem;
+}
+
 :root {
   --bg-canvas: #091018;
   --bg-elevated: #101824;
@@ -343,7 +348,7 @@ body::after {
   width: 100%;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 960px) {
   .desktop-shell {
     display: flex;
   }
@@ -1466,7 +1471,7 @@ a[class*="rounded"]:hover {
 
 @media (min-width: 960px) and (max-width: 1279px) {
   .desktop-shell {
-    --desktop-scale: clamp(0.78, calc(100vw / 1280), 1);
+    --desktop-scale: clamp(0.75, calc(100vw / 1280), 1);
     zoom: var(--desktop-scale);
   }
 }
@@ -1474,7 +1479,7 @@ a[class*="rounded"]:hover {
 @supports not (zoom: 1) {
   @media (min-width: 960px) and (max-width: 1279px) {
     .desktop-shell {
-      --desktop-scale: clamp(0.78, calc(100vw / 1280), 1);
+      --desktop-scale: clamp(0.75, calc(100vw / 1280), 1);
       transform: scale(var(--desktop-scale));
       transform-origin: top left;
       width: calc(100% / var(--desktop-scale));
