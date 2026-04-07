@@ -81,7 +81,7 @@ export default function AppShell({
               </div>
             </div>
 
-            <div className="space-y-4 md:space-y-6">{children}</div>
+            <div className="space-y-5 md:space-y-6">{children}</div>
           </section>
         </div>
       </div>

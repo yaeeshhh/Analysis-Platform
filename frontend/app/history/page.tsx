@@ -28,6 +28,10 @@ import { resolveAuthenticatedUser } from "@/lib/session";
 type ReadinessFilter = "all" | "ml-ready" | "eda-first";
 type MlFilter = "all" | "with-ml" | "without-ml";
 
+function truncateText(text: string, maxLength: number) {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
+}
+
 export default function HistoryPage() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -260,6 +264,7 @@ export default function HistoryPage() {
         {!loading ? (
           <section className="space-y-4">
             <HistoryMobileSections
+              key={`${searchQuery}|${readinessFilter}|${mlFilter}`}
               analyses={analyses}
               filteredAnalyses={filteredAnalyses}
               searchQuery={searchQuery}
@@ -538,9 +543,9 @@ export default function HistoryPage() {
       />
 
       {deleteTargetId ? (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-[#04090d]/75 p-4 backdrop-blur-md" onMouseDown={() => setDeleteTargetId(null)}>
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-[#04090d]/75 p-5 backdrop-blur-md" onMouseDown={() => setDeleteTargetId(null)}>
           <div
-            className="w-full max-w-lg rounded-xl border border-[#5a2328]/60 bg-[#111821]/95 p-6"
+            className="w-full max-w-lg rounded-xl border border-[#5a2328]/60 bg-[#111821]/95 p-5"
             onMouseDown={(event) => event.stopPropagation()}
           >
             <p className="text-xs uppercase tracking-[0.24em] text-[#ffb4ba]">Delete run</p>
@@ -616,6 +621,7 @@ function HistoryMobileSections({
   onDeleteRun,
   onDownloadReport,
 }: HistoryMobileSectionsProps) {
+  const [visibleCount, setVisibleCount] = useState(5);
   const latestRun = filteredAnalyses[0] ?? analyses[0] ?? null;
   const runsWithMl = analyses.filter((analysis) => analysis.experiment_count > 0).length;
   const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
@@ -654,7 +660,7 @@ function HistoryMobileSections({
           <div>
             <p className="mobile-screen-kicker">Run archive</p>
             <h2 className="mobile-screen-title">Search and filter saved runs</h2>
-            <p className="mobile-screen-lead">History keeps the same archive actions as desktop: search, reopen in place, download reports, and retire older runs.</p>
+            <p className="mobile-screen-lead">Search, reopen, download, or retire saved runs.</p>
           </div>
         </div>
         <div className="mobile-screen-field">
@@ -716,7 +722,7 @@ function HistoryMobileSections({
               {latestRun.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
             </span>
           </div>
-          <p className="mobile-screen-lead">{latestRun.insights.summary}</p>
+          <p className="mobile-screen-lead">{truncateText(latestRun.insights.summary, 150)}</p>
         </section>
       ) : null}
 
@@ -731,7 +737,7 @@ function HistoryMobileSections({
           <p className="mobile-screen-empty">No runs match the current filters.</p>
         ) : (
           <div className="mobile-screen-list">
-            {filteredAnalyses.map((analysis) => {
+            {filteredAnalyses.slice(0, visibleCount).map((analysis) => {
               const modeLabel = analysis.latest_experiment
                 ? analysis.latest_experiment.type === "supervised"
                   ? "Supervised ML"
@@ -749,7 +755,7 @@ function HistoryMobileSections({
                       {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                     </span>
                   </div>
-                  <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                  <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 120)}</p>
                   <div className="mobile-screen-pills compact">
                     <span className="mobile-screen-pill">{modeLabel}</span>
                     <span className="mobile-screen-pill">{analysis.status || "saved"}</span>
@@ -758,36 +764,52 @@ function HistoryMobileSections({
                     </span>
                   </div>
                   {analysis.latest_experiment ? (
-                    <p className="mobile-screen-row-note">Latest ML: {analysis.latest_experiment.summary}</p>
+                    <p className="mobile-screen-row-note">Latest ML: {truncateText(analysis.latest_experiment.summary, 80)}</p>
                   ) : null}
-                  <div className="mobile-screen-row-actions">
+                  <div className="mobile-screen-row-actions" style={{ flexDirection: "column", gap: "0.5rem" }}>
                     <button
                       type="button"
                       onClick={() => onOpenPopup(analysis)}
                       className="mobile-screen-button mobile-screen-button-primary"
+                      style={{ flex: "1 1 100%" }}
                     >
                       Open run
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => onDownloadReport(analysis.id)}
-                      className="mobile-screen-button mobile-screen-button-secondary"
-                    >
-                      Report
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onDeleteRun(analysis.id)}
-                      className="mobile-screen-button mobile-screen-button-danger"
-                    >
-                      Delete
-                    </button>
+                    <div style={{ display: "flex", gap: "0.5rem", width: "100%" }}>
+                      <button
+                        type="button"
+                        onClick={() => onDownloadReport(analysis.id)}
+                        className="mobile-screen-button mobile-screen-button-secondary"
+                        style={{ flex: 1 }}
+                      >
+                        Report
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onDeleteRun(analysis.id)}
+                        className="mobile-screen-button mobile-screen-button-danger"
+                        style={{ flex: 1 }}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
         )}
+        {visibleCount < filteredAnalyses.length ? (
+          <div className="mobile-screen-actions">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((prev) => prev + 5)}
+              className="mobile-screen-button mobile-screen-button-secondary"
+            >
+              Show more ({filteredAnalyses.length - visibleCount} remaining)
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

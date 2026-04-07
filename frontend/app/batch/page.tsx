@@ -25,6 +25,10 @@ import { resolveAuthenticatedUser } from "@/lib/session";
 
 type ConfirmAction = "selected" | null;
 
+function truncateText(text: string, maxLength: number) {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
+}
+
 export default function BatchPage() {
   const router = useRouter();
   const [analyses, setAnalyses] = useState<AnalysisListItem[]>([]);
@@ -703,6 +707,7 @@ function BatchMobileSections({
   setConfirmAction: (action: ConfirmAction) => void;
   setCurrentAnalysisSelection: (id: number) => void;
 }) {
+  const [showAllUploads, setShowAllUploads] = useState(false);
   const readyRuns = analyses.filter((item) => item.insights.modeling_readiness.is_ready).length;
   const highlightedMissing = highlightedAnalysis?.overview.total_missing_values ?? 0;
   const highlightedDuplicates = highlightedAnalysis?.overview.duplicate_row_count ?? 0;
@@ -732,7 +737,7 @@ function BatchMobileSections({
           <div>
             <p className="mobile-screen-kicker">Dataset intake</p>
             <h2 className="mobile-screen-title">Upload a CSV and route it into Analysis</h2>
-            <p className="mobile-screen-lead">Uploads keeps the same desktop flow: choose a file, process it, then open the saved report once the dataset is ready.</p>
+            <p className="mobile-screen-lead">Choose a file, process it, then open the saved report.</p>
           </div>
         </div>
         <label className="mobile-upload-dropzone">
@@ -787,10 +792,10 @@ function BatchMobileSections({
             </h2>
             <p className="mobile-screen-lead">
               {selectedAnalysis
-                ? selectedAnalysis.insights.summary
+                ? truncateText(selectedAnalysis.insights.summary, 150)
                 : selectedFile
                   ? `Ready to analyse ${selectedFile.name}. Process the upload to generate the saved report.`
-                  : "Pick a saved run below or upload a new CSV to create the current dataset for the Analysis workspace."}
+                  : "Pick a saved run below or upload a new CSV."}
             </p>
           </div>
         </div>
@@ -861,7 +866,7 @@ function BatchMobileSections({
           <p className="mobile-screen-empty">No saved runs yet. Upload a CSV to create the first one.</p>
         ) : (
           <div className="mobile-screen-list">
-            {analyses.map((analysis) => {
+            {(showAllUploads ? analyses : analyses.slice(0, 3)).map((analysis) => {
               const selected = analysis.id === selectedAnalysis?.id;
               return (
                 <div key={analysis.id} className={`mobile-screen-row ${selected ? "mobile-screen-row-selected" : ""}`}>
@@ -874,7 +879,7 @@ function BatchMobileSections({
                       {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "Ready" : "Review"}
                     </span>
                   </div>
-                  <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                  <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 100)}</p>
                   <div className="mobile-screen-row-actions">
                     <button
                       type="button"
@@ -896,6 +901,17 @@ function BatchMobileSections({
             })}
           </div>
         )}
+        {!showAllUploads && analyses.length > 3 ? (
+          <div className="mobile-screen-actions">
+            <button
+              type="button"
+              onClick={() => setShowAllUploads(true)}
+              className="mobile-screen-button mobile-screen-button-secondary"
+            >
+              Show all {analyses.length} datasets
+            </button>
+          </div>
+        ) : null}
         {selectedAnalysis ? (
           <div className="mobile-screen-actions">
             <button

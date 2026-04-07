@@ -46,17 +46,17 @@ const toolGroups: Array<{
       {
         key: "email",
         title: "Change email",
-        detail: "Update the login email with a verification code and no coupling to other account actions.",
+        detail: "Update login email with verification.",
       },
       {
         key: "username",
         title: "Change username",
-        detail: "Change the name shown across the workspace without opening a shared settings flow.",
+        detail: "Update workspace display name.",
       },
       {
         key: "password",
         title: "Update password",
-        detail: "Reset or update your password with its own verification flow.",
+        detail: "Reset or change your password.",
       },
     ],
   },
@@ -68,12 +68,12 @@ const toolGroups: Array<{
       {
         key: "remember",
         title: "Remembered login",
-        detail: "Enable, disable, or reset the browser-specific remembered-login window.",
+        detail: "Manage browser session memory.",
       },
       {
         key: "danger",
         title: "Delete account",
-        detail: "Start a separate, email-verified deletion flow that is isolated from every other tool.",
+        detail: "Permanently delete your account.",
         destructive: true,
       },
     ],
@@ -86,7 +86,7 @@ const toolGroups: Array<{
       {
         key: "clear-uploads",
         title: "Delete saved runs",
-        detail: "Clear uploaded datasets, saved reports, and stored ML experiment files for this account.",
+        detail: "Remove all saved datasets and reports.",
         destructive: true,
       },
     ],
@@ -386,14 +386,14 @@ export default function AccountPage() {
                       }}
                       className="mobile-screen-button mobile-screen-button-primary"
                     >
-                      Edit name and DOB
+                      Edit profile
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveDialog("username")}
                       className="mobile-screen-button mobile-screen-button-secondary"
                     >
-                      Change username
+                      Username
                     </button>
                   </div>
                 ) : (
@@ -498,8 +498,8 @@ export default function AccountPage() {
                     <p className="mobile-screen-row-title">Two-factor protection</p>
                     <p className="mobile-screen-row-copy">
                       {user.two_factor_enabled
-                        ? "Password logins require an email code. Remembered-login bypass still works when available."
-                        : "Password logins skip the email code. Remembered-login behaviour stays unchanged."}
+                        ? "Email code required for password logins."
+                        : "Password logins go straight through."}
                     </p>
                   </div>
                   <AccountSlideToggle
@@ -510,18 +510,6 @@ export default function AccountPage() {
                       void handleTwoFactorToggle();
                     }}
                   />
-                </div>
-                <div className="mobile-screen-link-grid">
-                  <ScrollIntentLink href="/history" className="mobile-screen-link-card">
-                    <p className="mobile-screen-link-title">Saved history</p>
-                    <p className="mobile-screen-link-copy">Review past reports and ML runs.</p>
-                    <span className="mobile-screen-link-cta">Open history</span>
-                  </ScrollIntentLink>
-                  <ScrollIntentLink href="/batch" className="mobile-screen-link-card">
-                    <p className="mobile-screen-link-title">Uploads</p>
-                    <p className="mobile-screen-link-copy">Return to dataset intake and current selection.</p>
-                    <span className="mobile-screen-link-cta">Open uploads</span>
-                  </ScrollIntentLink>
                 </div>
                 <div className="mobile-screen-actions">
                   <button
