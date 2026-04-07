@@ -156,8 +156,8 @@ export default function TopNav() {
       }}
     >
       <div className="desktop-sidebar-brand">
-        <div className="desktop-sidebar-brand-lockup justify-center">
-          <BrandMark compact={contentCollapsed} withCopy={!contentCollapsed} />
+        <div className="desktop-sidebar-brand-lockup">
+          <BrandMark compact={contentCollapsed} withCopy={!contentCollapsed} withTagline={false} />
         </div>
       </div>
 
