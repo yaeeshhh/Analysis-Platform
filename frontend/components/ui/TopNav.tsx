@@ -104,6 +104,30 @@ export default function TopNav() {
     };
   }, [collapsed]);
 
+  useEffect(() => {
+    if (collapsed) return;
+
+    const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
+    if (!sidebar) return;
+
+    const desktopMediaQuery = window.matchMedia("(min-width: 600px)");
+
+    const handleOutsideInteraction = (event: PointerEvent | FocusEvent) => {
+      if (!desktopMediaQuery.matches) return;
+      const target = event.target as Node | null;
+      if (!target || sidebar.contains(target)) return;
+      setCollapsed(true);
+    };
+
+    document.addEventListener("pointerdown", handleOutsideInteraction);
+    document.addEventListener("focusin", handleOutsideInteraction);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsideInteraction);
+      document.removeEventListener("focusin", handleOutsideInteraction);
+    };
+  }, [collapsed]);
+
   const linkClass = (match: string) =>
     `nav-link ${
       pathname === match || pathname.startsWith(`${match}/`)
