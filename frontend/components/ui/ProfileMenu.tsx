@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useEffectEvent, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { clearAccessToken, getAccessToken } from "@/lib/api";
 import { logout, type User } from "@/lib/auth";
@@ -30,10 +30,13 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [popoverStyle, setPopoverStyle] = useState<CSSProperties | null>(null);
 
   const currentPath = pathname || "/dashboard";
   const isSidebar = variant === "sidebar";
@@ -92,6 +95,49 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
     closeMenu();
   }, [pathname]);
 
+  useEffect(() => {
+    if (!menuOpen || !isSidebar) {
+      setPopoverStyle(null);
+      return;
+    }
+
+    const updateSidebarPopoverPosition = () => {
+      if (!buttonRef.current || !popoverRef.current) return;
+
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const popoverRect = popoverRef.current.getBoundingClientRect();
+      const gutter = 16;
+      const sidebarCollapsed =
+        menuRef.current?.closest<HTMLElement>("[data-desktop-sidebar]")?.dataset.collapsed === "true";
+      const popoverWidth = Math.min(popoverRect.width || 320, window.innerWidth - gutter * 2);
+
+      let left = sidebarCollapsed ? buttonRect.right + 14 : buttonRect.left;
+      left = Math.max(gutter, Math.min(left, window.innerWidth - popoverWidth - gutter));
+
+      let top = buttonRect.top - popoverRect.height - 12;
+      if (top < gutter) {
+        top = Math.min(window.innerHeight - popoverRect.height - gutter, buttonRect.bottom + 12);
+      }
+      top = Math.max(gutter, top);
+
+      setPopoverStyle({
+        left: `${Math.round(left)}px`,
+        top: `${Math.round(top)}px`,
+        width: `${Math.round(popoverWidth)}px`,
+      });
+    };
+
+    const frame = window.requestAnimationFrame(updateSidebarPopoverPosition);
+    window.addEventListener("resize", updateSidebarPopoverPosition);
+    window.addEventListener("scroll", updateSidebarPopoverPosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateSidebarPopoverPosition);
+      window.removeEventListener("scroll", updateSidebarPopoverPosition, true);
+    };
+  }, [isSidebar, menuOpen]);
+
   async function handleLoginSuccess() {
     const authenticatedUser = await resolveAuthenticatedUser();
     setUser(authenticatedUser);
@@ -138,7 +184,7 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
   }
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className={isSidebar ? "profile-menu-shell profile-menu-shell-sidebar" : "relative"} ref={menuRef}>
       <LoginRequiredModal
         open={showLoginModal}
         title="Login to continue"
@@ -151,6 +197,7 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
       />
 
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => {
           if (!user) {
@@ -162,6 +209,8 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
           setMenuOpen((previous) => !previous);
         }}
         className={isSidebar ? "profile-menu-sidebar-button" : "max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"}
+        aria-haspopup="menu"
+        aria-expanded={menuOpen}
       >
         {isSidebar ? (
           <>
@@ -177,7 +226,17 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
       </button>
 
       {menuOpen && user ? (
-        <div className={isSidebar ? "profile-menu-popover profile-menu-popover-sidebar" : "profile-menu-popover profile-menu-popover-default"}>
+        <div
+          ref={popoverRef}
+          className={isSidebar ? "profile-menu-popover profile-menu-popover-sidebar" : "profile-menu-popover profile-menu-popover-default"}
+          style={
+            isSidebar
+              ? popoverStyle
+                ? { ...popoverStyle, visibility: "visible" }
+                : { visibility: "hidden" }
+              : undefined
+          }
+        >
           <div className="space-y-4">
             <div className="rounded-[18px] border border-white/10 bg-black/10 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-white/42">Signed in</p>
