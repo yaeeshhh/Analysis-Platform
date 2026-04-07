@@ -9,11 +9,12 @@ import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   getRememberStatus,
   REMEMBER_LOGIN_STORAGE_KEY,
+  refreshAccessToken,
   updateCurrentUser,
   type RememberStatus,
   type User,
 } from "@/lib/auth";
-import { getAccessToken } from "@/lib/api";
+import { getAccessToken, setAccessToken } from "@/lib/api";
 import { clearCurrentAnalysisSelection, notifyAnalysesChanged } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
@@ -110,6 +111,7 @@ export default function AccountPage() {
   const [nameInput, setNameInput] = useState("");
   const [dobInput, setDobInput] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [savingTwoFactor, setSavingTwoFactor] = useState(false);
 
 
 
@@ -171,6 +173,55 @@ export default function AccountPage() {
     };
   }, [user?.email]);
 
+  async function withAuthRetry<T>(request: (token: string) => Promise<T>) {
+    let token = getAccessToken();
+
+    if (!token) {
+      const refreshed = await refreshAccessToken();
+      setAccessToken(refreshed.access_token);
+      token = refreshed.access_token;
+    }
+
+    try {
+      return await request(token);
+    } catch (error) {
+      if (!(error instanceof Error)) {
+        throw error;
+      }
+
+      const message = error.message.trim().toLowerCase();
+      const tokenRelated =
+        message === "invalid token" ||
+        message.includes("token") ||
+        message.includes("credentials") ||
+        message.includes("authenticated");
+
+      if (!tokenRelated) {
+        throw error;
+      }
+
+      const refreshed = await refreshAccessToken();
+      setAccessToken(refreshed.access_token);
+      return request(refreshed.access_token);
+    }
+  }
+
+  async function handleTwoFactorToggle() {
+    if (!user || savingTwoFactor) return;
+
+    try {
+      setSavingTwoFactor(true);
+      const updated = await withAuthRetry((token) =>
+        updateCurrentUser(token, {
+          two_factor_enabled: !user.two_factor_enabled,
+        })
+      );
+      setUser(updated);
+    } finally {
+      setSavingTwoFactor(false);
+    }
+  }
+
   return (
     <>
       <AppShell
@@ -231,6 +282,29 @@ export default function AccountPage() {
                 <span className="mobile-detail-value">
                   <span className="info-chip"><span className="pulse-dot" />{user.is_active ? "Active" : "Inactive"}</span>
                 </span>
+              </div>
+
+              <div className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-4">
+                <p className="text-[0.62rem] uppercase tracking-[0.16em] text-white/28">Two-factor authentication</p>
+                <p className="mt-2 text-sm leading-6 text-white/62">
+                  {user.two_factor_enabled
+                    ? "Password logins require an email code. Remembered-login bypass still works when available on this browser."
+                    : "Password logins skip the email code. Remembered-login behavior stays unchanged."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleTwoFactorToggle();
+                  }}
+                  disabled={savingTwoFactor}
+                  className="mt-3 w-full rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/82 disabled:opacity-50"
+                >
+                  {savingTwoFactor
+                    ? "Saving..."
+                    : user.two_factor_enabled
+                      ? "Disable two-factor authentication"
+                      : "Enable two-factor authentication"}
+                </button>
               </div>
 
               <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
@@ -332,14 +406,14 @@ export default function AccountPage() {
                           type="button"
                           disabled={savingProfile}
                           onClick={async () => {
-                            const token = getAccessToken();
-                            if (!token) return;
                             try {
                               setSavingProfile(true);
-                              const updated = await updateCurrentUser(token, {
-                                full_name: nameInput.trim() || undefined,
-                                date_of_birth: dobInput || null,
-                              });
+                              const updated = await withAuthRetry((token) =>
+                                updateCurrentUser(token, {
+                                  full_name: nameInput.trim() || undefined,
+                                  date_of_birth: dobInput || null,
+                                })
+                              );
                               setUser(updated);
                               setNameInput(updated.full_name || "");
                               setDobInput(updated.date_of_birth || "");
@@ -419,14 +493,6 @@ export default function AccountPage() {
                       detail: "Update the password independently so access recovery and identity changes stay isolated.",
                       action: "Open",
                     },
-                    {
-                      key: "2fa",
-                      title: "Two-factor authentication",
-                      detail: rememberStatus.available && rememberStatus.enabled
-                        ? "Remembered login is currently bypassing the email code on this browser. Open this to require the code again."
-                        : "Email verification is already required for password logins on this browser.",
-                      action: "Open",
-                    },
                   ].map((row) => (
                     <div key={row.key} className="flex items-center justify-between gap-6 py-4 first:pt-0 last:pb-0">
                       <div className="min-w-0">
@@ -442,6 +508,31 @@ export default function AccountPage() {
                       </button>
                     </div>
                   ))}
+
+                  <div className="flex items-center justify-between gap-6 py-4 last:pb-0">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-white/82">Two-factor authentication</p>
+                      <p className="mt-1 text-sm leading-6 text-white/40">
+                        {user.two_factor_enabled
+                          ? "Password logins require an email verification code. Remembered-login bypass still works when this browser already has a remembered session."
+                          : "Password logins go straight through without an email verification code. Remembered-login behavior stays unchanged."}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void handleTwoFactorToggle();
+                      }}
+                      disabled={savingTwoFactor}
+                      className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78 disabled:opacity-50"
+                    >
+                      {savingTwoFactor
+                        ? "Saving..."
+                        : user.two_factor_enabled
+                          ? "Disable"
+                          : "Enable"}
+                    </button>
+                  </div>
                 </div>
               </section>
 
@@ -593,31 +684,6 @@ function AccountMobileSections({
         </div>
       ),
     })),
-    {
-      id: "two-factor",
-      title: "Two-factor authentication",
-      hint: rememberStatus.available && rememberStatus.enabled
-        ? "Remembered login is bypassing the email code on this browser."
-        : "Email code already applies to password login on this browser.",
-      accent: "#8bf1a8",
-      content: (
-        <button
-          type="button"
-          onClick={() => setActiveDialog("2fa")}
-          className="w-full border-b border-white/6 py-3 text-left last:border-0"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="font-medium text-white">Manage login code behavior</p>
-              <p className="mt-1 text-sm leading-6 text-white/50">
-                Disable remembered login on this browser if you want the code step every time again.
-              </p>
-            </div>
-            <span className="shrink-0 text-xs text-white/30">›</span>
-          </div>
-        </button>
-      ),
-    },
   ];
 
   return <MobileSectionList sections={sections} />;

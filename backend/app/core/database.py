@@ -39,6 +39,7 @@ def ensure_runtime_schema_compatibility() -> None:
         "users": {
             "full_name": "ALTER TABLE users ADD COLUMN full_name VARCHAR(200)",
             "date_of_birth": "ALTER TABLE users ADD COLUMN date_of_birth DATE",
+            "two_factor_enabled": "ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN NOT NULL DEFAULT TRUE",
         },
         "pending_signups": {
             "full_name": "ALTER TABLE pending_signups ADD COLUMN full_name VARCHAR(200)",

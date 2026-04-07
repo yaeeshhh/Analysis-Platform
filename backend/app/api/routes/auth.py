@@ -68,6 +68,7 @@ def _user_response(user: User) -> UserResponse:
         username=user.username,
         full_name=user.full_name,
         date_of_birth=user.date_of_birth.isoformat() if user.date_of_birth else None,
+        two_factor_enabled=user.two_factor_enabled,
         is_active=user.is_active,
         created_at=user.created_at.isoformat(),
     )
@@ -162,18 +163,43 @@ def login(
     response: Response,
     db: Session = Depends(get_db),
 ):
-    user, challenge_token, expires_at = AuthService.login(
-        payload.identifier,
-        payload.password,
-        db,
-        remember_me=payload.remember_me,
-    )
+    user = AuthService.authenticate_login_user(payload.identifier, payload.password, db)
 
     response.delete_cookie(
         key="refresh_token",
         path="/",
         samesite=settings.COOKIE_SAMESITE,
         secure=settings.COOKIE_SECURE,
+    )
+
+    if not user.two_factor_enabled:
+        access_token, refresh_token, remember_token = AuthService._issue_login_artifacts(
+            user,
+            db,
+            remember_me=payload.remember_me,
+        )
+
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite=settings.COOKIE_SAMESITE,
+            max_age=settings.REFRESH_TOKEN_EXPIRE_SECONDS,
+            path="/",
+        )
+
+        return LoginResponse(
+            access_token=access_token,
+            token_type="bearer",
+            remember_token=remember_token,
+            user=_user_response(user),
+        )
+
+    challenge_token, expires_at = AuthService._create_login_verification(
+        user,
+        db,
+        remember_me=payload.remember_me,
     )
 
     expires_in_seconds = _seconds_until(expires_at)
@@ -400,6 +426,7 @@ def update_current_user_info(
         username=payload.username,
         full_name=payload.full_name,
         date_of_birth=payload.date_of_birth,
+        two_factor_enabled=payload.two_factor_enabled,
         password=payload.password,
         current_password=payload.current_password,
     )

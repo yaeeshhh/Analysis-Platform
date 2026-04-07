@@ -14,6 +14,7 @@ class User(Base):
     username: Mapped[str | None] = mapped_column(String(100), unique=True, nullable=True)
     full_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     date_of_birth: Mapped[date | None] = mapped_column(Date, nullable=True)
+    two_factor_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)

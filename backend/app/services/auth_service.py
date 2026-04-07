@@ -361,6 +361,35 @@ class AuthService:
         return True, user.email
 
     @staticmethod
+    def authenticate_login_user(
+        identifier: str,
+        password: str,
+        db: Session,
+    ) -> User:
+        from sqlalchemy import func, or_
+
+        normalized_identifier = AuthService._normalize_identifier(identifier)
+
+        user = (
+            db.query(User)
+            .filter(
+                or_(
+                    func.lower(User.email) == normalized_identifier,
+                    func.lower(User.username) == normalized_identifier,
+                )
+            )
+            .first()
+        )
+
+        if not user or not verify_password(password, user.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+
+        if not user.is_active:
+            raise HTTPException(status_code=403, detail="User account is inactive")
+
+        return user
+
+    @staticmethod
     def check_signup_availability(
         email: str | None,
         username: str | None,
@@ -398,42 +427,6 @@ class AuthService:
         if expires_at.tzinfo is None:
             now = now.replace(tzinfo=None)
         return max(0, int((expires_at - now).total_seconds()))
-
-    @staticmethod
-    def login(
-        identifier: str,
-        password: str,
-        db: Session,
-        remember_me: bool = False,
-    ):
-        from sqlalchemy import func, or_
-
-        normalized_identifier = AuthService._normalize_identifier(identifier)
-
-        user = (
-            db.query(User)
-            .filter(
-                or_(
-                    func.lower(User.email) == normalized_identifier,
-                    func.lower(User.username) == normalized_identifier,
-                )
-            )
-            .first()
-        )
-
-        if not user or not verify_password(password, user.password_hash):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-
-        if not user.is_active:
-            raise HTTPException(status_code=403, detail="User account is inactive")
-
-        challenge_token, expires_at = AuthService._create_login_verification(
-            user,
-            db,
-            remember_me=remember_me,
-        )
-
-        return user, challenge_token, expires_at
 
     @staticmethod
     def verify_login_code(
@@ -793,6 +786,7 @@ class AuthService:
         username: str | None = None,
         full_name: str | None = None,
         date_of_birth=None,
+        two_factor_enabled: bool | None = None,
         password: str | None = None,
         current_password: str | None = None,
         require_identity_verification: bool = True,
@@ -814,6 +808,10 @@ class AuthService:
             if date_of_birth != user.date_of_birth:
                 user.date_of_birth = date_of_birth
                 has_changes = True
+
+        if two_factor_enabled is not None and two_factor_enabled != user.two_factor_enabled:
+            user.two_factor_enabled = two_factor_enabled
+            has_changes = True
 
         if email is not None:
             normalized_email = AuthService._normalize_identifier(email)
