@@ -359,7 +359,8 @@ body::after {
     overflow: visible;
     position: sticky;
     top: 0;
-    transition: width 220ms ease;
+    transition: width 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: width;
     z-index: 24;
     width: 216px;
   }
@@ -387,29 +388,22 @@ body::after {
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-brand {
     align-items: center;
-    flex-direction: column;
-    gap: 0.35rem;
     justify-content: center;
-    padding: 0.55rem 0.35rem 0.6rem;
+    padding: 0.55rem 0.75rem 0.6rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-brand-lockup {
-    aspect-ratio: 1;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    max-width: 3rem;
+    max-width: none;
     min-height: unset;
     padding: 0;
-    width: 3rem;
+    width: 100%;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-brand-copy,
-  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-label,
   .desktop-sidebar[data-collapsed="true"] .nav-link-label,
   .desktop-sidebar[data-collapsed="true"] .profile-menu-copy {
     max-width: 0;
@@ -417,7 +411,15 @@ body::after {
     overflow: hidden;
     pointer-events: none;
     transform: translateX(-6px);
-    width: 0;
+  }
+
+  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-label {
+    margin: 0 1rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateX(-6px);
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-links-scroll {
@@ -429,15 +431,11 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-label {
-    display: none;
-  }
-
   .desktop-sidebar[data-collapsed="true"] .nav-links-track {
     align-content: start;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.35rem;
-    grid-auto-rows: 2.85rem;
     min-width: 0;
     padding: 0 0.75rem 0.9rem;
     width: 100%;
@@ -450,9 +448,9 @@ body::after {
     display: flex;
     flex: 0 0 auto;
     height: 2.85rem;
-    justify-content: flex-start;
+    justify-content: center;
     min-height: 2.85rem;
-    padding: 0.75rem 0.85rem;
+    padding: 0.75rem 0;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-links-scroll-collapsed {
@@ -465,9 +463,9 @@ body::after {
 
   .desktop-sidebar[data-collapsed="true"] .nav-links-track-collapsed {
     align-content: start;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.35rem;
-    grid-auto-rows: 2.85rem;
     min-width: 0;
     padding: 0 0.75rem 0.9rem;
     width: 100%;
@@ -477,6 +475,7 @@ body::after {
     flex: 0 0 auto;
     height: 2.85rem;
     min-height: 2.85rem;
+    width: 100%;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-link:hover,
@@ -501,7 +500,7 @@ body::after {
     align-items: center;
     display: flex;
     justify-content: center;
-    padding: 0.55rem 0.35rem 0.65rem;
+    padding: 0.55rem 0.75rem 0.65rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-shell-sidebar {
@@ -519,10 +518,10 @@ body::after {
     gap: 0;
     justify-content: center;
     margin: 0 auto;
-    max-width: 3rem;
+    max-width: none;
     min-height: unset;
     padding: 0;
-    width: 3rem;
+    width: 100%;
   }
 
   .desktop-sidebar[data-collapsed="true"] .profile-menu-sidebar-button:hover,
@@ -645,8 +644,9 @@ body::after {
   flex-direction: column;
   height: 100vh;
   min-height: 100%;
+  overflow: hidden;
   padding-bottom: 0.35rem;
-  transition: padding 220ms ease;
+  transition: padding 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .desktop-sidebar-brand-lockup {
@@ -656,10 +656,14 @@ body::after {
   min-width: 0;
   padding: 0;
   text-align: left;
+  transition: gap 200ms ease;
 }
 
 .nav-brand-monogram {
   align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.7rem;
   color: var(--text-100);
   display: inline-flex;
   font-family: var(--font-display), sans-serif;
@@ -667,11 +671,28 @@ body::after {
   font-weight: 800;
   height: 100%;
   justify-content: center;
+  opacity: 0;
+  overflow: hidden;
+  transform: scale(0.92);
+  transition:
+    width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+  user-select: none;
+  width: 0;
   letter-spacing: -0.04em;
   line-height: 1;
   text-align: center;
-  user-select: none;
-  width: 100%;
+}
+
+.desktop-sidebar[data-collapsed="true"] .nav-brand-monogram {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  opacity: 1;
+  transform: scale(1);
+  width: 3rem;
 }
 
 .nav-links-scroll {
@@ -756,7 +777,15 @@ body::after {
   font-size: 0.56rem;
   letter-spacing: 0.16em;
   margin: 0.95rem 1rem 0.5rem;
+  max-height: 1rem;
+  opacity: 1;
   text-transform: uppercase;
+  transform: translateX(0);
+  transition:
+    margin 180ms ease,
+    max-height 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
 }
 
 .nav-link-icon {
@@ -777,8 +806,13 @@ body::after {
 .nav-link-label {
   font-size: 0.88rem;
   font-weight: 500;
+  max-width: 8rem;
   min-width: 0;
+  opacity: 1;
+  overflow: hidden;
   text-align: left;
+  transform: translateX(0);
+  white-space: nowrap;
 }
 
 .desktop-sidebar-profile {
@@ -858,8 +892,8 @@ body::after {
 
 .nav-link-label {
   display: block;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
+  overflow-wrap: normal;
+  text-wrap: nowrap;
 }
 
 .ml-run-card {
@@ -918,8 +952,12 @@ body::after {
 }
 
 .nav-brand-copy {
+  max-width: 11rem;
   min-width: 0;
+  opacity: 1;
   line-height: 1.35;
+  overflow: hidden;
+  transform: translateX(0);
 }
 
 .nav-brand-title {
@@ -1090,7 +1128,11 @@ a[class*="rounded"]:hover {
   flex: 1;
   flex-direction: column;
   gap: 0.08rem;
+  max-width: 10rem;
   min-width: 0;
+  opacity: 1;
+  overflow: hidden;
+  transform: translateX(0);
 }
 
 .profile-menu-name {

@@ -155,14 +155,13 @@ export default function TopNav() {
     >
       <div className="desktop-sidebar-brand">
         <div className="desktop-sidebar-brand-lockup">
-          {collapsed ? (
-            <span className="nav-brand-monogram">AS</span>
-          ) : (
-            <div className="nav-brand-copy">
-              <p className="nav-brand-title">Analysis Studio</p>
-              <p className="nav-brand-subtitle">Tabular analysis workspace</p>
-            </div>
-          )}
+          <span className="nav-brand-monogram" aria-hidden="true">
+            AS
+          </span>
+          <div className="nav-brand-copy">
+            <p className="nav-brand-title">Analysis Studio</p>
+            <p className="nav-brand-subtitle">Tabular analysis workspace</p>
+          </div>
         </div>
       </div>
 
