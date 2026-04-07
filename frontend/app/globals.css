@@ -652,12 +652,15 @@ body::after {
 
 .nav-surface {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   height: 100vh;
   min-height: 100%;
+  min-width: 0;
   overflow: hidden;
   padding-bottom: 0.35rem;
   transition: padding 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
 }
 
 .desktop-sidebar-brand-lockup {
