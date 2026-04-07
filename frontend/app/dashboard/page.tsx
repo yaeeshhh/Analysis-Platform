@@ -11,25 +11,6 @@ import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
 import type { User } from "@/lib/auth";
 
-const workflowSteps = [
-  {
-    title: "Stage the file",
-    detail: "Use Uploads to add or choose the dataset you want to work on, then move into Analysis when the report is ready to review.",
-  },
-  {
-    title: "Read the explanation first",
-    detail: "Overview and Insights should be the first read after every run because they summarize what changed, what looks risky, and what to inspect next.",
-  },
-  {
-    title: "Use the technical tabs deliberately",
-    detail: "Schema, Data Quality, Statistics, Relationships, and Charts explain why the summary looks the way it does and where cleanup should happen.",
-  },
-  {
-    title: "Run ML last",
-    detail: "Use the ML Lab after the target choice is clear and the dataset looks stable enough for modeling.",
-  },
-];
-
 const destinationCards = [
   {
     title: "Uploads workspace",
@@ -92,21 +73,6 @@ const analysisTabCards = [
   },
 ];
 
-const historyFeatureCards = [
-  {
-    title: "Archive search",
-    detail: "Find older runs by dataset name, saved summary, readiness posture, or whether ML experiments were attached to the run.",
-  },
-  {
-    title: "In-place run review",
-    detail: "Open the full saved Overview-to-ML result stack in a same-page popup so the current Analysis selection stays untouched.",
-  },
-  {
-    title: "ML asset cleanup",
-    detail: "Download saved ML reports and summaries or remove older experiments directly from the saved run when the archive needs pruning.",
-  },
-];
-
 const featureMechanics = [
   {
     title: "Dataset intake",
@@ -145,6 +111,10 @@ const featureMechanics = [
     flow: "Use the profile menu when you need account, uploads, or history shortcuts.",
   },
 ];
+
+function truncateText(text: string, maxLength: number) {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
+}
 
 const desktopWorkflowPills = ["Upload", "Analyse", "Export"];
 
@@ -547,30 +517,8 @@ function DashboardMobileSections({
           {destinationCards.map((item) => (
             <ScrollIntentLink key={`${item.href}-${item.title}`} href={item.href} className="mobile-screen-link-card">
               <p className="mobile-screen-link-title">{item.title}</p>
-              <p className="mobile-screen-link-copy">{item.detail}</p>
               <span className="mobile-screen-link-cta">{item.cta}</span>
             </ScrollIntentLink>
-          ))}
-        </div>
-      </section>
-
-      <section className="mobile-screen-panel">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Workflow</p>
-            <h2 className="mobile-screen-title">Keep the same desktop flow on mobile</h2>
-          </div>
-        </div>
-        <div className="mobile-screen-list">
-          {workflowSteps.map((step, index) => (
-            <div key={step.title} className="mobile-screen-row">
-              <div className="mobile-screen-row-header">
-                <div className="mobile-screen-row-main">
-                  <p className="mobile-screen-row-title">{index + 1}. {step.title}</p>
-                  <p className="mobile-screen-row-copy">{step.detail}</p>
-                </div>
-              </div>
-            </div>
           ))}
         </div>
       </section>
@@ -598,7 +546,7 @@ function DashboardMobileSections({
                     {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                   </span>
                 </div>
-                <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 120)}</p>
                 <div className="mobile-screen-pills compact">
                   <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
                   <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
@@ -617,53 +565,6 @@ function DashboardMobileSections({
           </div>
         </section>
       ) : null}
-
-      <section className="mobile-screen-panel">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Analysis workspace</p>
-            <h2 className="mobile-screen-title">All report sections stay available</h2>
-            <p className="mobile-screen-lead">
-              Mobile keeps the same report surfaces as desktop, but only one section is expanded at a time so the workspace stays readable.
-            </p>
-          </div>
-        </div>
-        <div className="mobile-screen-link-grid mobile-screen-link-grid-dense">
-          {analysisTabCards.map((item) => (
-            <div key={item.title} className="mobile-screen-link-card">
-              <p className="mobile-screen-link-title">{item.title}</p>
-              <p className="mobile-screen-link-copy">{item.detail}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mobile-screen-panel">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">History and cleanup</p>
-            <h2 className="mobile-screen-title">Saved runs and ML history remain intact</h2>
-          </div>
-        </div>
-        <div className="mobile-screen-list">
-          {historyFeatureCards.map((item) => (
-            <div key={item.title} className="mobile-screen-row">
-              <div className="mobile-screen-row-main">
-                <p className="mobile-screen-row-title">{item.title}</p>
-                <p className="mobile-screen-row-copy">{item.detail}</p>
-              </div>
-            </div>
-          ))}
-          {featureMechanics.slice(0, 3).map((item) => (
-            <div key={item.title} className="mobile-screen-row mobile-screen-row-muted">
-              <div className="mobile-screen-row-main">
-                <p className="mobile-screen-row-title">{item.title}</p>
-                <p className="mobile-screen-row-copy">{item.flow}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

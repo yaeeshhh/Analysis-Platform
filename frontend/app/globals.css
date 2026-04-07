@@ -1300,9 +1300,9 @@ a[class*="rounded"]:hover {
 @media (max-width: 959px) {
   .mobile-shell-body {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
-    padding-left: calc(1rem + env(safe-area-inset-left, 0px));
-    padding-right: calc(1rem + env(safe-area-inset-right, 0px));
-    padding-top: 0.75rem;
+    padding-left: calc(1.25rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1.25rem + env(safe-area-inset-right, 0px));
+    padding-top: 1rem;
   }
 
   .app-shell::before {
@@ -1341,8 +1341,8 @@ a[class*="rounded"]:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.22rem;
-  padding: 0.6rem 0.25rem 0.55rem;
+  gap: 0.3rem;
+  padding: 0.65rem 0.35rem 0.6rem;
   color: rgba(242, 247, 251, 0.42);
   text-decoration: none;
   transition: color 140ms ease;
@@ -1355,10 +1355,12 @@ a[class*="rounded"]:hover {
 
 .mobile-bottom-nav-item-active {
   color: var(--accent-cta);
+  background: rgba(157, 184, 255, 0.08);
+  border-radius: 0.75rem;
 }
 
 .mobile-bottom-nav-label {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1372,10 +1374,10 @@ a[class*="rounded"]:hover {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.55rem 1rem;
-  padding-top: calc(0.55rem + env(safe-area-inset-top, 0px));
-  padding-left: calc(1rem + env(safe-area-inset-left, 0px));
-  padding-right: calc(1rem + env(safe-area-inset-right, 0px));
+  padding: 0.65rem 1.15rem;
+  padding-top: calc(0.65rem + env(safe-area-inset-top, 0px));
+  padding-left: calc(1.15rem + env(safe-area-inset-left, 0px));
+  padding-right: calc(1.15rem + env(safe-area-inset-right, 0px));
   background: linear-gradient(to bottom, rgba(9, 16, 24, 0.97), rgba(13, 20, 29, 0.94));
   border-bottom: 1px solid var(--line-soft);
   backdrop-filter: blur(16px) saturate(125%);
@@ -1419,7 +1421,7 @@ a[class*="rounded"]:hover {
 
 @media (max-width: 959px) {
   .mobile-page-label {
-    padding-bottom: 0.95rem;
+    padding-bottom: 1.1rem;
   }
 
   .mobile-page-intro {
@@ -1430,7 +1432,7 @@ a[class*="rounded"]:hover {
     border-radius: 1.1rem;
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
     overflow: hidden;
-    padding: 1rem 1rem 1.05rem;
+    padding: 1.15rem 1.2rem 1.2rem;
     position: relative;
   }
 
@@ -1473,6 +1475,7 @@ a[class*="rounded"]:hover {
     letter-spacing: -0.06em;
     line-height: 0.96;
     margin: 0.38rem 0 0;
+    overflow-wrap: anywhere;
   }
 
   .mobile-page-description {
@@ -1502,16 +1505,16 @@ a[class*="rounded"]:hover {
   .mobile-screen-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 1.05rem;
   }
 
   .mobile-screen-stack-compact {
-    gap: 0.75rem;
+    gap: 0.9rem;
   }
 
   .mobile-screen-stats {
     display: grid;
-    gap: 0.65rem;
+    gap: 0.75rem;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -1521,7 +1524,7 @@ a[class*="rounded"]:hover {
     border-radius: 1rem;
     min-width: 0;
     overflow: hidden;
-    padding: 0.82rem 0.82rem 0.78rem;
+    padding: 0.95rem 0.95rem 0.88rem;
     position: relative;
   }
 
@@ -1549,7 +1552,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-stat-label {
     color: rgba(242, 247, 251, 0.34);
     font-family: var(--font-mono), monospace;
-    font-size: 0.58rem;
+    font-size: 0.64rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -1568,7 +1571,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-stat-hint {
     color: rgba(242, 247, 251, 0.24);
-    font-size: 0.64rem;
+    font-size: 0.7rem;
     line-height: 1.5;
     margin-top: 0.24rem;
   }
@@ -1576,10 +1579,10 @@ a[class*="rounded"]:hover {
   .mobile-screen-panel {
     background: linear-gradient(180deg, rgba(13, 18, 33, 0.98), rgba(15, 20, 35, 0.92));
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.05rem;
+    border-radius: 1.15rem;
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
     overflow: hidden;
-    padding: 0.95rem;
+    padding: 1.15rem;
   }
 
   .mobile-screen-panel-danger {
@@ -1596,7 +1599,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-panel-action {
     color: var(--accent-cta-muted);
-    font-size: 0.72rem;
+    font-size: 0.77rem;
     font-weight: 600;
     line-height: 1.2;
     text-decoration: none;
@@ -1607,7 +1610,7 @@ a[class*="rounded"]:hover {
     color: rgba(242, 247, 251, 0.34);
     display: inline-flex;
     font-family: var(--font-mono), monospace;
-    font-size: 0.6rem;
+    font-size: 0.66rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1620,20 +1623,20 @@ a[class*="rounded"]:hover {
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 1.08;
-    margin: 0.3rem 0 0;
+    margin: 0.38rem 0 0;
   }
 
   .mobile-screen-lead {
-    color: rgba(242, 247, 251, 0.48);
-    font-size: 0.78rem;
+    color: rgba(242, 247, 251, 0.54);
+    font-size: 0.84rem;
     line-height: 1.62;
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
   }
 
   .mobile-screen-meta {
     color: rgba(242, 247, 251, 0.3);
     font-family: var(--font-mono), monospace;
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     letter-spacing: 0.04em;
     line-height: 1.45;
     margin-top: 0.3rem;
@@ -1642,8 +1645,8 @@ a[class*="rounded"]:hover {
   .mobile-screen-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 0.75rem;
+    gap: 0.55rem;
+    margin-top: 0.85rem;
   }
 
   .mobile-screen-pills.compact {
@@ -1655,10 +1658,10 @@ a[class*="rounded"]:hover {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 999px;
     color: rgba(242, 247, 251, 0.64);
-    font-size: 0.66rem;
+    font-size: 0.72rem;
     font-weight: 600;
     line-height: 1.2;
-    padding: 0.33rem 0.65rem;
+    padding: 0.38rem 0.72rem;
   }
 
   .mobile-screen-pill[data-tone="teal"] {
@@ -1682,8 +1685,8 @@ a[class*="rounded"]:hover {
   .mobile-screen-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
-    margin-top: 0.85rem;
+    gap: 0.7rem;
+    margin-top: 0.95rem;
   }
 
   .mobile-screen-actions > * {
@@ -1729,7 +1732,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-list {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.8rem;
     margin-top: 0.15rem;
   }
 
@@ -1738,7 +1741,7 @@ a[class*="rounded"]:hover {
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 0.95rem;
     color: inherit;
-    padding: 0.82rem 0.85rem;
+    padding: 0.95rem 1rem;
     text-align: left;
     width: 100%;
   }
@@ -1770,7 +1773,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row-title {
     color: var(--text-100);
-    font-size: 0.84rem;
+    font-size: 0.88rem;
     font-weight: 600;
     line-height: 1.35;
   }
@@ -1778,22 +1781,22 @@ a[class*="rounded"]:hover {
   .mobile-screen-row-meta {
     color: rgba(242, 247, 251, 0.28);
     font-family: var(--font-mono), monospace;
-    font-size: 0.63rem;
+    font-size: 0.68rem;
     letter-spacing: 0.04em;
     line-height: 1.45;
     margin-top: 0.18rem;
   }
 
   .mobile-screen-row-copy {
-    color: rgba(242, 247, 251, 0.48);
-    font-size: 0.77rem;
+    color: rgba(242, 247, 251, 0.54);
+    font-size: 0.82rem;
     line-height: 1.6;
-    margin-top: 0.45rem;
+    margin-top: 0.55rem;
   }
 
   .mobile-screen-row-note {
-    color: rgba(242, 247, 251, 0.34);
-    font-size: 0.7rem;
+    color: rgba(242, 247, 251, 0.4);
+    font-size: 0.75rem;
     line-height: 1.55;
     margin-top: 0.55rem;
   }
@@ -1801,7 +1804,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-row-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.65rem;
     margin-top: 0.75rem;
   }
 
@@ -1824,7 +1827,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-link-grid {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.75rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 0.2rem;
   }
@@ -1839,7 +1842,7 @@ a[class*="rounded"]:hover {
     border-radius: 0.95rem;
     display: block;
     min-width: 0;
-    padding: 0.78rem 0.82rem;
+    padding: 0.95rem 1rem;
     text-decoration: none;
   }
 
@@ -1851,8 +1854,8 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-screen-link-copy {
-    color: rgba(242, 247, 251, 0.44);
-    font-size: 0.73rem;
+    color: rgba(242, 247, 251, 0.5);
+    font-size: 0.78rem;
     line-height: 1.55;
     margin-top: 0.3rem;
   }
@@ -1860,17 +1863,17 @@ a[class*="rounded"]:hover {
   .mobile-screen-link-cta {
     color: var(--accent-cta-muted);
     display: inline-flex;
-    font-size: 0.67rem;
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    margin-top: 0.55rem;
+    margin-top: 0.65rem;
     text-transform: uppercase;
   }
 
   .mobile-screen-progress-list {
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.85rem;
     margin-top: 0.85rem;
   }
 
@@ -1883,7 +1886,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-progress-copy {
     color: rgba(242, 247, 251, 0.56);
     display: flex;
-    font-size: 0.72rem;
+    font-size: 0.77rem;
     justify-content: space-between;
     gap: 0.75rem;
   }
@@ -1915,11 +1918,11 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-screen-field {
-    margin-top: 0.3rem;
+    margin-top: 0.5rem;
   }
 
   .mobile-screen-field-label {
-    color: rgba(242, 247, 251, 0.32);
+    color: rgba(242, 247, 251, 0.38);
     display: block;
     font-size: 0.64rem;
     font-weight: 700;
@@ -1930,7 +1933,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-field-value {
     color: var(--text-100);
-    font-size: 0.77rem;
+    font-size: 0.82rem;
     line-height: 1.5;
     margin-top: 0.25rem;
     overflow-wrap: anywhere;
@@ -1954,7 +1957,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-form-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.9rem;
     margin-top: 0.85rem;
   }
 
@@ -1967,7 +1970,7 @@ a[class*="rounded"]:hover {
   .mobile-filter-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.55rem;
     margin-top: 0.7rem;
   }
 
@@ -1977,10 +1980,10 @@ a[class*="rounded"]:hover {
     border-radius: 999px;
     color: rgba(242, 247, 251, 0.56);
     cursor: pointer;
-    font-size: 0.69rem;
+    font-size: 0.74rem;
     font-weight: 600;
     line-height: 1.2;
-    padding: 0.42rem 0.78rem;
+    padding: 0.48rem 0.85rem;
   }
 
   .mobile-filter-pill-active {
@@ -2017,7 +2020,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-field-grid {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.7rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 0.85rem;
   }
@@ -2026,7 +2029,7 @@ a[class*="rounded"]:hover {
     background: rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 0.9rem;
-    padding: 0.7rem 0.72rem;
+    padding: 0.85rem 0.88rem;
   }
 
   .mobile-screen-toggle-row {
@@ -2037,7 +2040,7 @@ a[class*="rounded"]:hover {
     display: flex;
     gap: 0.85rem;
     justify-content: space-between;
-    padding: 0.82rem 0.85rem;
+    padding: 0.95rem 1rem;
   }
 
   .mobile-screen-toggle-row .mobile-screen-row-copy {
@@ -2051,9 +2054,9 @@ a[class*="rounded"]:hover {
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.45rem;
     margin-top: 0.8rem;
-    padding: 1.05rem 0.95rem;
+    padding: 1.2rem 1.1rem;
     text-align: center;
   }
 
@@ -2071,14 +2074,14 @@ a[class*="rounded"]:hover {
 
   .mobile-upload-dropzone-title {
     color: var(--text-100);
-    font-size: 0.84rem;
+    font-size: 0.88rem;
     font-weight: 600;
     line-height: 1.45;
   }
 
   .mobile-upload-dropzone-copy {
     color: rgba(242, 247, 251, 0.34);
-    font-size: 0.7rem;
+    font-size: 0.76rem;
     line-height: 1.45;
   }
 
@@ -2108,6 +2111,15 @@ a[class*="rounded"]:hover {
     font-size: 0.85rem;
   }
 
+  .mobile-analysis-content-panel .desktop-data-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -1.15rem;
+    margin-right: -1.15rem;
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
+  }
+
   .mobile-analysis-content-panel table {
     font-size: 0.76rem;
   }
@@ -2118,9 +2130,9 @@ a[class*="rounded"]:hover {
     margin: 0 auto;
     max-width: 52rem;
     padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
-    padding-left: calc(1.35rem + env(safe-area-inset-left, 0px));
-    padding-right: calc(1.35rem + env(safe-area-inset-right, 0px));
-    padding-top: 0.95rem;
+    padding-left: calc(1.5rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1.5rem + env(safe-area-inset-right, 0px));
+    padding-top: 1.1rem;
   }
 
   .mobile-header {
@@ -2136,11 +2148,11 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-page-label {
-    padding-bottom: 1rem;
+    padding-bottom: 1.15rem;
   }
 
   .mobile-bottom-nav-item {
-    gap: 0.28rem;
+    gap: 0.32rem;
     padding: 0.78rem 0.4rem 0.72rem;
   }
 
@@ -2149,15 +2161,15 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-page-intro {
-    padding: 1.1rem 1.15rem 1.15rem;
+    padding: 1.25rem 1.3rem 1.3rem;
   }
 
   .mobile-screen-stack {
-    gap: 0.95rem;
+    gap: 1.15rem;
   }
 
   .mobile-screen-panel {
-    padding: 1.05rem 1.05rem 1.08rem;
+    padding: 1.2rem 1.2rem 1.22rem;
   }
 
   .mobile-screen-link-grid-dense {
@@ -2166,7 +2178,14 @@ a[class*="rounded"]:hover {
 }
 
 @media (max-width: 420px) {
-  .mobile-screen-stats,
+  .mobile-screen-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobile-screen-stats > :last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+
   .mobile-screen-field-grid,
   .mobile-screen-link-grid,
   .mobile-screen-link-grid-dense {

@@ -66,6 +66,10 @@ const tabDescriptions: Record<AnalysisTabKey, string> = {
   ml: "Optional ML experiments that are saved back into the selected analysis run.",
 };
 
+function truncateText(text: string, maxLength: number) {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
+}
+
 function resolveRequestedTab(requestedTab: string | null): AnalysisTabKey | null {
   switch (requestedTab) {
     case "overview":
@@ -731,7 +735,7 @@ function AnalysisMobileSections({
               {report.overview.dataset_name}
               {report.saved_at ? ` • saved ${formatDate(report.saved_at)}` : ""}
             </p>
-            <p className="mobile-screen-lead">{report.insights.summary}</p>
+            <p className="mobile-screen-lead">{truncateText(report.insights.summary, 150)}</p>
           </div>
         </div>
         <div className="mobile-screen-pills">
@@ -772,7 +776,7 @@ function AnalysisMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Report section</p>
-            <h2 className="mobile-screen-title">Switch between the same desktop tabs</h2>
+            <h2 className="mobile-screen-title">Report sections</h2>
           </div>
         </div>
         <div className="mobile-screen-field">
@@ -789,19 +793,6 @@ function AnalysisMobileSections({
               </option>
             ))}
           </select>
-        </div>
-        <p className="mobile-screen-lead">{tabDescriptions[activeTab]}</p>
-        <div className="mobile-screen-pills compact">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => onTabChange(tab.key)}
-              className={`mobile-filter-pill ${activeTab === tab.key ? "mobile-filter-pill-active" : ""}`}
-            >
-              {tab.label}
-            </button>
-          ))}
         </div>
       </section>
 
