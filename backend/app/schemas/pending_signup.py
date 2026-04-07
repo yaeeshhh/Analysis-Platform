@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr
 class PendingSignupRequest(BaseModel):
     email: EmailStr
     username: str
+    full_name: str | None = None
     password: str
 
 

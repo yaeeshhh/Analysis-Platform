@@ -10,9 +10,11 @@ import { getAnalyses } from "@/lib/analysisApi";
 import {
   getRememberStatus,
   REMEMBER_LOGIN_STORAGE_KEY,
+  updateCurrentUser,
   type RememberStatus,
   type User,
 } from "@/lib/auth";
+import { getAccessToken } from "@/lib/api";
 import { clearCurrentAnalysisSelection, notifyAnalysesChanged } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
@@ -110,6 +112,10 @@ export default function AccountPage() {
     mlExperiments: 0,
     mlReadyRuns: 0,
   });
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [dobInput, setDobInput] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
 
 
 
@@ -133,6 +139,8 @@ export default function AccountPage() {
       }
 
       setUser(authenticatedUser);
+      setNameInput(authenticatedUser.full_name || "");
+      setDobInput(authenticatedUser.date_of_birth || "");
       setRememberStatus(getRememberStatus(authenticatedUser.email));
 
       try {
@@ -307,8 +315,10 @@ export default function AccountPage() {
 
                   <div className="grid gap-3 md:grid-cols-2">
                     {[
+                      { label: "Full name", value: user.full_name || "Not set" },
                       { label: "Username", value: user.username || "Not set" },
                       { label: "Email", value: user.email },
+                      { label: "Date of birth", value: user.date_of_birth || "Not set" },
                       { label: "Member since", value: formatDate(user.created_at) },
                       {
                         label: "Remembered login",
@@ -328,6 +338,81 @@ export default function AccountPage() {
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-3">
+                  {!editingName ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNameInput(user.full_name || "");
+                        setDobInput(user.date_of_birth || "");
+                        setEditingName(true);
+                      }}
+                      className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+                    >
+                      Edit name & date of birth
+                    </button>
+                  ) : (
+                    <div className="flex w-full flex-col gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                      <div>
+                        <label htmlFor="account-full-name" className="mb-1.5 block text-[0.62rem] uppercase tracking-[0.16em] text-white/28">Full name</label>
+                        <input
+                          id="account-full-name"
+                          type="text"
+                          value={nameInput}
+                          onChange={(e) => setNameInput(e.target.value)}
+                          placeholder="Your full name"
+                          disabled={savingProfile}
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="account-dob" className="mb-1.5 block text-[0.62rem] uppercase tracking-[0.16em] text-white/28">Date of birth <span className="text-white/20">(optional)</span></label>
+                        <input
+                          id="account-dob"
+                          type="date"
+                          value={dobInput}
+                          onChange={(e) => setDobInput(e.target.value)}
+                          disabled={savingProfile}
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white focus:border-blue-500 focus:outline-none disabled:opacity-50"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          disabled={savingProfile}
+                          onClick={async () => {
+                            const token = getAccessToken();
+                            if (!token) return;
+                            try {
+                              setSavingProfile(true);
+                              const updated = await updateCurrentUser(token, {
+                                full_name: nameInput.trim() || undefined,
+                                date_of_birth: dobInput || null,
+                              });
+                              setUser(updated);
+                              setNameInput(updated.full_name || "");
+                              setDobInput(updated.date_of_birth || "");
+                              setEditingName(false);
+                            } catch {
+                              // keep editing open on error
+                            } finally {
+                              setSavingProfile(false);
+                            }
+                          }}
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                        >
+                          {savingProfile ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingName(false)}
+                          disabled={savingProfile}
+                          className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/78 disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => setActiveDialog("username")}

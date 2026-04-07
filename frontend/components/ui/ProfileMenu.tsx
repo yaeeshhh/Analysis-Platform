@@ -17,7 +17,7 @@ type ProfileMenuProps = {
 function getInitials(user: User | null) {
   if (!user) return "?";
 
-  const source = user.username || user.email || "Profile";
+  const source = user.full_name || user.username || user.email || "Profile";
   return source
     .split(/\s+/)
     .filter(Boolean)
@@ -216,7 +216,7 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
           <>
             <span className="profile-menu-avatar">{initials}</span>
             <span className="profile-menu-copy">
-              <span className="profile-menu-name">{user ? user.username || "Profile" : "Log in"}</span>
+              <span className="profile-menu-name">{user ? user.full_name || user.username || "Profile" : "Log in"}</span>
               <span className="profile-menu-subtitle">{user ? "Open account tools" : "Access saved runs"}</span>
             </span>
           </>
@@ -240,7 +240,7 @@ export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
           <div className="space-y-4">
             <div className="rounded-[18px] border border-white/10 bg-black/10 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-white/42">Signed in</p>
-              <p className="mt-2 truncate text-sm font-medium text-white">{user.username || "Profile"}</p>
+              <p className="mt-2 truncate text-sm font-medium text-white">{user.full_name || user.username || "Profile"}</p>
               <p className="mt-1 truncate text-sm text-white/62">{user.email}</p>
             </div>
 

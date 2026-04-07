@@ -10,6 +10,7 @@ import { AnalysisListItem } from "@/lib/analysisTypes";
 import { isAnalysisStateStorageEvent } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
+import type { User } from "@/lib/auth";
 
 const workflowSteps = [
   {
@@ -153,6 +154,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [analyses, setAnalyses] = useState<AnalysisListItem[]>([]);
+  const [dashUser, setDashUser] = useState<User | null>(null);
 
 
 
@@ -167,12 +169,14 @@ export default function DashboardPage() {
       const user = await resolveAuthenticatedUser();
       if (!active) return;
       if (!user) {
+        setDashUser(null);
         setAnalyses([]);
         setLoginRequired(false);
         setLoading(false);
         return;
       }
 
+      setDashUser(user);
       setLoginRequired(false);
 
       try {
@@ -264,7 +268,7 @@ export default function DashboardPage() {
       <AppShell
         eyebrow="Overview"
         title="Dashboard"
-        description="Good morning - your workspace is ready."
+        description={dashUser?.full_name ? `Welcome back, ${dashUser.full_name}.` : "Good morning - your workspace is ready."}
         stats={stats}
       >
         {error ? (

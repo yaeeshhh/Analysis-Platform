@@ -42,7 +42,7 @@ class PendingSignupService:
         return int((now.replace(tzinfo=None) - timestamp).total_seconds())
 
     @staticmethod
-    def create_pending_signup(email: str, username: str, password: str, db: Session) -> PendingSignup:
+    def create_pending_signup(email: str, username: str, password: str, db: Session, full_name: str | None = None) -> PendingSignup:
         from sqlalchemy import func, or_
 
         normalized_email = PendingSignupService._normalize(email)
@@ -90,6 +90,7 @@ class PendingSignupService:
         pending = PendingSignup(
             email=normalized_email,
             username=normalized_username,
+            full_name=(full_name or "").strip() or None,
             password_hash=hash_password(password),
             challenge_token_hash=PendingSignupService._hash_token(raw_challenge_token),
             otp_code_hash=None,

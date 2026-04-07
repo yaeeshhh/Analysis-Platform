@@ -11,6 +11,7 @@ class PendingSignup(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
+    full_name = Column(String(200), nullable=True)
     password_hash = Column(String, nullable=False)
 
     challenge_token_hash = Column(String, unique=True, nullable=False, index=True)

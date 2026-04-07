@@ -61,6 +61,18 @@ def _seconds_until(expires_at: datetime) -> int:
     return max(0, int((expires_at - now).total_seconds()))
 
 
+def _user_response(user: User) -> UserResponse:
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        full_name=user.full_name,
+        date_of_birth=user.date_of_birth.isoformat() if user.date_of_birth else None,
+        is_active=user.is_active,
+        created_at=user.created_at.isoformat(),
+    )
+
+
 @router.post("/signup/start", response_model=PendingSignupStartResponse)
 def start_signup(payload: PendingSignupRequest, db: Session = Depends(get_db)):
     pending = PendingSignupService.create_pending_signup(
@@ -68,6 +80,7 @@ def start_signup(payload: PendingSignupRequest, db: Session = Depends(get_db)):
         payload.username,
         payload.password,
         db,
+        full_name=payload.full_name,
     )
 
     return PendingSignupStartResponse(
@@ -107,6 +120,7 @@ def verify_signup_code(
     user = User(
         email=pending.email,
         username=pending.username,
+        full_name=pending.full_name,
         password_hash=pending.password_hash,
     )
     db.add(user)
@@ -138,13 +152,7 @@ def verify_signup_code(
         access_token=access_token,
         token_type="bearer",
         remember_token=remember_token,
-        user=UserResponse(
-            id=user.id,
-            email=user.email,
-            username=user.username,
-            is_active=user.is_active,
-            created_at=user.created_at.isoformat(),
-        ),
+        user=_user_response(user),
     )
 
 
@@ -225,13 +233,7 @@ def verify_login_code(
         access_token=access_token,
         token_type="bearer",
         remember_token=remember_token,
-        user=UserResponse(
-            id=user.id,
-            email=user.email,
-            username=user.username,
-            is_active=user.is_active,
-            created_at=user.created_at.isoformat(),
-        ),
+        user=_user_response(user),
     )
 
 
@@ -263,13 +265,7 @@ def remember_login(
         access_token=access_token,
         token_type="bearer",
         remember_token=remember_token,
-        user=UserResponse(
-            id=user.id,
-            email=user.email,
-            username=user.username,
-            is_active=user.is_active,
-            created_at=user.created_at.isoformat(),
-        ),
+        user=_user_response(user),
     )
 
 
@@ -388,13 +384,7 @@ def refresh(
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: User = Depends(get_current_user)):
-    return UserResponse(
-        id=current_user.id,
-        email=current_user.email,
-        username=current_user.username,
-        is_active=current_user.is_active,
-        created_at=current_user.created_at.isoformat(),
-    )
+    return _user_response(current_user)
 
 
 @router.put("/me", response_model=UserResponse)
@@ -408,17 +398,13 @@ def update_current_user_info(
         db=db,
         email=payload.email,
         username=payload.username,
+        full_name=payload.full_name,
+        date_of_birth=payload.date_of_birth,
         password=payload.password,
         current_password=payload.current_password,
     )
 
-    return UserResponse(
-        id=updated_user.id,
-        email=updated_user.email,
-        username=updated_user.username,
-        is_active=updated_user.is_active,
-        created_at=updated_user.created_at.isoformat(),
-    )
+    return _user_response(updated_user)
 
 
 @router.post(
@@ -485,13 +471,7 @@ def verify_profile_identity_update_code(
         payload.code,
         db,
     )
-    return UserResponse(
-        id=updated_user.id,
-        email=updated_user.email,
-        username=updated_user.username,
-        is_active=updated_user.is_active,
-        created_at=updated_user.created_at.isoformat(),
-    )
+    return _user_response(updated_user)
 
 
 @router.post(
