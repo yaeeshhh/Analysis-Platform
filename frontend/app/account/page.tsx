@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
-import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import {
@@ -281,6 +280,12 @@ export default function AccountPage() {
     }
   }
 
+  const rememberSummary = rememberStatus.available
+    ? rememberStatus.enabled
+      ? `${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"} remaining`
+      : "Available but disabled on this browser"
+    : "Not configured on this browser";
+
   return (
     <>
       <AppShell
@@ -289,7 +294,7 @@ export default function AccountPage() {
         description="Manage access, identity, and saved work."
         actions={
           user ? (
-            <div className="flex flex-wrap gap-3">
+            <div className="tablet-up flex flex-wrap gap-3">
               <ScrollIntentLink href="/history" className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82">
                 Review saved history
               </ScrollIntentLink>
@@ -318,53 +323,183 @@ export default function AccountPage() {
 
         {!loading && user ? (
           <>
-            {/* ─── Phone: inline info + tappable section list ─── */}
-            <div className="phone-only space-y-3">
-              {/* Inline account summary */}
-              <div className="mobile-inline-stats">
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{user.username || "—"}</span>
-                  <span className="mobile-inline-stat-label">Username</span>
+            <div className="phone-only mobile-screen-stack">
+              <div className="mobile-screen-stats">
+                <article className="mobile-screen-stat">
+                  <p className="mobile-screen-stat-label">Username</p>
+                  <p className="mobile-screen-stat-value">{user.username || "—"}</p>
+                  <p className="mobile-screen-stat-hint">Workspace identity</p>
+                </article>
+                <article className="mobile-screen-stat">
+                  <p className="mobile-screen-stat-label">Remember</p>
+                  <p className="mobile-screen-stat-value">
+                    {rememberStatus.available ? (rememberStatus.enabled ? `${rememberStatus.daysRemaining}d` : "Off") : "N/A"}
+                  </p>
+                  <p className="mobile-screen-stat-hint">Browser memory</p>
+                </article>
+                <article className="mobile-screen-stat">
+                  <p className="mobile-screen-stat-label">2FA</p>
+                  <p className="mobile-screen-stat-value">{user.two_factor_enabled ? "On" : "Off"}</p>
+                  <p className="mobile-screen-stat-hint">Password verification</p>
+                </article>
+              </div>
+
+              <section className="mobile-screen-panel section-glow">
+                <div className="mobile-screen-profile">
+                  <div className="mobile-screen-avatar">{getAccountInitials(user.username || user.email)}</div>
+                  <div className="mobile-screen-profile-copy">
+                    <p className="mobile-screen-kicker">Profile</p>
+                    <h2 className="mobile-screen-title">{user.username || user.email}</h2>
+                    <p className="mobile-screen-meta">{user.email}</p>
+                  </div>
                 </div>
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">
-                    {rememberStatus.available
-                      ? rememberStatus.enabled
-                        ? `${rememberStatus.daysRemaining}d`
-                        : "Off"
-                      : "N/A"}
+                <div className="mobile-screen-field-grid">
+                  {[
+                    { label: "Full name", value: user.full_name || "Not set" },
+                    { label: "Date of birth", value: user.date_of_birth || "Not set" },
+                    { label: "Member since", value: formatDate(user.created_at) },
+                    { label: "Remembered login", value: rememberSummary },
+                  ].map((field) => (
+                    <div key={field.label} className="mobile-screen-field-card">
+                      <p className="mobile-screen-field-label">{field.label}</p>
+                      <p className="mobile-screen-field-value">{field.value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mobile-screen-pills">
+                  <span className="mobile-screen-pill" data-tone={user.is_active ? "teal" : "amber"}>
+                    {user.is_active ? "Active account" : "Inactive account"}
                   </span>
-                  <span className="mobile-inline-stat-label">Remember</span>
+                  <span className="mobile-screen-pill" data-tone={user.two_factor_enabled ? "teal" : "amber"}>
+                    {user.two_factor_enabled ? "2FA enabled" : "2FA disabled"}
+                  </span>
                 </div>
-              </div>
+                {!editingName ? (
+                  <div className="mobile-screen-actions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNameInput(user.full_name || "");
+                        setDobInput(user.date_of_birth || "");
+                        setProfileError("");
+                        setEditingName(true);
+                      }}
+                      className="mobile-screen-button mobile-screen-button-primary"
+                    >
+                      Edit name and DOB
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveDialog("username")}
+                      className="mobile-screen-button mobile-screen-button-secondary"
+                    >
+                      Change username
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mobile-screen-form-stack">
+                    <div className="mobile-screen-field">
+                      <label htmlFor="mobile-account-full-name" className="mobile-screen-field-label">Full name</label>
+                      <input
+                        id="mobile-account-full-name"
+                        type="text"
+                        value={nameInput}
+                        onChange={(event) => {
+                          setNameInput(event.target.value);
+                          if (profileError) {
+                            setProfileError("");
+                          }
+                        }}
+                        placeholder="Your full name"
+                        disabled={savingProfile}
+                        className="mobile-screen-input"
+                      />
+                    </div>
+                    <div className="mobile-screen-field">
+                      <label htmlFor="mobile-account-dob" className="mobile-screen-field-label">Date of birth</label>
+                      <input
+                        id="mobile-account-dob"
+                        type="date"
+                        value={dobInput}
+                        onChange={(event) => {
+                          setDobInput(event.target.value);
+                          if (profileError) {
+                            setProfileError("");
+                          }
+                        }}
+                        disabled={savingProfile}
+                        className="mobile-screen-input"
+                      />
+                    </div>
+                    {profileError ? <p className="mobile-screen-error">{profileError}</p> : null}
+                    <div className="mobile-screen-actions">
+                      <button
+                        type="button"
+                        disabled={savingProfile}
+                        onClick={async () => {
+                          const trimmedName = nameInput.trim();
 
-              <div className="mobile-detail-row">
-                <span className="mobile-detail-label">Email</span>
-                <span className="mobile-detail-value">{user.email}</span>
-              </div>
-              <div className="mobile-detail-row">
-                <span className="mobile-detail-label">Member since</span>
-                <span className="mobile-detail-value">{formatDate(user.created_at)}</span>
-              </div>
-              <div className="mobile-detail-row">
-                <span className="mobile-detail-label">Status</span>
-                <span className="mobile-detail-value">
-                  <span className="info-chip"><span className="pulse-dot" />{user.is_active ? "Active" : "Inactive"}</span>
-                </span>
-              </div>
+                          if (!trimmedName) {
+                            setProfileError("Enter a full name before saving.");
+                            return;
+                          }
 
-              <div className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-4">
-                <p className="text-[0.62rem] uppercase tracking-[0.16em] text-white/28">Two-factor authentication</p>
-                <p className="mt-2 text-sm leading-6 text-white/62">
-                  {user.two_factor_enabled
-                    ? "Password logins require an email code. Remembered-login bypass still works when available on this browser."
-                    : "Password logins skip the email code. Remembered-login behavior stays unchanged."}
-                </p>
-                <div className="mt-3 flex items-center justify-between gap-3 rounded-[18px] border border-white/10 bg-[#15151a] px-4 py-3">
+                          try {
+                            setSavingProfile(true);
+                            setProfileError("");
+                            const updated = await withAuthRetry((token) =>
+                              updateCurrentUser(token, {
+                                full_name: trimmedName,
+                                date_of_birth: dobInput || null,
+                              })
+                            );
+                            setUser(updated);
+                            setNameInput(updated.full_name || "");
+                            setDobInput(updated.date_of_birth || "");
+                            setProfileError("");
+                            setEditingName(false);
+                          } catch (error) {
+                            setProfileError(error instanceof Error ? error.message : "Failed to save your profile details.");
+                          } finally {
+                            setSavingProfile(false);
+                          }
+                        }}
+                        className="mobile-screen-button mobile-screen-button-primary"
+                      >
+                        {savingProfile ? "Saving..." : "Save profile"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingName(false);
+                          setNameInput(user.full_name || "");
+                          setDobInput(user.date_of_birth || "");
+                          setProfileError("");
+                        }}
+                        disabled={savingProfile}
+                        className="mobile-screen-button mobile-screen-button-secondary"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              <section className="mobile-screen-panel">
+                <div className="mobile-screen-panel-header">
                   <div>
-                    <p className="text-sm font-medium text-white">Two-factor protection</p>
-                    <p className="mt-1 text-xs leading-5 text-white/58">
-                      {savingTwoFactor ? "Saving..." : user.two_factor_enabled ? "Enabled" : "Disabled"}
+                    <p className="mobile-screen-kicker">Security and session</p>
+                    <h2 className="mobile-screen-title">Access controls for this browser</h2>
+                  </div>
+                </div>
+                <div className="mobile-screen-toggle-row">
+                  <div>
+                    <p className="mobile-screen-row-title">Two-factor protection</p>
+                    <p className="mobile-screen-row-copy">
+                      {user.two_factor_enabled
+                        ? "Password logins require an email code. Remembered-login bypass still works when available."
+                        : "Password logins skip the email code. Remembered-login behaviour stays unchanged."}
                     </p>
                   </div>
                   <AccountSlideToggle
@@ -376,7 +511,52 @@ export default function AccountPage() {
                     }}
                   />
                 </div>
-              </div>
+                <div className="mobile-screen-link-grid">
+                  <ScrollIntentLink href="/history" className="mobile-screen-link-card">
+                    <p className="mobile-screen-link-title">Saved history</p>
+                    <p className="mobile-screen-link-copy">Review past reports and ML runs.</p>
+                    <span className="mobile-screen-link-cta">Open history</span>
+                  </ScrollIntentLink>
+                  <ScrollIntentLink href="/batch" className="mobile-screen-link-card">
+                    <p className="mobile-screen-link-title">Uploads</p>
+                    <p className="mobile-screen-link-copy">Return to dataset intake and current selection.</p>
+                    <span className="mobile-screen-link-cta">Open uploads</span>
+                  </ScrollIntentLink>
+                </div>
+                <div className="mobile-screen-actions">
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("email")}
+                    className="mobile-screen-button mobile-screen-button-secondary"
+                  >
+                    Change email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("password")}
+                    className="mobile-screen-button mobile-screen-button-secondary"
+                  >
+                    Update password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("remember")}
+                    className="mobile-screen-button mobile-screen-button-secondary"
+                  >
+                    Manage remember login
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleLogout();
+                    }}
+                    disabled={loggingOut}
+                    className="mobile-screen-button mobile-screen-button-danger"
+                  >
+                    {loggingOut ? "Logging out..." : "Log out"}
+                  </button>
+                </div>
+              </section>
 
               <AccountMobileSections user={user} rememberStatus={rememberStatus} setActiveDialog={setActiveDialog} />
             </div>
@@ -725,64 +905,47 @@ function AccountMobileSections({
   rememberStatus: RememberStatus;
   setActiveDialog: (key: AccountDialogKey) => void;
 }) {
-  const sections: MobileSection[] = [
-    {
-      id: "snapshot",
-      title: "Account snapshot",
-      hint: user.email,
-      accent: "#7ad6ff",
-      content: (
-        <div className="space-y-0">
-          {[
-            { label: "Username", value: user.username || "Not set" },
-            { label: "Email", value: user.email },
-            { label: "Member since", value: formatDate(user.created_at) },
-            {
-              label: "Remembered login",
-              value: rememberStatus.available
-                ? rememberStatus.enabled
-                  ? `Enabled for ${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"}`
-                  : "Available but disabled"
-                : "Not configured",
-            },
-          ].map((stat) => (
-            <div key={stat.label} className="border-b border-white/6 py-3 last:border-0">
-              <p className="text-[0.65rem] uppercase tracking-wider text-white/42">{stat.label}</p>
-              <p className="mt-1 text-base font-medium text-white">{stat.value}</p>
+  return (
+    <div className="mobile-screen-stack mobile-screen-stack-compact">
+      {toolGroups.map((group) => (
+        <section
+          key={group.title}
+          className={`mobile-screen-panel ${group.items.some((item) => item.destructive) ? "mobile-screen-panel-danger" : ""}`}
+        >
+          <div className="mobile-screen-panel-header">
+            <div>
+              <p className="mobile-screen-kicker">{group.title}</p>
+              <h2 className="mobile-screen-title">{group.description}</h2>
             </div>
-          ))}
-        </div>
-      ),
-    },
-    ...toolGroups.map((group) => ({
-      id: group.title,
-      title: group.title,
-      hint: group.description,
-      accent: group.accent,
-      content: (
-        <div className="space-y-3">
-          {group.items.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => setActiveDialog(item.key)}
-              className={`w-full border-b border-white/6 py-3 text-left last:border-0 ${item.destructive ? "" : ""}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className={`font-medium ${item.destructive ? "text-[#ffb4ba]" : "text-white"}`}>{item.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-white/50">{item.detail}</p>
+          </div>
+          <div className="mobile-screen-list">
+            {group.items.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setActiveDialog(item.key)}
+                className={`mobile-screen-row mobile-screen-action-row ${item.destructive ? "mobile-screen-row-danger" : ""}`}
+              >
+                <div className="mobile-screen-row-header">
+                  <div className="mobile-screen-row-main">
+                    <p className="mobile-screen-row-title">{item.title}</p>
+                    <p className="mobile-screen-row-copy">{item.detail}</p>
+                  </div>
+                  <span className="mobile-screen-row-trail">
+                    {item.destructive ? "Danger" : "Open"}
+                  </span>
                 </div>
-                <span className={`shrink-0 text-xs ${item.destructive ? "text-[#ffb4ba]/60" : "text-white/30"}`}>
-                  {item.destructive ? <span className="danger-label"><span className="text-[#ff8c8c]/70">Danger</span></span> : "›"}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-      ),
-    })),
-  ];
-
-  return <MobileSectionList sections={sections} />;
+              </button>
+            ))}
+          </div>
+          {group.title === "Access and browser" ? (
+            <div className="mobile-screen-pills compact">
+              <span className="mobile-screen-pill">{user.email}</span>
+              <span className="mobile-screen-pill">{rememberStatus.available ? "Browser memory available" : "No browser memory saved"}</span>
+            </div>
+          ) : null}
+        </section>
+      ))}
+    </div>
+  );
 }

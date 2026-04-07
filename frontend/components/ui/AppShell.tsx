@@ -73,8 +73,12 @@ export default function AppShell({
 
           <section className="app-content-shell px-4 py-6 md:px-6 md:py-6 mobile-shell-body">
             <div className="mobile-page-label phone-only">
-              <span className="hero-pill">{eyebrow}</span>
-              {actions ? <div className="page-actions mt-3">{actions}</div> : null}
+              <div className="mobile-page-intro">
+                <span className="mobile-page-eyebrow">{eyebrow}</span>
+                <TitleTag className="mobile-page-title">{title}</TitleTag>
+                <div className="mobile-page-description">{description}</div>
+                {actions ? <div className="mobile-page-actions">{actions}</div> : null}
+              </div>
             </div>
 
             <div className="space-y-4 md:space-y-6">{children}</div>
