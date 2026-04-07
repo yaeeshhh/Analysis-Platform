@@ -28,10 +28,6 @@ import { resolveAuthenticatedUser } from "@/lib/session";
 type ReadinessFilter = "all" | "ml-ready" | "eda-first";
 type MlFilter = "all" | "with-ml" | "without-ml";
 
-function truncateText(text: string, maxLength: number) {
-  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
-}
-
 export default function HistoryPage() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -282,6 +278,8 @@ export default function HistoryPage() {
               onOpenPopup={handleOpenAnalysisPopup}
               onDeleteRun={setDeleteTargetId}
               onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
+              onDownloadMlReport={(id, experiment) => { if (experiment) void downloadMlExperimentReport(id, experiment); }}
+              onDownloadMlSummary={(id, experiment) => { if (experiment) void downloadMlExperimentSummary(id, experiment); }}
             />
 
             <div id="history-first-block" className="tablet-up route-scroll-target desktop-page-stack">
@@ -604,6 +602,8 @@ type HistoryMobileSectionsProps = {
   onOpenPopup: (a: AnalysisListItem) => void;
   onDeleteRun: (id: number) => void;
   onDownloadReport: (id: number) => void;
+  onDownloadMlReport: (analysisId: number, experiment: AnalysisListItem["latest_experiment"]) => void;
+  onDownloadMlSummary: (analysisId: number, experiment: AnalysisListItem["latest_experiment"]) => void;
 };
 
 function HistoryMobileSections({
@@ -620,9 +620,11 @@ function HistoryMobileSections({
   onOpenPopup,
   onDeleteRun,
   onDownloadReport,
+  onDownloadMlReport,
+  onDownloadMlSummary,
 }: HistoryMobileSectionsProps) {
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(5);
-  const latestRun = filteredAnalyses[0] ?? analyses[0] ?? null;
   const runsWithMl = analyses.filter((analysis) => analysis.experiment_count > 0).length;
   const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
     { value: "all", label: "All readiness" },
@@ -707,25 +709,6 @@ function HistoryMobileSections({
         ) : null}
       </section>
 
-      {latestRun ? (
-        <section className="mobile-screen-panel">
-          <div className="mobile-screen-panel-header">
-            <div>
-              <p className="mobile-screen-kicker">Latest match</p>
-              <h2 className="mobile-screen-title">{latestRun.overview.dataset_name}</h2>
-            </div>
-          </div>
-          <div className="mobile-screen-pills">
-            <span className="mobile-screen-pill">{latestRun.overview.row_count.toLocaleString()} rows</span>
-            <span className="mobile-screen-pill">{latestRun.overview.column_count} cols</span>
-            <span className="mobile-screen-pill" data-tone={latestRun.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-              {latestRun.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-            </span>
-          </div>
-          <p className="mobile-screen-lead">{truncateText(latestRun.insights.summary, 150)}</p>
-        </section>
-      ) : null}
-
       <section className="mobile-screen-panel">
         <div className="mobile-screen-panel-header">
           <div>
@@ -738,62 +721,117 @@ function HistoryMobileSections({
         ) : (
           <div className="mobile-screen-list">
             {filteredAnalyses.slice(0, visibleCount).map((analysis) => {
+              const isOpen = expandedId === analysis.id;
               const modeLabel = analysis.latest_experiment
                 ? analysis.latest_experiment.type === "supervised"
                   ? "Supervised ML"
                   : "Unsupervised ML"
                 : "Analysis only";
+              const latestExperiment = analysis.latest_experiment;
 
               return (
-                <div key={analysis.id} className="mobile-screen-row">
-                  <div className="mobile-screen-row-header">
-                    <div className="mobile-screen-row-main">
-                      <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
-                      <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
+                <div key={analysis.id} className="mobile-expand-card">
+                  <button
+                    type="button"
+                    className="mobile-expand-card-header"
+                    onClick={() => setExpandedId(isOpen ? null : analysis.id)}
+                  >
+                    <div className="mobile-screen-row-header">
+                      <div className="mobile-screen-row-main">
+                        <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
+                        <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
+                        {!isOpen ? (
+                          <p className="mobile-screen-row-copy" style={{ marginTop: "0.35rem" }}>
+                            {analysis.insights.summary.length > 100
+                              ? `${analysis.insights.summary.slice(0, 100)}…`
+                              : analysis.insights.summary}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.4rem", flexShrink: 0 }}>
+                        <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                          {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                        </span>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={`mobile-expand-card-chevron ${isOpen ? "mobile-expand-card-chevron-open" : ""}`}
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </div>
                     </div>
-                    <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                      {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                    </span>
-                  </div>
-                  <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 120)}</p>
-                  <div className="mobile-screen-pills compact">
-                    <span className="mobile-screen-pill">{modeLabel}</span>
-                    <span className="mobile-screen-pill">{analysis.status || "saved"}</span>
-                    <span className="mobile-screen-pill" data-tone="purple">
-                      {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
-                    </span>
-                  </div>
-                  {analysis.latest_experiment ? (
-                    <p className="mobile-screen-row-note">Latest ML: {truncateText(analysis.latest_experiment.summary, 80)}</p>
+                  </button>
+
+                  {isOpen ? (
+                    <div className="mobile-expand-card-body">
+                      <p className="mobile-screen-row-copy" style={{ marginTop: 0 }}>
+                        {analysis.insights.summary}
+                      </p>
+
+                      <div className="mobile-screen-pills" style={{ marginTop: "0.65rem" }}>
+                        <span className="mobile-screen-pill">{modeLabel}</span>
+                        <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
+                        <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
+                        <span className="mobile-screen-pill">{analysis.status || "saved"}</span>
+                        <span className="mobile-screen-pill" data-tone="purple">
+                          {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
+                        </span>
+                      </div>
+
+                      {latestExperiment ? (
+                        <p className="mobile-screen-row-note">Latest ML: {latestExperiment.summary}</p>
+                      ) : null}
+
+                      <div className="mobile-expand-card-actions">
+                        <button
+                          type="button"
+                          onClick={() => onOpenPopup(analysis)}
+                          className="mobile-screen-button mobile-screen-button-primary"
+                        >
+                          Open full run
+                        </button>
+                        <div className="mobile-expand-card-actions-row">
+                          <button
+                            type="button"
+                            onClick={() => onDownloadReport(analysis.id)}
+                            className="mobile-screen-button mobile-screen-button-secondary"
+                          >
+                            Report
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDeleteRun(analysis.id)}
+                            className="mobile-screen-button mobile-screen-button-danger"
+                          >
+                            Delete run
+                          </button>
+                        </div>
+                        {latestExperiment ? (
+                          <div className="mobile-expand-card-actions-row">
+                            <button
+                              type="button"
+                              onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
+                              className="mobile-screen-button mobile-screen-button-secondary"
+                            >
+                              ML report
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
+                              className="mobile-screen-button mobile-screen-button-secondary"
+                            >
+                              ML summary
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
                   ) : null}
-                  <div className="mobile-screen-row-actions" style={{ flexDirection: "column", gap: "0.5rem" }}>
-                    <button
-                      type="button"
-                      onClick={() => onOpenPopup(analysis)}
-                      className="mobile-screen-button mobile-screen-button-primary"
-                      style={{ flex: "1 1 100%" }}
-                    >
-                      Open run
-                    </button>
-                    <div style={{ display: "flex", gap: "0.5rem", width: "100%" }}>
-                      <button
-                        type="button"
-                        onClick={() => onDownloadReport(analysis.id)}
-                        className="mobile-screen-button mobile-screen-button-secondary"
-                        style={{ flex: 1 }}
-                      >
-                        Report
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDeleteRun(analysis.id)}
-                        className="mobile-screen-button mobile-screen-button-danger"
-                        style={{ flex: 1 }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
                 </div>
               );
             })}

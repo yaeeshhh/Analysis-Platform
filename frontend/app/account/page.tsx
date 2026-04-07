@@ -353,7 +353,7 @@ export default function AccountPage() {
                     <p className="mobile-screen-meta">{user.email}</p>
                   </div>
                 </div>
-                <div className="mobile-screen-field-grid">
+                <div className="mobile-screen-field-grid" style={{ marginTop: "1rem" }}>
                   {[
                     { label: "Full name", value: user.full_name || "Not set" },
                     { label: "Date of birth", value: user.date_of_birth || "Not set" },
@@ -511,7 +511,19 @@ export default function AccountPage() {
                     }}
                   />
                 </div>
-                <div className="mobile-screen-actions">
+                <div className="mobile-screen-link-grid" style={{ marginTop: "1rem" }}>
+                  <ScrollIntentLink href="/history" className="mobile-screen-link-card">
+                    <p className="mobile-screen-link-title">Saved history</p>
+                    <p className="mobile-screen-link-copy">Review past reports and ML runs.</p>
+                    <span className="mobile-screen-link-cta">Open history</span>
+                  </ScrollIntentLink>
+                  <ScrollIntentLink href="/batch" className="mobile-screen-link-card">
+                    <p className="mobile-screen-link-title">Uploads</p>
+                    <p className="mobile-screen-link-copy">Return to dataset intake and current selection.</p>
+                    <span className="mobile-screen-link-cta">Open uploads</span>
+                  </ScrollIntentLink>
+                </div>
+                <div className="mobile-screen-actions" style={{ marginTop: "1rem" }}>
                   <button
                     type="button"
                     onClick={() => setActiveDialog("email")}
@@ -906,7 +918,7 @@ function AccountMobileSections({
               <h2 className="mobile-screen-title">{group.description}</h2>
             </div>
           </div>
-          <div className="mobile-screen-list">
+          <div className="mobile-screen-list" style={{ marginTop: "0.3rem" }}>
             {group.items.map((item) => (
               <button
                 key={item.key}
