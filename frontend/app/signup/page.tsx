@@ -38,6 +38,7 @@ function SignupPageContent() {
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -279,7 +280,7 @@ function SignupPageContent() {
       setLoading(true);
       clearUserScopedFrontendState();
 
-      const resp = await startSignup(trimmedEmail, trimmedUsername, password);
+      const resp = await startSignup(trimmedEmail, trimmedUsername, password, fullName.trim() || undefined);
 
       setChallengeToken(resp.challenge_token);
       setOtpEmail(resp.email || trimmedEmail);
@@ -381,6 +382,22 @@ function SignupPageContent() {
           <div className="space-y-4">
             {!awaitingOtp && (
               <>
+                <div>
+                  <label htmlFor="full-name" className="block text-sm font-medium mb-2">
+                    Full name <span className="text-white/30 font-normal">(optional)</span>
+                  </label>
+                  <input
+                    id="full-name"
+                    type="text"
+                    placeholder="Your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={loading}
+                    className="w-full p-3 rounded-lg bg-[#11141c] border border-[#2a2e3a] focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                  />
+                </div>
+
                 <div>
                   <label htmlFor="username" className="block text-sm font-medium mb-2">
                     Username

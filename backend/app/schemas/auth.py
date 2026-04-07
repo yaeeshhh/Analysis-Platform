@@ -1,9 +1,12 @@
+from datetime import date
+
 from pydantic import BaseModel, EmailStr, Field
 
 
 class SignupRequest(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=100)
+    full_name: str | None = Field(default=None, max_length=200)
     password: str = Field(..., min_length=8, description="Password must be at least 8 characters")
 
 
@@ -17,6 +20,8 @@ class UserResponse(BaseModel):
     id: int
     email: str
     username: str | None
+    full_name: str | None = None
+    date_of_birth: str | None = None
     is_active: bool
     created_at: str
 
@@ -98,6 +103,8 @@ class RefreshResponse(BaseModel):
 class UpdateProfileRequest(BaseModel):
     email: EmailStr | None = None
     username: str | None = Field(default=None, max_length=100)
+    full_name: str | None = Field(default=None, max_length=200)
+    date_of_birth: date | None = None
     password: str | None = Field(default=None, min_length=8)
     current_password: str | None = None
 

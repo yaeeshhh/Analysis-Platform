@@ -149,18 +149,6 @@ export default function TopNav() {
       <div className="desktop-sidebar-brand">
         <button
           type="button"
-          className="desktop-sidebar-toggle"
-          onClick={() => setCollapsed((current) => !current)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          aria-expanded={!collapsed}
-        >
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M10.5 3.5L6 8l4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-
-        <button
-          type="button"
           className="desktop-sidebar-brand-lockup"
           onClick={() => {
             if (collapsed) {
@@ -174,6 +162,18 @@ export default function TopNav() {
             <p className="nav-brand-title">Analysis Studio</p>
             <p className="nav-brand-subtitle">Tabular analysis workspace</p>
           </div>
+        </button>
+
+        <button
+          type="button"
+          className="desktop-sidebar-toggle"
+          onClick={() => setCollapsed((current) => !current)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 4.5h10M3 8h10M3 11.5h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
         </button>
       </div>
 

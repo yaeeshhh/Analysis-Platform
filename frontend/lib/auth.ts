@@ -123,6 +123,8 @@ export interface User {
   id: number;
   email: string;
   username: string | null;
+  full_name: string | null;
+  date_of_birth: string | null;
   is_active: boolean;
   created_at: string;
 }
@@ -198,6 +200,8 @@ interface SignupAvailabilityResponse {
 interface UpdateProfileRequest {
   email?: string;
   username?: string;
+  full_name?: string;
+  date_of_birth?: string | null;
   password?: string;
   current_password?: string;
 }
@@ -593,11 +597,13 @@ function getErrorMessage(payload: unknown, fallback: string): string {
 export async function startSignup(
   email: string,
   username: string,
-  password: string
+  password: string,
+  fullName?: string,
 ): Promise<SignupStartResponse> {
   const response = await postAuthWithFallback("/auth/signup/start", {
     email,
     username,
+    full_name: fullName || undefined,
     password,
   });
   const payload = await parseJsonSafely(response);

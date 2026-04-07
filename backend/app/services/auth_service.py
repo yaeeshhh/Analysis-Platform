@@ -326,6 +326,7 @@ class AuthService:
             user.email,
             raw_code,
             settings.LOGIN_VERIFICATION_EXPIRE_MINUTES,
+            recipient_name=user.full_name,
         )
 
         if email_delivery_is_configured() and not sent:
@@ -595,7 +596,7 @@ class AuthService:
             f"{frontend_base_url}{safe_path}"
             f"{separator}reset_token={raw_token}"
         )
-        sent = send_password_reset_email(normalized_email, reset_link)
+        sent = send_password_reset_email(normalized_email, reset_link, recipient_name=user.full_name)
 
         # For local development without SMTP, return the link so frontend can show it.
         if not sent:
@@ -790,6 +791,8 @@ class AuthService:
         db: Session,
         email: str | None = None,
         username: str | None = None,
+        full_name: str | None = None,
+        date_of_birth=None,
         password: str | None = None,
         current_password: str | None = None,
         require_identity_verification: bool = True,
@@ -799,6 +802,18 @@ class AuthService:
 
         has_changes = False
         password_changed = False
+
+        # full_name and date_of_birth can be updated without verification
+        if full_name is not None:
+            cleaned_name = full_name.strip() if full_name else None
+            if cleaned_name != user.full_name:
+                user.full_name = cleaned_name or None
+                has_changes = True
+
+        if date_of_birth is not None:
+            if date_of_birth != user.date_of_birth:
+                user.date_of_birth = date_of_birth
+                has_changes = True
 
         if email is not None:
             normalized_email = AuthService._normalize_identifier(email)
@@ -983,6 +998,7 @@ class AuthService:
             db_challenge.send_to_email,
             raw_code,
             settings.LOGIN_VERIFICATION_EXPIRE_MINUTES,
+            recipient_name=user.full_name,
         )
 
         return (
@@ -1145,6 +1161,7 @@ class AuthService:
             db_challenge.send_to_email,
             raw_code,
             settings.LOGIN_VERIFICATION_EXPIRE_MINUTES,
+            recipient_name=user.full_name,
         )
 
         return (
