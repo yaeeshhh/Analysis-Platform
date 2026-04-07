@@ -158,6 +158,8 @@ export default function HistoryPage() {
   }, [analyses, mlFilter, readinessFilter, searchQuery]);
 
   const latestRun = analyses[0] ?? null;
+  const runsWithMl = analyses.filter((analysis) => analysis.experiment_count > 0).length;
+  const hasHistoryFilters = Boolean(searchQuery.trim() || readinessFilter !== "all" || mlFilter !== "all");
   const stats = [
     {
       label: "Saved runs",
@@ -174,7 +176,7 @@ export default function HistoryPage() {
     },
     {
       label: "Runs with ML",
-      value: analyses.filter((analysis) => analysis.experiment_count > 0).length.toLocaleString(),
+      value: runsWithMl.toLocaleString(),
       hint: "Saved experiment history attached",
     },
   ];
@@ -242,9 +244,9 @@ export default function HistoryPage() {
   return (
     <>
       <AppShell
-        eyebrow="Analysis History"
-        title="Search, reopen, download, and retire saved runs"
-        description="History is the archive surface for saved datasets. Search it, filter it, download what you need, or open a run in a detached popup without replacing the app's current dataset selection."
+        eyebrow="Run archive"
+        title="History"
+        description="Search, reopen, download, and retire saved runs."
         stats={stats}
       >
         {error ? (
@@ -338,151 +340,210 @@ export default function HistoryPage() {
               onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
             />
 
-            <section id="history-first-block" className="flow-section tablet-up route-scroll-target section-glow">
-              <div className="flex items-baseline justify-between gap-4">
-                <p className="flow-section-label"><span className="pulse-dot mr-2" />Archive search</p>
-                <span className="text-xs text-white/40">{filteredAnalyses.length} of {analyses.length} run{analyses.length === 1 ? "" : "s"}</span>
-              </div>
-              <p className="mt-2 text-sm leading-6 text-white/55">Find a run by dataset name or summary, then narrow by readiness or ML status.</p>
+            <div id="history-first-block" className="tablet-up route-scroll-target desktop-page-stack">
+              <section className="desktop-toolbar">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search by dataset, file, summary, or status"
+                  className="desktop-search-input"
+                />
 
-              <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.75fr)_minmax(0,0.75fr)]">
-                <label className="block">
-                  <p className="text-xs uppercase tracking-[0.14em] text-white/42">Search runs</p>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search by dataset, summary, or status"
-                    className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
-                  />
-                </label>
+                <select
+                  value={readinessFilter}
+                  onChange={(event) => setReadinessFilter(event.target.value as ReadinessFilter)}
+                  className="desktop-select"
+                >
+                  <option value="all">All readiness</option>
+                  <option value="ml-ready">ML-ready only</option>
+                  <option value="eda-first">EDA-first only</option>
+                </select>
 
-                <label className="block">
-                  <p className="text-xs uppercase tracking-[0.14em] text-white/42">Readiness</p>
-                  <select
-                    value={readinessFilter}
-                    onChange={(event) => setReadinessFilter(event.target.value as ReadinessFilter)}
-                    className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
+                <select
+                  value={mlFilter}
+                  onChange={(event) => setMlFilter(event.target.value as MlFilter)}
+                  className="desktop-select"
+                >
+                  <option value="all">All ML history</option>
+                  <option value="with-ml">With ML runs</option>
+                  <option value="without-ml">Without ML runs</option>
+                </select>
+
+                {hasHistoryFilters ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setReadinessFilter("all");
+                      setMlFilter("all");
+                    }}
+                    className="desktop-filter-pill text-white/82"
                   >
-                    <option value="all" className="bg-[#08131e] text-white">All runs</option>
-                    <option value="ml-ready" className="bg-[#08131e] text-white">ML-ready only</option>
-                    <option value="eda-first" className="bg-[#08131e] text-white">EDA-first only</option>
-                  </select>
-                </label>
-
-                <label className="block">
-                  <p className="text-xs uppercase tracking-[0.14em] text-white/42">ML history</p>
-                  <select
-                    value={mlFilter}
-                    onChange={(event) => setMlFilter(event.target.value as MlFilter)}
-                    className="mt-2 w-full rounded-lg border border-white/12 bg-[#08131e] px-4 py-3 text-sm text-white outline-none [color-scheme:dark]"
-                  >
-                    <option value="all" className="bg-[#08131e] text-white">All runs</option>
-                    <option value="with-ml" className="bg-[#08131e] text-white">With ML runs</option>
-                    <option value="without-ml" className="bg-[#08131e] text-white">Without ML runs</option>
-                  </select>
-                </label>
-              </div>
-            </section>
-
-            {filteredAnalyses.map((analysis) => (
-              <section key={analysis.id} className="flow-section tablet-up">
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <p className="flow-section-label">Run #{analysis.id}</p>
-                    <p className="mt-1 font-[family:var(--font-display)] text-xl font-bold text-white">
-                      {analysis.overview.dataset_name}
-                    </p>
-                    <p className="mt-1 text-xs text-white/40">Saved {formatDate(analysis.saved_at)}</p>
-                    <p className="mt-2 max-w-4xl text-sm leading-6 text-white/55">{analysis.insights.summary}</p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 xl:w-auto xl:shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => { void handleOpenAnalysisPopup(analysis); }}
-                      className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]"
-                    >
-                      Open
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { void downloadAnalysisReport(analysis.id); }}
-                      className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
-                    >
-                      Report
-                    </button>
-                    {analysis.latest_experiment ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => { void downloadMlExperimentReport(analysis.id, analysis.latest_experiment!); }}
-                          className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
-                        >
-                          ML report
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { void downloadMlExperimentSummary(analysis.id, analysis.latest_experiment!); }}
-                          className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/70"
-                        >
-                          ML summary
-                        </button>
-                      </>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => setDeleteTargetId(analysis.id)}
-                      className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-
-                <div className="stat-row mt-3">
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{analysis.overview.row_count.toLocaleString()}</p>
-                    <p className="stat-row-label">Rows</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{analysis.overview.column_count}</p>
-                    <p className="stat-row-label">Columns</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{analysis.status}</p>
-                    <p className="stat-row-label">Status</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{analysis.insights.modeling_readiness.is_ready ? "ML" : "EDA"}</p>
-                    <p className="stat-row-label">Readiness</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{analysis.experiment_count}</p>
-                    <p className="stat-row-label">ML experiments</p>
-                  </div>
-                </div>
-
-                {analysis.latest_experiment ? (
-                  <p className="mt-2 text-sm text-white/50">
-                    <span className="text-xs uppercase tracking-wider text-white/35">Latest ML:</span>{" "}
-                    {analysis.latest_experiment.summary}
-                  </p>
+                    Clear filters
+                  </button>
                 ) : null}
               </section>
-            ))}
 
-            {analyses.length === 0 ? (
-              <div className="py-10 text-center text-sm text-white/40">
-                No analysis history yet. Upload a dataset from the Uploads page to get started.
-              </div>
-            ) : null}
+              <section className="desktop-panel section-glow">
+                <div className="desktop-panel-header">
+                  <div>
+                    <p className="desktop-panel-title">Saved runs</p>
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-white/46">
+                      Search the archive, reopen saved datasets in place, download reports, or retire older runs without replacing the current workspace selection.
+                    </p>
+                  </div>
+                  <span className="desktop-badge" data-tone={runsWithMl ? "purple" : "amber"}>
+                    <span className="desktop-status-dot" />
+                    {runsWithMl} run{runsWithMl === 1 ? "" : "s"} with ML
+                  </span>
+                </div>
 
-            {analyses.length > 0 && filteredAnalyses.length === 0 ? (
-              <div className="py-10 text-center text-sm text-white/40">
-                No saved runs match the current filters. Adjust the search, readiness, or ML filter.
-              </div>
-            ) : null}
+                {filteredAnalyses.length > 0 ? (
+                  <div className="desktop-data-table-wrap">
+                    <table className="desktop-data-table">
+                      <thead>
+                        <tr>
+                          <th>Run</th>
+                          <th>Mode</th>
+                          <th>Readiness</th>
+                          <th>Status</th>
+                          <th>Saved</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAnalyses.map((analysis) => {
+                          const modeLabel = analysis.latest_experiment
+                            ? analysis.latest_experiment.type === "supervised"
+                              ? "Supervised ML"
+                              : "Unsupervised ML"
+                            : "Analysis only";
+                          const modeTone = analysis.latest_experiment ? "purple" : "teal";
+                          const readinessTone = analysis.insights.modeling_readiness.is_ready ? "teal" : "amber";
+                          const statusValue = analysis.status || "saved";
+                          const statusTone = statusValue.toLowerCase().includes("error")
+                            ? "red"
+                            : analysis.experiment_count > 0
+                              ? "purple"
+                              : "teal";
+
+                          return (
+                            <tr key={analysis.id}>
+                              <td>
+                                <div>
+                                  <div>{analysis.overview.dataset_name}</div>
+                                  <div className="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-white/28">
+                                    {analysis.source_filename}
+                                  </div>
+                                  <div className="mt-2 max-w-md text-[0.74rem] leading-5 text-white/38">
+                                    {analysis.insights.summary}
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <div className="space-y-2">
+                                  <span className="desktop-badge" data-tone={modeTone}>
+                                    <span className="desktop-status-dot" />
+                                    {modeLabel}
+                                  </span>
+                                  <div className="text-[0.68rem] leading-5 text-white/28">
+                                    {analysis.latest_experiment?.summary || "No ML experiment saved for this run."}
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <div className="space-y-1">
+                                  <span className="desktop-badge" data-tone={readinessTone}>
+                                    <span className="desktop-status-dot" />
+                                    {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                                  </span>
+                                  <div className="text-[0.68rem] text-white/28">
+                                    {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <span className="desktop-badge" data-tone={statusTone}>
+                                  <span className="desktop-status-dot" />
+                                  {statusValue}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="text-sm text-white/72">{formatDate(analysis.saved_at)}</div>
+                                <div className="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-white/24">
+                                  {analysis.overview.row_count.toLocaleString()} rows · {analysis.overview.column_count} cols
+                                </div>
+                              </td>
+                              <td>
+                                <div className="desktop-action-row">
+                                  <button
+                                    type="button"
+                                    onClick={() => { void handleOpenAnalysisPopup(analysis); }}
+                                    className="rounded-md border border-[#7c3aed]/35 px-3 py-1.5 text-[0.72rem] text-[#d8c3ff]"
+                                  >
+                                    Open
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => { void downloadAnalysisReport(analysis.id); }}
+                                    className="rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
+                                  >
+                                    Report
+                                  </button>
+                                  {analysis.latest_experiment ? (
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() => { void downloadMlExperimentReport(analysis.id, analysis.latest_experiment!); }}
+                                        className="rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
+                                      >
+                                        ML report
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => { void downloadMlExperimentSummary(analysis.id, analysis.latest_experiment!); }}
+                                        className="rounded-md border border-white/10 px-3 py-1.5 text-[0.72rem] text-white/70"
+                                      >
+                                        ML summary
+                                      </button>
+                                    </>
+                                  ) : null}
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteTargetId(analysis.id)}
+                                    className="rounded-md border border-[#5a2328]/60 px-3 py-1.5 text-[0.72rem] text-[#ffb4ba]"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="desktop-empty-panel !min-h-[18rem]">
+                    <div className="desktop-empty-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="8" />
+                        <path d="M12 8v4l3 3" />
+                      </svg>
+                    </div>
+                    <p className="desktop-section-title text-[1.15rem]">
+                      {analyses.length === 0 ? "No saved runs yet" : "No runs match the current filters"}
+                    </p>
+                    <p className="desktop-section-text max-w-md">
+                      {analyses.length === 0
+                        ? "Upload a dataset from Uploads to create the first saved analysis run in the archive."
+                        : "Adjust the search text or the readiness and ML filters to bring matching runs back into view."}
+                    </p>
+                  </div>
+                )}
+              </section>
+            </div>
           </section>
         ) : null}
       </AppShell>

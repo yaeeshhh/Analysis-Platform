@@ -1,0 +1,446 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap');
+
+  .studio-wrap {
+    display: flex;
+    min-height: 660px;
+    font-family: 'Syne', sans-serif;
+    background: #0b0f1a;
+    border-radius: 14px;
+    overflow: hidden;
+    color: #e2e8f0;
+  }
+
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: #0d1120;
+    border-right: 0.5px solid rgba(255,255,255,0.07);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  }
+
+  .logo-mark { display: flex; align-items: center; gap: 8px; }
+
+  .logo-icon {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-icon svg { width: 14px; height: 14px; }
+  .logo-text { font-size: 13px; font-weight: 700; color: #f1f5f9; letter-spacing: 0.02em; }
+  .logo-sub { font-size: 9px; color: #4a5568; font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+
+  .nav-section { padding: 16px 12px; flex: 1; }
+  .nav-label { font-size: 9px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: #2d3748; margin: 0 8px 8px; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: 7px;
+    font-size: 13px; color: #718096; cursor: pointer; margin-bottom: 2px;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: #cbd5e0; }
+
+  .nav-item.active {
+    background: rgba(59,130,246,0.12);
+    color: #93c5fd;
+    border: 0.5px solid rgba(59,130,246,0.2);
+  }
+
+  .nav-icon { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  .sidebar-footer {
+    padding: 14px 12px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+  }
+
+  .avatar-row { display: flex; align-items: center; gap: 9px; }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #7c3aed);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .avatar-name { font-size: 12px; color: #94a3b8; }
+  .avatar-role { font-size: 10px; color: #374151; font-family: 'DM Mono', monospace; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    padding: 18px 28px 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+
+  .page-eyebrow { font-size: 10px; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: #0d9488; margin-bottom: 4px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #f1f5f9; margin: 0 0 2px; }
+  .page-sub { font-size: 12px; color: #4a5568; font-family: 'DM Mono', monospace; }
+
+  .topbar-actions { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+
+  .btn-ghost {
+    padding: 6px 12px; border-radius: 6px;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    background: transparent; color: #718096;
+    font-size: 11px; font-family: 'Syne', sans-serif; cursor: pointer;
+  }
+
+  .btn-primary {
+    padding: 6px 14px; border-radius: 6px; border: none;
+    background: #0d9488; color: #f0fdfa;
+    font-size: 11px; font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer;
+  }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin: 20px 28px 0;
+  }
+
+  .stat-card {
+    background: #0d1120;
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 14px 16px;
+    position: relative; overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .stat-card.teal::before { background: #0d9488; }
+  .stat-card.amber::before { background: #d97706; }
+  .stat-card.red::before { background: #dc2626; }
+
+  .stat-label { font-size: 10px; color: #4a5568; font-family: 'DM Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: #f1f5f9; line-height: 1; margin-bottom: 4px; }
+  .stat-hint { font-size: 10px; color: #374151; }
+
+  .content-area {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 14px;
+    margin: 14px 28px 20px;
+    flex: 1;
+  }
+
+  .drop-zone {
+    background: #0d1120;
+    border: 1.5px dashed rgba(13,148,136,0.35);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 28px 20px; text-align: center; gap: 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .drop-zone::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 40%, rgba(13,148,136,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .drop-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: rgba(13,148,136,0.1);
+    border: 0.5px solid rgba(13,148,136,0.25);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 4px;
+  }
+
+  .drop-title { font-size: 14px; font-weight: 600; color: #94a3b8; }
+  .drop-sub { font-size: 11px; color: #374151; font-family: 'DM Mono', monospace; line-height: 1.6; }
+
+  .drop-formats {
+    display: flex; gap: 6px; margin-top: 4px;
+  }
+
+  .format-pill {
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(13,148,136,0.08);
+    border: 0.5px solid rgba(13,148,136,0.2);
+    font-size: 9px; font-family: 'DM Mono', monospace;
+    color: #0d9488; letter-spacing: 0.06em;
+  }
+
+  .drop-btn {
+    margin-top: 6px;
+    padding: 7px 18px; border-radius: 6px;
+    border: 0.5px solid rgba(13,148,136,0.4);
+    background: rgba(13,148,136,0.1);
+    color: #5eead4; font-size: 11px; font-weight: 600;
+    font-family: 'Syne', sans-serif; cursor: pointer;
+  }
+
+  .right-col { display: flex; flex-direction: column; gap: 12px; }
+
+  .panel {
+    background: #0d1120;
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 14px 16px;
+  }
+
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .panel-title { font-size: 12px; font-weight: 600; color: #94a3b8; }
+  .panel-action { font-size: 10px; color: #0d9488; font-family: 'DM Mono', monospace; cursor: pointer; }
+
+  .file-table { width: 100%; border-collapse: collapse; }
+
+  .file-table th {
+    font-size: 9px; font-family: 'DM Mono', monospace; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #374151; text-align: left;
+    padding: 0 8px 8px; border-bottom: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .file-table td {
+    padding: 9px 8px; font-size: 11px; color: #64748b;
+    border-bottom: 0.5px solid rgba(255,255,255,0.03);
+    vertical-align: middle;
+  }
+
+  .file-table tr:last-child td { border-bottom: none; }
+
+  .file-name { color: #94a3b8; font-weight: 500; }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px; border-radius: 4px; font-size: 9px;
+    font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+  }
+
+  .status-pill.ready { background: rgba(13,148,136,0.1); color: #0d9488; border: 0.5px solid rgba(13,148,136,0.2); }
+  .status-pill.pending { background: rgba(217,119,6,0.1); color: #d97706; border: 0.5px solid rgba(217,119,6,0.2); }
+  .status-pill.error { background: rgba(220,38,38,0.1); color: #dc2626; border: 0.5px solid rgba(220,38,38,0.2); }
+
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  .mini-actions { display: flex; gap: 6px; }
+
+  .mini-btn {
+    padding: 3px 8px; border-radius: 4px; font-size: 9px;
+    font-family: 'DM Mono', monospace; cursor: pointer;
+    border: 0.5px solid rgba(255,255,255,0.08); color: #4a5568;
+    background: transparent;
+  }
+
+  .mini-btn.primary { border-color: rgba(59,130,246,0.3); color: #3b82f6; }
+
+  .quality-row { display: flex; gap: 10px; }
+
+  .quality-item {
+    flex: 1; background: rgba(255,255,255,0.02);
+    border: 0.5px solid rgba(255,255,255,0.04);
+    border-radius: 8px; padding: 10px 12px;
+  }
+
+  .q-label { font-size: 9px; font-family: 'DM Mono', monospace; color: #374151; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .q-val { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+  .q-sub { font-size: 9px; color: #2d3748; font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+  .bar-track {
+    height: 3px; background: rgba(255,255,255,0.06);
+    border-radius: 2px; margin-top: 8px;
+  }
+
+  .bar-fill { height: 100%; border-radius: 2px; }
+</style>
+
+<div class="studio-wrap">
+
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="7" width="3" height="6" rx="1" fill="white" opacity="0.9"/>
+            <rect x="5.5" y="4" width="3" height="9" rx="1" fill="white" opacity="0.7"/>
+            <rect x="10" y="1" width="3" height="12" rx="1" fill="white" opacity="0.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-text">Analysis Studio</div>
+          <div class="logo-sub">Tabular workspace</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="1" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.5"/></svg>
+        Dashboard
+      </div>
+
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><path d="M2 3h11M2 7h11M2 11h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Uploads
+      </div>
+
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7.5h5M7.5 5v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Analysis
+      </div>
+
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 4.5V7.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        History
+      </div>
+
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Account
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar-row">
+        <div class="avatar">JS</div>
+        <div>
+          <div class="avatar-name">J. Smith</div>
+          <div class="avatar-role">free plan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-eyebrow">dataset intake</div>
+        <div class="page-title">Uploads</div>
+        <div class="page-sub">Import and inspect your tabular datasets</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost">Sample data</button>
+        <button class="btn-primary">+ Upload file</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card teal">
+        <div class="stat-label">Saved runs</div>
+        <div class="stat-value">3</div>
+        <div class="stat-hint">2 ready for analysis</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Missing values</div>
+        <div class="stat-value">142</div>
+        <div class="stat-hint">Across 2 datasets</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Duplicates</div>
+        <div class="stat-value">17</div>
+        <div class="stat-hint">Flagged for review</div>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <div class="drop-zone">
+        <div class="drop-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 4v12M7 9l5-5 5 5" stroke="#0d9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1" stroke="#0d9488" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="drop-title">Drop your dataset here</div>
+        <div class="drop-sub">or click to browse files<br/>Max file size 50 MB</div>
+        <div class="drop-formats">
+          <div class="format-pill">.CSV</div>
+          <div class="format-pill">.XLSX</div>
+          <div class="format-pill">.JSON</div>
+          <div class="format-pill">.PARQUET</div>
+        </div>
+        <button class="drop-btn">Browse files</button>
+      </div>
+
+      <div class="right-col">
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent uploads</div>
+            <div class="panel-action">manage all →</div>
+          </div>
+          <table class="file-table">
+            <thead>
+              <tr>
+                <th>Filename</th>
+                <th>Rows</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="file-name">sales_q3_2024.csv</span></td>
+                <td>12,840</td>
+                <td><span class="status-pill ready"><span class="status-dot"></span>Ready</span></td>
+                <td><div class="mini-actions"><button class="mini-btn primary">Analyse</button><button class="mini-btn">Delete</button></div></td>
+              </tr>
+              <tr>
+                <td><span class="file-name">customer_data.xlsx</span></td>
+                <td>4,210</td>
+                <td><span class="status-pill pending"><span class="status-dot"></span>Processing</span></td>
+                <td><div class="mini-actions"><button class="mini-btn">View</button></div></td>
+              </tr>
+              <tr>
+                <td><span class="file-name">returns_nov.csv</span></td>
+                <td>891</td>
+                <td><span class="status-pill error"><span class="status-dot"></span>Error</span></td>
+                <td><div class="mini-actions"><button class="mini-btn">Retry</button><button class="mini-btn">Delete</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Data quality — sales_q3_2024.csv</div>
+            <div class="panel-action">full report →</div>
+          </div>
+          <div class="quality-row">
+            <div class="quality-item">
+              <div class="q-label">Completeness</div>
+              <div class="q-val">98.9%</div>
+              <div class="q-sub">142 missing cells</div>
+              <div class="bar-track"><div class="bar-fill" style="width:98.9%;background:#0d9488;"></div></div>
+            </div>
+            <div class="quality-item">
+              <div class="q-label">Uniqueness</div>
+              <div class="q-val">99.8%</div>
+              <div class="q-sub">17 duplicate rows</div>
+              <div class="bar-track"><div class="bar-fill" style="width:99.8%;background:#d97706;"></div></div>
+            </div>
+            <div class="quality-item">
+              <div class="q-label">ML readiness</div>
+              <div class="q-val">High</div>
+              <div class="q-sub">Pass all checks</div>
+              <div class="bar-track"><div class="bar-fill" style="width:88%;background:#2563eb;"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -15,6 +15,7 @@ import RelationshipsTab from "@/components/analysis/RelationshipsTab";
 import MLTab from "@/components/analysis/MLTab";
 import {
   deleteMlExperiment,
+  downloadAnalysisReport,
   getAnalyses,
   getAnalysisById,
   runSupervisedAnalysis,
@@ -29,6 +30,7 @@ import {
   setCurrentAnalysisSelection,
 } from "@/lib/currentAnalysis";
 import { calculateQualityScore } from "@/lib/analysisDerived";
+import { formatDate } from "@/lib/helpers";
 import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
@@ -249,26 +251,6 @@ function AnalysisPageContent() {
   );
   const visibleTab: AnalysisTabKey = hasRenderableReport ? activeTab : "overview";
 
-  const stats = hasRenderableReport && report
-    ? [
-        {
-          label: "Rows",
-          value: report.overview.row_count.toLocaleString(),
-          hint: report.overview.dataset_name,
-        },
-        {
-          label: "Columns",
-          value: report.overview.column_count.toLocaleString(),
-          hint: `${report.schema.target_candidates.length} target candidates inferred`,
-        },
-        {
-          label: "Quality score",
-          value: calculateQualityScore(report.overview, report.quality).toFixed(1),
-          hint: report.insights.modeling_readiness.is_ready ? "Optional ML enabled" : "EDA-first mode",
-        },
-      ]
-    : [];
-
   const showWorkspaceNavigation = Boolean(selectedAnalysisId);
   useApplyNavigationScroll("/analysis", !loading && showWorkspaceNavigation);
 
@@ -312,10 +294,29 @@ function AnalysisPageContent() {
   return (
     <>
       <AppShell
-        eyebrow="Analysis Workspace"
-        title="Review the current dataset from Overview first, then inspect the details"
-        description="Open the selected dataset report and move through the tabs as needed."
-        stats={stats}
+        eyebrow="Analysis workspace"
+        title="Analysis"
+        description="Explore, visualise, and model your dataset."
+        actions={
+          hasRenderableReport && report ? (
+            <div className="tablet-up flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => { void downloadAnalysisReport(report.analysis_id); }}
+                className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+              >
+                Export results
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTabChange("ml")}
+                className="rounded-lg bg-[#7c3aed] px-5 py-2.5 text-sm font-semibold text-[#f3e8ff]"
+              >
+                Run ML model
+              </button>
+            </div>
+          ) : undefined
+        }
       >
         {error ? (
           <div className="border-l-2 border-[#ff8c8c]/40 pl-4 text-sm text-[#ffe1e1]">
@@ -373,53 +374,48 @@ function AnalysisPageContent() {
               </div>
             ) : null}
 
-            {/* Desktop: pre-tab dataset summary */}
             {showWorkspaceNavigation && hasRenderableReport && report ? (
-              <div className="tablet-up flow-section section-glow">
-                <p className="flow-section-label">Dataset overview</p>
-                <div className="accent-bar" />
-                <p className="mt-2 font-[family:var(--font-display)] text-lg font-bold text-white">{report.overview.dataset_name}</p>
-                <p className="mt-1.5 max-w-4xl text-sm leading-6 text-white/55">{report.insights.summary}</p>
-                <div className="stat-row mt-3">
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{report.overview.row_count.toLocaleString()}</p>
-                    <p className="stat-row-label">Rows</p>
+              <section className="tablet-up desktop-panel section-glow">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                  <div className="flex min-w-0 items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#7c3aed]/25 bg-[#7c3aed]/10 text-[#c4b5fd]">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <rect x="5" y="3" width="14" height="18" rx="3" />
+                        <path d="M9 8h6" />
+                        <path d="M9 12h6" />
+                        <path d="M9 16h4" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-[family:var(--font-display)] text-xl font-bold text-white">
+                        {report.source_filename || report.overview.dataset_name}
+                      </p>
+                      <p className="mt-1 font-[family:var(--font-mono)] text-[0.72rem] uppercase tracking-[0.14em] text-white/28">
+                        {report.overview.row_count.toLocaleString()} rows · {report.overview.column_count} columns
+                        {report.saved_at ? ` · saved ${formatDate(report.saved_at)}` : ""}
+                      </p>
+                      <p className="mt-3 max-w-4xl text-sm leading-6 text-white/48">{report.insights.summary}</p>
+                    </div>
                   </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{report.overview.column_count}</p>
-                    <p className="stat-row-label">Columns</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{report.overview.total_missing_values.toLocaleString()}</p>
-                    <p className="stat-row-label">Missing values</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{report.overview.duplicate_row_count.toLocaleString()}</p>
-                    <p className="stat-row-label">Duplicates</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
-                    <p className="stat-row-label">Quality score</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{report.ml_experiments.length}</p>
-                    <p className="stat-row-label">ML experiments</p>
+
+                  <div className="flex flex-wrap gap-2 xl:justify-end">
+                    <span className="desktop-badge" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                      <span className="desktop-status-dot" />
+                      {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                    </span>
+                    <span className="desktop-badge" data-tone="purple">Active dataset</span>
+                    {report.schema.target_candidates.length > 0 ? (
+                      <span className="desktop-badge" data-tone="amber">
+                        {report.schema.target_candidates.length} target candidate{report.schema.target_candidates.length === 1 ? "" : "s"}
+                      </span>
+                    ) : null}
                   </div>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="info-chip">
-                    <span className="pulse-dot" />
-                    {report.insights.modeling_readiness.is_ready ? "Modeling-ready" : "EDA-first recommended"}
-                  </span>
-                  {report.schema.target_candidates.length > 0 && (
-                    <span className="info-chip">{report.schema.target_candidates.length} target candidate{report.schema.target_candidates.length === 1 ? "" : "s"}</span>
-                  )}
-                </div>
-              </div>
+              </section>
             ) : null}
 
-            {showWorkspaceNavigation ? (
-              <div id="analysis-workspace-navigation" className="tablet-up route-scroll-target border-b border-white/6 pb-4">
+            {showWorkspaceNavigation && hasRenderableReport ? (
+              <section id="analysis-workspace-navigation" className="tablet-up route-scroll-target desktop-panel" style={{ paddingBottom: 0 }}>
                 <p className="px-1 text-xs uppercase tracking-[0.2em] text-white/42">Report sections</p>
 
                 {/* Tablet+: horizontal scroll tab bar */}
@@ -447,34 +443,98 @@ function AnalysisPageContent() {
                   </div>
                 </div>
 
-                <p className="analysis-subnav-description px-1 pt-3 text-sm leading-6 text-white/50">{activeTabDescription}</p>
-              </div>
+                <p className="analysis-subnav-description px-1 pb-4 pt-3 text-sm leading-6 text-white/50">{activeTabDescription}</p>
+              </section>
             ) : null}
 
             {placeholderState ? (
-              <article className="flow-section">
-                <p className="flow-section-label">{placeholderState.eyebrow}</p>
-                <p className="mt-2 font-[family:var(--font-display)] text-xl font-bold text-white">
-                  {placeholderState.title}
-                </p>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
-                  {placeholderState.description}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
-                    {placeholderState.primaryLabel}
-                  </ScrollIntentLink>
-                  {placeholderState.secondaryHref && placeholderState.secondaryLabel ? (
-                    <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70">
-                      {placeholderState.secondaryLabel}
+              <>
+                <article className="phone-only flow-section">
+                  <p className="flow-section-label">{placeholderState.eyebrow}</p>
+                  <p className="mt-2 font-[family:var(--font-display)] text-xl font-bold text-white">
+                    {placeholderState.title}
+                  </p>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
+                    {placeholderState.description}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
+                      {placeholderState.primaryLabel}
                     </ScrollIntentLink>
-                  ) : null}
-                </div>
-              </article>
+                    {placeholderState.secondaryHref && placeholderState.secondaryLabel ? (
+                      <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70">
+                        {placeholderState.secondaryLabel}
+                      </ScrollIntentLink>
+                    ) : null}
+                  </div>
+                </article>
+
+                <section className="tablet-up desktop-empty-panel section-glow">
+                  <div className="desktop-empty-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="5" y="3" width="14" height="18" rx="3" />
+                      <path d="M9 8h6" />
+                      <path d="M9 12h6" />
+                      <path d="M9 16h4" />
+                      <circle cx="18" cy="18" r="3" />
+                    </svg>
+                  </div>
+                  <p className="desktop-section-title">{placeholderState.title}</p>
+                  <p className="desktop-section-text max-w-md">{placeholderState.description}</p>
+                  <div className="desktop-step-list mt-5 justify-center">
+                    {["Go to Uploads", "Import file", "Open in Analysis"].map((label, index) => (
+                      <span key={label} className="desktop-step-pill">
+                        <strong>{index + 1}</strong>
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-5 flex flex-wrap justify-center gap-3">
+                    <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-lg bg-[#7c3aed] px-5 py-2.5 text-sm font-semibold text-[#f3e8ff]">
+                      {placeholderState.primaryLabel}
+                    </ScrollIntentLink>
+                    {placeholderState.secondaryHref && placeholderState.secondaryLabel ? (
+                      <ScrollIntentLink href={placeholderState.secondaryHref} className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70">
+                        {placeholderState.secondaryLabel}
+                      </ScrollIntentLink>
+                    ) : null}
+                  </div>
+                </section>
+              </>
+            ) : null}
+
+            {visibleTab === "overview" && hasRenderableReport && report ? (
+              <div className="tablet-up grid gap-4 xl:grid-cols-3">
+                <article className="desktop-stat-card">
+                  <p className="desktop-stat-label">Total rows</p>
+                  <p className="desktop-stat-value">{report.overview.row_count.toLocaleString()}</p>
+                  <p className="desktop-stat-hint">
+                    {report.overview.duplicate_row_count === 0
+                      ? "No duplicates found"
+                      : `${report.overview.duplicate_row_count.toLocaleString()} duplicate row${report.overview.duplicate_row_count === 1 ? "" : "s"}`}
+                  </p>
+                </article>
+                <article className="desktop-stat-card">
+                  <p className="desktop-stat-label">Columns</p>
+                  <p className="desktop-stat-value">{report.overview.column_count.toLocaleString()}</p>
+                  <p className="desktop-stat-hint">
+                    {(report.schema.type_counts.numeric ?? 0)} numeric · {((report.schema.type_counts.categorical ?? 0) + (report.schema.type_counts.text ?? 0) + (report.schema.type_counts.boolean ?? 0))} non-numeric · {(report.schema.type_counts.datetime ?? 0)} date
+                  </p>
+                </article>
+                <article className="desktop-stat-card">
+                  <p className="desktop-stat-label">Missing values</p>
+                  <p className="desktop-stat-value">{report.overview.total_missing_values.toLocaleString()}</p>
+                  <p className="desktop-stat-hint">
+                    {report.overview.total_missing_values === 0
+                      ? "No missing cells detected"
+                      : `${calculateQualityScore(report.overview, report.quality).toFixed(1)} quality score`}
+                  </p>
+                </article>
+              </div>
             ) : null}
 
             {/* Inline tab content — tablet+ only (phone uses slide pages) */}
-            <div className="tablet-up">
+            <div className="tablet-up space-y-4">
             {visibleTab === "overview" && hasRenderableReport && report ? (
               <OverviewTab
                 overview={report.overview}

@@ -8,6 +8,7 @@ import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
 import { AnalysisListItem } from "@/lib/analysisTypes";
 import { isAnalysisStateStorageEvent } from "@/lib/currentAnalysis";
+import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
 
 const workflowSteps = [
@@ -145,6 +146,8 @@ const featureMechanics = [
   },
 ];
 
+const desktopWorkflowPills = ["Upload", "Analyse", "Export"];
+
 export default function DashboardPage() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -206,8 +209,38 @@ export default function DashboardPage() {
   }, []);
 
   const latest = analyses[0] ?? null;
+  const recentAnalyses = analyses.slice(0, 4);
   const mlReadyRuns = analyses.filter((item) => item.insights.modeling_readiness.is_ready).length;
   const totalExperiments = analyses.reduce((sum, item) => sum + item.experiment_count, 0);
+  const activityItems = [
+    analyses.length
+      ? {
+          title: `${analyses.length} saved run${analyses.length === 1 ? "" : "s"} in the workspace`,
+          detail: `${mlReadyRuns} ${mlReadyRuns === 1 ? "run looks" : "runs look"} ready for optional ML.`,
+        }
+      : {
+          title: "Workspace initialised",
+          detail: "Upload the first dataset to start the archive and analysis flow.",
+        },
+    latest
+      ? {
+          title: `Latest dataset: ${latest.overview.dataset_name}`,
+          detail: `Saved ${formatDate(latest.saved_at)} with ${latest.experiment_count} ML experiment${latest.experiment_count === 1 ? "" : "s"}.`,
+        }
+      : {
+          title: "Awaiting first upload",
+          detail: "Uploads will appear here once a CSV has been processed.",
+        },
+    totalExperiments
+      ? {
+          title: `${totalExperiments} ML experiment${totalExperiments === 1 ? "" : "s"} stored`,
+          detail: "Reopen them from Analysis or History whenever you need the saved outputs.",
+        }
+      : {
+          title: "No ML experiments yet",
+          detail: "Run ML from the Analysis workspace after the dataset looks stable enough.",
+        },
+  ];
   const stats = [
     {
       label: "Saved runs",
@@ -229,9 +262,9 @@ export default function DashboardPage() {
   return (
     <>
       <AppShell
-        eyebrow="Analysis Dashboard"
-        title="Navigate the studio from upload to model review"
-        description="Use Uploads for dataset intake, Analysis for the full report, History for saved runs and downloads, and Account for security and cleanup actions."
+        eyebrow="Overview"
+        title="Dashboard"
+        description="Good morning - your workspace is ready."
         stats={stats}
       >
         {error ? (
@@ -317,81 +350,95 @@ export default function DashboardPage() {
               <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
             </div>
 
-            {/* ─── Desktop: clean flowing sections ─── */}
-            <div className="tablet-up space-y-0">
-
-              {/* Workflow */}
-              <section className="flow-section section-glow">
-                <p className="flow-section-label">Recommended workflow</p>
-                <div className="accent-bar" />
-                <div className="mt-4 grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
-                  {workflowSteps.map((step, i) => (
-                    <div key={step.title}>
-                      <p className="flex items-baseline gap-2 text-sm font-semibold text-white">
-                        <span className="text-xs text-white/30">{i + 1}</span>
-                        {step.title}
-                      </p>
-                      <p className="mt-1.5 text-sm leading-6 text-white/55">{step.detail}</p>
-                    </div>
+            <div className="tablet-up desktop-page-stack">
+              <section className="desktop-hero-panel section-glow">
+                <span className="desktop-kicker">Getting started</span>
+                <h2 className="desktop-section-title">Navigate the studio from upload to model review</h2>
+                <p className="desktop-section-text">Upload a dataset, review the explanation first, then reopen saved history or export ML outputs when the report is ready.</p>
+                <div className="desktop-step-list">
+                  {desktopWorkflowPills.map((label, index) => (
+                    <span key={label} className="desktop-step-pill">
+                      <strong>{index + 1}</strong>
+                      {label}
+                    </span>
                   ))}
                 </div>
               </section>
 
-              {/* Studio pages */}
-              <section className="flow-section">
-                <div className="flex items-baseline justify-between gap-4">
-                  <p className="flow-section-label"><span className="pulse-dot mr-2" />Studio pages</p>
-                  <ScrollIntentLink href="/history" className="inline-tag">
-                    Open history archive
-                  </ScrollIntentLink>
-                </div>
-                <div className="mt-3">
-                  {destinationCards.map((item) => (
-                    <ScrollIntentLink
-                      key={`${item.href}-${item.title}`}
-                      href={item.href}
-                      className="list-row group"
-                    >
-                      <div className="list-row-content">
-                        <p className="list-row-title">{item.title}</p>
-                        <p className="list-row-hint">{item.detail}</p>
+              <div className="desktop-grid-2">
+                <section className="desktop-panel">
+                  <div className="desktop-panel-header">
+                    <p className="desktop-panel-title">Recent uploads</p>
+                    <ScrollIntentLink href="/batch" className="desktop-panel-action">Open uploads</ScrollIntentLink>
+                  </div>
+
+                  {recentAnalyses.length ? (
+                    <div className="desktop-data-table-wrap">
+                      <table className="desktop-data-table">
+                        <thead>
+                          <tr>
+                            <th>Dataset</th>
+                            <th>Rows</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {recentAnalyses.map((analysis) => (
+                            <tr key={analysis.id}>
+                              <td>
+                                <div>
+                                  <div>{analysis.overview.dataset_name}</div>
+                                  <div className="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-white/28">{analysis.source_filename}</div>
+                                </div>
+                              </td>
+                              <td>{analysis.overview.row_count.toLocaleString()}</td>
+                              <td>
+                                <span className="desktop-badge" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                                  <span className="desktop-status-dot" />
+                                  {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                                </span>
+                              </td>
+                              <td>
+                                <ScrollIntentLink href={`/analysis?analysisId=${analysis.id}`} className="desktop-panel-action">
+                                  Open run
+                                </ScrollIntentLink>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="desktop-empty-panel">
+                      <div className="desktop-empty-icon">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 3v12" />
+                          <path d="m7 8 5-5 5 5" />
+                          <path d="M5 15v3a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-3" />
+                        </svg>
                       </div>
-                      <span className="text-sm text-white/30 transition group-hover:text-[#ffcfaa]">{item.cta} →</span>
-                    </ScrollIntentLink>
-                  ))}
-                </div>
-              </section>
-
-              {/* Analysis tabs */}
-              <section className="flow-section">
-                <div className="flex items-baseline justify-between gap-4">
-                  <p className="flow-section-label">Analysis tabs</p>
-                  <ScrollIntentLink href="/analysis" className="inline-tag">
-                    Open analysis workspace
-                  </ScrollIntentLink>
-                </div>
-                <div className="mt-4 grid gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
-                  {analysisTabCards.map((item) => (
-                    <div key={item.title}>
-                      <p className="text-sm font-semibold text-white">{item.title}</p>
-                      <p className="mt-1.5 text-sm leading-6 text-white/55">{item.detail}</p>
+                      <p className="desktop-section-title text-[1.2rem]">No datasets uploaded</p>
+                      <p className="desktop-section-text max-w-sm">Drop a CSV or open the Uploads workspace to create the first saved run.</p>
+                      <ScrollIntentLink href="/batch" className="mt-4 rounded-lg bg-[#14b8a6] px-5 py-2.5 text-sm font-semibold text-[#042226]">
+                        Upload dataset
+                      </ScrollIntentLink>
                     </div>
-                  ))}
-                </div>
-              </section>
+                  )}
+                </section>
 
-              {/* History archive */}
-              <section className="flow-section">
-                <div className="flex items-baseline justify-between gap-4">
-                  <p className="flow-section-label">History archive</p>
-                  <ScrollIntentLink href="/history" className="inline-tag">
-                    Open history
-                  </ScrollIntentLink>
-                </div>
-                <div className="mt-3 grid gap-6 xl:grid-cols-[1fr_auto]">
-                  <div>
-                    {historyFeatureCards.map((item) => (
+                <section className="desktop-panel">
+                  <div className="desktop-panel-header">
+                    <p className="desktop-panel-title">Activity</p>
+                    <ScrollIntentLink href="/history" className="desktop-panel-action">History</ScrollIntentLink>
+                  </div>
+                  <div className="space-y-3">
+                    {activityItems.map((item, index) => (
                       <div key={item.title} className="list-row">
+                        <span className="desktop-badge" data-tone={index === 0 ? "purple" : index === 1 ? "teal" : "amber"}>
+                          <span className="desktop-status-dot" />
+                          {index === 0 ? "Studio" : index === 1 ? "Latest" : "ML"}
+                        </span>
                         <div className="list-row-content">
                           <p className="list-row-title">{item.title}</p>
                           <p className="list-row-hint">{item.detail}</p>
@@ -399,52 +446,63 @@ export default function DashboardPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="stat-row xl:flex-col xl:gap-4">
-                    <div className="stat-row-item">
-                      <p className="stat-row-value">{latest ? latest.overview.dataset_name : "—"}</p>
-                      <p className="stat-row-label">Latest run</p>
-                    </div>
-                    <div className="stat-row-item">
-                      <p className="stat-row-value">{analyses.length}</p>
-                      <p className="stat-row-label">Saved runs</p>
-                    </div>
-                    <div className="stat-row-item">
-                      <p className="stat-row-value">{totalExperiments}</p>
-                      <p className="stat-row-label">ML experiments</p>
-                    </div>
-                  </div>
-                </div>
-              </section>
+                </section>
+              </div>
 
-              {/* Features */}
-              <section className="flow-section section-glow">
-                <p className="flow-section-label">How features work</p>
-                <div className="accent-bar" />
-                <div className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-2 xl:grid-cols-3">
+              <div className="desktop-grid-2">
+                <section className="desktop-panel">
+                  <div className="desktop-panel-header">
+                    <p className="desktop-panel-title">Studio pages</p>
+                    <ScrollIntentLink href="/history" className="desktop-panel-action">Open archive</ScrollIntentLink>
+                  </div>
+                  <div>
+                    {destinationCards.map((item) => (
+                      <ScrollIntentLink
+                        key={`${item.href}-${item.title}`}
+                        href={item.href}
+                        className="list-row group"
+                      >
+                        <div className="list-row-content">
+                          <p className="list-row-title">{item.title}</p>
+                          <p className="list-row-hint">{item.detail}</p>
+                        </div>
+                        <span className="desktop-panel-action">{item.cta}</span>
+                      </ScrollIntentLink>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="desktop-panel">
+                  <div className="desktop-panel-header">
+                    <p className="desktop-panel-title">Analysis tabs</p>
+                    <ScrollIntentLink href="/analysis" className="desktop-panel-action">Open workspace</ScrollIntentLink>
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {analysisTabCards.map((item) => (
+                      <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                        <p className="text-sm font-semibold text-white">{item.title}</p>
+                        <p className="mt-2 text-sm leading-6 text-white/52">{item.detail}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <section className="desktop-panel section-glow">
+                <div className="desktop-panel-header">
+                  <p className="desktop-panel-title">How features work</p>
+                  <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="desktop-panel-action">
+                    {latest ? "Open latest run" : "Open uploads"}
+                  </ScrollIntentLink>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {featureMechanics.map((item) => (
-                    <div key={item.title}>
-                      <p className="text-xs font-bold uppercase tracking-wide" style={{ color: item.accent }}>{item.title}</p>
-                      <p className="mt-2 text-sm leading-6 text-white/60">{item.detail}</p>
-                      <p className="mt-1.5 text-sm leading-6 text-white/40">{item.flow}</p>
+                    <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                      <p className="text-[0.64rem] font-bold uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.title}</p>
+                      <p className="mt-2 text-sm leading-6 text-white/58">{item.detail}</p>
+                      <p className="mt-1.5 text-sm leading-6 text-white/38">{item.flow}</p>
                     </div>
                   ))}
-                </div>
-              </section>
-
-              {/* Quick actions strip */}
-              <section className="flow-section">
-                <div className="flex flex-wrap items-center gap-4">
-                  <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
-                    {latest ? "Open latest run" : "Open uploads page"}
-                  </ScrollIntentLink>
-                  <ScrollIntentLink href="/history" className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70">
-                    View saved history
-                  </ScrollIntentLink>
-                  <p className="text-sm text-white/40">
-                    {latest
-                      ? `${latest.overview.dataset_name} is the most recent saved run.`
-                      : "No saved analysis yet — upload a CSV to get started."}
-                  </p>
                 </div>
               </section>
             </div>

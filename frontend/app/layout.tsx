@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { DM_Mono, Manrope, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import GlobalOverlays from "@/components/ui/GlobalOverlays";
@@ -14,6 +14,12 @@ const bodyFont = Manrope({
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
+});
+
+const monoFont = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
 });
 
 export const viewport: Viewport = {
@@ -44,7 +50,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${bodyFont.variable} ${displayFont.variable}`}
+      className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`}
     >
       <body suppressHydrationWarning className="antialiased">
         <MobileSlideProvider>
