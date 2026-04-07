@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
-import BrandMark from "@/components/ui/BrandMark";
 
 const SIDEBAR_STORAGE_KEY = "analysis-studio:desktop-sidebar-collapsed";
 
@@ -147,34 +146,16 @@ export default function TopNav() {
       }}
     >
       <div className="desktop-sidebar-brand">
-        <button
-          type="button"
-          className="desktop-sidebar-brand-lockup"
-          onClick={() => {
-            if (collapsed) {
-              setCollapsed(false);
-            }
-          }}
-          aria-label="Analysis Studio navigation"
-        >
-          <BrandMark compact withCopy={false} />
-          <div className="nav-brand-copy">
-            <p className="nav-brand-title">Analysis Studio</p>
-            <p className="nav-brand-subtitle">Tabular analysis workspace</p>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          className="desktop-sidebar-toggle"
-          onClick={() => setCollapsed((current) => !current)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          aria-expanded={!collapsed}
-        >
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 4.5h10M3 8h10M3 11.5h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          </svg>
-        </button>
+        <div className="desktop-sidebar-brand-lockup">
+          {collapsed ? (
+            <span className="nav-brand-monogram">AS</span>
+          ) : (
+            <div className="nav-brand-copy">
+              <p className="nav-brand-title">Analysis Studio</p>
+              <p className="nav-brand-subtitle">Tabular analysis workspace</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <p className="desktop-sidebar-label">Workspace</p>
