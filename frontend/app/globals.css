@@ -386,13 +386,13 @@ body::after {
     padding: 1.15rem 1.7rem 1.9rem;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-brand {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .desktop-sidebar-brand {
     align-items: center;
     justify-content: center;
     padding: 0.55rem 0.5rem 0.65rem;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-brand-lockup {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .desktop-sidebar-brand-lockup {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -403,9 +403,9 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-brand-copy,
-  .desktop-sidebar[data-collapsed="true"] .nav-link-label,
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-copy {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-brand-copy,
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link-label,
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-copy {
     opacity: 0;
     overflow: hidden;
     pointer-events: none;
@@ -413,13 +413,13 @@ body::after {
     transition-delay: 0ms;
   }
 
-  .desktop-sidebar[data-collapsed="false"] .nav-brand-copy,
-  .desktop-sidebar[data-collapsed="false"] .nav-link-label,
-  .desktop-sidebar[data-collapsed="false"] .profile-menu-copy {
-    transition-delay: 90ms;
+  .desktop-sidebar[data-collapsed="false"][data-interactive="true"] .nav-brand-copy,
+  .desktop-sidebar[data-collapsed="false"][data-interactive="true"] .nav-link-label,
+  .desktop-sidebar[data-collapsed="false"][data-interactive="true"] .profile-menu-copy {
+    transition-delay: 0ms;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-label {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .desktop-sidebar-label {
     margin: 0 1rem;
     max-height: 0;
     opacity: 0;
@@ -429,11 +429,11 @@ body::after {
     transition-delay: 0ms;
   }
 
-  .desktop-sidebar[data-collapsed="false"] .desktop-sidebar-label {
-    transition-delay: 90ms;
+  .desktop-sidebar[data-collapsed="false"][data-interactive="true"] .desktop-sidebar-label {
+    transition-delay: 0ms;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-links-scroll {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-links-scroll {
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-start;
@@ -442,7 +442,7 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-links-track {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-links-track {
     align-content: start;
     display: flex;
     flex-direction: column;
@@ -452,7 +452,7 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-link {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link {
     align-items: center;
     background: transparent;
     border-color: transparent;
@@ -464,7 +464,7 @@ body::after {
     padding: 0.75rem 0;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-links-scroll-collapsed {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-links-scroll-collapsed {
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-start;
@@ -472,7 +472,7 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-links-track-collapsed {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-links-track-collapsed {
     align-content: start;
     display: flex;
     flex-direction: column;
@@ -482,24 +482,24 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-link-collapsed {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link-collapsed {
     flex: 0 0 auto;
     height: 2.85rem;
     min-height: 2.85rem;
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-link:hover,
-  .desktop-sidebar[data-collapsed="true"] .nav-link-active {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link:hover,
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link-active {
     background: transparent;
     border-color: transparent;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-link-active {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link-active {
     color: #dbe8ff;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .nav-link-icon {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .nav-link-icon {
     display: inline-flex;
     height: 1.05rem;
     margin: 0;
@@ -507,20 +507,20 @@ body::after {
     width: 1.05rem;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .desktop-sidebar-profile {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .desktop-sidebar-profile {
     align-items: center;
     display: flex;
     justify-content: center;
     padding: 0.55rem 0.75rem 0.65rem;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-shell-sidebar {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-shell-sidebar {
     display: flex;
     justify-content: center;
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-sidebar-button {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-sidebar-button {
     align-items: center;
     aspect-ratio: 1;
     background: transparent;
@@ -535,18 +535,18 @@ body::after {
     width: 100%;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-sidebar-button:hover,
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-sidebar-button:disabled {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-sidebar-button:hover,
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-sidebar-button:disabled {
     background: transparent;
     border-color: transparent;
     opacity: 1;
   }
 
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-popover-sidebar {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-popover-sidebar {
     width: min(18.5rem, calc(100vw - 2rem));
   }
 
-  .desktop-sidebar[data-collapsed="true"] .profile-menu-avatar {
+  .desktop-sidebar:is([data-collapsed="true"], [data-interactive="false"]) .profile-menu-avatar {
     font-size: 0.78rem;
     height: 1.65rem;
     width: 1.65rem;
@@ -976,8 +976,8 @@ body::after {
 .nav-link-label,
 .profile-menu-copy {
   transition:
-    opacity 140ms ease,
-    transform 190ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 110ms ease,
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
@@ -985,8 +985,8 @@ body::after {
   transition:
     margin 180ms ease,
     max-height 180ms ease,
-    opacity 140ms ease,
-    transform 190ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 110ms ease,
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-brand-copy {

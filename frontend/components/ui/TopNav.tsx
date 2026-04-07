@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
@@ -104,7 +104,7 @@ export default function TopNav() {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
     if (sidebar) {
       sidebar.dataset.collapsed = collapsed ? "true" : "false";
@@ -120,6 +120,7 @@ export default function TopNav() {
   }, [collapsed, interactive]);
 
   const navInteractive = !collapsed && interactive;
+  const contentCollapsed = !navInteractive;
 
   const linkClass = (match: string) =>
     `nav-link ${
@@ -131,7 +132,7 @@ export default function TopNav() {
   return (
     <div
       ref={surfaceRef}
-      className={`nav-surface ${collapsed ? "nav-surface-collapsed" : ""}`}
+      className={`nav-surface ${contentCollapsed ? "nav-surface-collapsed" : ""}`}
       data-interactive={navInteractive ? "true" : "false"}
       tabIndex={navInteractive ? -1 : 0}
       aria-label="Workspace navigation"
@@ -167,15 +168,15 @@ export default function TopNav() {
 
       <p className="desktop-sidebar-label">Workspace</p>
 
-      <div className={`nav-links-scroll ${collapsed ? "nav-links-scroll-collapsed" : ""}`}>
-        <div className={`nav-links-track ${collapsed ? "nav-links-track-collapsed" : ""}`}>
+      <div className={`nav-links-scroll ${contentCollapsed ? "nav-links-scroll-collapsed" : ""}`}>
+        <div className={`nav-links-track ${contentCollapsed ? "nav-links-track-collapsed" : ""}`}>
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`${linkClass(item.match)} ${collapsed ? "nav-link-collapsed" : ""}`}
-              title={collapsed ? item.label : undefined}
-              aria-label={collapsed ? item.label : undefined}
+              className={`${linkClass(item.match)} ${contentCollapsed ? "nav-link-collapsed" : ""}`}
+              title={contentCollapsed ? item.label : undefined}
+              aria-label={contentCollapsed ? item.label : undefined}
               aria-disabled={!navInteractive || undefined}
               tabIndex={navInteractive ? undefined : -1}
               onClick={(event) => {
