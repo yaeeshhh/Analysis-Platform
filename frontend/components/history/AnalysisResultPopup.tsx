@@ -317,11 +317,16 @@ export default function AnalysisResultPopup({
         </div>
       </div>
 
-      <BackToTopButton
-        scrollContainerRef={scrollContainerRef}
-        threshold={320}
-        className="bottom-5 right-5 z-[145] sm:bottom-6 sm:right-6"
-      />
+      <div
+        onMouseDown={(event) => event.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <BackToTopButton
+          scrollContainerRef={scrollContainerRef}
+          threshold={320}
+          className="bottom-5 right-5 z-[145] sm:bottom-6 sm:right-6"
+        />
+      </div>
     </div>
   );
 }

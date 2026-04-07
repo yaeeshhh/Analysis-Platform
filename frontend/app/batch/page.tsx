@@ -16,8 +16,8 @@ import { type AnalysisListItem } from "@/lib/analysisTypes";
 import {
   clearCurrentAnalysisSelection,
   getCurrentAnalysisSelection,
-  isAnalysisStateStorageEvent,
   notifyAnalysesChanged,
+  subscribeToAnalysisStateChanges,
   setCurrentAnalysisSelection,
 } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
@@ -114,20 +114,19 @@ export default function BatchPage() {
       void bootstrap();
     };
 
-    const handleStorage = (event: StorageEvent) => {
-      if (!active || !isAnalysisStateStorageEvent(event)) return;
-      void bootstrap();
-    };
+    const unsubscribeAnalysisState = subscribeToAnalysisStateChanges(() => {
+      if (!active) return;
+      void refreshAnalyses(getCurrentAnalysisSelection());
+    });
 
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
-    window.addEventListener("storage", handleStorage);
 
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
-      window.removeEventListener("storage", handleStorage);
+      unsubscribeAnalysisState();
     };
   }, []);
 

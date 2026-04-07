@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
 
+const SIDEBAR_OPEN_DELAY_MS = 220;
+
 const navItems = [
   { href: "/dashboard", label: "Dashboard", match: "/dashboard", icon: "dashboard" },
   { href: "/batch", label: "Uploads", match: "/batch", icon: "uploads" },
@@ -59,20 +61,65 @@ function NavIcon({ kind }: { kind: (typeof navItems)[number]["icon"] }) {
 export default function TopNav() {
   const pathname = usePathname();
   const surfaceRef = useRef<HTMLDivElement | null>(null);
+  const interactiveTimerRef = useRef<number | null>(null);
   const [collapsed, setCollapsed] = useState(true);
+  const [interactive, setInteractive] = useState(false);
+
+  const clearInteractiveTimer = () => {
+    if (interactiveTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(interactiveTimerRef.current);
+    interactiveTimerRef.current = null;
+  };
+
+  const openNav = () => {
+    if (!collapsed && interactive) {
+      return;
+    }
+
+    setCollapsed(false);
+
+    if (interactive) {
+      return;
+    }
+
+    clearInteractiveTimer();
+    interactiveTimerRef.current = window.setTimeout(() => {
+      setInteractive(true);
+      interactiveTimerRef.current = null;
+    }, SIDEBAR_OPEN_DELAY_MS);
+  };
+
+  const closeNav = () => {
+    clearInteractiveTimer();
+    setInteractive(false);
+    setCollapsed(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearInteractiveTimer();
+    };
+  }, []);
 
   useEffect(() => {
     const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
     if (sidebar) {
       sidebar.dataset.collapsed = collapsed ? "true" : "false";
+      sidebar.dataset.interactive = interactive ? "true" : "false";
     }
 
     return () => {
       if (sidebar) {
         delete sidebar.dataset.collapsed;
+        delete sidebar.dataset.interactive;
       }
     };
-  }, [collapsed]);
+  }, [collapsed, interactive]);
+
+  const navInteractive = !collapsed && interactive;
 
   const linkClass = (match: string) =>
     `nav-link ${
@@ -85,18 +132,21 @@ export default function TopNav() {
     <div
       ref={surfaceRef}
       className={`nav-surface ${collapsed ? "nav-surface-collapsed" : ""}`}
-      onMouseEnter={() => setCollapsed(false)}
-      onMouseLeave={() => setCollapsed(true)}
-      onFocusCapture={() => setCollapsed(false)}
+      data-interactive={navInteractive ? "true" : "false"}
+      tabIndex={navInteractive ? -1 : 0}
+      aria-label="Workspace navigation"
+      onMouseEnter={openNav}
+      onMouseLeave={closeNav}
+      onFocusCapture={openNav}
       onBlurCapture={(event) => {
         const nextFocusTarget = event.relatedTarget as Node | null;
         if (!nextFocusTarget || !event.currentTarget.contains(nextFocusTarget)) {
-          setCollapsed(true);
+          closeNav();
         }
       }}
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
-        setCollapsed(true);
+        closeNav();
         const activeElement = document.activeElement;
         if (activeElement instanceof HTMLElement && event.currentTarget.contains(activeElement)) {
           activeElement.blur();
@@ -118,15 +168,22 @@ export default function TopNav() {
 
       <p className="desktop-sidebar-label">Workspace</p>
 
-      <div className="nav-links-scroll">
-        <div className="nav-links-track">
+      <div className={`nav-links-scroll ${collapsed ? "nav-links-scroll-collapsed" : ""}`}>
+        <div className={`nav-links-track ${collapsed ? "nav-links-track-collapsed" : ""}`}>
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={linkClass(item.match)}
+              className={`${linkClass(item.match)} ${collapsed ? "nav-link-collapsed" : ""}`}
               title={collapsed ? item.label : undefined}
               aria-label={collapsed ? item.label : undefined}
+              aria-disabled={!navInteractive || undefined}
+              tabIndex={navInteractive ? undefined : -1}
+              onClick={(event) => {
+                if (!navInteractive) {
+                  event.preventDefault();
+                }
+              }}
             >
               <span className="nav-link-icon" aria-hidden="true">
                 <NavIcon kind={item.icon} />
@@ -138,7 +195,7 @@ export default function TopNav() {
       </div>
 
       <div className="desktop-sidebar-profile">
-        <ProfileMenu variant="sidebar" onSidebarAction={() => setCollapsed(true)} />
+        <ProfileMenu variant="sidebar" disabled={!navInteractive} onSidebarAction={closeNav} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSec
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
 import { AnalysisListItem } from "@/lib/analysisTypes";
-import { isAnalysisStateStorageEvent } from "@/lib/currentAnalysis";
+import { subscribeToAnalysisStateChanges } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
 import type { User } from "@/lib/auth";
@@ -161,6 +161,16 @@ export default function DashboardPage() {
   useEffect(() => {
     let active = true;
 
+    const refreshAnalyses = async () => {
+      try {
+        setError("");
+        setAnalyses(await getAnalyses());
+      } catch (err: unknown) {
+        if (!active) return;
+        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+      }
+    };
+
     const bootstrap = async () => {
       if (!active) return;
       setLoading(true);
@@ -180,9 +190,7 @@ export default function DashboardPage() {
       setLoginRequired(false);
 
       try {
-        setAnalyses(await getAnalyses());
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+        await refreshAnalyses();
       } finally {
         if (active) setLoading(false);
       }
@@ -195,20 +203,19 @@ export default function DashboardPage() {
       void bootstrap();
     };
 
-    const handleStorage = (event: StorageEvent) => {
-      if (!active || !isAnalysisStateStorageEvent(event)) return;
-      void bootstrap();
-    };
+    const unsubscribeAnalysisState = subscribeToAnalysisStateChanges(() => {
+      if (!active) return;
+      void refreshAnalyses();
+    });
 
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
-    window.addEventListener("storage", handleStorage);
 
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
-      window.removeEventListener("storage", handleStorage);
+      unsubscribeAnalysisState();
     };
   }, []);
 

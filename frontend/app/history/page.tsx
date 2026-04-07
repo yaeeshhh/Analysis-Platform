@@ -17,11 +17,10 @@ import {
 } from "@/lib/analysisApi";
 import { AnalysisListItem, AnalysisReport } from "@/lib/analysisTypes";
 import {
-  ANALYSES_UPDATED_EVENT,
   clearCurrentAnalysisSelection,
   getCurrentAnalysisSelection,
-  isAnalysisStateStorageEvent,
   notifyAnalysesChanged,
+  subscribeToAnalysisStateChanges,
 } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
@@ -84,27 +83,19 @@ export default function HistoryPage() {
       void bootstrap();
     };
 
-    const handleStorage = (event: StorageEvent) => {
-      if (!active || !isAnalysisStateStorageEvent(event)) return;
-      void bootstrap();
-    };
-
-    const handleAnalysesChanged = () => {
+    const unsubscribeAnalysisState = subscribeToAnalysisStateChanges(() => {
       if (!active) return;
       void refreshHistoryList();
-    };
+    });
 
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
-    window.addEventListener("storage", handleStorage);
-    window.addEventListener(ANALYSES_UPDATED_EVENT, handleAnalysesChanged);
 
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
-      window.removeEventListener("storage", handleStorage);
-      window.removeEventListener(ANALYSES_UPDATED_EVENT, handleAnalysesChanged);
+      unsubscribeAnalysisState();
     };
   }, []);
 
