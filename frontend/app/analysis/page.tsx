@@ -33,7 +33,6 @@ import { calculateQualityScore } from "@/lib/analysisDerived";
 import { formatDate } from "@/lib/helpers";
 import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
-import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
 type AnalysisTabKey =
   | "overview"
@@ -341,44 +340,12 @@ function AnalysisPageContent() {
           <>
             {/* Phone: dataset summary + tappable section list for each tab */}
             {showWorkspaceNavigation && hasRenderableReport && report ? (
-              <div className="phone-only space-y-3">
-                {/* Inline dataset overview on mobile */}
-                <div className="mobile-inline-stats">
-                  <div className="mobile-inline-stat">
-                    <span className="mobile-inline-stat-value">{report.overview.row_count.toLocaleString()}</span>
-                    <span className="mobile-inline-stat-label">Rows</span>
-                  </div>
-                  <div className="mobile-inline-stat">
-                    <span className="mobile-inline-stat-value">{report.overview.column_count}</span>
-                    <span className="mobile-inline-stat-label">Columns</span>
-                  </div>
-                  <div className="mobile-inline-stat">
-                    <span className="mobile-inline-stat-value">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</span>
-                    <span className="mobile-inline-stat-label">Quality</span>
-                  </div>
-                </div>
-
-                <div className="border-b border-white/6 pb-3">
-                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Active dataset</p>
-                  <p className="mt-1 font-medium text-white">{report.overview.dataset_name}</p>
-                  <p className="mt-1.5 text-sm leading-6 text-white/55">{report.insights.summary}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="info-chip">
-                      <span className="pulse-dot" />
-                      {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                    </span>
-                    {report.overview.total_missing_values > 0 && (
-                      <span className="info-chip">{report.overview.total_missing_values.toLocaleString()} missing</span>
-                    )}
-                    {report.overview.duplicate_row_count > 0 && (
-                      <span className="info-chip">{report.overview.duplicate_row_count.toLocaleString()} duplicates</span>
-                    )}
-                    <span className="info-chip">{report.ml_experiments.length} ML experiment{report.ml_experiments.length === 1 ? "" : "s"}</span>
-                  </div>
-                </div>
-
-                <AnalysisMobileSections report={report} refreshAnalyses={refreshAnalyses} />
-              </div>
+              <AnalysisMobileSections
+                report={report}
+                activeTab={visibleTab}
+                onTabChange={handleTabChange}
+                refreshAnalyses={refreshAnalyses}
+              />
             ) : null}
 
             {showWorkspaceNavigation && hasRenderableReport && report ? (
@@ -657,115 +624,190 @@ export default function AnalysisPage() {
 
 /* ────────────────── Phone-only analysis tab slides ────────────────── */
 
-const tabAccents: Record<AnalysisTabKey, string> = {
-  overview: "#7ad6ff",
-  insights: "#9db8ff",
-  schema: "#a78bfa",
-  quality: "#5ae681",
-  statistics: "#bfb8ff",
-  relationships: "#f472b6",
-  visualisations: "#38bdf8",
-  ml: "#c084fc",
-};
-
 function AnalysisMobileSections({
   report,
+  activeTab,
+  onTabChange,
   refreshAnalyses,
 }: {
   report: AnalysisReport;
+  activeTab: AnalysisTabKey;
+  onTabChange: (nextTab: AnalysisTabKey) => void;
   refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
 }) {
-  const sections: MobileSection[] = [
-    {
-      id: "analysis-overview",
-      title: "Overview",
-      hint: `${report.overview.row_count.toLocaleString()} rows · ${report.overview.column_count} columns`,
-      accent: tabAccents.overview,
-      content: (
-        <OverviewTab
-          overview={report.overview}
-          schema={report.schema}
-          quality={report.quality}
-          insights={report.insights}
-        />
-      ),
-    },
-    {
-      id: "analysis-insights",
-      title: "Insights",
-      hint: report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first",
-      accent: tabAccents.insights,
-      content: <InsightsTab insights={report.insights} />,
-    },
-    {
-      id: "analysis-schema",
-      title: "Schema",
-      hint: `${report.schema.columns.length} columns profiled`,
-      accent: tabAccents.schema,
-      content: <SchemaTab schema={report.schema} />,
-    },
-    {
-      id: "analysis-quality",
-      title: "Data Quality",
-      hint: `Score ${calculateQualityScore(report.overview, report.quality).toFixed(1)}`,
-      accent: tabAccents.quality,
-      content: <DataQualityTab overview={report.overview} quality={report.quality} />,
-    },
-    {
-      id: "analysis-statistics",
-      title: "Statistics",
-      hint: `${report.statistics.numeric_summary.length} numeric · ${report.statistics.categorical_summary.length} categorical`,
-      accent: tabAccents.statistics,
-      content: <StatisticsTab statistics={report.statistics} />,
-    },
-    {
-      id: "analysis-relationships",
-      title: "Relationships",
-      hint: "Structural patterns and correlations",
-      accent: tabAccents.relationships,
-      content: <RelationshipsTab schema={report.schema} statistics={report.statistics} />,
-    },
-    {
-      id: "analysis-visualisations",
-      title: "Charts",
-      hint: "Visual summaries from the current run",
-      accent: tabAccents.visualisations,
-      content: <VisualisationsTab visualisations={report.visualisations} />,
-    },
-    {
-      id: "analysis-ml",
-      title: "ML Lab",
-      hint: `${report.ml_experiments.length} experiment${report.ml_experiments.length === 1 ? "" : "s"} saved`,
-      accent: tabAccents.ml,
-      content: (
-        <MLTab
-          key={`mobile-${report.analysis_id}:${report.ml_experiments.map((e) => e.id).join("|")}`}
-          analysisId={report.analysis_id}
-          capabilities={report.ml_capabilities}
-          experiments={report.ml_experiments || []}
-          initialUnsupervised={report.ml_results.unsupervised}
-          initialSupervised={report.ml_results.supervised}
-          onRunUnsupervised={async (nClusters) => {
-            const result = await runUnsupervisedAnalysis(report.analysis_id, nClusters);
-            await refreshAnalyses(report.analysis_id);
-            notifyAnalysesChanged();
-            return result;
-          }}
-          onRunSupervised={async (targetColumn) => {
-            const result = await runSupervisedAnalysis(report.analysis_id, targetColumn);
-            await refreshAnalyses(report.analysis_id);
-            notifyAnalysesChanged();
-            return result;
-          }}
-          onDeleteExperiment={async (experiment) => {
-            await deleteMlExperiment(report.analysis_id, experiment);
-            await refreshAnalyses(report.analysis_id, "ml");
-            notifyAnalysesChanged();
-          }}
-        />
-      ),
-    },
-  ];
+  let activeContent: React.ReactNode = null;
 
-  return <MobileSectionList sections={sections} />;
+  if (activeTab === "overview") {
+    activeContent = (
+      <OverviewTab
+        overview={report.overview}
+        schema={report.schema}
+        quality={report.quality}
+        insights={report.insights}
+      />
+    );
+  }
+
+  if (activeTab === "insights") {
+    activeContent = <InsightsTab insights={report.insights} />;
+  }
+
+  if (activeTab === "schema") {
+    activeContent = <SchemaTab schema={report.schema} />;
+  }
+
+  if (activeTab === "quality") {
+    activeContent = <DataQualityTab overview={report.overview} quality={report.quality} />;
+  }
+
+  if (activeTab === "statistics") {
+    activeContent = <StatisticsTab statistics={report.statistics} />;
+  }
+
+  if (activeTab === "relationships") {
+    activeContent = <RelationshipsTab schema={report.schema} statistics={report.statistics} />;
+  }
+
+  if (activeTab === "visualisations") {
+    activeContent = <VisualisationsTab visualisations={report.visualisations} />;
+  }
+
+  if (activeTab === "ml") {
+    activeContent = (
+      <MLTab
+        key={`mobile-${report.analysis_id}:${report.ml_experiments.map((e) => e.id).join("|")}`}
+        analysisId={report.analysis_id}
+        capabilities={report.ml_capabilities}
+        experiments={report.ml_experiments || []}
+        initialUnsupervised={report.ml_results.unsupervised}
+        initialSupervised={report.ml_results.supervised}
+        onRunUnsupervised={async (nClusters) => {
+          const result = await runUnsupervisedAnalysis(report.analysis_id, nClusters);
+          await refreshAnalyses(report.analysis_id);
+          notifyAnalysesChanged();
+          return result;
+        }}
+        onRunSupervised={async (targetColumn) => {
+          const result = await runSupervisedAnalysis(report.analysis_id, targetColumn);
+          await refreshAnalyses(report.analysis_id);
+          notifyAnalysesChanged();
+          return result;
+        }}
+        onDeleteExperiment={async (experiment) => {
+          await deleteMlExperiment(report.analysis_id, experiment);
+          await refreshAnalyses(report.analysis_id, "ml");
+          notifyAnalysesChanged();
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className="phone-only mobile-screen-stack">
+      <div className="mobile-screen-stats">
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">Rows</p>
+          <p className="mobile-screen-stat-value">{report.overview.row_count.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Dataset size</p>
+        </article>
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">Columns</p>
+          <p className="mobile-screen-stat-value">{report.overview.column_count.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Profiled fields</p>
+        </article>
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">Quality</p>
+          <p className="mobile-screen-stat-value">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
+          <p className="mobile-screen-stat-hint">Composite score</p>
+        </article>
+      </div>
+
+      <section className="mobile-screen-panel section-glow">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Active dataset</p>
+            <h2 className="mobile-screen-title">{report.source_filename || report.overview.dataset_name}</h2>
+            <p className="mobile-screen-meta">
+              {report.overview.dataset_name}
+              {report.saved_at ? ` • saved ${formatDate(report.saved_at)}` : ""}
+            </p>
+            <p className="mobile-screen-lead">{report.insights.summary}</p>
+          </div>
+        </div>
+        <div className="mobile-screen-pills">
+          <span className="mobile-screen-pill" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+            {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+          </span>
+          {report.overview.total_missing_values > 0 ? (
+            <span className="mobile-screen-pill">{report.overview.total_missing_values.toLocaleString()} missing</span>
+          ) : null}
+          {report.overview.duplicate_row_count > 0 ? (
+            <span className="mobile-screen-pill">{report.overview.duplicate_row_count.toLocaleString()} duplicates</span>
+          ) : null}
+          <span className="mobile-screen-pill" data-tone="purple">
+            {report.ml_experiments.length} ML experiment{report.ml_experiments.length === 1 ? "" : "s"}
+          </span>
+        </div>
+        <div className="mobile-screen-actions">
+          <button
+            type="button"
+            onClick={() => {
+              void downloadAnalysisReport(report.analysis_id);
+            }}
+            className="mobile-screen-button mobile-screen-button-secondary"
+          >
+            Export results
+          </button>
+          <button
+            type="button"
+            onClick={() => onTabChange("ml")}
+            className="mobile-screen-button mobile-screen-button-primary"
+          >
+            {activeTab === "ml" ? "ML lab open" : "Open ML lab"}
+          </button>
+        </div>
+      </section>
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Report section</p>
+            <h2 className="mobile-screen-title">Switch between the same desktop tabs</h2>
+          </div>
+        </div>
+        <div className="mobile-screen-field">
+          <label htmlFor="mobile-analysis-tab" className="mobile-screen-field-label">Current section</label>
+          <select
+            id="mobile-analysis-tab"
+            value={activeTab}
+            onChange={(event) => onTabChange(event.target.value as AnalysisTabKey)}
+            className="mobile-tab-select"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.key} value={tab.key}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p className="mobile-screen-lead">{tabDescriptions[activeTab]}</p>
+        <div className="mobile-screen-pills compact">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => onTabChange(tab.key)}
+              className={`mobile-filter-pill ${activeTab === tab.key ? "mobile-filter-pill-active" : ""}`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="mobile-screen-panel mobile-analysis-content-panel">
+        {activeContent}
+      </section>
+    </div>
+  );
 }

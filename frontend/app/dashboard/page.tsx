@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
-import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
 import { AnalysisListItem } from "@/lib/analysisTypes";
@@ -292,74 +291,7 @@ export default function DashboardPage() {
 
         {!loading ? (
           <>
-            {/* ─── Phone: inline content + tappable list → slides ─── */}
-            <div className="phone-only space-y-4">
-              {/* Quick stats strip */}
-              <div className="mobile-inline-stats">
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{analyses.length}</span>
-                  <span className="mobile-inline-stat-label">Saved runs</span>
-                </div>
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{mlReadyRuns}</span>
-                  <span className="mobile-inline-stat-label">ML-ready</span>
-                </div>
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{totalExperiments}</span>
-                  <span className="mobile-inline-stat-label">ML runs</span>
-                </div>
-              </div>
-
-              {/* Latest run info */}
-              {latest ? (
-                <div className="border-b border-white/6 pb-4">
-                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Latest run</p>
-                  <p className="mt-1 font-medium text-white">{latest.overview.dataset_name}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="info-chip">
-                      <span className="pulse-dot" />
-                      {latest.overview.row_count?.toLocaleString() ?? "—"} rows
-                    </span>
-                    <span className="info-chip">{latest.overview.column_count ?? "—"} cols</span>
-                    <span className="info-chip">{latest.insights.modeling_readiness.is_ready ? "ML Ready" : "EDA only"}</span>
-                  </div>
-                  <div className="mt-3 flex gap-2">
-                    <ScrollIntentLink href={`/analysis?analysisId=${latest.id}`} className="flex-1 rounded-lg bg-[#ffb079] px-4 py-2.5 text-center text-sm font-semibold text-[#11273b]">
-                      Open run
-                    </ScrollIntentLink>
-                    <ScrollIntentLink href="/batch" className="flex-1 rounded-lg border border-white/12 px-4 py-2.5 text-center text-sm text-white/70">
-                      Uploads
-                    </ScrollIntentLink>
-                  </div>
-                </div>
-              ) : (
-                <div className="border-b border-white/6 pb-4 text-center">
-                  <p className="text-sm text-white/45">No saved analysis yet</p>
-                  <ScrollIntentLink href="/batch" className="mt-2 inline-block rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
-                    Upload first dataset
-                  </ScrollIntentLink>
-                </div>
-              )}
-
-              {/* Quick links */}
-              <div className="flex flex-wrap gap-2 pb-2">
-                <ScrollIntentLink href="/batch" className="info-chip">Uploads →</ScrollIntentLink>
-                <ScrollIntentLink href="/analysis" className="info-chip">Analysis →</ScrollIntentLink>
-                <ScrollIntentLink href="/history" className="info-chip">History →</ScrollIntentLink>
-                <ScrollIntentLink href="/account" className="info-chip">Account →</ScrollIntentLink>
-              </div>
-
-              {/* Feature highlights */}
-              <div className="border-b border-white/6 pb-3">
-                <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">How it works</p>
-                <p className="mt-1.5 text-sm leading-6 text-white/55">
-                  Upload a CSV in Uploads, review the report in Analysis, and check saved runs in History. ML experiments are optional and run after the dataset looks ready.
-                </p>
-              </div>
-
-              {/* Section list for deeper drill-down */}
-              <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
-            </div>
+            <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
 
             <div className="tablet-up desktop-page-stack">
               <section className="desktop-hero-panel section-glow">
@@ -533,7 +465,7 @@ export default function DashboardPage() {
   );
 }
 
-/* ── Phone-only sections list ── */
+/* ── Phone and tablet dashboard layout ── */
 function DashboardMobileSections({
   analyses,
   latest,
@@ -543,135 +475,195 @@ function DashboardMobileSections({
   latest: AnalysisListItem | null;
   totalExperiments: number;
 }) {
-  const sections: MobileSection[] = [
-    {
-      id: "workflow",
-      title: "Recommended workflow",
-      hint: "Four steps from upload through analysis to ML review",
-      accent: "#7ad6ff",
-      content: (
-        <div className="space-y-3">
-          <div className="mini-bar"><div className="mini-bar-fill" style={{ width: "100%", background: "linear-gradient(90deg, var(--accent-cool), var(--accent-warm))" }} /></div>
-          {workflowSteps.map((step, i) => (
-            <div key={step.title} className="border-b border-white/6 pb-3 last:border-0">
-              <p className="flex items-baseline gap-2 text-sm font-semibold text-white">
-                <span className="text-xs text-white/30">{i + 1}</span>
-                {step.title}
-              </p>
-              <p className="mt-1 text-sm leading-6 text-white/55">{step.detail}</p>
-            </div>
-          ))}
+  const mlReadyRuns = analyses.filter((item) => item.insights.modeling_readiness.is_ready).length;
+  const recentAnalyses = analyses.slice(0, 3);
+
+  return (
+    <div className="phone-only mobile-screen-stack">
+      <div className="mobile-screen-stats">
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">Saved runs</p>
+          <p className="mobile-screen-stat-value">{analyses.length.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Workspace archive</p>
+        </article>
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">ML-ready</p>
+          <p className="mobile-screen-stat-value">{mlReadyRuns.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Ready for modeling</p>
+        </article>
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">ML runs</p>
+          <p className="mobile-screen-stat-value">{totalExperiments.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Saved experiments</p>
+        </article>
+      </div>
+
+      <section className="mobile-screen-panel section-glow">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Latest run</p>
+            <h2 className="mobile-screen-title">
+              {latest ? latest.overview.dataset_name : "Start with your first dataset"}
+            </h2>
+            <p className="mobile-screen-lead">
+              {latest
+                ? latest.insights.summary
+                : "Upload a CSV in Uploads, then return here to reopen the latest saved run and branch into Analysis or History."}
+            </p>
+          </div>
         </div>
-      ),
-    },
-    {
-      id: "pages",
-      title: "Studio pages",
-      hint: "Direct links to Uploads, Analysis, History, and Account",
-      accent: "#9db8ff",
-      content: (
-        <div>
+        <div className="mobile-screen-pills">
+          <span className="mobile-screen-pill" data-tone="teal">
+            {latest ? `${latest.overview.row_count.toLocaleString()} rows` : "CSV intake"}
+          </span>
+          <span className="mobile-screen-pill" data-tone="purple">
+            {latest ? `${latest.overview.column_count} columns` : "Guided workflow"}
+          </span>
+          <span className="mobile-screen-pill" data-tone={latest?.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+            {latest ? (latest.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first") : "History saved"}
+          </span>
+        </div>
+        <div className="mobile-screen-actions">
+          <ScrollIntentLink
+            href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"}
+            className="mobile-screen-button mobile-screen-button-primary"
+          >
+            {latest ? "Open latest run" : "Upload first dataset"}
+          </ScrollIntentLink>
+          <ScrollIntentLink href="/history" className="mobile-screen-button mobile-screen-button-secondary">
+            View history
+          </ScrollIntentLink>
+        </div>
+      </section>
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Studio map</p>
+            <h2 className="mobile-screen-title">Move between the core workspaces</h2>
+          </div>
+        </div>
+        <div className="mobile-screen-link-grid">
           {destinationCards.map((item) => (
-            <ScrollIntentLink
-              key={`${item.href}-${item.title}`}
-              href={item.href}
-              className="block border-b border-white/6 py-3 last:border-0"
-            >
-              <p className="text-sm font-semibold text-white">{item.title}</p>
-              <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
-              <p className="mt-1 text-sm font-medium text-[#ffcfaa]">{item.cta} →</p>
+            <ScrollIntentLink key={`${item.href}-${item.title}`} href={item.href} className="mobile-screen-link-card">
+              <p className="mobile-screen-link-title">{item.title}</p>
+              <p className="mobile-screen-link-copy">{item.detail}</p>
+              <span className="mobile-screen-link-cta">{item.cta}</span>
             </ScrollIntentLink>
           ))}
         </div>
-      ),
-    },
-    {
-      id: "tabs",
-      title: "Analysis tabs",
-      hint: "What each of the 8 tabs in the Analysis workspace shows",
-      accent: "#8bf1a8",
-      content: (
-        <div>
-          <ScrollIntentLink href="/analysis" className="mb-3 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
-            Open analysis workspace
-          </ScrollIntentLink>
-          {analysisTabCards.map((item) => (
-            <div key={item.title} className="border-b border-white/6 py-3 last:border-0">
-              <p className="text-sm font-semibold text-white">{item.title}</p>
-              <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      id: "history",
-      title: "History archive",
-      hint: "Tools for reopening, searching, and downloading past runs",
-      accent: "#bfb8ff",
-      content: (
-        <div>
-          <ScrollIntentLink href="/history" className="mb-3 block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
-            Open history tools
-          </ScrollIntentLink>
-          {historyFeatureCards.map((item) => (
-            <div key={item.title} className="border-b border-white/6 py-3 last:border-0">
-              <p className="text-sm font-semibold text-white">{item.title}</p>
-              <p className="mt-1 text-sm leading-6 text-white/55">{item.detail}</p>
-            </div>
-          ))}
-          <div className="mobile-inline-stats mt-3">
-            <div className="mobile-inline-stat">
-              <span className="mobile-inline-stat-value">{analyses.length}</span>
-              <span className="mobile-inline-stat-label">Saved runs</span>
-            </div>
-            <div className="mobile-inline-stat">
-              <span className="mobile-inline-stat-value">{totalExperiments}</span>
-              <span className="mobile-inline-stat-label">ML runs</span>
-            </div>
+      </section>
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Workflow</p>
+            <h2 className="mobile-screen-title">Keep the same desktop flow on mobile</h2>
           </div>
         </div>
-      ),
-    },
-    {
-      id: "features",
-      title: "How features work",
-      hint: "Product map for uploads, persistence, charts, experiments, and cleanup",
-      accent: "#d7b7ff",
-      content: (
-        <div>
-          {featureMechanics.map((item) => (
-            <div key={item.title} className="border-b border-white/6 py-3 last:border-0">
-              <p className="text-xs font-bold uppercase tracking-wide" style={{ color: item.accent }}>{item.title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/60">{item.detail}</p>
-              <p className="mt-1 text-sm leading-6 text-white/40">{item.flow}</p>
+        <div className="mobile-screen-list">
+          {workflowSteps.map((step, index) => (
+            <div key={step.title} className="mobile-screen-row">
+              <div className="mobile-screen-row-header">
+                <div className="mobile-screen-row-main">
+                  <p className="mobile-screen-row-title">{index + 1}. {step.title}</p>
+                  <p className="mobile-screen-row-copy">{step.detail}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
-      ),
-    },
-    {
-      id: "latest",
-      title: "Latest saved run",
-      hint: latest ? latest.overview.dataset_name : "No saved analyses yet",
-      accent: "#7ad6ff",
-      content: (
-        <div className="space-y-3">
-          <p className="text-sm leading-6 text-white/68">
-            {latest
-              ? `${latest.overview.dataset_name} is the most recent saved run. Open Uploads to review quick quality signals or open Analysis to continue through the full report.`
-              : "No saved analysis yet. Open Uploads to upload the first CSV."}
-          </p>
-          <ScrollIntentLink href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"} className="block rounded-lg bg-[#ffb079] px-5 py-3 text-center text-sm font-semibold text-[#11273b]">
-            {latest ? "Open latest run" : "Open uploads page"}
-          </ScrollIntentLink>
-          <ScrollIntentLink href="/history" className="block rounded-lg border border-white/12 px-5 py-3 text-center text-sm text-white/82">
-            View saved history
-          </ScrollIntentLink>
-        </div>
-      ),
-    },
-  ];
+      </section>
 
-  return <MobileSectionList sections={sections} />;
+      {recentAnalyses.length ? (
+        <section className="mobile-screen-panel">
+          <div className="mobile-screen-panel-header">
+            <div>
+              <p className="mobile-screen-kicker">Recent uploads</p>
+              <h2 className="mobile-screen-title">Recent saved datasets</h2>
+            </div>
+            <ScrollIntentLink href="/batch" className="mobile-screen-panel-action">
+              Uploads
+            </ScrollIntentLink>
+          </div>
+          <div className="mobile-screen-list">
+            {recentAnalyses.map((analysis) => (
+              <div key={analysis.id} className="mobile-screen-row">
+                <div className="mobile-screen-row-header">
+                  <div className="mobile-screen-row-main">
+                    <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
+                    <p className="mobile-screen-row-meta">{analysis.source_filename}</p>
+                  </div>
+                  <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                    {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                  </span>
+                </div>
+                <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                <div className="mobile-screen-pills compact">
+                  <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
+                  <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
+                  <span className="mobile-screen-pill">Saved {formatDate(analysis.saved_at)}</span>
+                </div>
+                <div className="mobile-screen-row-actions">
+                  <ScrollIntentLink href={`/analysis?analysisId=${analysis.id}`} className="mobile-screen-button mobile-screen-button-primary">
+                    Open run
+                  </ScrollIntentLink>
+                  <ScrollIntentLink href="/history" className="mobile-screen-button mobile-screen-button-secondary">
+                    Archive
+                  </ScrollIntentLink>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Analysis workspace</p>
+            <h2 className="mobile-screen-title">All report sections stay available</h2>
+            <p className="mobile-screen-lead">
+              Mobile keeps the same report surfaces as desktop, but only one section is expanded at a time so the workspace stays readable.
+            </p>
+          </div>
+        </div>
+        <div className="mobile-screen-link-grid mobile-screen-link-grid-dense">
+          {analysisTabCards.map((item) => (
+            <div key={item.title} className="mobile-screen-link-card">
+              <p className="mobile-screen-link-title">{item.title}</p>
+              <p className="mobile-screen-link-copy">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">History and cleanup</p>
+            <h2 className="mobile-screen-title">Saved runs and ML history remain intact</h2>
+          </div>
+        </div>
+        <div className="mobile-screen-list">
+          {historyFeatureCards.map((item) => (
+            <div key={item.title} className="mobile-screen-row">
+              <div className="mobile-screen-row-main">
+                <p className="mobile-screen-row-title">{item.title}</p>
+                <p className="mobile-screen-row-copy">{item.detail}</p>
+              </div>
+            </div>
+          ))}
+          {featureMechanics.slice(0, 3).map((item) => (
+            <div key={item.title} className="mobile-screen-row mobile-screen-row-muted">
+              <div className="mobile-screen-row-main">
+                <p className="mobile-screen-row-title">{item.title}</p>
+                <p className="mobile-screen-row-copy">{item.flow}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }

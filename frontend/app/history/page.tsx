@@ -24,7 +24,6 @@ import {
 } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
-import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 
 type ReadinessFilter = "all" | "ml-ready" | "eda-first";
 type MlFilter = "all" | "with-ml" | "without-ml";
@@ -260,72 +259,21 @@ export default function HistoryPage() {
 
         {!loading ? (
           <section className="space-y-4">
-            {/* Phone: inline stats + search + section list */}
-            <div className="phone-only space-y-3">
-              <div className="mobile-inline-stats">
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{analyses.length}</span>
-                  <span className="mobile-inline-stat-label">Total runs</span>
-                </div>
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{filteredAnalyses.length}</span>
-                  <span className="mobile-inline-stat-label">Filtered</span>
-                </div>
-                <div className="mobile-inline-stat">
-                  <span className="mobile-inline-stat-value">{analyses.filter(a => a.experiment_count > 0).length}</span>
-                  <span className="mobile-inline-stat-label">With ML</span>
-                </div>
-              </div>
-
-              {/* Inline search on phone */}
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search runs..."
-                className="w-full rounded-lg border border-white/12 bg-[#08131e] px-3 py-2 text-sm text-white outline-none placeholder:text-white/35"
-              />
-
-              {/* Compact inline filters */}
-              <div className="flex gap-2">
-                <select
-                  value={readinessFilter}
-                  onChange={(e) => setReadinessFilter(e.target.value as ReadinessFilter)}
-                  className="flex-1 rounded-lg border border-white/12 bg-[#08131e] px-2 py-2 text-xs text-white outline-none [color-scheme:dark]"
-                >
-                  <option value="all">All readiness</option>
-                  <option value="ml-ready">ML-ready</option>
-                  <option value="eda-first">EDA-first</option>
-                </select>
-                <select
-                  value={mlFilter}
-                  onChange={(e) => setMlFilter(e.target.value as MlFilter)}
-                  className="flex-1 rounded-lg border border-white/12 bg-[#08131e] px-2 py-2 text-xs text-white outline-none [color-scheme:dark]"
-                >
-                  <option value="all">All ML</option>
-                  <option value="with-ml">With ML</option>
-                  <option value="without-ml">No ML</option>
-                </select>
-              </div>
-
-              {/* Most recent run card */}
-              {filteredAnalyses[0] ? (
-                <div className="border-b border-white/6 pb-3">
-                  <p className="text-[0.65rem] font-bold uppercase tracking-wider text-white/42">Most recent</p>
-                  <p className="mt-1 font-medium text-white">{filteredAnalyses[0].overview.dataset_name}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="info-chip">{filteredAnalyses[0].overview.row_count?.toLocaleString() ?? "—"} rows</span>
-                    <span className="info-chip">{filteredAnalyses[0].overview.column_count ?? "—"} cols</span>
-                    {filteredAnalyses[0].experiment_count > 0 && (
-                      <span className="info-chip"><span className="pulse-dot" />{filteredAnalyses[0].experiment_count} ML</span>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
             <HistoryMobileSections
+              analyses={analyses}
               filteredAnalyses={filteredAnalyses}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              readinessFilter={readinessFilter}
+              setReadinessFilter={setReadinessFilter}
+              mlFilter={mlFilter}
+              setMlFilter={setMlFilter}
+              hasHistoryFilters={hasHistoryFilters}
+              clearFilters={() => {
+                setSearchQuery("");
+                setReadinessFilter("all");
+                setMlFilter("all");
+              }}
               onOpenPopup={handleOpenAnalysisPopup}
               onDeleteRun={setDeleteTargetId}
               onDownloadReport={(id: number) => { void downloadAnalysisReport(id); }}
@@ -638,88 +586,209 @@ export default function HistoryPage() {
 /* ────────────────── Phone-only slide sections ────────────────── */
 
 type HistoryMobileSectionsProps = {
+  analyses: AnalysisListItem[];
   filteredAnalyses: AnalysisListItem[];
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  readinessFilter: ReadinessFilter;
+  setReadinessFilter: (value: ReadinessFilter) => void;
+  mlFilter: MlFilter;
+  setMlFilter: (value: MlFilter) => void;
+  hasHistoryFilters: boolean;
+  clearFilters: () => void;
   onOpenPopup: (a: AnalysisListItem) => void;
   onDeleteRun: (id: number) => void;
   onDownloadReport: (id: number) => void;
 };
 
 function HistoryMobileSections({
+  analyses,
   filteredAnalyses,
+  searchQuery,
+  setSearchQuery,
+  readinessFilter,
+  setReadinessFilter,
+  mlFilter,
+  setMlFilter,
+  hasHistoryFilters,
+  clearFilters,
   onOpenPopup,
   onDeleteRun,
   onDownloadReport,
 }: HistoryMobileSectionsProps) {
-  const runSections: MobileSection[] = filteredAnalyses.map((a) => ({
-    id: `history-run-${a.id}`,
-    title: a.overview.dataset_name,
-    hint: `${formatDate(a.saved_at)} · ${a.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"} · ${a.experiment_count} ML`,
-    accent: a.insights.modeling_readiness.is_ready ? "#5ae681" : "#9db8ff",
-    content: (
-      <div className="space-y-3">
-        <p className="text-sm text-white/40">Saved {formatDate(a.saved_at)}</p>
-        <p className="text-sm leading-6 text-white/55">{a.insights.summary}</p>
+  const latestRun = filteredAnalyses[0] ?? analyses[0] ?? null;
+  const runsWithMl = analyses.filter((analysis) => analysis.experiment_count > 0).length;
+  const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
+    { value: "all", label: "All readiness" },
+    { value: "ml-ready", label: "ML-ready" },
+    { value: "eda-first", label: "EDA-first" },
+  ];
+  const mlOptions: Array<{ value: MlFilter; label: string }> = [
+    { value: "all", label: "All ML" },
+    { value: "with-ml", label: "With ML" },
+    { value: "without-ml", label: "No ML" },
+  ];
 
-        <div className="stat-row">
-          <div className="stat-row-item">
-            <p className="stat-row-value">{a.overview.row_count.toLocaleString()}</p>
-            <p className="stat-row-label">Rows</p>
-          </div>
-          <div className="stat-row-item">
-            <p className="stat-row-value">{a.overview.column_count}</p>
-            <p className="stat-row-label">Columns</p>
-          </div>
-          <div className="stat-row-item">
-            <p className="stat-row-value">{a.status}</p>
-            <p className="stat-row-label">Status</p>
-          </div>
-          <div className="stat-row-item">
-            <p className="stat-row-value">{a.experiment_count}</p>
-            <p className="stat-row-label">ML runs</p>
+  return (
+    <div className="phone-only mobile-screen-stack">
+      <div className="mobile-screen-stats">
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">Saved runs</p>
+          <p className="mobile-screen-stat-value">{analyses.length.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Archive total</p>
+        </article>
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">Filtered</p>
+          <p className="mobile-screen-stat-value">{filteredAnalyses.length.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Current view</p>
+        </article>
+        <article className="mobile-screen-stat">
+          <p className="mobile-screen-stat-label">With ML</p>
+          <p className="mobile-screen-stat-value">{runsWithMl.toLocaleString()}</p>
+          <p className="mobile-screen-stat-hint">Saved experiments</p>
+        </article>
+      </div>
+
+      <section className="mobile-screen-panel section-glow">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Run archive</p>
+            <h2 className="mobile-screen-title">Search and filter saved runs</h2>
+            <p className="mobile-screen-lead">History keeps the same archive actions as desktop: search, reopen in place, download reports, and retire older runs.</p>
           </div>
         </div>
-
-        {a.latest_experiment ? (
-          <p className="text-sm text-white/50">
-            <span className="text-xs uppercase tracking-wider text-white/35">Latest ML:</span>{" "}
-            {a.latest_experiment.summary}
-          </p>
+        <div className="mobile-screen-field">
+          <label htmlFor="history-search" className="mobile-screen-field-label">Search runs</label>
+          <input
+            id="history-search"
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Dataset, filename, summary, or status"
+            className="mobile-screen-input"
+          />
+        </div>
+        <div className="mobile-filter-group">
+          {readinessOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setReadinessFilter(option.value)}
+              className={`mobile-filter-pill ${readinessFilter === option.value ? "mobile-filter-pill-active" : ""}`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        <div className="mobile-filter-group">
+          {mlOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setMlFilter(option.value)}
+              className={`mobile-filter-pill ${mlFilter === option.value ? "mobile-filter-pill-active" : ""}`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        {hasHistoryFilters ? (
+          <div className="mobile-screen-actions">
+            <button type="button" onClick={clearFilters} className="mobile-screen-button mobile-screen-button-secondary">
+              Clear filters
+            </button>
+          </div>
         ) : null}
+      </section>
 
-        <div className="flex flex-col gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() => onOpenPopup(a)}
-            className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
-          >
-            Open saved run
-          </button>
-          <button
-            type="button"
-            onClick={() => onDownloadReport(a.id)}
-            className="rounded-lg border border-white/10 px-5 py-3 text-sm text-white/70"
-          >
-            Download report
-          </button>
-          <button
-            type="button"
-            onClick={() => onDeleteRun(a.id)}
-            className="rounded-lg border border-[#5a2328]/60 px-5 py-3 text-sm font-medium text-[#ffb4ba]"
-          >
-            Delete saved run
-          </button>
+      {latestRun ? (
+        <section className="mobile-screen-panel">
+          <div className="mobile-screen-panel-header">
+            <div>
+              <p className="mobile-screen-kicker">Latest match</p>
+              <h2 className="mobile-screen-title">{latestRun.overview.dataset_name}</h2>
+            </div>
+          </div>
+          <div className="mobile-screen-pills">
+            <span className="mobile-screen-pill">{latestRun.overview.row_count.toLocaleString()} rows</span>
+            <span className="mobile-screen-pill">{latestRun.overview.column_count} cols</span>
+            <span className="mobile-screen-pill" data-tone={latestRun.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+              {latestRun.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+            </span>
+          </div>
+          <p className="mobile-screen-lead">{latestRun.insights.summary}</p>
+        </section>
+      ) : null}
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Saved runs</p>
+            <h2 className="mobile-screen-title">Open or retire archived results</h2>
+          </div>
         </div>
-      </div>
-    ),
-  }));
+        {filteredAnalyses.length === 0 ? (
+          <p className="mobile-screen-empty">No runs match the current filters.</p>
+        ) : (
+          <div className="mobile-screen-list">
+            {filteredAnalyses.map((analysis) => {
+              const modeLabel = analysis.latest_experiment
+                ? analysis.latest_experiment.type === "supervised"
+                  ? "Supervised ML"
+                  : "Unsupervised ML"
+                : "Analysis only";
 
-  if (filteredAnalyses.length === 0) {
-    return (
-      <div className="phone-only py-4 text-center text-sm text-white/40">
-        No runs match the current filters.
-      </div>
-    );
-  }
-
-  return <MobileSectionList sections={runSections} />;
+              return (
+                <div key={analysis.id} className="mobile-screen-row">
+                  <div className="mobile-screen-row-header">
+                    <div className="mobile-screen-row-main">
+                      <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
+                      <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
+                    </div>
+                    <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                      {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                    </span>
+                  </div>
+                  <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                  <div className="mobile-screen-pills compact">
+                    <span className="mobile-screen-pill">{modeLabel}</span>
+                    <span className="mobile-screen-pill">{analysis.status || "saved"}</span>
+                    <span className="mobile-screen-pill" data-tone="purple">
+                      {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  {analysis.latest_experiment ? (
+                    <p className="mobile-screen-row-note">Latest ML: {analysis.latest_experiment.summary}</p>
+                  ) : null}
+                  <div className="mobile-screen-row-actions">
+                    <button
+                      type="button"
+                      onClick={() => onOpenPopup(analysis)}
+                      className="mobile-screen-button mobile-screen-button-primary"
+                    >
+                      Open run
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDownloadReport(analysis.id)}
+                      className="mobile-screen-button mobile-screen-button-secondary"
+                    >
+                      Report
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteRun(analysis.id)}
+                      className="mobile-screen-button mobile-screen-button-danger"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }
