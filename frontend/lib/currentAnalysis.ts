@@ -3,6 +3,12 @@ const CURRENT_ANALYSIS_EVENT = "analysis:current-selection-changed";
 const ANALYSES_UPDATED_STORAGE_KEY = "analysisRecordsUpdatedAt";
 export const ANALYSES_UPDATED_EVENT = "analysis:records-changed";
 
+type AnalysisStateChangeListener = () => void;
+
+type AnalysisStateSubscriptionOptions = {
+  includeCurrentSelectionChanges?: boolean;
+};
+
 function normalizeAnalysisId(value: number | null | undefined): number | null {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
     return null;
@@ -56,4 +62,40 @@ export function isAnalysisStateStorageEvent(event: StorageEvent): boolean {
     event.key === CURRENT_ANALYSIS_STORAGE_KEY ||
     event.key === ANALYSES_UPDATED_STORAGE_KEY
   );
+}
+
+export function subscribeToAnalysisStateChanges(
+  listener: AnalysisStateChangeListener,
+  options: AnalysisStateSubscriptionOptions = {}
+): () => void {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const { includeCurrentSelectionChanges = false } = options;
+
+  const handleStorage = (event: StorageEvent) => {
+    if (!isAnalysisStateStorageEvent(event)) return;
+    listener();
+  };
+
+  const handleAnalysesChanged = () => {
+    listener();
+  };
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(ANALYSES_UPDATED_EVENT, handleAnalysesChanged);
+
+  if (includeCurrentSelectionChanges) {
+    window.addEventListener(CURRENT_ANALYSIS_EVENT, handleAnalysesChanged);
+  }
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(ANALYSES_UPDATED_EVENT, handleAnalysesChanged);
+
+    if (includeCurrentSelectionChanges) {
+      window.removeEventListener(CURRENT_ANALYSIS_EVENT, handleAnalysesChanged);
+    }
+  };
 }

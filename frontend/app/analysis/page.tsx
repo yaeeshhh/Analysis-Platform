@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
@@ -25,8 +25,8 @@ import { AnalysisListItem, AnalysisReport } from "@/lib/analysisTypes";
 import {
   clearCurrentAnalysisSelection,
   getCurrentAnalysisSelection,
-  isAnalysisStateStorageEvent,
   notifyAnalysesChanged,
+  subscribeToAnalysisStateChanges,
   setCurrentAnalysisSelection,
 } from "@/lib/currentAnalysis";
 import { calculateQualityScore } from "@/lib/analysisDerived";
@@ -108,11 +108,16 @@ function AnalysisPageContent() {
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<number | null>(null);
   const [report, setReport] = useState<AnalysisReport | null>(null);
   const [activeTab, setActiveTab] = useState<AnalysisTabKey>("overview");
+  const selectedAnalysisIdRef = useRef<number | null>(null);
+  const activeTabRef = useRef<AnalysisTabKey>("overview");
 
-  function buildAnalysisHref(analysisId: number, tab: AnalysisTabKey = activeTab) {
-    const tabQuery = tab !== "overview" ? `&tab=${tab}` : "";
-    return `/analysis?analysisId=${analysisId}${tabQuery}`;
-  }
+  useEffect(() => {
+    selectedAnalysisIdRef.current = selectedAnalysisId;
+  }, [selectedAnalysisId]);
+
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
 
   function handleTabChange(nextTab: AnalysisTabKey) {
     setActiveTab(nextTab);
@@ -125,6 +130,30 @@ function AnalysisPageContent() {
   useEffect(() => {
     setActiveTab(requestedTabKey ?? "overview");
   }, [requestedTabKey]);
+
+  const refreshAnalyses = useCallback(async (nextId?: number, nextTab?: AnalysisTabKey) => {
+    const items = await getAnalyses();
+    setAnalyses(items);
+    const targetId = nextId ?? selectedAnalysisIdRef.current;
+
+    if (!targetId || !items.some((item) => item.id === targetId)) {
+      setSelectedAnalysisId(null);
+      setReport(null);
+      router.replace("/analysis");
+      return;
+    }
+
+    const payload = await getAnalysisById(targetId);
+    setCurrentAnalysisSelection(targetId);
+    setSelectedAnalysisId(targetId);
+    setReport(payload);
+    if (nextTab) {
+      setActiveTab(nextTab);
+    }
+    const targetTab = nextTab ?? activeTabRef.current;
+    const tabQuery = targetTab !== "overview" ? `&tab=${targetTab}` : "";
+    router.replace(`/analysis?analysisId=${targetId}${tabQuery}`, { scroll: false });
+  }, [router]);
 
   useEffect(() => {
     let active = true;
@@ -202,44 +231,22 @@ function AnalysisPageContent() {
       void bootstrap();
     };
 
-    const handleStorage = (event: StorageEvent) => {
-      if (!active || !isAnalysisStateStorageEvent(event)) return;
-      void bootstrap();
-    };
+    const unsubscribeAnalysisState = subscribeToAnalysisStateChanges(() => {
+      if (!active) return;
+      const nextId = getCurrentAnalysisSelection() ?? selectedAnalysisIdRef.current;
+      void refreshAnalyses(nextId ?? undefined, activeTabRef.current);
+    });
 
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
-    window.addEventListener("storage", handleStorage);
 
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
-      window.removeEventListener("storage", handleStorage);
+      unsubscribeAnalysisState();
     };
-  }, [requestedAnalysisId, router]);
-
-  async function refreshAnalyses(nextId?: number, nextTab?: AnalysisTabKey) {
-    const items = await getAnalyses();
-    setAnalyses(items);
-    const targetId = nextId ?? selectedAnalysisId;
-
-    if (!targetId || !items.some((item) => item.id === targetId)) {
-      setSelectedAnalysisId(null);
-      setReport(null);
-      router.replace("/analysis");
-      return;
-    }
-
-    const payload = await getAnalysisById(targetId);
-    setCurrentAnalysisSelection(targetId);
-    setSelectedAnalysisId(targetId);
-    setReport(payload);
-    if (nextTab) {
-      setActiveTab(nextTab);
-    }
-    router.replace(buildAnalysisHref(targetId, nextTab ?? activeTab), { scroll: false });
-  }
+  }, [requestedAnalysisId, refreshAnalyses, router]);
 
   const hasRenderableReport = Boolean(
     report &&

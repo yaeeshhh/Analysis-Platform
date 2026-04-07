@@ -13,6 +13,7 @@ import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 type ProfileMenuProps = {
   variant?: "default" | "sidebar";
   onSidebarAction?: () => void;
+  disabled?: boolean;
 };
 
 function getInitials(user: User | null) {
@@ -27,7 +28,7 @@ function getInitials(user: User | null) {
     .join("") || source.charAt(0).toUpperCase();
 }
 
-export default function ProfileMenu({ variant = "default", onSidebarAction }: ProfileMenuProps) {
+export default function ProfileMenu({ variant = "default", onSidebarAction, disabled = false }: ProfileMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -201,6 +202,10 @@ export default function ProfileMenu({ variant = "default", onSidebarAction }: Pr
         ref={buttonRef}
         type="button"
         onClick={() => {
+          if (disabled) {
+            return;
+          }
+
           if (!user) {
             if (isSidebar) {
               onSidebarAction?.();
@@ -222,8 +227,11 @@ export default function ProfileMenu({ variant = "default", onSidebarAction }: Pr
           setMenuOpen((previous) => !previous);
         }}
         className={isSidebar ? "profile-menu-sidebar-button" : "max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"}
+        disabled={disabled}
         aria-haspopup={!isSidebar && user ? "menu" : undefined}
         aria-expanded={!isSidebar && user ? menuOpen : undefined}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
       >
         {isSidebar ? (
           <>
