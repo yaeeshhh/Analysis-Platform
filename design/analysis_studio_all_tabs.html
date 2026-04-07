@@ -1,0 +1,517 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  .sw{display:flex;min-height:720px;font-family:'Syne',sans-serif;background:#0b0f1a;border-radius:14px;overflow:hidden;color:#e2e8f0;}
+  .sb{width:200px;flex-shrink:0;background:#0d1120;border-right:0.5px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;}
+  .sb-logo{padding:20px 20px 16px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+  .lm{display:flex;align-items:center;gap:8px;}
+  .li{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;}
+  .li svg{width:14px;height:14px;}
+  .lt{font-size:13px;font-weight:700;color:#f1f5f9;letter-spacing:0.02em;}
+  .ls{font-size:9px;color:#4a5568;font-family:'DM Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;}
+  .ns{padding:16px 12px;flex:1;}
+  .nl{font-size:9px;font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#2d3748;margin:0 8px 8px;}
+  .ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;font-size:13px;color:#718096;cursor:pointer;margin-bottom:2px;}
+  .ni:hover{background:rgba(255,255,255,0.04);color:#cbd5e0;}
+  .ni.active{background:rgba(124,58,237,0.12);color:#c4b5fd;border:0.5px solid rgba(124,58,237,0.2);}
+  .nicon{width:15px;height:15px;flex-shrink:0;opacity:0.7;}
+  .ni.active .nicon{opacity:1;}
+  .sf{padding:14px 12px;border-top:0.5px solid rgba(255,255,255,0.06);}
+  .ar{display:flex;align-items:center;gap:9px;}
+  .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;}
+  .an{font-size:12px;color:#94a3b8;}
+  .arl{font-size:10px;color:#374151;font-family:'DM Mono',monospace;}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+  .topbar{padding:18px 28px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;}
+  .ey{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:4px;}
+  .pt{font-size:22px;font-weight:700;color:#f1f5f9;margin:0 0 2px;}
+  .ps{font-size:12px;color:#4a5568;font-family:'DM Mono',monospace;}
+  .ta{display:flex;gap:8px;align-items:center;margin-top:4px;}
+  .bg{padding:6px 12px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.1);background:transparent;color:#718096;font-size:11px;font-family:'Syne',sans-serif;cursor:pointer;}
+  .bp{padding:6px 14px;border-radius:6px;border:none;background:#7c3aed;color:#ede9fe;font-size:11px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;}
+  .file-bar{margin:14px 28px 0;padding:10px 14px;background:#0d1120;border:0.5px solid rgba(124,58,237,0.2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .fb-left{display:flex;align-items:center;gap:10px;}
+  .fb-icon{width:28px;height:28px;border-radius:6px;background:rgba(124,58,237,0.12);border:0.5px solid rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;}
+  .fb-name{font-size:12px;font-weight:600;color:#c4b5fd;}
+  .fb-meta{font-size:10px;color:#374151;font-family:'DM Mono',monospace;}
+  .fb-right{display:flex;gap:8px;}
+  .tag{padding:3px 8px;border-radius:4px;font-size:9px;font-family:'DM Mono',monospace;}
+  .tag.g{background:rgba(13,148,136,0.1);color:#0d9488;border:0.5px solid rgba(13,148,136,0.2);}
+  .tag.p{background:rgba(124,58,237,0.1);color:#a78bfa;border:0.5px solid rgba(124,58,237,0.2);}
+  .tab-bar{margin:14px 28px 0;display:flex;gap:0;border-bottom:0.5px solid rgba(255,255,255,0.06);flex-shrink:0;overflow-x:auto;}
+  .tab-bar::-webkit-scrollbar{display:none;}
+  .tab{padding:8px 13px;font-size:11px;color:#4a5568;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;font-family:'DM Mono',monospace;letter-spacing:0.03em;transition:color 0.15s;}
+  .tab:hover{color:#94a3b8;}
+  .tab.active{color:#c4b5fd;border-bottom-color:#7c3aed;}
+  .tab-content{display:none;padding:16px 28px 24px;overflow-y:auto;flex:1;}
+  .tab-content.show{display:block;}
+
+  /* shared components */
+  .panel{background:#0d1120;border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+  .panel:last-child{margin-bottom:0;}
+  .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .ptl{font-size:12px;font-weight:600;color:#94a3b8;}
+  .pa{font-size:10px;color:#7c3aed;font-family:'DM Mono',monospace;cursor:pointer;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .sc{background:#0d1120;border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;}
+  .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:10px 10px 0 0;}
+  .sc.purple::before{background:#7c3aed;}
+  .sc.teal::before{background:#0d9488;}
+  .sc.amber::before{background:#d97706;}
+  .sc.blue::before{background:#2563eb;}
+  .sc.red::before{background:#dc2626;}
+  .sc.green::before{background:#16a34a;}
+  .sl{font-size:10px;color:#4a5568;font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;}
+  .sv{font-size:26px;font-weight:700;color:#f1f5f9;line-height:1;margin-bottom:4px;}
+  .sh{font-size:10px;color:#374151;}
+  .sh.ok{color:#0d9488;}
+  .sh.warn{color:#d97706;}
+  .sh.err{color:#dc2626;}
+  .track{height:4px;background:rgba(255,255,255,0.05);border-radius:3px;margin-top:8px;}
+  .fill{height:100%;border-radius:3px;}
+  .mono{font-family:'DM Mono',monospace;}
+
+  /* col list */
+  .col-list{display:flex;flex-direction:column;gap:0;}
+  .col-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,0.03);}
+  .col-item:last-child{border-bottom:none;}
+  .col-name{font-size:11px;color:#94a3b8;flex:1;}
+  .col-type{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:3px;}
+  .col-type.num{background:rgba(59,130,246,0.1);color:#60a5fa;}
+  .col-type.str{background:rgba(13,148,136,0.1);color:#0d9488;}
+  .col-type.dt{background:rgba(217,119,6,0.1);color:#d97706;}
+  .col-null{font-size:9px;font-family:'DM Mono',monospace;color:#374151;width:44px;text-align:right;}
+  .col-uniq{font-size:9px;font-family:'DM Mono',monospace;color:#374151;width:56px;text-align:right;}
+  .col-bar-w{width:60px;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;}
+  .col-bar{height:100%;border-radius:2px;background:#7c3aed;}
+
+  /* chart bars */
+  .chart-area{height:90px;display:flex;align-items:flex-end;gap:4px;}
+  .bar{flex:1;border-radius:2px 2px 0 0;}
+  .chart-labels{display:flex;justify-content:space-between;margin-top:5px;}
+  .chart-label{font-size:8px;font-family:'DM Mono',monospace;color:#374151;}
+
+  /* table */
+  .tbl{width:100%;border-collapse:collapse;}
+  .tbl th{font-size:9px;font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;color:#374151;text-align:left;padding:0 8px 7px;border-bottom:0.5px solid rgba(255,255,255,0.05);}
+  .tbl td{padding:8px 8px;font-size:11px;color:#64748b;border-bottom:0.5px solid rgba(255,255,255,0.03);vertical-align:middle;}
+  .tbl tr:last-child td{border-bottom:none;}
+  .tbl tr:hover td{background:rgba(255,255,255,0.01);}
+
+  /* insight card */
+  .insight-card{display:flex;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.05);border-radius:8px;margin-bottom:8px;}
+  .insight-card:last-child{margin-bottom:0;}
+  .insight-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .insight-title{font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:3px;}
+  .insight-body{font-size:11px;color:#4a5568;line-height:1.6;}
+  .insight-tag{display:inline-block;margin-top:6px;font-size:9px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:3px;}
+
+  /* relationship matrix */
+  .matrix-wrap{overflow-x:auto;}
+  .matrix{border-collapse:collapse;font-family:'DM Mono',monospace;font-size:10px;}
+  .matrix th{padding:4px 8px;color:#374151;font-size:9px;text-align:center;white-space:nowrap;}
+  .matrix td{width:44px;height:34px;text-align:center;border:0.5px solid rgba(255,255,255,0.03);font-size:10px;}
+  .matrix .row-hdr{color:#64748b;font-size:9px;padding:0 10px 0 0;text-align:right;white-space:nowrap;}
+
+  /* ML cards */
+  .ml-model{padding:10px 12px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+  .ml-model.sel{border-color:rgba(124,58,237,0.4);background:rgba(124,58,237,0.08);}
+  .ml-model-name{font-size:12px;color:#94a3b8;font-weight:600;}
+  .ml-model.sel .ml-model-name{color:#c4b5fd;}
+  .ml-model-sub{font-size:10px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;}
+  .ml-sel-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid #374151;}
+  .ml-model.sel .ml-sel-dot{background:#7c3aed;border-color:#7c3aed;}
+  .result-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+  .result-row:last-child{border-bottom:none;}
+  .result-label{font-size:11px;color:#64748b;}
+  .result-val{font-size:13px;font-weight:700;color:#f1f5f9;font-family:'DM Mono',monospace;}
+  .result-val.ok{color:#0d9488;}
+  .result-val.warn{color:#d97706;}
+
+  /* stat table */
+  .stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid rgba(255,255,255,0.03);}
+  .stat-row:last-child{border-bottom:none;}
+  .stat-key{font-size:11px;color:#64748b;}
+  .stat-v{font-size:11px;color:#94a3b8;font-family:'DM Mono',monospace;}
+</style>
+
+<div class="sw">
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="lm">
+        <div class="li"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="7" width="3" height="6" rx="1" fill="white" opacity="0.9"/><rect x="5.5" y="4" width="3" height="9" rx="1" fill="white" opacity="0.7"/><rect x="10" y="1" width="3" height="12" rx="1" fill="white" opacity="0.5"/></svg></div>
+        <div><div class="lt">Analysis Studio</div><div class="ls">Tabular workspace</div></div>
+      </div>
+    </div>
+    <div class="ns">
+      <div class="nl">Workspace</div>
+      <div class="ni"><svg class="nicon" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="1" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.5"/></svg>Dashboard</div>
+      <div class="ni"><svg class="nicon" viewBox="0 0 15 15" fill="none"><path d="M2 3h11M2 7h11M2 11h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Uploads</div>
+      <div class="ni active"><svg class="nicon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7.5h5M7.5 5v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Analysis</div>
+      <div class="ni"><svg class="nicon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 4.5V7.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>History</div>
+      <div class="ni"><svg class="nicon" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Account</div>
+    </div>
+    <div class="sf"><div class="ar"><div class="av">JS</div><div><div class="an">J. Smith</div><div class="arl">free plan</div></div></div></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="ey">analysis workspace</div>
+        <div class="pt">Analysis</div>
+        <div class="ps">Explore, visualise, and model your dataset</div>
+      </div>
+      <div class="ta">
+        <button class="bg">Export results</button>
+        <button class="bp">Run ML model</button>
+      </div>
+    </div>
+
+    <div class="file-bar">
+      <div class="fb-left">
+        <div class="fb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="2" stroke="#a78bfa" stroke-width="1.2"/><path d="M4 5h6M4 7.5h6M4 10h4" stroke="#a78bfa" stroke-width="1" stroke-linecap="round" opacity="0.7"/></svg></div>
+        <div><div class="fb-name">sales_q3_2024.csv</div><div class="fb-meta">12,840 rows · 9 columns · uploaded 2h ago</div></div>
+      </div>
+      <div class="fb-right"><span class="tag g">ML-ready</span><span class="tag p">Active dataset</span></div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('overview',this)">Overview</div>
+      <div class="tab" onclick="switchTab('insights',this)">Insights</div>
+      <div class="tab" onclick="switchTab('schema',this)">Schema</div>
+      <div class="tab" onclick="switchTab('dataquality',this)">Data quality</div>
+      <div class="tab" onclick="switchTab('statistics',this)">Statistics</div>
+      <div class="tab" onclick="switchTab('relationships',this)">Relationships</div>
+      <div class="tab" onclick="switchTab('charts',this)">Charts</div>
+      <div class="tab" onclick="switchTab('mllab',this)">ML lab</div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="tab-content show" id="tab-overview">
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="sc purple"><div class="sl">Total rows</div><div class="sv">12,840</div><div class="sh ok">No duplicates</div></div>
+        <div class="sc teal"><div class="sl">Columns</div><div class="sv">9</div><div class="sh">3 numeric · 4 string · 2 date</div></div>
+        <div class="sc amber"><div class="sl">Missing values</div><div class="sv">142</div><div class="sh warn">1.1% — review recommended</div></div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="panel">
+          <div class="ph"><div class="ptl">Column breakdown</div><div class="pa">schema →</div></div>
+          <div class="col-list">
+            <div class="col-item"><span class="col-name">order_id</span><span class="col-type num">INT</span><span class="col-null">0 null</span><div class="col-bar-w"><div class="col-bar" style="width:100%"></div></div></div>
+            <div class="col-item"><span class="col-name">revenue</span><span class="col-type num">FLOAT</span><span class="col-null">12 null</span><div class="col-bar-w"><div class="col-bar" style="width:88%"></div></div></div>
+            <div class="col-item"><span class="col-name">region</span><span class="col-type str">STR</span><span class="col-null">0 null</span><div class="col-bar-w"><div class="col-bar" style="width:74%;background:#0d9488"></div></div></div>
+            <div class="col-item"><span class="col-name">order_date</span><span class="col-type dt">DATE</span><span class="col-null">0 null</span><div class="col-bar-w"><div class="col-bar" style="width:95%;background:#d97706"></div></div></div>
+            <div class="col-item"><span class="col-name">customer_id</span><span class="col-type num">INT</span><span class="col-null">130 null</span><div class="col-bar-w"><div class="col-bar" style="width:60%"></div></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Revenue distribution</div><div class="pa">charts →</div></div>
+          <div class="chart-area">
+            <div class="bar" style="height:30%;background:rgba(124,58,237,0.45)"></div>
+            <div class="bar" style="height:52%;background:rgba(124,58,237,0.45)"></div>
+            <div class="bar" style="height:78%;background:rgba(124,58,237,0.55)"></div>
+            <div class="bar" style="height:100%;background:rgba(124,58,237,0.65)"></div>
+            <div class="bar" style="height:88%;background:rgba(124,58,237,0.55)"></div>
+            <div class="bar" style="height:64%;background:rgba(124,58,237,0.45)"></div>
+            <div class="bar" style="height:40%;background:rgba(124,58,237,0.4)"></div>
+            <div class="bar" style="height:20%;background:rgba(124,58,237,0.35)"></div>
+          </div>
+          <div class="chart-labels"><span class="chart-label">$0</span><span class="chart-label">$5k</span><span class="chart-label">$10k</span><span class="chart-label">$15k+</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Data preview</div><div class="pa">full table →</div></div>
+        <table class="tbl">
+          <thead><tr><th>order_id</th><th>revenue</th><th>region</th><th>order_date</th><th>customer_id</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">10042</td><td class="mono">$8,420.00</td><td>APAC</td><td class="mono">2024-07-03</td><td class="mono">C-4821</td></tr>
+            <tr><td class="mono">10043</td><td class="mono">$1,205.50</td><td>EMEA</td><td class="mono">2024-07-03</td><td class="mono">C-2047</td></tr>
+            <tr><td class="mono">10044</td><td class="mono">$12,980.00</td><td>NA</td><td class="mono">2024-07-04</td><td class="mono">C-9912</td></tr>
+            <tr><td class="mono">10045</td><td class="mono">$340.00</td><td>APAC</td><td class="mono">2024-07-04</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="tab-content" id="tab-insights">
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="sc blue"><div class="sl">Auto-insights</div><div class="sv">7</div><div class="sh">Generated from your data</div></div>
+        <div class="sc amber"><div class="sl">Warnings</div><div class="sv">2</div><div class="sh warn">Action recommended</div></div>
+        <div class="sc green"><div class="sl">Opportunities</div><div class="sv">3</div><div class="sh ok">Patterns detected</div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Auto-generated insights</div></div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(124,58,237,0.1);border:0.5px solid rgba(124,58,237,0.2)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v4l3 3" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="#a78bfa" stroke-width="1.2"/></svg></div>
+          <div><div class="insight-title">Revenue peaks mid-week</div><div class="insight-body">Tuesdays and Wednesdays account for 38% of total revenue, significantly above the daily average of 14.3%.</div><span class="insight-tag" style="background:rgba(124,58,237,0.1);color:#a78bfa;border:0.5px solid rgba(124,58,237,0.2);">Trend</span></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(13,148,136,0.1);border:0.5px solid rgba(13,148,136,0.2)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 11l4-4 3 3 5-6" stroke="#0d9488" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><div class="insight-title">APAC is the strongest region</div><div class="insight-body">APAC contributes 37.5% of total rows and has the highest average order value at $6,240.</div><span class="insight-tag" style="background:rgba(13,148,136,0.1);color:#0d9488;border:0.5px solid rgba(13,148,136,0.2);">Opportunity</span></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(217,119,6,0.1);border:0.5px solid rgba(217,119,6,0.2)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 5v4M8 11v1" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="#d97706" stroke-width="1.2"/></svg></div>
+          <div><div class="insight-title">130 missing customer IDs</div><div class="insight-body">1.01% of rows have no customer_id. This may affect segmentation and ML model accuracy.</div><span class="insight-tag" style="background:rgba(217,119,6,0.1);color:#d97706;border:0.5px solid rgba(217,119,6,0.2);">Warning</span></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(220,38,38,0.08);border:0.5px solid rgba(220,38,38,0.2)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3L14 13H2L8 3z" stroke="#f87171" stroke-width="1.2"/><path d="M8 7v3M8 11.5v.5" stroke="#f87171" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div><div class="insight-title">Low-value outliers detected</div><div class="insight-body">84 orders below $10 may be test transactions or refunds — consider filtering before modelling.</div><span class="insight-tag" style="background:rgba(220,38,38,0.08);color:#f87171;border:0.5px solid rgba(220,38,38,0.2);">Warning</span></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon" style="background:rgba(13,148,136,0.1);border:0.5px solid rgba(13,148,136,0.2)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#0d9488" stroke-width="1.2"/><path d="M5.5 8.5l2 2 3-4" stroke="#0d9488" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><div class="insight-title">Strong seasonal pattern in Q3</div><div class="insight-body">July shows 22% higher volume than August, suggesting a seasonal demand curve worth modelling.</div><span class="insight-tag" style="background:rgba(13,148,136,0.1);color:#0d9488;border:0.5px solid rgba(13,148,136,0.2);">Opportunity</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEMA -->
+    <div class="tab-content" id="tab-schema">
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="sc blue"><div class="sl">Total columns</div><div class="sv">9</div><div class="sh">Fully typed</div></div>
+        <div class="sc teal"><div class="sl">Numeric</div><div class="sv">3</div><div class="sh">INT · FLOAT</div></div>
+        <div class="sc amber"><div class="sl">Non-numeric</div><div class="sv">6</div><div class="sh">STR · DATE · BOOL</div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Full schema</div><div class="pa">edit types →</div></div>
+        <table class="tbl">
+          <thead><tr><th>Column</th><th>Type</th><th>Nulls</th><th>Unique values</th><th>Sample</th></tr></thead>
+          <tbody>
+            <tr><td>order_id</td><td><span class="col-type num">INT</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">12,840</td><td class="mono" style="color:#374151">10042</td></tr>
+            <tr><td>revenue</td><td><span class="col-type num">FLOAT</span></td><td class="mono" style="color:#d97706">12</td><td class="mono">11,980</td><td class="mono" style="color:#374151">$8,420.00</td></tr>
+            <tr><td>region</td><td><span class="col-type str">STR</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">4</td><td class="mono" style="color:#374151">APAC</td></tr>
+            <tr><td>order_date</td><td><span class="col-type dt">DATE</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">92</td><td class="mono" style="color:#374151">2024-07-03</td></tr>
+            <tr><td>customer_id</td><td><span class="col-type str">STR</span></td><td class="mono" style="color:#dc2626">130</td><td class="mono">8,421</td><td class="mono" style="color:#374151">C-4821</td></tr>
+            <tr><td>product_sku</td><td><span class="col-type str">STR</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">312</td><td class="mono" style="color:#374151">SKU-0041</td></tr>
+            <tr><td>units_sold</td><td><span class="col-type num">INT</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">48</td><td class="mono" style="color:#374151">3</td></tr>
+            <tr><td>channel</td><td><span class="col-type str">STR</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">5</td><td class="mono" style="color:#374151">Online</td></tr>
+            <tr><td>is_returned</td><td><span class="col-type str">BOOL</span></td><td class="mono" style="color:#0d9488">0</td><td class="mono">2</td><td class="mono" style="color:#374151">false</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DATA QUALITY -->
+    <div class="tab-content" id="tab-dataquality">
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="sc teal"><div class="sl">Completeness</div><div class="sv">98.9%</div><div class="sh ok">142 missing cells</div><div class="track"><div class="fill" style="width:98.9%;background:#0d9488"></div></div></div>
+        <div class="sc purple"><div class="sl">Uniqueness</div><div class="sv">100%</div><div class="sh ok">No duplicate rows</div><div class="track"><div class="fill" style="width:100%;background:#7c3aed"></div></div></div>
+        <div class="sc blue"><div class="sl">Consistency</div><div class="sv">97.4%</div><div class="sh warn">8 format issues</div><div class="track"><div class="fill" style="width:97.4%;background:#2563eb"></div></div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Issues by column</div></div>
+        <table class="tbl">
+          <thead><tr><th>Column</th><th>Issue type</th><th>Count</th><th>Severity</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>customer_id</td><td>Missing values</td><td class="mono">130</td><td><span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(220,38,38,0.1);color:#f87171;font-family:'DM Mono',monospace;">High</span></td><td style="font-size:10px;color:#7c3aed;cursor:pointer;font-family:'DM Mono',monospace;">Impute →</td></tr>
+            <tr><td>revenue</td><td>Missing values</td><td class="mono">12</td><td><span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(217,119,6,0.1);color:#d97706;font-family:'DM Mono',monospace;">Medium</span></td><td style="font-size:10px;color:#7c3aed;cursor:pointer;font-family:'DM Mono',monospace;">Impute →</td></tr>
+            <tr><td>order_date</td><td>Format inconsistency</td><td class="mono">8</td><td><span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(59,130,246,0.1);color:#60a5fa;font-family:'DM Mono',monospace;">Low</span></td><td style="font-size:10px;color:#7c3aed;cursor:pointer;font-family:'DM Mono',monospace;">Normalise →</td></tr>
+            <tr><td>revenue</td><td>Outliers (&lt;$10)</td><td class="mono">84</td><td><span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(217,119,6,0.1);color:#d97706;font-family:'DM Mono',monospace;">Medium</span></td><td style="font-size:10px;color:#7c3aed;cursor:pointer;font-family:'DM Mono',monospace;">Filter →</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Overall ML readiness</div></div>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.04);border-radius:7px;padding:10px 12px;"><div style="font-size:9px;font-family:'DM Mono',monospace;color:#374151;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Score</div><div style="font-size:26px;font-weight:700;color:#0d9488;">88 / 100</div><div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;margin-top:3px;">High — ready to model</div></div>
+          <div style="flex:1;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.04);border-radius:7px;padding:10px 12px;"><div style="font-size:9px;font-family:'DM Mono',monospace;color:#374151;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Blockers</div><div style="font-size:26px;font-weight:700;color:#d97706;">2</div><div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;margin-top:3px;">Recommend fixing before run</div></div>
+          <div style="flex:1;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.04);border-radius:7px;padding:10px 12px;"><div style="font-size:9px;font-family:'DM Mono',monospace;color:#374151;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Warnings</div><div style="font-size:26px;font-weight:700;color:#2563eb;">3</div><div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;margin-top:3px;">Minor — proceed with care</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="tab-content" id="tab-statistics">
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="panel">
+          <div class="ph"><div class="ptl">Revenue — descriptive stats</div></div>
+          <div class="stat-row"><span class="stat-key">Mean</span><span class="stat-v">$5,842.30</span></div>
+          <div class="stat-row"><span class="stat-key">Median</span><span class="stat-v">$4,210.00</span></div>
+          <div class="stat-row"><span class="stat-key">Std deviation</span><span class="stat-v">$3,901.55</span></div>
+          <div class="stat-row"><span class="stat-key">Min</span><span class="stat-v">$2.40</span></div>
+          <div class="stat-row"><span class="stat-key">Max</span><span class="stat-v">$48,200.00</span></div>
+          <div class="stat-row"><span class="stat-key">25th percentile</span><span class="stat-v">$1,840.00</span></div>
+          <div class="stat-row"><span class="stat-key">75th percentile</span><span class="stat-v">$9,120.00</span></div>
+          <div class="stat-row"><span class="stat-key">Skewness</span><span class="stat-v">1.42 (right)</span></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Units sold — descriptive stats</div></div>
+          <div class="stat-row"><span class="stat-key">Mean</span><span class="stat-v">4.2 units</span></div>
+          <div class="stat-row"><span class="stat-key">Median</span><span class="stat-v">3 units</span></div>
+          <div class="stat-row"><span class="stat-key">Std deviation</span><span class="stat-v">3.8</span></div>
+          <div class="stat-row"><span class="stat-key">Min</span><span class="stat-v">1</span></div>
+          <div class="stat-row"><span class="stat-key">Max</span><span class="stat-v">48</span></div>
+          <div class="stat-row"><span class="stat-key">25th percentile</span><span class="stat-v">2</span></div>
+          <div class="stat-row"><span class="stat-key">75th percentile</span><span class="stat-v">6</span></div>
+          <div class="stat-row"><span class="stat-key">Skewness</span><span class="stat-v">2.11 (right)</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Categorical columns — value counts</div></div>
+        <table class="tbl">
+          <thead><tr><th>Column</th><th>Top value</th><th>Count</th><th>% of total</th><th>Unique values</th></tr></thead>
+          <tbody>
+            <tr><td>region</td><td>APAC</td><td class="mono">4,812</td><td class="mono">37.5%</td><td class="mono">4</td></tr>
+            <tr><td>channel</td><td>Online</td><td class="mono">7,104</td><td class="mono">55.3%</td><td class="mono">5</td></tr>
+            <tr><td>is_returned</td><td>false</td><td class="mono">11,940</td><td class="mono">93.0%</td><td class="mono">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RELATIONSHIPS -->
+    <div class="tab-content" id="tab-relationships">
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="sc purple"><div class="sl">Strong correlations</div><div class="sv">2</div><div class="sh">|r| &gt; 0.7</div></div>
+        <div class="sc blue"><div class="sl">Moderate</div><div class="sv">4</div><div class="sh">0.4 &lt; |r| &lt; 0.7</div></div>
+        <div class="sc teal"><div class="sl">Weak / none</div><div class="sv">6</div><div class="sh">|r| &lt; 0.4</div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Correlation matrix — numeric columns</div></div>
+        <div class="matrix-wrap">
+          <table class="matrix">
+            <thead>
+              <tr>
+                <th></th>
+                <th>revenue</th><th>units_sold</th><th>order_id</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="row-hdr">revenue</td>
+                <td style="background:rgba(124,58,237,0.5);color:#c4b5fd;">1.00</td>
+                <td style="background:rgba(124,58,237,0.35);color:#a78bfa;">0.74</td>
+                <td style="background:rgba(255,255,255,0.03);color:#374151;">0.02</td>
+              </tr>
+              <tr>
+                <td class="row-hdr">units_sold</td>
+                <td style="background:rgba(124,58,237,0.35);color:#a78bfa;">0.74</td>
+                <td style="background:rgba(124,58,237,0.5);color:#c4b5fd;">1.00</td>
+                <td style="background:rgba(255,255,255,0.03);color:#374151;">-0.03</td>
+              </tr>
+              <tr>
+                <td class="row-hdr">order_id</td>
+                <td style="background:rgba(255,255,255,0.03);color:#374151;">0.02</td>
+                <td style="background:rgba(255,255,255,0.03);color:#374151;">-0.03</td>
+                <td style="background:rgba(124,58,237,0.5);color:#c4b5fd;">1.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px;font-size:11px;color:#4a5568;font-family:'DM Mono',monospace;line-height:1.6;">Strong positive correlation between <span style="color:#c4b5fd;">revenue</span> and <span style="color:#c4b5fd;">units_sold</span> (r = 0.74) — higher unit counts strongly predict higher revenue.</div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Revenue by region — mean comparison</div></div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">APAC</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$6,240 avg</span></div><div class="track"><div class="fill" style="width:82%;background:#7c3aed;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">NA</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$5,810 avg</span></div><div class="track"><div class="fill" style="width:76%;background:#2563eb;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">EMEA</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$5,120 avg</span></div><div class="track"><div class="fill" style="width:67%;background:#0d9488;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">LATAM</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$3,890 avg</span></div><div class="track"><div class="fill" style="width:51%;background:#d97706;"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="tab-content" id="tab-charts">
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="panel">
+          <div class="ph"><div class="ptl">Revenue by month</div><div class="pa">expand →</div></div>
+          <div class="chart-area">
+            <div class="bar" style="height:60%;background:rgba(59,130,246,0.5)"></div>
+            <div class="bar" style="height:75%;background:rgba(59,130,246,0.5)"></div>
+            <div class="bar" style="height:100%;background:rgba(59,130,246,0.65)"></div>
+            <div class="bar" style="height:85%;background:rgba(59,130,246,0.5)"></div>
+            <div class="bar" style="height:70%;background:rgba(59,130,246,0.5)"></div>
+            <div class="bar" style="height:55%;background:rgba(59,130,246,0.45)"></div>
+            <div class="bar" style="height:40%;background:rgba(59,130,246,0.4)"></div>
+          </div>
+          <div class="chart-labels"><span class="chart-label">Jan</span><span class="chart-label">Feb</span><span class="chart-label">Mar</span><span class="chart-label">Apr</span><span class="chart-label">May</span><span class="chart-label">Jun</span><span class="chart-label">Jul</span></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Units sold distribution</div><div class="pa">expand →</div></div>
+          <div class="chart-area">
+            <div class="bar" style="height:100%;background:rgba(13,148,136,0.5)"></div>
+            <div class="bar" style="height:72%;background:rgba(13,148,136,0.45)"></div>
+            <div class="bar" style="height:50%;background:rgba(13,148,136,0.4)"></div>
+            <div class="bar" style="height:30%;background:rgba(13,148,136,0.35)"></div>
+            <div class="bar" style="height:18%;background:rgba(13,148,136,0.3)"></div>
+            <div class="bar" style="height:10%;background:rgba(13,148,136,0.25)"></div>
+            <div class="bar" style="height:5%;background:rgba(13,148,136,0.2)"></div>
+          </div>
+          <div class="chart-labels"><span class="chart-label">1</span><span class="chart-label">2-3</span><span class="chart-label">4-5</span><span class="chart-label">6-8</span><span class="chart-label">9-12</span><span class="chart-label">13-20</span><span class="chart-label">20+</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Revenue share by region</div></div>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#7c3aed" stroke-width="20" stroke-dasharray="94.2 251.3" stroke-dashoffset="0"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#2563eb" stroke-width="20" stroke-dasharray="66.0 251.3" stroke-dashoffset="-94.2"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#0d9488" stroke-width="20" stroke-dasharray="58.8 251.3" stroke-dashoffset="-160.2"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#d97706" stroke-width="20" stroke-dasharray="32.3 251.3" stroke-dashoffset="-219.0"/>
+          </svg>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:2px;background:#7c3aed;flex-shrink:0;"></div><span style="font-size:11px;color:#94a3b8;">APAC</span><span style="font-size:11px;font-family:'DM Mono',monospace;color:#374151;margin-left:8px;">37.5%</span></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:2px;background:#2563eb;flex-shrink:0;"></div><span style="font-size:11px;color:#94a3b8;">NA</span><span style="font-size:11px;font-family:'DM Mono',monospace;color:#374151;margin-left:8px;">26.3%</span></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:2px;background:#0d9488;flex-shrink:0;"></div><span style="font-size:11px;color:#94a3b8;">EMEA</span><span style="font-size:11px;font-family:'DM Mono',monospace;color:#374151;margin-left:8px;">23.4%</span></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:2px;background:#d97706;flex-shrink:0;"></div><span style="font-size:11px;color:#94a3b8;">LATAM</span><span style="font-size:11px;font-family:'DM Mono',monospace;color:#374151;margin-left:8px;">12.8%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ML LAB -->
+    <div class="tab-content" id="tab-mllab">
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="sc purple"><div class="sl">Active model</div><div class="sv" style="font-size:16px;margin-top:4px;">Random Forest</div><div class="sh">Classification</div></div>
+        <div class="sc teal"><div class="sl">Accuracy</div><div class="sv">94.2%</div><div class="sh ok">F1 score: 0.91</div></div>
+        <div class="sc blue"><div class="sl">Training rows</div><div class="sv">10,272</div><div class="sh">80 / 20 split</div></div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="panel">
+          <div class="ph"><div class="ptl">Select model</div></div>
+          <div class="ml-model sel" onclick="selectModel(this)"><div><div class="ml-model-name">Random Forest</div><div class="ml-model-sub">Classification · Ensemble</div></div><div class="ml-sel-dot"></div></div>
+          <div class="ml-model" onclick="selectModel(this)"><div><div class="ml-model-name">XGBoost</div><div class="ml-model-sub">Classification · Gradient boost</div></div><div class="ml-sel-dot"></div></div>
+          <div class="ml-model" onclick="selectModel(this)"><div><div class="ml-model-name">Linear Regression</div><div class="ml-model-sub">Regression · Parametric</div></div><div class="ml-sel-dot"></div></div>
+          <div class="ml-model" onclick="selectModel(this)"><div><div class="ml-model-name">K-Means</div><div class="ml-model-sub">Clustering · Unsupervised</div></div><div class="ml-sel-dot"></div></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Last run results</div></div>
+          <div class="result-row"><span class="result-label">Accuracy</span><span class="result-val ok">94.2%</span></div>
+          <div class="result-row"><span class="result-label">Precision</span><span class="result-val ok">0.93</span></div>
+          <div class="result-row"><span class="result-label">Recall</span><span class="result-val ok">0.91</span></div>
+          <div class="result-row"><span class="result-label">F1 Score</span><span class="result-val ok">0.91</span></div>
+          <div class="result-row"><span class="result-label">AUC-ROC</span><span class="result-val ok">0.97</span></div>
+          <div class="result-row"><span class="result-label">Train time</span><span class="result-val">4.2s</span></div>
+          <div style="margin-top:12px;"><button style="width:100%;padding:8px;border-radius:6px;border:none;background:#7c3aed;color:#ede9fe;font-size:11px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Re-run model</button></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="ptl">Feature importance</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">units_sold</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">0.38</span></div><div class="track"><div class="fill" style="width:100%;background:#7c3aed;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">region</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">0.24</span></div><div class="track"><div class="fill" style="width:63%;background:#2563eb;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">order_date</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">0.18</span></div><div class="track"><div class="fill" style="width:47%;background:#0d9488;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">channel</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">0.12</span></div><div class="track"><div class="fill" style="width:32%;background:#d97706;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:#94a3b8;">is_returned</span><span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">0.08</span></div><div class="track"><div class="fill" style="width:21%;background:#374151;"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function switchTab(name, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('show'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('show');
+}
+function selectModel(el){
+  document.querySelectorAll('.ml-model').forEach(m=>m.classList.remove('sel'));
+  el.classList.add('sel');
+}
+</script>

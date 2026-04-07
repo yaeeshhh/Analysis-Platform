@@ -6,6 +6,7 @@ import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
 import MobileSectionList, { type MobileSection } from "@/components/ui/MobileSectionList";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import { getAnalyses } from "@/lib/analysisApi";
 import {
   getRememberStatus,
   REMEMBER_LOGIN_STORAGE_KEY,
@@ -88,12 +89,27 @@ const toolGroups: Array<{
   },
 ];
 
+function getAccountInitials(value: string) {
+  const parts = value
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (parts.length === 0) return "AS";
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("") || "AS";
+}
+
 export default function AccountPage() {
   const [activeDialog, setActiveDialog] = useState<AccountDialogKey | null>(null);
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [rememberStatus, setRememberStatus] = useState<RememberStatus>(emptyRememberStatus);
+  const [archiveStats, setArchiveStats] = useState({
+    savedRuns: 0,
+    mlExperiments: 0,
+    mlReadyRuns: 0,
+  });
 
 
 
@@ -110,6 +126,7 @@ export default function AccountPage() {
       if (!authenticatedUser) {
         setUser(null);
         setRememberStatus(emptyRememberStatus);
+        setArchiveStats({ savedRuns: 0, mlExperiments: 0, mlReadyRuns: 0 });
         setLoginRequired(true);
         setLoading(false);
         return;
@@ -117,6 +134,20 @@ export default function AccountPage() {
 
       setUser(authenticatedUser);
       setRememberStatus(getRememberStatus(authenticatedUser.email));
+
+      try {
+        const analyses = await getAnalyses();
+        if (!active) return;
+        setArchiveStats({
+          savedRuns: analyses.length,
+          mlExperiments: analyses.reduce((sum, item) => sum + item.experiment_count, 0),
+          mlReadyRuns: analyses.filter((item) => item.insights.modeling_readiness.is_ready).length,
+        });
+      } catch {
+        if (!active) return;
+        setArchiveStats({ savedRuns: 0, mlExperiments: 0, mlReadyRuns: 0 });
+      }
+
       setLoginRequired(false);
       setLoading(false);
     };
@@ -152,37 +183,40 @@ export default function AccountPage() {
     };
   }, [user?.email]);
 
-  const stats = user
-    ? [
-        {
-          label: "Member since",
-          value: formatDate(user.created_at),
-          hint: user.email,
-        },
-        {
-          label: "Status",
-          value: user.is_active ? "Active" : "Inactive",
-          hint: "Current access state",
-        },
-        {
-          label: "Remembered login",
-          value: rememberStatus.available
-            ? rememberStatus.enabled
-              ? `${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"}`
-              : "Disabled"
-            : "Not set",
-          hint: "This browser only",
-        },
-      ]
-    : [];
+  const usageScale = Math.max(archiveStats.savedRuns, archiveStats.mlExperiments, archiveStats.mlReadyRuns, 1);
+  const usageItems = [
+    {
+      label: "Saved runs",
+      value: archiveStats.savedRuns,
+      caption: `${archiveStats.savedRuns} current archive item${archiveStats.savedRuns === 1 ? "" : "s"}`,
+      hint: `${archiveStats.mlReadyRuns} run${archiveStats.mlReadyRuns === 1 ? "" : "s"} currently look ML-ready.`,
+      tone: "#2563eb",
+      width: (archiveStats.savedRuns / usageScale) * 100,
+    },
+    {
+      label: "ML-ready runs",
+      value: archiveStats.mlReadyRuns,
+      caption: `${archiveStats.mlReadyRuns} of ${archiveStats.savedRuns} saved run${archiveStats.savedRuns === 1 ? "" : "s"}`,
+      hint: "Use these when you want to reopen stronger candidates for optional ML.",
+      tone: "#f59e0b",
+      width: (archiveStats.mlReadyRuns / usageScale) * 100,
+    },
+    {
+      label: "Saved ML experiments",
+      value: archiveStats.mlExperiments,
+      caption: `${archiveStats.mlExperiments} stored experiment output${archiveStats.mlExperiments === 1 ? "" : "s"}`,
+      hint: "Reopen or download them from Analysis and History whenever needed.",
+      tone: "#ef4444",
+      width: (archiveStats.mlExperiments / usageScale) * 100,
+    },
+  ];
 
   return (
     <>
       <AppShell
-        eyebrow="Account"
-        title="Manage access, identity, and saved work"
-        description="Update profile details, remembered-login settings, saved runs, and deletion controls from one account center."
-        stats={stats}
+        eyebrow="Settings"
+        title="Account"
+        description="Manage access, identity, and saved work."
         actions={
           user ? (
             <div className="flex flex-wrap gap-3">
@@ -243,61 +277,213 @@ export default function AccountPage() {
             </div>
 
             {/* ─── Desktop: flowing sections ─── */}
-            <section id="account-first-block" className="tablet-up route-scroll-target space-y-0">
-              <section className="flow-section section-glow">
-                <p className="flow-section-label">Account snapshot</p>
-                <div className="accent-bar" />
-                <div className="stat-row mt-3">
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{user.username || "Not set"}</p>
-                    <p className="stat-row-label">Username</p>
+            <div id="account-first-block" className="tablet-up route-scroll-target desktop-page-stack">
+              <section className="desktop-panel">
+                <div className="desktop-panel-header">
+                  <p className="desktop-panel-title">Profile</p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("username")}
+                    className="desktop-panel-action"
+                  >
+                    Edit profile
+                  </button>
+                </div>
+
+                <div className="grid gap-6 xl:grid-cols-[auto,1fr]">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#3b82f6,#7c3aed)] font-[family:var(--font-display)] text-2xl font-bold text-white">
+                      {getAccountInitials(user.username || user.email)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-[family:var(--font-display)] text-2xl font-bold text-white">
+                        {user.username || user.email}
+                      </p>
+                      <p className="mt-1 font-[family:var(--font-mono)] text-[0.72rem] uppercase tracking-[0.14em] text-white/28">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value break-all">{user.email}</p>
-                    <p className="stat-row-label">Email</p>
+
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {[
+                      { label: "Username", value: user.username || "Not set" },
+                      { label: "Email", value: user.email },
+                      { label: "Member since", value: formatDate(user.created_at) },
+                      {
+                        label: "Remembered login",
+                        value: rememberStatus.available
+                          ? rememberStatus.enabled
+                            ? `${rememberStatus.daysRemaining} day${rememberStatus.daysRemaining === 1 ? "" : "s"}`
+                            : "Disabled"
+                          : "Not set",
+                      },
+                    ].map((field) => (
+                      <div key={field.label} className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
+                        <p className="text-[0.62rem] uppercase tracking-[0.16em] text-white/28">{field.label}</p>
+                        <p className="mt-2 text-sm font-medium text-white/78 break-all">{field.value}</p>
+                      </div>
+                    ))}
                   </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">{formatDate(user.created_at)}</p>
-                    <p className="stat-row-label">Member since</p>
-                  </div>
-                  <div className="stat-row-item">
-                    <p className="stat-row-value">
-                      {rememberStatus.available
-                        ? rememberStatus.enabled
-                          ? `${rememberStatus.daysRemaining}d`
-                          : "Off"
-                        : "N/A"}
-                    </p>
-                    <p className="stat-row-label">Remembered login</p>
-                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("username")}
+                    className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+                  >
+                    Change username
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("email")}
+                    className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+                  >
+                    Change email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDialog("password")}
+                    className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+                  >
+                    Update password
+                  </button>
                 </div>
               </section>
 
-              {toolGroups.map((group) => (
-                <section key={group.title} className="flow-section">
-                  <p className="flow-section-label" style={{ color: group.accent }}>{group.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-white/50">{group.description}</p>
-                  <div className="mt-3">
-                    {group.items.map((item) => (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => { setActiveDialog(item.key); }}
-                        className={`list-row w-full text-left ${item.destructive ? "hover:bg-[#2a1215]/50" : ""}`}
-                      >
-                        <div className="list-row-content">
-                          <p className={`list-row-title ${item.destructive ? "text-[#ffb4ba]" : ""}`}>{item.title}</p>
-                          <p className="list-row-hint">{item.detail}</p>
-                        </div>
-                        <span className={`shrink-0 text-xs ${item.destructive ? "text-[#ffb4ba]/60" : "text-white/30"}`}>
-                          {item.destructive ? <span className="danger-label"><span className="text-[#ff8c8c]/70">Danger</span></span> : "›"}
+              <section className="desktop-panel">
+                <div className="desktop-panel-header">
+                  <p className="desktop-panel-title">Usage snapshot</p>
+                  <span className="desktop-panel-action">Current workspace state</span>
+                </div>
+
+                <div className="space-y-5">
+                  {usageItems.map((item) => (
+                    <div key={item.label}>
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span className="text-sm text-white/76">{item.label}</span>
+                        <span className="font-[family:var(--font-mono)] text-[0.72rem] uppercase tracking-[0.14em] text-white/28">
+                          {item.caption}
                         </span>
-                      </button>
-                    ))}
+                      </div>
+                      <div className="mt-2 h-1.5 rounded-full bg-white/6">
+                        <div
+                          className="h-1.5 rounded-full"
+                          style={{ width: `${Math.max(item.width, item.value > 0 ? 18 : 0)}%`, background: item.tone }}
+                        />
+                      </div>
+                      <p className="mt-2 text-[0.72rem] leading-5 text-white/32">{item.hint}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="desktop-panel">
+                <div className="desktop-panel-header">
+                  <p className="desktop-panel-title">Login & session</p>
+                  <span className="desktop-panel-action">Browser and access controls</span>
+                </div>
+
+                <div className="divide-y divide-white/6">
+                  {[
+                    {
+                      key: "remember",
+                      title: "Remember login",
+                      detail: rememberStatus.available
+                        ? rememberStatus.enabled
+                          ? `Enabled for ${rememberStatus.daysRemaining} more day${rememberStatus.daysRemaining === 1 ? "" : "s"} on this browser.`
+                          : "Disabled on this browser."
+                        : "No remembered-login state is set on this browser yet.",
+                      action: "Manage",
+                    },
+                    {
+                      key: "email",
+                      title: "Email access",
+                      detail: "Change the login email through its verification flow without touching the rest of the account settings.",
+                      action: "Open",
+                    },
+                    {
+                      key: "password",
+                      title: "Password security",
+                      detail: "Update the password independently so access recovery and identity changes stay isolated.",
+                      action: "Open",
+                    },
+                    {
+                      key: "notifications",
+                      title: "Email notifications",
+                      detail: "Completion alerts and background reminders are planned for a later release.",
+                      badge: "Coming soon",
+                    },
+                    {
+                      key: "2fa",
+                      title: "Two-factor authentication",
+                      detail: "A second verification step is not available yet, but the desktop layout now reserves space for it.",
+                      badge: "Planned",
+                    },
+                  ].map((row) => (
+                    <div key={row.key} className="flex items-center justify-between gap-6 py-4 first:pt-0 last:pb-0">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white/82">{row.title}</p>
+                        <p className="mt-1 text-sm leading-6 text-white/40">{row.detail}</p>
+                      </div>
+                      {"action" in row ? (
+                        <button
+                          type="button"
+                          onClick={() => setActiveDialog(row.key as AccountDialogKey)}
+                          className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-white/78"
+                        >
+                          {row.action}
+                        </button>
+                      ) : (
+                        <span className="desktop-badge" data-tone="purple">{row.badge}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="desktop-panel" style={{ borderColor: "rgba(90, 35, 40, 0.58)" }}>
+                <div className="desktop-panel-header">
+                  <p className="desktop-panel-title text-[#ffc7cc]">Danger zone</p>
+                  <span className="desktop-panel-action" style={{ color: "#f59ea7" }}>High-impact actions</span>
+                </div>
+
+                <div className="divide-y divide-white/6">
+                  <div className="flex items-center justify-between gap-6 py-4 first:pt-0">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-white/82">Delete saved runs</p>
+                      <p className="mt-1 text-sm leading-6 text-white/40">
+                        Remove uploaded datasets, saved reports, and stored ML experiment files for this account.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveDialog("clear-uploads")}
+                      className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
+                    >
+                      Delete runs
+                    </button>
                   </div>
-                </section>
-              ))}
-            </section>
+
+                  <div className="flex items-center justify-between gap-6 py-4 last:pb-0">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-white/82">Delete account</p>
+                      <p className="mt-1 text-sm leading-6 text-white/40">
+                        Start the separate email-verified account deletion flow. This cannot be reversed once confirmed.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveDialog("danger")}
+                      className="rounded-lg border border-[#5a2328]/60 px-4 py-2.5 text-sm font-medium text-[#ffb4ba]"
+                    >
+                      Delete account
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
           </>
         ) : null}
 
@@ -322,6 +508,7 @@ export default function AccountPage() {
         }}
         onAnalysisUploadsCleared={() => {
           clearCurrentAnalysisSelection();
+          setArchiveStats({ savedRuns: 0, mlExperiments: 0, mlReadyRuns: 0 });
           notifyAnalysesChanged();
         }}
       />

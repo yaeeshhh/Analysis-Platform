@@ -10,7 +10,23 @@ import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 
-export default function ProfileMenu() {
+type ProfileMenuProps = {
+  variant?: "default" | "sidebar";
+};
+
+function getInitials(user: User | null) {
+  if (!user) return "?";
+
+  const source = user.username || user.email || "Profile";
+  return source
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("") || source.charAt(0).toUpperCase();
+}
+
+export default function ProfileMenu({ variant = "default" }: ProfileMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -20,6 +36,8 @@ export default function ProfileMenu() {
   const [user, setUser] = useState<User | null>(null);
 
   const currentPath = pathname || "/dashboard";
+  const isSidebar = variant === "sidebar";
+  const initials = getInitials(user);
 
   useEffect(() => {
     let active = true;
@@ -103,8 +121,18 @@ export default function ProfileMenu() {
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70">
-        Profile
+      <div className={isSidebar ? "profile-menu-sidebar-button" : "rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70"}>
+        {isSidebar ? (
+          <>
+            <span className="profile-menu-avatar">...</span>
+            <span className="profile-menu-copy">
+              <span className="profile-menu-name">Loading</span>
+              <span className="profile-menu-subtitle">Account tools</span>
+            </span>
+          </>
+        ) : (
+          "Profile"
+        )}
       </div>
     );
   }
@@ -133,13 +161,23 @@ export default function ProfileMenu() {
 
           setMenuOpen((previous) => !previous);
         }}
-        className="max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+        className={isSidebar ? "profile-menu-sidebar-button" : "max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"}
       >
-        <span className="block truncate">{user ? user.username || "Profile" : "Log in"}</span>
+        {isSidebar ? (
+          <>
+            <span className="profile-menu-avatar">{initials}</span>
+            <span className="profile-menu-copy">
+              <span className="profile-menu-name">{user ? user.username || "Profile" : "Log in"}</span>
+              <span className="profile-menu-subtitle">{user ? "Open account tools" : "Access saved runs"}</span>
+            </span>
+          </>
+        ) : (
+          <span className="block truncate">{user ? user.username || "Profile" : "Log in"}</span>
+        )}
       </button>
 
       {menuOpen && user ? (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[280px] rounded-xl border border-white/10 bg-[#111821]/96 p-4">
+        <div className={isSidebar ? "profile-menu-popover profile-menu-popover-sidebar" : "profile-menu-popover profile-menu-popover-default"}>
           <div className="space-y-4">
             <div className="rounded-[18px] border border-white/10 bg-black/10 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-white/42">Signed in</p>
