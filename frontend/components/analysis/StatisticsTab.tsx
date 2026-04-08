@@ -2,16 +2,20 @@ import { AnalysisStatistics } from "@/lib/analysisTypes";
 
 type StatisticsTabProps = {
   statistics: AnalysisStatistics;
+  mobileSection?: string | null;
 };
 
 function metric(value: number) {
   return Number.isInteger(value) ? value.toString() : value.toFixed(4);
 }
 
-export default function StatisticsTab({ statistics }: StatisticsTabProps) {
+export default function StatisticsTab({ statistics, mobileSection }: StatisticsTabProps) {
+  const show = (section: string) => !mobileSection || mobileSection === section;
+
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">
-      <details className="mobile-accordion">
+      {show("numeric-summary") ? (
+      <details className="mobile-accordion" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Numeric summary</span>
@@ -45,8 +49,10 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
           </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion">
+      {show("categorical-summary") ? (
+      <details className="mobile-accordion" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Categorical summary</span>
@@ -82,6 +88,7 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
           </div>
         </div>
       </details>
+      ) : null}
     </section>
   );
 }

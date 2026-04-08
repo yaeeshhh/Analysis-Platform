@@ -6,6 +6,7 @@ type OverviewTabProps = {
   schema: AnalysisSchema;
   quality: AnalysisQuality;
   insights: AnalysisInsights;
+  mobileSection?: string | null;
 };
 
 function formatPreviewValue(value: unknown) {
@@ -19,7 +20,7 @@ function truncatePreview(text: string, limit = 96) {
   return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
 }
 
-export default function OverviewTab({ overview, schema, quality, insights }: OverviewTabProps) {
+export default function OverviewTab({ overview, schema, quality, insights, mobileSection }: OverviewTabProps) {
   const previewColumns = Object.keys(overview.preview_rows?.[0] ?? {});
   const headlineFindings = insights.findings.slice(0, 3);
   const stats = [
@@ -31,10 +32,14 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
   const typeMix = getTypeMix(schema);
   const posture = getDatasetPosture(overview, schema, quality, insights);
 
+  const show = (section: string) => !mobileSection || mobileSection === section;
+
   return (
     <section className="analysis-tab-surface space-y-4">
+      {show("what-the-data-says") || show("dataset-posture") ? (
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <details className="mobile-accordion">
+        {show("what-the-data-says") ? (
+        <details className="mobile-accordion" open={!!mobileSection}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
@@ -62,8 +67,10 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             ) : null}
           </div>
         </details>
+        ) : null}
 
-        <details className="mobile-accordion">
+        {show("dataset-posture") ? (
+        <details className="mobile-accordion" open={!!mobileSection}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</span>
@@ -89,8 +96,11 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             </div>
           </div>
         </details>
+        ) : null}
       </div>
+      ) : null}
 
+      {!mobileSection ? (
       <div className="grid gap-4 md:grid-cols-4">
         {stats.map((stat) => (
           <article key={stat.label} className="border-b border-white/6 pb-3">
@@ -99,9 +109,12 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
           </article>
         ))}
       </div>
+      ) : null}
 
+      {show("type-mix") || show("reading-order") ? (
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <details className="mobile-accordion">
+        {show("type-mix") ? (
+        <details className="mobile-accordion" open={!!mobileSection}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</span>
@@ -132,8 +145,10 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             </div>
           </div>
         </details>
+        ) : null}
 
-        <details className="mobile-accordion">
+        {show("reading-order") ? (
+        <details className="mobile-accordion" open={!!mobileSection}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Reading order</span>
@@ -171,9 +186,12 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             </div>
           </div>
         </details>
+        ) : null}
       </div>
+      ) : null}
 
-      <details className="mobile-accordion">
+      {show("raw-data") ? (
+      <details className="mobile-accordion" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Raw data</span>
@@ -216,6 +234,7 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
         </div>
         </div>
       </details>
+      ) : null}
     </section>
   );
 }

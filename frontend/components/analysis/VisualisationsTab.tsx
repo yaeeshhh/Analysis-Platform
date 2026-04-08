@@ -17,6 +17,7 @@ import { getVisualGuides, getVisualNarratives, getVisualStory } from "@/lib/anal
 
 type VisualisationsTabProps = {
   visualisations: AnalysisVisualisations;
+  mobileSection?: string | null;
 };
 
 const chartPalette = ["#7ad6ff", "#9db8ff", "#8bf1a8", "#bfb8ff", "#d7b7ff"];
@@ -80,7 +81,7 @@ function ChartGuide({
   );
 }
 
-export default function VisualisationsTab({ visualisations }: VisualisationsTabProps) {
+export default function VisualisationsTab({ visualisations, mobileSection }: VisualisationsTabProps) {
   const story = getVisualStory(visualisations);
   const narratives = getVisualNarratives(visualisations);
   const guides = getVisualGuides(visualisations);
@@ -103,9 +104,12 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
     : [];
   const histogramPreview = [...histogramData].sort((left, right) => right.count - left.count).slice(0, 3);
 
+  const show = (section: string) => !mobileSection || mobileSection === section;
+
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">
-      <details className="mobile-accordion min-w-0">
+      {show("missingness") ? (
+      <details className="mobile-accordion min-w-0" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
@@ -158,8 +162,10 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion min-w-0">
+      {show("distribution") ? (
+      <details className="mobile-accordion min-w-0" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Distribution</span>
@@ -215,8 +221,10 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion min-w-0 lg:col-span-2">
+      {show("top-categories") ? (
+      <details className="mobile-accordion min-w-0 lg:col-span-2" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Top categories</span>
@@ -267,8 +275,10 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion">
+      {show("boxplot-summary") ? (
+      <details className="mobile-accordion" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Boxplot summary</span>
@@ -305,8 +315,10 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion min-w-0">
+      {show("correlation-heatmap") ? (
+      <details className="mobile-accordion min-w-0" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Correlation heatmap</span>
@@ -373,8 +385,10 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion min-w-0 lg:col-span-2">
+      {show("pairwise-scatter") ? (
+      <details className="mobile-accordion min-w-0 lg:col-span-2" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Pairwise scatter</span>
@@ -435,8 +449,10 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion lg:col-span-2">
+      {show("drift-checks") ? (
+      <details className="mobile-accordion lg:col-span-2" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Drift checks</span>
@@ -483,6 +499,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         </div>
         </div>
       </details>
+      ) : null}
     </section>
   );
 }
