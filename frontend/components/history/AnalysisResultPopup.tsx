@@ -40,6 +40,97 @@ const sections = [
 
 type PopupSectionId = (typeof sections)[number]["id"];
 
+const popupCards: Array<{
+  key: PopupSectionId;
+  label: string;
+  description: string;
+  icon: string;
+  subtabs?: Array<{ section: string; label: string }>;
+}> = [
+  {
+    key: "overview",
+    label: "Summary",
+    description: "AI summary, dataset posture, type mix, reading order, and raw data preview.",
+    icon: "📊",
+    subtabs: [
+      { section: "what-the-data-says", label: "What the data says" },
+      { section: "dataset-posture", label: "Dataset posture" },
+      { section: "type-mix", label: "Type mix" },
+      { section: "reading-order", label: "Reading order" },
+      { section: "raw-data", label: "Raw data" },
+    ],
+  },
+  {
+    key: "insights",
+    label: "Findings",
+    description: "Key findings, cleanup steps, and modeling readiness assessment.",
+    icon: "🔍",
+    subtabs: [
+      { section: "findings", label: "Findings" },
+      { section: "what-to-do-next", label: "What to do next" },
+    ],
+  },
+  {
+    key: "quality",
+    label: "Quality",
+    description: "Missing values, duplicates, constants, and quality recommendations.",
+    icon: "🩺",
+    subtabs: [
+      { section: "missingness", label: "Missingness" },
+      { section: "recommendations", label: "Recommendations" },
+    ],
+  },
+  {
+    key: "statistics",
+    label: "Statistics",
+    description: "Numeric and categorical column summaries with key distribution metrics.",
+    icon: "📐",
+    subtabs: [
+      { section: "numeric-summary", label: "Numeric summary" },
+      { section: "categorical-summary", label: "Categorical summary" },
+    ],
+  },
+  {
+    key: "schema",
+    label: "Fields",
+    description: "Column types, roles, identifiers, and target candidates.",
+    icon: "🗂️",
+  },
+  {
+    key: "relationships",
+    label: "Patterns",
+    description: "Correlations, skewed fields, dominant categories, and modeling signals.",
+    icon: "🔗",
+    subtabs: [
+      { section: "strongest-relationships", label: "Relationships" },
+      { section: "skewed-numeric-fields", label: "Skew" },
+      { section: "dominant-categories", label: "Dominant categories" },
+      { section: "modeling-signals", label: "Modeling signals" },
+    ],
+  },
+  {
+    key: "visualisations",
+    label: "Charts",
+    description: "Missingness, histograms, categories, boxplots, heatmap, scatter, and drift.",
+    icon: "📈",
+    subtabs: [
+      { section: "missingness", label: "Missingness" },
+      { section: "distribution", label: "Distribution" },
+      { section: "top-categories", label: "Top categories" },
+      { section: "boxplot-summary", label: "Boxplots" },
+      { section: "correlation-heatmap", label: "Heatmap" },
+      { section: "pairwise-scatter", label: "Scatter" },
+      { section: "drift-checks", label: "Drift" },
+    ],
+  },
+  {
+    key: "ml",
+    label: "ML Lab",
+    description: "Saved experiments and benchmark outputs.",
+    icon: "🧪",
+  },
+];
+
 function hasRenderableReport(report: AnalysisReport | null) {
   return Boolean(
     report &&
@@ -211,8 +302,9 @@ export default function AnalysisResultPopup({
               </div>
             ) : null}
 
+            {/* Desktop/tablet: Jump to section dropdown */}
             {report && ready ? (
-              <div className="history-popup-jump">
+              <div className="history-popup-jump tablet-up">
                 <label className="history-popup-select-shell">
                   <span className="history-popup-select-label">Jump to section</span>
                   <select
@@ -258,8 +350,22 @@ export default function AnalysisResultPopup({
             </div>
           ) : null}
 
+          {/* ── Phone: card-based navigation ── */}
           {!loading && !error && report && ready ? (
-            <div className="history-popup-content">
+            <div className="phone-only">
+              <PopupMobileCards
+                key={report.analysis_id}
+                report={report}
+                onRunUnsupervised={onRunUnsupervised}
+                onRunSupervised={onRunSupervised}
+                onDeleteExperiment={onDeleteExperiment}
+              />
+            </div>
+          ) : null}
+
+          {/* ── Tablet/Desktop: long scroll with section frames ── */}
+          {!loading && !error && report && ready ? (
+            <div className="history-popup-content tablet-up">
               <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows.">
                 <OverviewTab
                   overview={report.overview}
@@ -322,6 +428,127 @@ export default function AnalysisResultPopup({
           className="bottom-5 right-5 z-[145] sm:bottom-6 sm:right-6"
         />
       </div>
+    </div>
+  );
+}
+
+/* ── Sub-component for mobile card navigation (state resets via key) ── */
+
+type PopupMobileCardsProps = {
+  report: AnalysisReport;
+  onRunUnsupervised: (nClusters: number) => Promise<UnsupervisedResult>;
+  onRunSupervised: (targetColumn: string) => Promise<SupervisedResult>;
+  onDeleteExperiment: (experiment: MlExperimentSummary) => Promise<void>;
+};
+
+function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDeleteExperiment }: PopupMobileCardsProps) {
+  const [openCard, setOpenCard] = useState<PopupSectionId | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  function handleOpenCard(card: (typeof popupCards)[number]) {
+    setOpenCard(card.key);
+    setActiveSection(card.subtabs?.[0]?.section ?? null);
+  }
+
+  function handleBack() {
+    setOpenCard(null);
+    setActiveSection(null);
+  }
+
+  function renderContent(): ReactNode {
+    if (!openCard) return null;
+    switch (openCard) {
+      case "overview":
+        return <OverviewTab overview={report.overview} schema={report.schema} quality={report.quality} insights={report.insights} mobileSection={activeSection} />;
+      case "insights":
+        return <InsightsTab insights={report.insights} mobileSection={activeSection} />;
+      case "schema":
+        return <SchemaTab schema={report.schema} />;
+      case "quality":
+        return <DataQualityTab overview={report.overview} quality={report.quality} mobileSection={activeSection} />;
+      case "statistics":
+        return <StatisticsTab statistics={report.statistics} mobileSection={activeSection} />;
+      case "relationships":
+        return <RelationshipsTab schema={report.schema} statistics={report.statistics} mobileSection={activeSection} />;
+      case "visualisations":
+        return <VisualisationsTab visualisations={report.visualisations} mobileSection={activeSection} />;
+      case "ml":
+        return (
+          <MLTab
+            key={`popup-mobile-${report.analysis_id}:${report.ml_experiments.map((e) => e.id).join("|")}`}
+            analysisId={report.analysis_id}
+            capabilities={report.ml_capabilities}
+            experiments={report.ml_experiments || []}
+            readiness={report.insights.modeling_readiness}
+            initialUnsupervised={report.ml_results.unsupervised}
+            initialSupervised={report.ml_results.supervised}
+            onRunUnsupervised={onRunUnsupervised}
+            onRunSupervised={onRunSupervised}
+            onDeleteExperiment={onDeleteExperiment}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
+  const currentCard = popupCards.find((c) => c.key === openCard);
+
+  if (openCard && currentCard) {
+    return (
+      <div className="history-popup-mobile-detail">
+        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          All sections
+        </button>
+
+        <div className="mobile-analysis-detail-header">
+          <span className="mobile-analysis-detail-icon">{currentCard.icon}</span>
+          <div>
+            <h2 className="mobile-analysis-detail-title">{currentCard.label}</h2>
+            <p className="mobile-analysis-detail-desc">{currentCard.description}</p>
+          </div>
+        </div>
+
+        {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+          <div className="mobile-analysis-tab-pills">
+            {currentCard.subtabs.map((sub) => (
+              <button
+                key={sub.section}
+                type="button"
+                onClick={() => setActiveSection(sub.section)}
+                className={`mobile-analysis-tab-pill${activeSection === sub.section ? " mobile-analysis-tab-pill-active" : ""}`}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">
+          {renderContent()}
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mobile-analysis-card-list">
+      {popupCards.map((card) => (
+        <button
+          key={card.key}
+          type="button"
+          onClick={() => handleOpenCard(card)}
+          className="mobile-analysis-card"
+        >
+          <span className="mobile-analysis-card-icon">{card.icon}</span>
+          <div className="mobile-analysis-card-text">
+            <p className="mobile-analysis-card-label">{card.label}</p>
+            <p className="mobile-analysis-card-desc">{card.description}</p>
+          </div>
+          <svg className="mobile-analysis-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      ))}
     </div>
   );
 }

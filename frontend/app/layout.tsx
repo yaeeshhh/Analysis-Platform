@@ -1,18 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Mono, Manrope, Space_Grotesk } from "next/font/google";
+import { DM_Mono, Inter } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import GlobalOverlays from "@/components/ui/GlobalOverlays";
 import DesktopAccordionOpener from "@/components/ui/DesktopAccordionOpener";
 import { MobileSlideProvider } from "@/components/ui/MobileSlideProvider";
 
-const bodyFont = Manrope({
+const bodyFont = Inter({
   subsets: ["latin"],
   variable: "--font-body",
 });
 
-const displayFont = Space_Grotesk({
+const displayFont = Inter({
   subsets: ["latin"],
+  weight: ["600", "700", "800"],
   variable: "--font-display",
 });
 
