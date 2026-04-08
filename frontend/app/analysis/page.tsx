@@ -596,87 +596,73 @@ export default function AnalysisPage() {
 
 /* ────────────────── Phone-only analysis card navigation ────────────────── */
 
-/** Cards shown on the mobile analysis index screen. Each maps to one tab component.
- *  Subtabs refer to accordion sections *within* that component. */
-const mobileAnalysisCards: Array<{
-  key: AnalysisTabKey;
+/** Cards shown on the mobile analysis index screen.
+ *  Each subtab can optionally override the tab component it renders via `tab`. */
+type MobileCardSubtab = { section: string; label: string; tab?: AnalysisTabKey };
+type MobileCard = {
+  key: string;
   label: string;
   description: string;
   icon: string;
-  subtabs?: Array<{ section: string; label: string }>;
-}> = [
+  defaultTab: AnalysisTabKey;
+  subtabs?: MobileCardSubtab[];
+};
+
+const mobileAnalysisCards: MobileCard[] = [
   {
     key: "overview",
-    label: "Summary",
-    description: "AI summary, dataset posture, type mix, reading order, and raw data preview.",
+    label: "Overview",
+    description: "AI summary, findings, posture, type mix, next steps, and raw data.",
     icon: "📊",
+    defaultTab: "overview",
     subtabs: [
-      { section: "what-the-data-says", label: "What the data says" },
-      { section: "dataset-posture", label: "Dataset posture" },
+      { section: "what-the-data-says", label: "Data says" },
+      { section: "dataset-posture", label: "Posture" },
       { section: "type-mix", label: "Type mix" },
-      { section: "reading-order", label: "Reading order" },
+      { section: "findings", label: "Findings", tab: "insights" },
+      { section: "what-to-do-next", label: "Next steps", tab: "insights" },
       { section: "raw-data", label: "Raw data" },
     ],
   },
   {
-    key: "insights",
-    label: "Findings",
-    description: "Key findings, cleanup steps, and modeling readiness assessment.",
-    icon: "🔍",
-    subtabs: [
-      { section: "findings", label: "Findings" },
-      { section: "what-to-do-next", label: "What to do next" },
-    ],
-  },
-  {
-    key: "quality",
-    label: "Quality",
-    description: "Missing values, duplicates, constants, and quality recommendations.",
+    key: "data-health",
+    label: "Data Health",
+    description: "Missing values, quality recommendations, numeric and categorical summaries.",
     icon: "🩺",
+    defaultTab: "quality",
     subtabs: [
-      { section: "missingness", label: "Missingness" },
-      { section: "recommendations", label: "Recommendations" },
-    ],
-  },
-  {
-    key: "statistics",
-    label: "Statistics",
-    description: "Numeric and categorical column summaries with key distribution metrics.",
-    icon: "📐",
-    subtabs: [
-      { section: "numeric-summary", label: "Numeric summary" },
-      { section: "categorical-summary", label: "Categorical summary" },
+      { section: "missingness", label: "Missing" },
+      { section: "recommendations", label: "Fixes" },
+      { section: "numeric-summary", label: "Numeric", tab: "statistics" },
+      { section: "categorical-summary", label: "Categorical", tab: "statistics" },
     ],
   },
   {
     key: "schema",
-    label: "Fields",
-    description: "Column types, roles, identifiers, and target candidates.",
+    label: "Schema",
+    description: "Column types, roles, correlations, skew, dominant categories, and signals.",
     icon: "🗂️",
-  },
-  {
-    key: "relationships",
-    label: "Patterns",
-    description: "Correlations, skewed fields, dominant categories, and modeling signals.",
-    icon: "🔗",
+    defaultTab: "schema",
     subtabs: [
-      { section: "strongest-relationships", label: "Relationships" },
-      { section: "skewed-numeric-fields", label: "Skew" },
-      { section: "dominant-categories", label: "Dominant categories" },
-      { section: "modeling-signals", label: "Modeling signals" },
+      { section: "__all__", label: "Fields" },
+      { section: "strongest-relationships", label: "Correlations", tab: "relationships" },
+      { section: "skewed-numeric-fields", label: "Skew", tab: "relationships" },
+      { section: "dominant-categories", label: "Dominant", tab: "relationships" },
+      { section: "modeling-signals", label: "Signals", tab: "relationships" },
     ],
   },
   {
-    key: "visualisations",
+    key: "charts",
     label: "Charts",
-    description: "Missingness, histograms, categories, boxplots, heatmap, scatter, and drift.",
+    description: "Missingness, distributions, categories, boxplots, heatmap, scatter, and drift.",
     icon: "📈",
+    defaultTab: "visualisations",
     subtabs: [
-      { section: "missingness", label: "Missingness" },
-      { section: "distribution", label: "Distribution" },
-      { section: "top-categories", label: "Top categories" },
-      { section: "boxplot-summary", label: "Boxplots" },
-      { section: "correlation-heatmap", label: "Heatmap" },
+      { section: "missingness", label: "Missing" },
+      { section: "distribution", label: "Distrib." },
+      { section: "top-categories", label: "Top cats" },
+      { section: "boxplot-summary", label: "Box" },
+      { section: "correlation-heatmap", label: "Heat" },
       { section: "pairwise-scatter", label: "Scatter" },
       { section: "drift-checks", label: "Drift" },
     ],
@@ -686,6 +672,7 @@ const mobileAnalysisCards: Array<{
     label: "ML Lab",
     description: "Run or reopen supervised and unsupervised experiments.",
     icon: "🧪",
+    defaultTab: "ml",
   },
 ];
 
@@ -701,28 +688,30 @@ function AnalysisMobileSections({
   refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
 }) {
   const [openCard, setOpenCard] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
 
-  /* When a card is opened, default to its first subtab (or null for cards without subtabs). */
-  function handleOpenCard(card: (typeof mobileAnalysisCards)[number]) {
+  /* When a card is opened, default to its first subtab. */
+  function handleOpenCard(card: MobileCard) {
     setOpenCard(card.key);
-    setActiveSection(card.subtabs?.[0]?.section ?? null);
-    onTabChange(card.key);
+    setActiveSubIdx(0);
+    onTabChange(card.defaultTab);
   }
 
   function handleBack() {
     setOpenCard(null);
-    setActiveSection(null);
+    setActiveSubIdx(0);
   }
 
-  function handleSectionChange(section: string) {
-    setActiveSection(section);
-  }
-
-  /* Render the tab component matching the opened card, passing mobileSection. */
+  /* Render the appropriate tab component for the currently active subtab. */
   function renderContent(): React.ReactNode {
     if (!openCard) return null;
-    switch (openCard as AnalysisTabKey) {
+    const card = mobileAnalysisCards.find((c) => c.key === openCard);
+    if (!card) return null;
+    const sub = card.subtabs?.[activeSubIdx];
+    const tab = sub?.tab ?? card.defaultTab;
+    const section = sub?.section === "__all__" ? null : (sub?.section ?? null);
+
+    switch (tab) {
       case "overview":
         return (
           <OverviewTab
@@ -730,21 +719,21 @@ function AnalysisMobileSections({
             schema={report.schema}
             quality={report.quality}
             insights={report.insights}
-            mobileSection={activeSection}
+            mobileSection={section}
           />
         );
       case "insights":
-        return <InsightsTab insights={report.insights} mobileSection={activeSection} />;
+        return <InsightsTab insights={report.insights} mobileSection={section} />;
       case "schema":
         return <SchemaTab schema={report.schema} />;
       case "quality":
-        return <DataQualityTab overview={report.overview} quality={report.quality} mobileSection={activeSection} />;
+        return <DataQualityTab overview={report.overview} quality={report.quality} mobileSection={section} />;
       case "statistics":
-        return <StatisticsTab statistics={report.statistics} mobileSection={activeSection} />;
+        return <StatisticsTab statistics={report.statistics} mobileSection={section} />;
       case "relationships":
-        return <RelationshipsTab schema={report.schema} statistics={report.statistics} mobileSection={activeSection} />;
+        return <RelationshipsTab schema={report.schema} statistics={report.statistics} mobileSection={section} />;
       case "visualisations":
-        return <VisualisationsTab visualisations={report.visualisations} mobileSection={activeSection} />;
+        return <VisualisationsTab visualisations={report.visualisations} mobileSection={section} />;
       case "ml":
         return (
           <MLTab
@@ -801,12 +790,12 @@ function AnalysisMobileSections({
 
         {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
           <div className="mobile-analysis-tab-pills">
-            {currentCard.subtabs.map((sub) => (
+            {currentCard.subtabs.map((sub, idx) => (
               <button
                 key={sub.section}
                 type="button"
-                onClick={() => handleSectionChange(sub.section)}
-                className={`mobile-analysis-tab-pill${activeSection === sub.section ? " mobile-analysis-tab-pill-active" : ""}`}
+                onClick={() => setActiveSubIdx(idx)}
+                className={`mobile-analysis-tab-pill${activeSubIdx === idx ? " mobile-analysis-tab-pill-active" : ""}`}
               >
                 {sub.label}
               </button>
