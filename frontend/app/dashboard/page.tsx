@@ -351,6 +351,21 @@ export default function DashboardPage() {
                       </ScrollIntentLink>
                     ))}
                   </div>
+                  <div className="desktop-studio-note">
+                    <div>
+                      <p className="desktop-studio-note-kicker">Suggested route</p>
+                      <p className="desktop-studio-note-title">Start in the library, move through the report, finish in the archive.</p>
+                      <p className="desktop-studio-note-copy">Uploads is the intake lane, Analysis is the working surface, History is the long-term record, and Account handles the cleanup tools around it.</p>
+                    </div>
+                    <div className="desktop-studio-route">
+                      {desktopWorkflowPills.map((label, index) => (
+                        <span key={`studio-route-${label}`} className="desktop-step-pill">
+                          <strong>{index + 1}</strong>
+                          {label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </section>
 
                 <section className="desktop-panel">
@@ -382,6 +397,25 @@ export default function DashboardPage() {
                         </div>
                       </article>
                     ))}
+                  </div>
+                  <div className="analysis-breakdown-footer">
+                    <div className="analysis-breakdown-note">
+                      <p className="analysis-breakdown-note-kicker">Coverage</p>
+                      <p className="analysis-breakdown-note-title">One report spine, five coloured reading lanes.</p>
+                      <p className="analysis-breakdown-note-copy">Summary stays blue, quality stays green, schema keeps the violet structure pass, charts stay amber, and ML ends in the red lab surface.</p>
+                    </div>
+                    <div className="analysis-breakdown-legend">
+                      {analysisVisualCards.map((card) => (
+                        <div
+                          key={`analysis-breakdown-${card.key}`}
+                          className="analysis-breakdown-legend-item"
+                          style={{ "--analysis-card-accent": card.accent } as CSSProperties}
+                        >
+                          <span className="analysis-breakdown-legend-swatch" />
+                          <span>{card.label}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </section>
               </div>
