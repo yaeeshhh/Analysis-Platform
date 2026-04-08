@@ -14,6 +14,7 @@ type AppShellProps = {
   eyebrow: string;
   title: ReactNode;
   description: ReactNode;
+  mobileDescription?: ReactNode;
   stats?: AppShellStat[];
   actions?: ReactNode;
   titleTag?: "h1" | "div";
@@ -24,6 +25,7 @@ export default function AppShell({
   eyebrow,
   title,
   description,
+  mobileDescription,
   stats = [],
   actions,
   titleTag = "h1",
@@ -75,7 +77,7 @@ export default function AppShell({
             <div className="mobile-page-label phone-only">
               <TitleTag className="sr-only">{title}</TitleTag>
               <div className="mobile-page-intro">
-                <div className="mobile-page-description">{description}</div>
+                <div className="mobile-page-description">{mobileDescription ?? description}</div>
                 {actions ? <div className="mobile-page-actions">{actions}</div> : null}
               </div>
             </div>

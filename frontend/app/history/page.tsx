@@ -247,6 +247,7 @@ export default function HistoryPage() {
         eyebrow="Run archive"
         title="History"
         description="Search, reopen, download, and retire saved runs."
+        mobileDescription="Search, reopen, and manage saved runs."
         stats={stats}
       >
         {error ? (
@@ -717,8 +718,8 @@ function HistoryMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Saved runs</p>
-            <h2 className="mobile-screen-title">Open a run, keep extras tucked away</h2>
-            <p className="mobile-screen-lead">Use More actions for downloads and cleanup instead of loading every card with buttons.</p>
+            <h2 className="mobile-screen-title">Saved runs</h2>
+            <p className="mobile-screen-lead">Open a run first. Downloads and cleanup stay under More.</p>
           </div>
         </div>
         {filteredAnalyses.length === 0 ? (
@@ -757,7 +758,7 @@ function HistoryMobileSections({
 
                   <p className="mobile-screen-row-copy">
                     {analysis.insights.summary.length > 132
-                      ? `${analysis.insights.summary.slice(0, 132).trimEnd()}…`
+                      ? `${analysis.insights.summary.slice(0, 104).trimEnd()}…`
                       : analysis.insights.summary}
                   </p>
                   {needsReview ? (
@@ -780,7 +781,7 @@ function HistoryMobileSections({
                       onClick={() => setExpandedActionId((current) => (current === analysis.id ? null : analysis.id))}
                       className="mobile-screen-button mobile-screen-button-secondary"
                     >
-                      {actionsExpanded ? "Hide actions" : "More actions"}
+                      {actionsExpanded ? "Hide more" : "More"}
                     </button>
                   </div>
 
@@ -823,7 +824,7 @@ function HistoryMobileSections({
                       <p className="mobile-screen-row-note">
                         {latestExperiment
                           ? `Latest ML: ${latestExperiment.summary}`
-                          : "No ML experiment is attached to this saved run yet."}
+                          : "No ML run is attached to this analysis yet."}
                       </p>
                     </>
                   ) : null}

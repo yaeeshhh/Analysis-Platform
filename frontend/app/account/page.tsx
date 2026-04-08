@@ -41,7 +41,7 @@ const toolGroups: Array<{
   {
     title: "Profile changes",
     accent: "#7ad6ff",
-    description: "Manage identity updates in focused dialogs built for one task at a time.",
+    description: "Update profile details and sign-in information.",
     items: [
       {
         key: "email",
@@ -63,7 +63,7 @@ const toolGroups: Array<{
   {
     title: "Access and browser",
     accent: "#8bf1a8",
-    description: "Control how this browser remembers the account and keep destructive access actions separate.",
+    description: "Manage sign-in security and browser memory.",
     items: [
       {
         key: "remember",
@@ -81,7 +81,7 @@ const toolGroups: Array<{
   {
     title: "Saved work",
     accent: "#9db8ff",
-    description: "Clean up uploaded analysis runs with a distinct confirmation dialog that does not interfere with access settings.",
+    description: "Delete saved runs and other stored workspace data.",
     items: [
       {
         key: "clear-uploads",
@@ -292,6 +292,7 @@ export default function AccountPage() {
         eyebrow="Settings"
         title="Account"
         description="Manage access, identity, and saved work."
+        mobileDescription="Manage profile, security, and saved work."
         actions={
           user ? (
             <div className="tablet-up flex flex-wrap gap-3">
@@ -478,8 +479,8 @@ export default function AccountPage() {
                     <p className="mobile-screen-row-title">Two-factor protection</p>
                     <p className="mobile-screen-row-copy">
                       {user.two_factor_enabled
-                        ? "Email code required for password logins."
-                        : "Password logins go straight through."}
+                        ? "Password logins require an email code."
+                        : "Password logins do not require an email code."}
                     </p>
                   </div>
                   <AccountSlideToggle
@@ -494,12 +495,12 @@ export default function AccountPage() {
                 <div className="mobile-screen-link-grid" style={{ marginTop: "1rem" }}>
                   <ScrollIntentLink href="/history" className="mobile-screen-link-card">
                     <p className="mobile-screen-link-title">Saved history</p>
-                    <p className="mobile-screen-link-copy">Review past reports and ML runs.</p>
+                    <p className="mobile-screen-link-copy">Review saved reports and ML runs.</p>
                     <span className="mobile-screen-link-cta">Open history</span>
                   </ScrollIntentLink>
                   <ScrollIntentLink href="/batch" className="mobile-screen-link-card">
                     <p className="mobile-screen-link-title">Uploads</p>
-                    <p className="mobile-screen-link-copy">Return to dataset intake and current selection.</p>
+                    <p className="mobile-screen-link-copy">Upload a CSV or change the active dataset.</p>
                     <span className="mobile-screen-link-cta">Open uploads</span>
                   </ScrollIntentLink>
                 </div>
@@ -912,7 +913,7 @@ function AccountMobileSections({
                     <p className="mobile-screen-row-copy">{item.detail}</p>
                   </div>
                   <span className="mobile-screen-row-trail">
-                    {item.destructive ? "Danger" : "Open"}
+                    {item.destructive ? "Delete" : "Open"}
                   </span>
                 </div>
               </button>
