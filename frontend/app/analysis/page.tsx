@@ -94,6 +94,93 @@ function parseAnalysisId(value: string | null): number | null {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
+type AnalysisSectionPreview = {
+  summary: string;
+  pills: string[];
+};
+
+function getAnalysisSectionPreview(report: AnalysisReport, tab: AnalysisTabKey): AnalysisSectionPreview {
+  switch (tab) {
+    case "overview":
+      return {
+        summary: "Dataset scale, sample rows, missingness, and readiness signals stay visible before you dive into any deeper report section.",
+        pills: [
+          `${report.overview.row_count.toLocaleString()} rows`,
+          `${report.overview.column_count.toLocaleString()} cols`,
+          `${report.overview.total_missing_values.toLocaleString()} missing`,
+        ],
+      };
+    case "insights":
+      return {
+        summary: report.insights.findings[0] ?? report.insights.summary,
+        pills: [
+          `${report.insights.findings.length} findings`,
+          `${report.insights.recommended_next_steps.length} next steps`,
+          report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first",
+        ],
+      };
+    case "schema":
+      return {
+        summary: `${report.schema.columns.length.toLocaleString()} profiled columns with inferred types, likely roles, identifiers, and target candidates.`,
+        pills: [
+          `${report.schema.identifier_columns.length} identifiers`,
+          `${report.schema.target_candidates.length} targets`,
+          `${report.schema.type_counts.numeric ?? report.overview.type_counts.numeric ?? 0} numeric`,
+        ],
+      };
+    case "quality":
+      return {
+        summary: `${report.quality.missing_by_column.length} columns with missing data, ${report.quality.constant_columns.length} constant columns, and ${report.quality.outlier_columns.length} outlier-heavy fields are flagged.`,
+        pills: [
+          `${report.quality.duplicate_row_count.toLocaleString()} duplicates`,
+          `${report.quality.high_correlations.length} correlations`,
+          `${report.quality.recommendations.length} fixes`,
+        ],
+      };
+    case "statistics":
+      return {
+        summary: `${report.statistics.numeric_summary.length} numeric summaries, ${report.statistics.categorical_summary.length} categorical profiles, and ${report.statistics.datetime_summary.length} datetime ranges are ready to inspect.`,
+        pills: [
+          `${report.statistics.numeric_summary.length} numeric`,
+          `${report.statistics.categorical_summary.length} categorical`,
+          `${report.statistics.datetime_summary.length} datetime`,
+        ],
+      };
+    case "relationships":
+      return {
+        summary: `${report.quality.high_correlations.length} high-correlation pairs and ${report.statistics.correlation_matrix.length} correlation cells help surface the strongest links in the dataset.`,
+        pills: [
+          `${report.quality.high_correlations.length} strong pairs`,
+          `${report.statistics.correlation_matrix.length} correlation cells`,
+          `${report.schema.target_candidates.length} targets`,
+        ],
+      };
+    case "visualisations":
+      return {
+        summary: `${report.visualisations.histograms.length} histograms, ${report.visualisations.boxplots.length} boxplots, and ${report.visualisations.top_categories.length} category charts are ready to review.`,
+        pills: [
+          `${report.visualisations.missingness.length} missingness`,
+          `${report.visualisations.pairwise_scatter.length} scatter plots`,
+          `${report.visualisations.drift_checks.length} drift checks`,
+        ],
+      };
+    case "ml":
+      return {
+        summary:
+          report.ml_experiments.length > 0
+            ? `${report.ml_experiments.length} saved experiment${report.ml_experiments.length === 1 ? " is" : "s are"} already attached to this run, and you can keep iterating from mobile.`
+            : "Run supervised or unsupervised experiments here and keep the outputs attached to this saved analysis run.",
+        pills: [
+          `${report.ml_experiments.length} saved`,
+          report.ml_capabilities.unsupervised.available ? "Unsupervised ready" : "Unsupervised blocked",
+          report.ml_capabilities.supervised.available
+            ? `${report.ml_capabilities.supervised.target_candidates.length} targets`
+            : "Supervised blocked",
+        ],
+      };
+  }
+}
+
 function AnalysisPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -706,6 +793,7 @@ function AnalysisMobileSections({
   }
 
   const activeTabLabel = tabs.find((tab) => tab.key === activeTab)?.label ?? "Section";
+  const activeTabPreview = getAnalysisSectionPreview(report, activeTab);
 
   return (
     <div className="phone-only mobile-screen-stack">
@@ -800,37 +888,63 @@ function AnalysisMobileSections({
       <section className="mobile-screen-panel">
         <div className="mobile-screen-panel-header">
           <div>
-            <p className="mobile-screen-kicker">Report section</p>
-            <h2 className="mobile-screen-title">Report sections</h2>
-          </div>
-        </div>
-        <div className="mobile-screen-field">
-          <label htmlFor="mobile-analysis-tab" className="mobile-screen-field-label">Current section</label>
-          <select
-            id="mobile-analysis-tab"
-            value={activeTab}
-            onChange={(event) => onTabChange(event.target.value as AnalysisTabKey)}
-            className="mobile-tab-select"
-          >
-            {tabs.map((tab) => (
-              <option key={tab.key} value={tab.key}>
-                {tab.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <p className="mobile-screen-lead">{tabDescriptions[activeTab]}</p>
-      </section>
-
-      <section className="mobile-screen-panel">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Focused subpage</p>
-            <h2 className="mobile-screen-title">{activeTabLabel}</h2>
+            <p className="mobile-screen-kicker">Report sections</p>
+            <h2 className="mobile-screen-title">Browse every section without losing context</h2>
             <p className="mobile-screen-lead">
-              Open the selected report section in a focused subpage so the analysis page stays easier to scan.
+              The mobile view keeps the same analysis sections as desktop, but the selected section now stays visible inline instead of hiding behind an extra step.
             </p>
           </div>
+        </div>
+        <div className="mobile-screen-list">
+          {tabs.map((tab) => {
+            const selected = activeTab === tab.key;
+            const preview = getAnalysisSectionPreview(report, tab.key);
+
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => onTabChange(tab.key)}
+                className={`mobile-screen-row mobile-screen-action-row ${selected ? "mobile-screen-row-selected" : ""}`}
+              >
+                <div className="mobile-screen-row-header">
+                  <div className="mobile-screen-row-main">
+                    <p className="mobile-screen-row-title">{tab.label}</p>
+                  </div>
+                  {selected ? (
+                    <span className="mobile-screen-pill" data-tone="purple">Selected</span>
+                  ) : (
+                    <span className="mobile-screen-row-trail">Tap to view</span>
+                  )}
+                </div>
+                <p className="mobile-screen-row-copy">{preview.summary}</p>
+                <div className="mobile-screen-pills compact">
+                  {preview.pills.map((pill) => (
+                    <span key={`${tab.key}-${pill}`} className="mobile-screen-pill">
+                      {pill}
+                    </span>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="mobile-screen-panel section-glow">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Selected section</p>
+            <h2 className="mobile-screen-title">{activeTabLabel}</h2>
+            <p className="mobile-screen-lead">{tabDescriptions[activeTab]}</p>
+          </div>
+        </div>
+        <div className="mobile-screen-pills">
+          {activeTabPreview.pills.map((pill) => (
+            <span key={`${activeTab}-${pill}`} className="mobile-screen-pill">
+              {pill}
+            </span>
+          ))}
         </div>
         <div className="mobile-screen-actions">
           <button
@@ -849,11 +963,15 @@ function AnalysisMobileSections({
                 ),
               })
             }
-            className="mobile-screen-button mobile-screen-button-primary"
+            className="mobile-screen-button mobile-screen-button-secondary"
           >
-            Open {activeTabLabel}
+            Open focused view
           </button>
         </div>
+      </section>
+
+      <section className="mobile-screen-panel mobile-analysis-content-panel section-glow">
+        {activeContent}
       </section>
     </div>
   );

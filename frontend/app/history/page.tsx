@@ -623,7 +623,6 @@ function HistoryMobileSections({
   onDownloadMlReport,
   onDownloadMlSummary,
 }: HistoryMobileSectionsProps) {
-  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(5);
   const runsWithMl = analyses.filter((analysis) => analysis.experiment_count > 0).length;
   const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
@@ -676,29 +675,35 @@ function HistoryMobileSections({
             className="mobile-screen-input"
           />
         </div>
-        <div className="mobile-filter-group">
-          {readinessOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setReadinessFilter(option.value)}
-              className={`mobile-filter-pill ${readinessFilter === option.value ? "mobile-filter-pill-active" : ""}`}
-            >
-              {option.label}
-            </button>
-          ))}
+        <div className="mobile-screen-field">
+          <label htmlFor="history-readiness" className="mobile-screen-field-label">Readiness</label>
+          <select
+            id="history-readiness"
+            value={readinessFilter}
+            onChange={(event) => setReadinessFilter(event.target.value as ReadinessFilter)}
+            className="mobile-tab-select"
+          >
+            {readinessOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="mobile-filter-group">
-          {mlOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setMlFilter(option.value)}
-              className={`mobile-filter-pill ${mlFilter === option.value ? "mobile-filter-pill-active" : ""}`}
-            >
-              {option.label}
-            </button>
-          ))}
+        <div className="mobile-screen-field">
+          <label htmlFor="history-ml-filter" className="mobile-screen-field-label">ML history</label>
+          <select
+            id="history-ml-filter"
+            value={mlFilter}
+            onChange={(event) => setMlFilter(event.target.value as MlFilter)}
+            className="mobile-tab-select"
+          >
+            {mlOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
         {hasHistoryFilters ? (
           <div className="mobile-screen-actions">
@@ -713,7 +718,10 @@ function HistoryMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Saved runs</p>
-            <h2 className="mobile-screen-title">Open or retire archived results</h2>
+            <h2 className="mobile-screen-title">Scan the archive without opening every card</h2>
+            <p className="mobile-screen-lead">
+              Key run details and all download actions stay visible on each card so the mobile archive feels closer to desktop.
+            </p>
           </div>
         </div>
         {filteredAnalyses.length === 0 ? (
@@ -721,118 +729,87 @@ function HistoryMobileSections({
         ) : (
           <div className="mobile-screen-list">
             {filteredAnalyses.slice(0, visibleCount).map((analysis) => {
-              const isOpen = expandedId === analysis.id;
               const modeLabel = analysis.latest_experiment
                 ? analysis.latest_experiment.type === "supervised"
                   ? "Supervised ML"
                   : "Unsupervised ML"
                 : "Analysis only";
               const latestExperiment = analysis.latest_experiment;
+              const statusValue = analysis.status || "saved";
 
               return (
-                <div key={analysis.id} className="mobile-expand-card">
-                  <button
-                    type="button"
-                    className="mobile-expand-card-header"
-                    onClick={() => setExpandedId(isOpen ? null : analysis.id)}
-                  >
-                    <div className="mobile-screen-row-header">
-                      <div className="mobile-screen-row-main">
-                        <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
-                        <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
-                        {!isOpen ? (
-                          <p className="mobile-screen-row-copy" style={{ marginTop: "0.35rem" }}>
-                            {analysis.insights.summary.length > 100
-                              ? `${analysis.insights.summary.slice(0, 100)}…`
-                              : analysis.insights.summary}
-                          </p>
-                        ) : null}
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.4rem", flexShrink: 0 }}>
-                        <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                          {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                        </span>
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className={`mobile-expand-card-chevron ${isOpen ? "mobile-expand-card-chevron-open" : ""}`}
-                        >
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                      </div>
+                <article key={analysis.id} className="mobile-screen-row">
+                  <div className="mobile-screen-row-header">
+                    <div className="mobile-screen-row-main">
+                      <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
+                      <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
                     </div>
-                  </button>
+                    <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                      {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                    </span>
+                  </div>
 
-                  {isOpen ? (
-                    <div className="mobile-expand-card-body">
-                      <p className="mobile-screen-row-copy" style={{ marginTop: 0 }}>
-                        {analysis.insights.summary}
-                      </p>
+                  <div className="mobile-screen-pills compact">
+                    <span className="mobile-screen-pill">{modeLabel}</span>
+                    <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
+                    <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
+                    <span className="mobile-screen-pill">{statusValue}</span>
+                    <span className="mobile-screen-pill" data-tone="purple">
+                      {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
+                    </span>
+                  </div>
 
-                      <div className="mobile-screen-pills" style={{ marginTop: "0.65rem" }}>
-                        <span className="mobile-screen-pill">{modeLabel}</span>
-                        <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
-                        <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
-                        <span className="mobile-screen-pill">{analysis.status || "saved"}</span>
-                        <span className="mobile-screen-pill" data-tone="purple">
-                          {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
-                        </span>
-                      </div>
+                  <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                  <p className="mobile-screen-row-note">
+                    {latestExperiment
+                      ? `Latest ML: ${latestExperiment.summary}`
+                      : "No ML experiment is attached to this saved run yet."}
+                  </p>
 
-                      {latestExperiment ? (
-                        <p className="mobile-screen-row-note">Latest ML: {latestExperiment.summary}</p>
-                      ) : null}
-
-                      <div className="mobile-expand-card-actions">
-                        <button
-                          type="button"
-                          onClick={() => onOpenPopup(analysis)}
-                          className="mobile-screen-button mobile-screen-button-primary"
-                        >
-                          Open full run
-                        </button>
-                        <div className="mobile-expand-card-actions-row">
-                          <button
-                            type="button"
-                            onClick={() => onDownloadReport(analysis.id)}
-                            className="mobile-screen-button mobile-screen-button-secondary"
-                          >
-                            Report
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteRun(analysis.id)}
-                            className="mobile-screen-button mobile-screen-button-danger"
-                          >
-                            Delete run
-                          </button>
-                        </div>
-                        {latestExperiment ? (
-                          <div className="mobile-expand-card-actions-row">
-                            <button
-                              type="button"
-                              onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
-                              className="mobile-screen-button mobile-screen-button-secondary"
-                            >
-                              ML report
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
-                              className="mobile-screen-button mobile-screen-button-secondary"
-                            >
-                              ML summary
-                            </button>
-                          </div>
-                        ) : null}
-                      </div>
+                  <div className="mobile-screen-actions">
+                    <button
+                      type="button"
+                      onClick={() => onOpenPopup(analysis)}
+                      className="mobile-screen-button mobile-screen-button-primary"
+                    >
+                      Open full run
+                    </button>
+                  </div>
+                  <div className="mobile-screen-row-actions">
+                    <button
+                      type="button"
+                      onClick={() => onDownloadReport(analysis.id)}
+                      className="mobile-screen-button mobile-screen-button-secondary"
+                    >
+                      Report
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteRun(analysis.id)}
+                      className="mobile-screen-button mobile-screen-button-danger"
+                    >
+                      Delete run
+                    </button>
+                  </div>
+                  {latestExperiment ? (
+                    <div className="mobile-screen-row-actions">
+                      <button
+                        type="button"
+                        onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
+                        className="mobile-screen-button mobile-screen-button-secondary"
+                      >
+                        ML report
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
+                        className="mobile-screen-button mobile-screen-button-secondary"
+                      >
+                        ML summary
+                      </button>
                     </div>
                   ) : null}
-                </div>
+                </article>
               );
             })}
           </div>
