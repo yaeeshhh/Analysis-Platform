@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 const OverviewTab = lazy(() => import("@/components/analysis/OverviewTab"));
 const SchemaTab = lazy(() => import("@/components/analysis/SchemaTab"));
 const DataQualityTab = lazy(() => import("@/components/analysis/DataQualityTab"));
@@ -41,6 +42,7 @@ import { analysisVisualCards } from "@/lib/analysisVisualCards";
 import { formatDate } from "@/lib/helpers";
 import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
+import { useSwipeTabs } from "@/lib/useSwipeTabs";
 
 function parseAnalysisId(value: string | null): number | null {
   const parsed = Number(value);
@@ -256,18 +258,8 @@ function AnalysisPageContent() {
 
   const activeTabDescription = analysisTabDescriptions[visibleTab];
   const activeFocusArea = getAnalysisFocusArea(visibleTab);
-
-  const tabToAccent: Record<string, string> = {
-    overview: "#4f6ef7",
-    insights: "#4f6ef7",
-    quality: "#22c55e",
-    statistics: "#22c55e",
-    schema: "#a78bfa",
-    relationships: "#f59e0b",
-    visualisations: "#f59e0b",
-    ml: "#f43f5e",
-  };
-  const desktopAccent = tabToAccent[visibleTab] ?? "#4f6ef7";
+  const activeCard = analysisVisualCards.find((card) => card.tabKeys.includes(visibleTab)) ?? analysisVisualCards[0];
+  const desktopAccent = activeCard.accent;
 
   return (
     <>
@@ -304,8 +296,8 @@ function AnalysisPageContent() {
         ) : null}
 
         {loading ? (
-          <div className="py-10 text-center text-sm text-white/55">
-            Loading analysis workspace...
+          <div className="py-10">
+            <SurfaceLoadingIndicator label="Loading analysis workspace..." className="mx-auto" />
           </div>
         ) : null}
 
@@ -376,24 +368,42 @@ function AnalysisPageContent() {
                           <div className="analysis-visual-body">
                             <p className="analysis-visual-title">{card.label}</p>
                             <p className="analysis-visual-copy">{card.description}</p>
-                            <div className="analysis-visual-tabs">
-                              {card.tabKeys.map((tabKey) => {
-                              const tab = getAnalysisTabDefinition(tabKey);
-                              const active = visibleTab === tab.key;
-                              return (
-                                <button
-                                  type="button"
-                                  key={tab.key}
-                                  onClick={() => handleTabChange(tab.key)}
-                                  className={`analysis-subnav-link ${active ? "analysis-subnav-link-active" : ""}`}
-                                >
-                                  {tab.label}
-                                </button>
-                              );
-                            })}
-                          </div>
                           </div>
                         </article>
+                      );
+                    })}
+                  </div>
+
+                  <div className="analysis-visual-tabrail-grid mt-3" data-layout="workspace">
+                    {analysisVisualCards.map((card) => {
+                      const areaActive = card.tabKeys.includes(visibleTab);
+                      return (
+                        <div
+                          key={`workspace-rail-${card.key}`}
+                          className={`analysis-visual-tabrail-group ${areaActive ? "analysis-visual-tabrail-group-active" : ""}`}
+                          style={{ "--analysis-card-accent": card.accent, "--analysis-card-border": `${card.accent}33` } as React.CSSProperties}
+                        >
+                          <div className="analysis-visual-tabrail-head">
+                            <span className="analysis-visual-tabrail-label">{card.label}</span>
+                            <span className="analysis-visual-tabrail-count">
+                              {card.tabKeys.length} view{card.tabKeys.length === 1 ? "" : "s"}
+                            </span>
+                          </div>
+                          {card.tabKeys.map((tabKey) => {
+                            const tab = getAnalysisTabDefinition(tabKey);
+                            const active = visibleTab === tab.key;
+                            return (
+                              <button
+                                type="button"
+                                key={`workspace-rail-${card.key}-${tab.key}`}
+                                onClick={() => handleTabChange(tab.key)}
+                                className={`analysis-subnav-link analysis-subnav-link-accent ${active ? "analysis-subnav-link-active" : ""}`}
+                              >
+                                {tab.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       );
                     })}
                   </div>
@@ -495,8 +505,8 @@ function AnalysisPageContent() {
             ) : null}
 
             {/* Inline tab content — tablet+ only (phone uses slide pages) */}
-            <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
-            <div className="tablet-up space-y-4 desktop-tab-accent-wrapper" style={{ "--analysis-card-accent": desktopAccent, "--analysis-card-border": `${desktopAccent}33` } as React.CSSProperties}>
+            <Suspense fallback={<div className="py-12"><SurfaceLoadingIndicator label="Loading analysis view..." compact className="mx-auto" /></div>}>
+            <div key={visibleTab} className="tablet-up space-y-4 desktop-tab-accent-wrapper analysis-content-stage" style={{ "--analysis-card-accent": desktopAccent, "--analysis-card-border": `${desktopAccent}33` } as React.CSSProperties}>
 
             {visibleTab === "overview" && hasRenderableReport && report ? (
               <OverviewTab
@@ -603,8 +613,8 @@ export default function AnalysisPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#08131e] px-6 py-10 text-sm text-white/55">
-          Loading analysis workspace...
+        <div className="flex min-h-screen items-center justify-center bg-[#08131e] px-6 py-10 text-sm text-white/55">
+          <SurfaceLoadingIndicator label="Loading analysis workspace..." />
         </div>
       }
     >
@@ -913,6 +923,12 @@ function AnalysisMobileSections({
 
   const qualityScore = calculateQualityScore(report.overview, report.quality);
   const currentCard = mobileAnalysisCards.find((c) => c.key === openCard);
+  const swipeHandlers = useSwipeTabs({
+    length: currentCard?.subtabs?.length ?? 0,
+    index: activeSubIdx,
+    onChange: setActiveSubIdx,
+    disabled: !currentCard,
+  });
 
   const cardAccents: Record<string, string> = {
     "overview": "#4f6ef7",
@@ -937,38 +953,39 @@ function AnalysisMobileSections({
           </span>
         </div>
 
-        {/* SVG card cover as the detail header */}
-        <div
-          className="mobile-analysis-detail-cover"
-          style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
-        >
-          {cardCovers[currentCard.key]}
-        </div>
-
-        {/* Subtab dropdown below the card, styled with the card accent */}
-        {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+        <div className="mobile-analysis-detail-stage" {...swipeHandlers}>
           <div
-            className="mobile-analysis-detail-dropdown"
-            style={{ "--analysis-card-accent": accent } as React.CSSProperties}
+            className="mobile-analysis-detail-cover"
+            style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
           >
-            <select
-              value={activeSubIdx}
-              onChange={(e) => setActiveSubIdx(Number(e.target.value))}
-            >
-              {currentCard.subtabs.map((sub, idx) => (
-                <option key={sub.label} value={idx}>
-                  {sub.label}
-                </option>
-              ))}
-            </select>
+            {cardCovers[currentCard.key]}
+            {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+              <div className="mobile-analysis-detail-subtabs">
+                {currentCard.subtabs.map((sub, idx) => (
+                  <button
+                    key={sub.label}
+                    type="button"
+                    onClick={() => setActiveSubIdx(idx)}
+                    className={`mobile-analysis-detail-subtab${activeSubIdx === idx ? " mobile-analysis-detail-subtab-active" : ""}`}
+                    style={{ "--subtab-accent": accent } as React.CSSProperties}
+                  >
+                    {sub.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
-        ) : null}
 
-        <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content" style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}>
-          <Suspense fallback={<div className="py-8 text-center text-sm text-white/40">Loading…</div>}>
-            {renderContent()}
-          </Suspense>
-        </section>
+          {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+            <p className="mobile-analysis-swipe-hint">Swipe left or right across this panel to switch views.</p>
+          ) : null}
+
+          <section key={`analysis-mobile-${currentCard.key}-${activeSubIdx}`} className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content analysis-motion-surface" style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}>
+            <Suspense fallback={<div className="py-8"><SurfaceLoadingIndicator label="Loading analysis view..." compact className="mx-auto" /></div>}>
+              {renderContent()}
+            </Suspense>
+          </section>
+        </div>
       </div>
     );
   }

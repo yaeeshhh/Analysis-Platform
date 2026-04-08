@@ -10,10 +10,12 @@ const SchemaTab = lazy(() => import("@/components/analysis/SchemaTab"));
 const StatisticsTab = lazy(() => import("@/components/analysis/StatisticsTab"));
 const VisualisationsTab = lazy(() => import("@/components/analysis/VisualisationsTab"));
 import BackToTopButton from "@/components/ui/BackToTopButton";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import { analysisVisualCards } from "@/lib/analysisVisualCards";
 import { AnalysisReport, MlExperimentSummary, SupervisedResult, UnsupervisedResult } from "@/lib/analysisTypes";
 import { formatDate } from "@/lib/helpers";
+import { useSwipeTabs } from "@/lib/useSwipeTabs";
 
 type AnalysisResultPopupProps = {
   open: boolean;
@@ -167,43 +169,20 @@ export default function AnalysisResultPopup({
 
   const ready = hasRenderableReport(report);
   const activeCardKey = popupSectionToCardKey[activeSectionId] ?? "overview";
+  const activeSection = sections.find((section) => section.id === activeSectionId) ?? sections[0];
 
   useEffect(() => {
-    if (!open || !ready) return;
+    if (!open) return;
 
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const sectionElements = sections
-      .map((section) => document.getElementById(`history-popup-${section.id}`))
-      .filter((section): section is HTMLElement => !!section);
-
-    const updateActiveSection = () => {
-      const containerTop = container.getBoundingClientRect().top;
-      let nextSectionId: PopupSectionId = sections[0].id;
-
-      for (const section of sectionElements) {
-        const rect = section.getBoundingClientRect();
-        if (rect.top - containerTop <= 148) {
-          nextSectionId = section.id.replace("history-popup-", "") as PopupSectionId;
-        } else {
-          break;
-        }
-      }
-
-      setActiveSectionId((current) => (current === nextSectionId ? current : nextSectionId));
-    };
-
-    const frame = window.requestAnimationFrame(updateActiveSection);
-    container.addEventListener("scroll", updateActiveSection, { passive: true });
-    window.addEventListener("resize", updateActiveSection);
+    const frame = window.requestAnimationFrame(() => {
+      setActiveSectionId("overview");
+      setMobileCardOpen(false);
+    });
 
     return () => {
       window.cancelAnimationFrame(frame);
-      container.removeEventListener("scroll", updateActiveSection);
-      window.removeEventListener("resize", updateActiveSection);
     };
-  }, [open, ready, report?.analysis_id]);
+  }, [open, report?.analysis_id]);
 
   useEffect(() => {
     if (!open) return;
@@ -218,26 +197,83 @@ export default function AnalysisResultPopup({
     return () => {
       window.cancelAnimationFrame(frame);
     };
-  }, [open, mobileCardOpen, report?.analysis_id]);
+  }, [open, activeSectionId, mobileCardOpen, report?.analysis_id]);
 
-  function handleScrollToSection(sectionId: PopupSectionId) {
+  function handleSectionChange(sectionId: PopupSectionId) {
     setActiveSectionId(sectionId);
-    const container = scrollContainerRef.current;
-    const section = document.getElementById(`history-popup-${sectionId}`);
-    if (!section) {
-      return;
+  }
+
+  function renderDesktopSection() {
+    if (!report) return null;
+
+    switch (activeSectionId) {
+      case "overview":
+        return (
+          <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows." accent="#4f6ef7">
+            <OverviewTab
+              overview={report.overview}
+              schema={report.schema}
+              quality={report.quality}
+              insights={report.insights}
+            />
+          </SectionFrame>
+        );
+      case "insights":
+        return (
+          <SectionFrame id="insights" title="Insights" note="Plain-language findings and recommended next steps." accent="#4f6ef7">
+            <InsightsTab insights={report.insights} />
+          </SectionFrame>
+        );
+      case "schema":
+        return (
+          <SectionFrame id="schema" title="Schema" note="Column roles, inferred types, and field inventory." accent="#a78bfa">
+            <SchemaTab schema={report.schema} />
+          </SectionFrame>
+        );
+      case "quality":
+        return (
+          <SectionFrame id="quality" title="Data Quality" note="Missingness, duplicates, and cleanup direction." accent="#22c55e">
+            <DataQualityTab overview={report.overview} quality={report.quality} />
+          </SectionFrame>
+        );
+      case "statistics":
+        return (
+          <SectionFrame id="statistics" title="Statistics" note="Numeric and categorical summaries for key columns." accent="#22c55e">
+            <StatisticsTab statistics={report.statistics} />
+          </SectionFrame>
+        );
+      case "relationships":
+        return (
+          <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues." accent="#f59e0b">
+            <RelationshipsTab schema={report.schema} statistics={report.statistics} />
+          </SectionFrame>
+        );
+      case "visualisations":
+        return (
+          <SectionFrame id="visualisations" title="Charts" note="Distribution views, heatmap signals, and drift checks." accent="#f59e0b">
+            <VisualisationsTab visualisations={report.visualisations} />
+          </SectionFrame>
+        );
+      case "ml":
+        return (
+          <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details." accent="#f43f5e">
+            <MLTab
+              key={`${report.analysis_id}:${report.ml_experiments.map((experiment) => experiment.id).join("|")}`}
+              analysisId={report.analysis_id}
+              capabilities={report.ml_capabilities}
+              experiments={report.ml_experiments || []}
+              readiness={report.insights.modeling_readiness}
+              initialUnsupervised={report.ml_results.unsupervised}
+              initialSupervised={report.ml_results.supervised}
+              onRunUnsupervised={onRunUnsupervised}
+              onRunSupervised={onRunSupervised}
+              onDeleteExperiment={onDeleteExperiment}
+            />
+          </SectionFrame>
+        );
+      default:
+        return null;
     }
-
-    if (!container) {
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-
-    const containerRect = container.getBoundingClientRect();
-    const sectionRect = section.getBoundingClientRect();
-    const nextTop = container.scrollTop + (sectionRect.top - containerRect.top) - 12;
-
-    container.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
   }
 
   if (!open) {
@@ -312,30 +348,11 @@ export default function AnalysisResultPopup({
               </div>
             ) : null}
 
-            {/* Desktop/tablet: Jump to section dropdown */}
-            {report && ready ? (
-              <div className="history-popup-jump tablet-up">
-                <label className="history-popup-select-shell">
-                  <span className="history-popup-select-label">Jump to section</span>
-                  <select
-                    value={activeSectionId}
-                    onChange={(event) => handleScrollToSection(event.target.value as PopupSectionId)}
-                    className="history-popup-select"
-                  >
-                    {sections.map((section) => (
-                      <option key={`select-${section.id}`} value={section.id}>
-                        {section.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            ) : null}
           </div>
 
           {loading ? (
-            <div className="py-10 text-center text-sm text-white/55">
-              Loading saved run details...
+            <div className="py-10">
+              <SurfaceLoadingIndicator label="Loading saved run details..." className="mx-auto" />
             </div>
           ) : null}
 
@@ -355,7 +372,7 @@ export default function AnalysisResultPopup({
             <div className="border-l-2 border-[#ffb079]/40 pl-4 text-sm text-[#ffe7d7]">
               <p className="font-semibold text-white">This saved run is missing part of the report.</p>
               <p className="mt-2 leading-6 text-white/72">
-                The history popup loaded the record, but the full section stack is not available for this run. Download the saved report to view the readable text summary.
+                The history popup loaded the record, but the full report surface is not available for this run. Download the saved report to view the readable text summary.
               </p>
             </div>
           ) : null}
@@ -378,7 +395,7 @@ export default function AnalysisResultPopup({
             <section className="history-popup-visual-strip tablet-up">
               <div className="history-popup-visual-strip-head">
                 <p className="history-popup-select-label">Report map</p>
-                <p className="history-popup-section-note">Jump between the saved report surfaces without leaving the popup.</p>
+                <p className="history-popup-section-note">Switch between saved report surfaces without dragging through the entire archive view.</p>
               </div>
               <div className="analysis-visual-grid" data-layout="workspace">
                 {analysisVisualCards.map((card) => {
@@ -393,81 +410,59 @@ export default function AnalysisResultPopup({
                       <div className="analysis-visual-body">
                         <p className="analysis-visual-title">{card.label}</p>
                         <p className="analysis-visual-copy">{card.description}</p>
-                        <div className="analysis-visual-tabs">
-                          {card.tabKeys.map((tabKey) => {
-                            const section = sections.find((item) => item.id === tabKey);
-                            const active = activeSectionId === tabKey;
-                            return (
-                              <button
-                                type="button"
-                                key={`history-popup-${card.key}-${tabKey}`}
-                                onClick={() => handleScrollToSection(tabKey as PopupSectionId)}
-                                className={`analysis-subnav-link ${active ? "analysis-subnav-link-active" : ""}`}
-                              >
-                                {section?.label ?? tabKey}
-                              </button>
-                            );
-                          })}
-                        </div>
                       </div>
                     </article>
                   );
                 })}
               </div>
+
+              <div className="analysis-visual-tabrail-grid mt-3" data-layout="workspace">
+                {analysisVisualCards.map((card) => {
+                  const areaActive = card.key === activeCardKey;
+                  return (
+                    <div
+                      key={`history-popup-rail-${card.key}`}
+                      className={`analysis-visual-tabrail-group ${areaActive ? "analysis-visual-tabrail-group-active" : ""}`}
+                      style={{ "--analysis-card-accent": card.accent, "--analysis-card-border": `${card.accent}33` } as React.CSSProperties}
+                    >
+                      <div className="analysis-visual-tabrail-head">
+                        <span className="analysis-visual-tabrail-label">{card.label}</span>
+                        <span className="analysis-visual-tabrail-count">
+                          {card.tabKeys.length} view{card.tabKeys.length === 1 ? "" : "s"}
+                        </span>
+                      </div>
+                      {card.tabKeys.map((tabKey) => {
+                        const section = sections.find((item) => item.id === tabKey);
+                        const active = activeSectionId === tabKey;
+                        return (
+                          <button
+                            type="button"
+                            key={`history-popup-${card.key}-${tabKey}`}
+                            onClick={() => handleSectionChange(tabKey as PopupSectionId)}
+                            className={`analysis-subnav-link analysis-subnav-link-accent ${active ? "analysis-subnav-link-active" : ""}`}
+                          >
+                            {section?.label ?? tabKey}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className="analysis-subnav-description pt-4 text-sm leading-6 text-white/50">
+                <span className="font-semibold text-white/74">{activeSection.label}</span> - {activeSection.note}
+              </p>
             </section>
           ) : null}
 
-          {/* ── Tablet/Desktop: long scroll with section frames ── */}
+          {/* ── Tablet/Desktop: single active report page ── */}
           {!loading && !error && report && ready ? (
             <div className="history-popup-content tablet-up">
-              <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
-              <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows." accent="#4f6ef7">
-                <OverviewTab
-                  overview={report.overview}
-                  schema={report.schema}
-                  quality={report.quality}
-                  insights={report.insights}
-                />
-              </SectionFrame>
-
-              <SectionFrame id="insights" title="Insights" note="Plain-language findings and recommended next steps." accent="#4f6ef7">
-                <InsightsTab insights={report.insights} />
-              </SectionFrame>
-
-              <SectionFrame id="schema" title="Schema" note="Column roles, inferred types, and field inventory." accent="#a78bfa">
-                <SchemaTab schema={report.schema} />
-              </SectionFrame>
-
-              <SectionFrame id="quality" title="Data Quality" note="Missingness, duplicates, and cleanup direction." accent="#22c55e">
-                <DataQualityTab overview={report.overview} quality={report.quality} />
-              </SectionFrame>
-
-              <SectionFrame id="statistics" title="Statistics" note="Numeric and categorical summaries for key columns." accent="#22c55e">
-                <StatisticsTab statistics={report.statistics} />
-              </SectionFrame>
-
-              <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues." accent="#f59e0b">
-                <RelationshipsTab schema={report.schema} statistics={report.statistics} />
-              </SectionFrame>
-
-              <SectionFrame id="visualisations" title="Charts" note="Distribution views, heatmap signals, and drift checks." accent="#f59e0b">
-                <VisualisationsTab visualisations={report.visualisations} />
-              </SectionFrame>
-
-              <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details." accent="#f43f5e">
-                <MLTab
-                  key={`${report.analysis_id}:${report.ml_experiments.map((experiment) => experiment.id).join("|")}`}
-                  analysisId={report.analysis_id}
-                  capabilities={report.ml_capabilities}
-                  experiments={report.ml_experiments || []}
-                  readiness={report.insights.modeling_readiness}
-                  initialUnsupervised={report.ml_results.unsupervised}
-                  initialSupervised={report.ml_results.supervised}
-                  onRunUnsupervised={onRunUnsupervised}
-                  onRunSupervised={onRunSupervised}
-                  onDeleteExperiment={onDeleteExperiment}
-                />
-              </SectionFrame>
+              <Suspense fallback={<div className="py-12"><SurfaceLoadingIndicator label="Loading saved report view..." compact className="mx-auto" /></div>}>
+              <div key={activeSectionId} className="history-popup-stage">
+                {renderDesktopSection()}
+              </div>
               </Suspense>
             </div>
           ) : null}
@@ -622,6 +617,13 @@ const popupCardAccents: Record<string, string> = {
 function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSupervised, onDeleteExperiment }: PopupMobileCardsProps) {
   const [openCard, setOpenCard] = useState<string | null>(null);
   const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
+  const currentCard = popupCards.find((c) => c.key === openCard);
+  const swipeHandlers = useSwipeTabs({
+    length: currentCard?.subtabs?.length ?? 0,
+    index: activeSubIdx,
+    onChange: setActiveSubIdx,
+    disabled: !currentCard,
+  });
 
   function handleOpenCard(card: PopupCard) {
     setOpenCard(card.key);
@@ -679,8 +681,6 @@ function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSu
     }
   }
 
-  const currentCard = popupCards.find((c) => c.key === openCard);
-
   if (openCard && currentCard) {
     const accent = popupCardAccents[currentCard.key] ?? "#4f6ef7";
     return (
@@ -690,42 +690,48 @@ function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSu
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
             Back
           </button>
+          <span style={{ color: accent, fontFamily: "var(--font-mono)", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+            {currentCard.label}
+          </span>
         </div>
 
-        <div
-          className="mobile-analysis-detail-cover"
-          style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
-        >
-          {popupCardCovers[currentCard.key]}
-        </div>
-
-        {/* Subtab dropdown below the card, styled with the card accent */}
-        {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+        <div className="mobile-analysis-detail-stage" {...swipeHandlers}>
           <div
-            className="mobile-analysis-detail-dropdown"
-            style={{ "--analysis-card-accent": accent } as React.CSSProperties}
+            className="mobile-analysis-detail-cover"
+            style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
           >
-            <select
-              value={activeSubIdx}
-              onChange={(e) => setActiveSubIdx(Number(e.target.value))}
-            >
-              {currentCard.subtabs.map((sub, idx) => (
-                <option key={sub.label} value={idx}>
-                  {sub.label}
-                </option>
-              ))}
-            </select>
+            {popupCardCovers[currentCard.key]}
+            {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+              <div className="mobile-analysis-detail-subtabs">
+                {currentCard.subtabs.map((sub, idx) => (
+                  <button
+                    key={sub.label}
+                    type="button"
+                    onClick={() => setActiveSubIdx(idx)}
+                    className={`mobile-analysis-detail-subtab${activeSubIdx === idx ? " mobile-analysis-detail-subtab-active" : ""}`}
+                    style={{ "--subtab-accent": accent } as React.CSSProperties}
+                  >
+                    {sub.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
-        ) : null}
 
-        <section
-          className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content"
-          style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}
-        >
-          <Suspense fallback={<div className="py-8 text-center text-sm text-white/40">Loading…</div>}>
-            {renderContent()}
-          </Suspense>
-        </section>
+          {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+            <p className="mobile-analysis-swipe-hint">Swipe left or right across this panel to switch views.</p>
+          ) : null}
+
+          <section
+            key={`history-mobile-${currentCard.key}-${activeSubIdx}`}
+            className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content analysis-motion-surface"
+            style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}
+          >
+            <Suspense fallback={<div className="py-8"><SurfaceLoadingIndicator label="Loading saved report view..." compact className="mx-auto" /></div>}>
+              {renderContent()}
+            </Suspense>
+          </section>
+        </div>
       </div>
     );
   }

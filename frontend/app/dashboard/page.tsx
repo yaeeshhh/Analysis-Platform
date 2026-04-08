@@ -4,6 +4,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 import { getAnalyses } from "@/lib/analysisApi";
 import { getAnalysisTabDefinition } from "@/lib/analysisNavigation";
 import { AnalysisListItem } from "@/lib/analysisTypes";
@@ -205,6 +206,56 @@ export default function DashboardPage() {
       hint: "Persisted across analysis history",
     },
   ];
+  const studioRouteChecks = [
+    {
+      label: "Uploads",
+      value: analyses.length ? `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}` : "Waiting on the first CSV",
+      note: analyses.length
+        ? "Keep reusable datasets in the library before opening the working report."
+        : "Start here to create the first reusable dataset lane.",
+    },
+    {
+      label: "Analysis",
+      value: latest ? truncateText(latest.overview.dataset_name, 28) : "No active report yet",
+      note: latest
+        ? latest.insights.modeling_readiness.is_ready
+          ? "This run already looks stable enough to hand off into ML when needed."
+          : "Stay in Findings, Quality, and Charts before moving into experiments."
+        : "The report view fills in once a dataset has been processed.",
+    },
+    {
+      label: "History",
+      value: totalExperiments ? `${totalExperiments} ML artifact${totalExperiments === 1 ? "" : "s"}` : "Archive still empty",
+      note: totalExperiments
+        ? "Older reports and experiment exports remain recoverable from the archive."
+        : "Saved runs and experiment files will collect here after the first pass.",
+    },
+  ];
+  const breakdownSidecarItems = [
+    {
+      label: "Latest lane",
+      value: latest ? (latest.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first") : "Standby",
+      note: latest ? truncateText(latest.overview.dataset_name, 34) : "No saved dataset has claimed the active lane yet.",
+    },
+    {
+      label: "Saved experiments",
+      value: totalExperiments.toLocaleString(),
+      note: totalExperiments ? "Reopen or download them from the red lab surface." : "The ML lane stays quiet until you choose to run it.",
+    },
+    {
+      label: "Recommended next move",
+      value: latest
+        ? latest.insights.modeling_readiness.is_ready
+          ? "Open ML Lab"
+          : "Review Findings"
+        : "Open Uploads",
+      note: latest
+        ? latest.insights.modeling_readiness.is_ready
+          ? "The report is stable enough to benchmark without leaving the flow."
+          : "Work left-to-right through summary, health, and charts before modeling."
+        : "Create the first run before the right-hand lane comes alive.",
+    },
+  ];
 
   return (
     <>
@@ -222,8 +273,8 @@ export default function DashboardPage() {
         ) : null}
 
         {loading ? (
-          <div className="py-10 text-center text-sm text-white/40">
-            Loading dashboard...
+          <div className="py-10">
+            <SurfaceLoadingIndicator label="Loading dashboard..." className="mx-auto" />
           </div>
         ) : null}
 
@@ -445,6 +496,15 @@ export default function DashboardPage() {
                         </span>
                       ))}
                     </div>
+                    <div className="desktop-studio-route-checks">
+                      {studioRouteChecks.map((item) => (
+                        <article key={item.label} className="desktop-studio-route-card">
+                          <p className="desktop-studio-route-card-label">{item.label}</p>
+                          <p className="desktop-studio-route-card-value">{item.value}</p>
+                          <p className="desktop-studio-route-card-note">{item.note}</p>
+                        </article>
+                      ))}
+                    </div>
                   </div>
                 </section>
 
@@ -477,10 +537,23 @@ export default function DashboardPage() {
                         </div>
                       </article>
                     ))}
+                    <article className="analysis-breakdown-sidecar">
+                      <p className="analysis-breakdown-sidecar-kicker">Right lane</p>
+                      <p className="analysis-breakdown-sidecar-title">Keep the ML hand-off on the edge of the map.</p>
+                      <p className="analysis-breakdown-sidecar-copy">That empty slot now tracks whether the current run is ready to move from explanation into experiments, so the red lab surface feels like a deliberate final stage instead of a disconnected add-on.</p>
+                      <div className="analysis-breakdown-sidecar-list">
+                        {breakdownSidecarItems.map((item) => (
+                          <div key={item.label} className="analysis-breakdown-sidecar-item">
+                            <span className="analysis-breakdown-sidecar-label">{item.label}</span>
+                            <strong className="analysis-breakdown-sidecar-value">{item.value}</strong>
+                            <p className="analysis-breakdown-sidecar-note">{item.note}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </article>
                   </div>
                   <div className="analysis-breakdown-footer">
                     <div className="analysis-breakdown-note">
-                      <p className="analysis-breakdown-note-kicker">Coverage</p>
                       <p className="analysis-breakdown-note-title">One report spine, five coloured reading lanes.</p>
                       <p className="analysis-breakdown-note-copy">Summary stays blue, quality stays green, schema keeps the violet structure pass, charts stay amber, and ML ends in the red lab surface.</p>
                     </div>
