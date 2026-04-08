@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
-import { analysisFocusAreas, getAnalysisTabDefinition } from "@/lib/analysisNavigation";
+import { getAnalysisTabDefinition } from "@/lib/analysisNavigation";
 import { AnalysisListItem } from "@/lib/analysisTypes";
+import { analysisVisualCards } from "@/lib/analysisVisualCards";
 import { subscribeToAnalysisStateChanges } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
 import { resolveAuthenticatedUser } from "@/lib/session";
@@ -36,140 +37,6 @@ const destinationCards = [
     detail: "Manage login details, remembered sessions, and saved-upload cleanup tools.",
     href: "/account",
     cta: "Open account",
-  },
-];
-
-const analysisBreakdownCards = analysisFocusAreas.map((area) => ({
-  title: area.label,
-  detail: area.description,
-  tabs: area.tabKeys.map((tabKey) => getAnalysisTabDefinition(tabKey).label),
-}));
-
-const dashboardCardCovers: { key: string; label: string; defaultTab: string; accent: string; cover: React.ReactElement }[] = [
-  {
-    key: "overview",
-    label: "Overview",
-    defaultTab: "overview",
-    accent: "#4f6ef7",
-    cover: (
-      <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-        <rect width="300" height="140" fill="#1a1f36"/>
-        <circle cx="260" cy="20" r="70" fill="#2d3f8a" opacity="0.5"/>
-        <circle cx="40" cy="120" r="45" fill="#2d3f8a" opacity="0.3"/>
-        <polygon points="0,0 200,0 0,140" fill="#4f6ef7" opacity="0.06"/>
-        <polygon points="300,140 100,140 300,0" fill="#06b6d4" opacity="0.04"/>
-        <line x1="0" y1="140" x2="300" y2="0" stroke="#4f6ef7" strokeWidth="0.8" opacity="0.15"/>
-        <rect x="24" y="42" width="52" height="36" rx="5" fill="#4f6ef7" opacity="0.9"/>
-        <rect x="84" y="42" width="80" height="36" rx="5" fill="#4f6ef7" opacity="0.5"/>
-        <rect x="172" y="42" width="104" height="36" rx="5" fill="#4f6ef7" opacity="0.25"/>
-        <rect x="24" y="86" width="252" height="9" rx="3" fill="#4f6ef7" opacity="0.2"/>
-        <rect x="24" y="102" width="190" height="9" rx="3" fill="#4f6ef7" opacity="0.14"/>
-        <text x="24" y="130" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Overview</text>
-        <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(165,184,255,0.6)" letterSpacing="2">SUMMARY · METRICS · KPIs</text>
-      </svg>
-    ),
-  },
-  {
-    key: "data-health",
-    label: "Data Health",
-    defaultTab: "quality",
-    accent: "#22c55e",
-    cover: (
-      <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-        <rect width="300" height="140" fill="#0d3b2e"/>
-        <circle cx="270" cy="20" r="70" fill="#145a42" opacity="0.5"/>
-        <circle cx="30" cy="120" r="45" fill="#145a42" opacity="0.3"/>
-        <polyline points="20,72 56,72 74,38 92,108 110,55 128,82 152,72 280,72" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="74" cy="38" r="4" fill="#22c55e"/>
-        <circle cx="92" cy="108" r="4" fill="#22c55e"/>
-        <circle cx="110" cy="55" r="4" fill="#22c55e"/>
-        <text x="24" y="130" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Data Health</text>
-        <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(134,239,172,0.6)" letterSpacing="2">QUALITY · NULLS · ANOMALIES</text>
-      </svg>
-    ),
-  },
-  {
-    key: "schema",
-    label: "Schema",
-    defaultTab: "schema",
-    accent: "#a78bfa",
-    cover: (
-      <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-        <rect width="300" height="140" fill="#1e1535"/>
-        <circle cx="260" cy="20" r="65" fill="#2d1f52" opacity="0.5"/>
-        <rect x="24" y="38" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.9"/>
-        <rect x="24" y="56" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.45"/>
-        <rect x="24" y="74" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.3"/>
-        <rect x="24" y="92" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.18"/>
-        <line x1="108" y1="38" x2="108" y2="102" stroke="#a78bfa" strokeWidth="1" opacity="0.35"/>
-        <line x1="192" y1="38" x2="192" y2="102" stroke="#a78bfa" strokeWidth="1" opacity="0.35"/>
-        <text x="24" y="125" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Schema</text>
-        <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(196,181,253,0.6)" letterSpacing="2">TABLES · COLUMNS · TYPES</text>
-      </svg>
-    ),
-  },
-  {
-    key: "charts",
-    label: "Charts",
-    defaultTab: "visualisations",
-    accent: "#f59e0b",
-    cover: (
-      <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-        <rect width="300" height="140" fill="#2d1a00"/>
-        <circle cx="262" cy="18" r="68" fill="#4a2c00" opacity="0.5"/>
-        <rect x="24" y="82" width="28" height="38" rx="3" fill="#f59e0b" opacity="0.4"/>
-        <rect x="60" y="62" width="28" height="58" rx="3" fill="#f59e0b" opacity="0.6"/>
-        <rect x="96" y="44" width="28" height="76" rx="3" fill="#f59e0b" opacity="0.85"/>
-        <rect x="132" y="55" width="28" height="65" rx="3" fill="#f59e0b" opacity="0.7"/>
-        <rect x="168" y="68" width="28" height="52" rx="3" fill="#f59e0b" opacity="0.5"/>
-        <rect x="204" y="76" width="28" height="44" rx="3" fill="#f59e0b" opacity="0.35"/>
-        <line x1="14" y1="120" x2="286" y2="120" stroke="#f59e0b" strokeWidth="1" opacity="0.2"/>
-        <text x="24" y="135" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Charts</text>
-        <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(253,211,77,0.6)" letterSpacing="2">VISUALISE · EXPLORE · COMPARE</text>
-      </svg>
-    ),
-  },
-  {
-    key: "ml",
-    label: "ML Lab",
-    defaultTab: "ml",
-    accent: "#f43f5e",
-    cover: (
-      <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-        <rect width="300" height="140" fill="#2d0a1a"/>
-        <circle cx="258" cy="18" r="70" fill="#4a0f28" opacity="0.5"/>
-        <circle cx="20" cy="118" r="45" fill="#4a0f28" opacity="0.3"/>
-        <circle cx="44" cy="42" r="9" fill="#f43f5e" opacity="0.9"/>
-        <circle cx="44" cy="70" r="9" fill="#f43f5e" opacity="0.9"/>
-        <circle cx="44" cy="98" r="9" fill="#f43f5e" opacity="0.9"/>
-        <circle cx="110" cy="32" r="9" fill="#f43f5e" opacity="0.65"/>
-        <circle cx="110" cy="60" r="9" fill="#f43f5e" opacity="0.65"/>
-        <circle cx="110" cy="88" r="9" fill="#f43f5e" opacity="0.65"/>
-        <circle cx="110" cy="108" r="9" fill="#f43f5e" opacity="0.65"/>
-        <circle cx="176" cy="42" r="9" fill="#f43f5e" opacity="0.5"/>
-        <circle cx="176" cy="70" r="9" fill="#f43f5e" opacity="0.5"/>
-        <circle cx="176" cy="98" r="9" fill="#f43f5e" opacity="0.5"/>
-        <circle cx="242" cy="56" r="9" fill="#f43f5e" opacity="0.9"/>
-        <circle cx="242" cy="84" r="9" fill="#f43f5e" opacity="0.9"/>
-        <line x1="53" y1="42" x2="101" y2="32" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="53" y1="42" x2="101" y2="60" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="53" y1="70" x2="101" y2="60" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="53" y1="70" x2="101" y2="88" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="53" y1="98" x2="101" y2="88" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="53" y1="98" x2="101" y2="108" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="119" y1="32" x2="167" y2="42" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="119" y1="60" x2="167" y2="42" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="119" y1="60" x2="167" y2="70" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="119" y1="88" x2="167" y2="70" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="119" y1="88" x2="167" y2="98" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-        <line x1="185" y1="42" x2="233" y2="56" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-        <line x1="185" y1="70" x2="233" y2="56" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-        <line x1="185" y1="70" x2="233" y2="84" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-        <line x1="185" y1="98" x2="233" y2="84" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-        <text x="24" y="130" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">ML Lab</text>
-        <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(253,164,175,0.6)" letterSpacing="2">TRAIN · EVALUATE · PREDICT</text>
-      </svg>
-    ),
   },
 ];
 
@@ -491,19 +358,29 @@ export default function DashboardPage() {
                     <p className="desktop-panel-title">Analysis breakdown</p>
                     <ScrollIntentLink href="/analysis" className="desktop-panel-action">Open workspace</ScrollIntentLink>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    {analysisBreakdownCards.map((item) => (
-                      <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.02] p-4">
-                        <p className="text-sm font-semibold text-white">{item.title}</p>
-                        <p className="mt-2 text-sm leading-6 text-white/52">{item.detail}</p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {item.tabs.map((tab) => (
-                            <span key={`${item.title}-${tab}`} className="desktop-badge" data-tone="purple">
-                              {tab}
-                            </span>
-                          ))}
+                  <div className="analysis-visual-grid" data-layout="dashboard">
+                    {analysisVisualCards.map((card) => (
+                      <article
+                        key={card.key}
+                        className="analysis-visual-card analysis-visual-card-static"
+                        style={{ "--analysis-card-accent": card.accent, "--analysis-card-border": `${card.accent}33` } as CSSProperties}
+                      >
+                        <div className="analysis-visual-cover">{card.cover}</div>
+                        <div className="analysis-visual-body">
+                          <p className="analysis-visual-title">{card.label}</p>
+                          <p className="analysis-visual-copy">{card.description}</p>
+                          <div className="analysis-visual-tabs">
+                            {card.tabKeys.map((tabKey) => {
+                              const tab = getAnalysisTabDefinition(tabKey);
+                              return (
+                                <span key={`${card.key}-${tab.key}`} className="desktop-badge" data-tone="purple">
+                                  {tab.label}
+                                </span>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      </article>
                     ))}
                   </div>
                 </section>
@@ -676,16 +553,14 @@ function DashboardMobileSections({
           </summary>
           <div className="mobile-accordion-body">
             <div className="mobile-analysis-svg-grid">
-              {dashboardCardCovers.map((card) => (
-                <ScrollIntentLink
+              {analysisVisualCards.map((card) => (
+                <article
                   key={card.key}
-                  href={latest ? `/analysis?analysisId=${latest.id}&tab=${card.defaultTab}` : `/analysis`}
-                  className="mobile-analysis-svg-card"
-                  style={{ "--analysis-card-accent": card.accent } as React.CSSProperties}
+                  className="mobile-analysis-svg-card mobile-analysis-svg-card-static"
+                  style={{ "--analysis-card-accent": card.accent } as CSSProperties}
                 >
                   {card.cover}
-                  <span className="mobile-analysis-svg-card-tap">Tap to open</span>
-                </ScrollIntentLink>
+                </article>
               ))}
             </div>
             <div className="mobile-screen-actions">

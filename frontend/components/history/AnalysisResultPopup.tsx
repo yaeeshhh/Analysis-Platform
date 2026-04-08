@@ -192,6 +192,21 @@ export default function AnalysisResultPopup({
     };
   }, [open, ready, report?.analysis_id]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      container.scrollTo({ top: 0, behavior: "auto" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [open, mobileCardOpen, report?.analysis_id]);
+
   function handleScrollToSection(sectionId: PopupSectionId) {
     setActiveSectionId(sectionId);
     const container = scrollContainerRef.current;

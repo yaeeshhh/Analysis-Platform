@@ -530,6 +530,8 @@ def _append_experiment(
         "created_at": created_at,
         "parameters": parameters,
         "summary": summary_text,
+        "summary_text_inline": summary_text,
+        "report_payload_inline": experiment_payload,
         "report_path": str(experiment_json_path.relative_to(PROJECT_ROOT).as_posix()),
         "summary_path": str(experiment_summary_path.relative_to(PROJECT_ROOT).as_posix()),
         "download_url": f"/analysis/{analysis_run.id}/ml/experiments/{experiment_id}/download",
@@ -595,7 +597,26 @@ def _get_saved_experiments(summary: object) -> list[dict[str, object]]:
     return [item for item in experiments if isinstance(item, dict)]
 
 
+def _get_saved_experiment_summary_text(experiment: dict[str, object]) -> str | None:
+    inline_summary = experiment.get("summary_text_inline") or experiment.get("summary")
+    if isinstance(inline_summary, str) and inline_summary.strip():
+        return inline_summary
+
+    summary_path = _resolve_saved_path(experiment.get("summary_path"))
+    if summary_path is None or not summary_path.exists():
+        return None
+
+    try:
+        return summary_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
 def _load_saved_experiment_payload(experiment: dict[str, object]) -> dict[str, object] | None:
+    inline_payload = experiment.get("report_payload_inline")
+    if isinstance(inline_payload, dict):
+        return inline_payload
+
     report_path_value = experiment.get("report_path")
     report_path = _resolve_saved_path(report_path_value if isinstance(report_path_value, str) else None)
     if report_path is None or not report_path.exists():
@@ -605,6 +626,53 @@ def _load_saved_experiment_payload(experiment: dict[str, object]) -> dict[str, o
         payload = json.load(f)
 
     return payload if isinstance(payload, dict) else None
+
+
+def _public_experiment_record(experiment: dict[str, object]) -> dict[str, object]:
+    return {
+        key: value
+        for key, value in experiment.items()
+        if key not in {"report_payload_inline", "summary_text_inline"}
+    }
+
+
+def _public_summary(summary: dict[str, object]) -> dict[str, object]:
+    public_summary = dict(summary)
+    public_summary["ml_experiments"] = [
+        _public_experiment_record(item) for item in _get_saved_experiments(summary)
+    ]
+    return public_summary
+
+
+def _rebuild_saved_experiment_payload(
+    analysis_id: int,
+    summary: dict[str, object],
+    experiment: dict[str, object],
+) -> dict[str, object] | None:
+    experiment_type = experiment.get("type")
+    if not isinstance(experiment_type, str) or not experiment_type:
+        return None
+
+    experiments_of_type = [
+        item for item in _get_saved_experiments(summary) if item.get("type") == experiment_type
+    ]
+    if len(experiments_of_type) != 1:
+        return None
+
+    ml_results = summary.get("ml_results") if isinstance(summary.get("ml_results"), dict) else {}
+    result = ml_results.get(experiment_type) if isinstance(ml_results, dict) else None
+    if not isinstance(result, dict):
+        return None
+
+    return {
+        "analysis_id": analysis_id,
+        "experiment_id": experiment.get("id"),
+        "experiment_type": experiment_type,
+        "created_at": experiment.get("created_at"),
+        "parameters": experiment.get("parameters") if isinstance(experiment.get("parameters"), dict) else {},
+        "summary": experiment.get("summary") if isinstance(experiment.get("summary"), str) else "",
+        "result": result,
+    }
 
 
 def _sync_saved_ml_result(
@@ -768,13 +836,14 @@ async def upload_analysis_csv(
         json.dump(report, f, indent=2)
 
     save_analysis_report(db, analysis_run, report)
+    public_report = _public_summary(report)
 
     return {
         "analysis_id": analysis_run.id,
         "display_name": analysis_run.display_name,
         "source_filename": analysis_run.source_filename,
         "saved_at": analysis_run.created_at,
-        **report,
+        **public_report,
         "download_url": f"/analysis/{analysis_run.id}/download",
     }
 
@@ -801,7 +870,7 @@ def list_analysis_runs(
                 "overview": overview,
                 "insights": summary.get("insights", {}) if isinstance(summary, dict) else {},
                 "experiment_count": len(experiments),
-                "latest_experiment": latest_experiment,
+                "latest_experiment": _public_experiment_record(latest_experiment) if latest_experiment else None,
             }
         )
     return items
@@ -815,12 +884,13 @@ def get_full_analysis(
 ):
     analysis_run = _get_analysis_run(analysis_id, db, current_user)
     summary = _hydrate_dynamic_ml_capabilities(analysis_run, dict(analysis_run.report_payload), db=db)
+    public_summary = _public_summary(summary)
     return {
         "analysis_id": analysis_run.id,
         "display_name": analysis_run.display_name,
         "source_filename": analysis_run.source_filename,
         "saved_at": analysis_run.created_at,
-        **summary,
+        **public_summary,
     }
 
 
@@ -994,7 +1064,7 @@ def run_analysis_unsupervised(
             detail="The unsupervised run completed, but the result could not be saved.",
         ) from exc
 
-    return {**result, "experiment": experiment}
+    return {**result, "experiment": _public_experiment_record(experiment)}
 
 
 @router.post("/{analysis_id}/ml/supervised")
@@ -1043,7 +1113,7 @@ def run_analysis_supervised(
             detail="The supervised benchmark completed, but the result could not be saved.",
         ) from exc
 
-    return {**result, "experiment": experiment}
+    return {**result, "experiment": _public_experiment_record(experiment)}
 
 
 @router.get("/{analysis_id}/ml/experiments/{experiment_id}/download")
@@ -1059,15 +1129,13 @@ def download_ml_experiment_report(
     if experiment is None:
         raise HTTPException(status_code=404, detail="ML experiment not found.")
 
-    report_path = _resolve_saved_path(experiment.get("report_path"))
-    if report_path is None or not report_path.exists():
-        raise HTTPException(status_code=404, detail="ML experiment report not found.")
-
-    with open(report_path, "r", encoding="utf-8") as f:
-        payload = json.load(f)
-
+    payload = _load_saved_experiment_payload(experiment) or _rebuild_saved_experiment_payload(
+        analysis_id,
+        analysis_run.report_payload,
+        experiment,
+    )
     if not isinstance(payload, dict):
-        raise HTTPException(status_code=500, detail="Saved ML experiment report is invalid.")
+        raise HTTPException(status_code=404, detail="ML experiment report not found.")
 
     return PlainTextResponse(
         _render_ml_experiment_report_text(payload),
@@ -1091,12 +1159,15 @@ def get_ml_experiment_detail(
     if experiment is None:
         raise HTTPException(status_code=404, detail="ML experiment not found.")
 
-    report_path = _resolve_saved_path(experiment.get("report_path"))
-    if report_path is None or not report_path.exists():
+    payload = _load_saved_experiment_payload(experiment) or _rebuild_saved_experiment_payload(
+        analysis_id,
+        analysis_run.report_payload,
+        experiment,
+    )
+    if not isinstance(payload, dict):
         raise HTTPException(status_code=404, detail="ML experiment report not found.")
 
-    with open(report_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return payload
 
 
 @router.get("/{analysis_id}/ml/experiments/{experiment_id}/summary")
@@ -1111,6 +1182,14 @@ def download_ml_experiment_summary(
     experiment = next((item for item in experiments if item.get("id") == experiment_id), None)
     if experiment is None:
         raise HTTPException(status_code=404, detail="ML experiment not found.")
+
+    summary_text = _get_saved_experiment_summary_text(experiment)
+    if summary_text is not None:
+        return PlainTextResponse(
+            summary_text,
+            media_type="text/plain",
+            headers={"Content-Disposition": f'attachment; filename="analysis_{analysis_id}_{experiment_id}_summary.txt"'},
+        )
 
     summary_path = _resolve_saved_path(experiment.get("summary_path"))
     if summary_path is None or not summary_path.exists():
@@ -1130,13 +1209,7 @@ def download_analysis_report(
     current_user: User = Depends(get_current_user),
 ):
     analysis_run = _get_analysis_run(analysis_id, db, current_user)
-    report_path = _report_path_for_analysis_run(analysis_run)
-    if report_path is None or not report_path.exists():
-        raise HTTPException(status_code=404, detail="Analysis report not found.")
-
-    with open(report_path, "r", encoding="utf-8") as f:
-        payload = json.load(f)
-
+    payload = analysis_run.report_payload
     if not isinstance(payload, dict):
         raise HTTPException(status_code=500, detail="Saved analysis report is invalid.")
 
