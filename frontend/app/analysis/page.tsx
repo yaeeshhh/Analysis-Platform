@@ -763,8 +763,17 @@ function AnalysisMobileSections({
   const qualityScore = calculateQualityScore(report.overview, report.quality);
   const currentCard = mobileAnalysisCards.find((c) => c.key === openCard);
 
+  const cardAccents: Record<string, string> = {
+    "overview": "#4f6ef7",
+    "data-health": "#22c55e",
+    "schema": "#a78bfa",
+    "charts": "#f59e0b",
+    "ml": "#f43f5e",
+  };
+
   /* ── Detail view (card opened) ── */
   if (openCard && currentCard) {
+    const accent = cardAccents[currentCard.key] ?? "#4f6ef7";
     return (
       <div className="phone-only mobile-screen-stack">
         <button type="button" onClick={handleBack} className="mobile-analysis-back-btn">
@@ -772,7 +781,10 @@ function AnalysisMobileSections({
           All sections
         </button>
 
-        <div className="mobile-analysis-detail-header">
+        <div
+          className="mobile-analysis-detail-header"
+          style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
+        >
           <span className="mobile-analysis-detail-icon">{currentCard.icon}</span>
           <div>
             <h2 className="mobile-analysis-detail-title">{currentCard.label}</h2>
@@ -827,23 +839,27 @@ function AnalysisMobileSections({
         </div>
       </section>
 
-      {/* ── Vertical section cards ── */}
+      {/* ── Vertical section cards with per-card accent colour ── */}
       <div className="mobile-analysis-card-list">
-        {mobileAnalysisCards.map((card) => (
-          <button
-            key={card.key}
-            type="button"
-            onClick={() => handleOpenCard(card)}
-            className="mobile-analysis-card"
-          >
-            <span className="mobile-analysis-card-icon">{card.icon}</span>
-            <div className="mobile-analysis-card-text">
-              <p className="mobile-analysis-card-label">{card.label}</p>
-              <p className="mobile-analysis-card-desc">{card.description}</p>
-            </div>
-            <svg className="mobile-analysis-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        ))}
+        {mobileAnalysisCards.map((card) => {
+          const accent = cardAccents[card.key] ?? "#4f6ef7";
+          return (
+            <button
+              key={card.key}
+              type="button"
+              onClick={() => handleOpenCard(card)}
+              className="mobile-analysis-card"
+              style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}38` } as React.CSSProperties}
+            >
+              <span className="mobile-analysis-card-icon">{card.icon}</span>
+              <div className="mobile-analysis-card-text">
+                <p className="mobile-analysis-card-label">{card.label}</p>
+                <p className="mobile-analysis-card-desc">{card.description}</p>
+              </div>
+              <svg className="mobile-analysis-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
