@@ -2138,6 +2138,245 @@ a[class*="rounded"]:hover {
     font-size: 0.76rem;
   }
 
+  .analysis-mobile-tab-spotlight {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--analysis-focus-accent) 20%, transparent), transparent 45%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    margin-top: 0.95rem;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .analysis-mobile-tab-spotlight::before {
+    background: linear-gradient(90deg, var(--analysis-focus-accent), transparent 80%);
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .analysis-mobile-tab-spotlight-kicker {
+    color: var(--analysis-focus-accent);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .analysis-mobile-tab-spotlight-title {
+    color: var(--text-100);
+    font-family: var(--font-display), sans-serif;
+    font-size: 1.08rem;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+    margin: 0.38rem 0 0;
+  }
+
+  .analysis-mobile-tab-spotlight-copy {
+    color: rgba(242, 247, 251, 0.56);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    margin: 0.56rem 0 0;
+  }
+
+  .analysis-mobile-tab-spotlight-summary {
+    color: rgba(242, 247, 251, 0.72);
+    font-size: 0.82rem;
+    line-height: 1.62;
+    margin: 0.82rem 0 0;
+  }
+
+  .analysis-mobile-focus-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0 1.35rem;
+  }
+
+  .analysis-mobile-focus-hero {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--analysis-focus-accent) 24%, transparent), transparent 42%),
+      linear-gradient(180deg, rgba(13, 19, 33, 0.98), rgba(16, 22, 36, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.2rem;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    padding: 1.15rem;
+    position: relative;
+  }
+
+  .analysis-mobile-focus-hero::before {
+    background: linear-gradient(90deg, var(--analysis-focus-accent), transparent 82%);
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .analysis-mobile-focus-kicker {
+    color: var(--analysis-focus-accent);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .analysis-mobile-focus-title {
+    color: var(--text-100);
+    font-family: var(--font-display), sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    margin: 0.4rem 0 0;
+  }
+
+  .analysis-mobile-focus-lead {
+    color: rgba(242, 247, 251, 0.58);
+    font-size: 0.84rem;
+    line-height: 1.58;
+    margin: 0.62rem 0 0;
+  }
+
+  .analysis-mobile-focus-summary {
+    color: rgba(242, 247, 251, 0.8);
+    font-size: 0.87rem;
+    line-height: 1.66;
+    margin: 0.92rem 0 0;
+  }
+
+  .analysis-mobile-focus-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.95rem;
+  }
+
+  .analysis-mobile-focus-note {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .analysis-mobile-focus-note-title {
+    color: var(--text-100);
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .analysis-mobile-focus-note-copy {
+    color: rgba(242, 247, 251, 0.56);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    margin: 0.42rem 0 0;
+  }
+
+  .analysis-mobile-focus-content {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .analysis-mobile-focus-content .analysis-tab-surface {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+  }
+
+  .analysis-mobile-focus-content .analysis-chart-frame {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .analysis-mobile-focus-content .analysis-tab-surface [class*="border-b"][class*="border-white/6"] {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 0.96rem;
+    padding: 0.92rem 0.96rem !important;
+  }
+
+  .analysis-mobile-focus-content .mobile-col-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.96rem;
+    padding: 0.92rem 0.96rem;
+  }
+
+  .analysis-mobile-focus-content details.mobile-accordion {
+    background: linear-gradient(180deg, rgba(13, 18, 33, 0.98), rgba(15, 20, 35, 0.92));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.05rem;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    padding: 1rem;
+  }
+
+  .analysis-mobile-focus-content details.mobile-accordion::before {
+    background: linear-gradient(90deg, rgba(122, 214, 255, 0.85), rgba(157, 184, 255, 0.45), transparent 82%);
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .analysis-mobile-focus-content details.mobile-accordion > summary {
+    cursor: pointer;
+    display: block;
+    padding: 0;
+    user-select: none;
+  }
+
+  .analysis-mobile-focus-content .mobile-accordion-hint {
+    color: rgba(242, 247, 251, 0.44);
+    font-size: 0.74rem;
+    line-height: 1.5;
+    margin-top: 0.22rem;
+  }
+
+  .analysis-mobile-focus-content details.mobile-accordion > summary::after {
+    align-items: center;
+    background: rgba(157, 184, 255, 0.08);
+    border: 1px solid rgba(157, 184, 255, 0.2);
+    border-radius: 999px;
+    color: var(--accent-cta-muted);
+    content: "Read more";
+    display: inline-flex;
+    font-size: 0.71rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-top: 0.82rem;
+    padding: 0.4rem 0.78rem;
+    text-transform: uppercase;
+    transform: none;
+  }
+
+  .analysis-mobile-focus-content details.mobile-accordion[open] > summary::after {
+    content: "Show less";
+    transform: none;
+  }
+
+  .analysis-mobile-focus-content details.mobile-accordion > .mobile-accordion-body {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 0.9rem;
+    padding: 0.95rem 0 0.05rem;
+  }
+
   .mobile-expand-card {
     background: rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(255, 255, 255, 0.06);
