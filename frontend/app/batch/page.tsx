@@ -856,37 +856,37 @@ function BatchMobileSections({
         {analyses.length === 0 ? (
           <p className="mobile-screen-empty">No saved runs yet. Upload a CSV to create the first one.</p>
         ) : (
-          <div className="mobile-screen-list">
+          <div className="mobile-batch-card-list">
             {(showAllUploads ? analyses : analyses.slice(0, 3)).map((analysis) => {
               const selected = analysis.id === selectedAnalysis?.id;
               return (
-                <div key={analysis.id} className={`mobile-screen-row ${selected ? "mobile-screen-row-selected" : ""}`}>
-                  <div className="mobile-screen-row-header">
-                    <div className="mobile-screen-row-main">
-                      <p className="mobile-screen-row-title">{analysis.overview.dataset_name || analysis.source_filename}</p>
-                      <p className="mobile-screen-row-meta">Saved {formatDate(analysis.saved_at)} • {analysis.overview.row_count.toLocaleString()} rows</p>
-                    </div>
-                    <span className="mobile-screen-pill" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                        {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                    </span>
-                  </div>
-                    <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 90)}</p>
-                  <div className="mobile-screen-row-actions">
-                    <button
-                      type="button"
-                      onClick={() => handleSelectSavedUpload(analysis.id)}
-                      className="mobile-screen-button mobile-screen-button-secondary"
-                    >
+                <div key={analysis.id} className={`mobile-batch-card${selected ? " mobile-batch-card-active" : ""}`}>
+                  <span className="mobile-batch-card-icon" aria-hidden="true">📄</span>
+                  <div className="mobile-batch-card-body">
+                    <p className="mobile-batch-card-label">{analysis.overview.dataset_name || analysis.source_filename}</p>
+                    <p className="mobile-batch-card-meta">
+                      {formatDate(analysis.saved_at)} · {analysis.overview.row_count.toLocaleString()} rows · {analysis.overview.column_count} cols
+                    </p>
+                    <div className="mobile-batch-card-actions">
+                      <button
+                        type="button"
+                        onClick={() => handleSelectSavedUpload(analysis.id)}
+                        className="mobile-screen-button mobile-screen-button-secondary"
+                      >
                         {selected ? "Selected" : "Set active"}
-                    </button>
-                    <ScrollIntentLink
-                      href={`/analysis?analysisId=${analysis.id}`}
-                      onClick={() => setSelection(analysis.id)}
-                      className="mobile-screen-button mobile-screen-button-primary"
-                    >
+                      </button>
+                      <ScrollIntentLink
+                        href={`/analysis?analysisId=${analysis.id}`}
+                        onClick={() => setSelection(analysis.id)}
+                        className="mobile-screen-button mobile-screen-button-primary"
+                      >
                         Open analysis
-                    </ScrollIntentLink>
+                      </ScrollIntentLink>
+                    </div>
                   </div>
+                  <span className="mobile-batch-card-badge" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                    {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                  </span>
                 </div>
               );
             })}

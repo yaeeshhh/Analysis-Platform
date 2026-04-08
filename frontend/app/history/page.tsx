@@ -661,43 +661,32 @@ function HistoryMobileSections({
         />
       </div>
 
-      {/* ── Filter chips ── */}
-      <nav className="mobile-history-filter-track" aria-label="History filters">
-        {([
-          { value: "all", label: "All" },
-          { value: "ml-ready", label: "ML-ready" },
-          { value: "eda-first", label: "EDA-first" },
-        ] as const).map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => setReadinessFilter(opt.value)}
-            className={`mobile-history-filter-chip${readinessFilter === opt.value ? " mobile-history-filter-chip-active" : ""}`}
-          >
-            {opt.label}
-          </button>
-        ))}
-        <span className="mobile-history-filter-divider" />
-        {([
-          { value: "all", label: "Any ML" },
-          { value: "with-ml", label: "Has ML" },
-          { value: "without-ml", label: "No ML" },
-        ] as const).map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => setMlFilter(opt.value)}
-            className={`mobile-history-filter-chip${mlFilter === opt.value ? " mobile-history-filter-chip-active" : ""}`}
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* ── Filter dropdowns ── */}
+      <div className="mobile-history-filter-row">
+        <select
+          value={readinessFilter}
+          onChange={(event) => setReadinessFilter(event.target.value as ReadinessFilter)}
+          className="mobile-history-filter-select"
+        >
+          <option value="all">All readiness</option>
+          <option value="ml-ready">ML-ready</option>
+          <option value="eda-first">EDA-first</option>
+        </select>
+        <select
+          value={mlFilter}
+          onChange={(event) => setMlFilter(event.target.value as MlFilter)}
+          className="mobile-history-filter-select"
+        >
+          <option value="all">Any ML</option>
+          <option value="with-ml">Has ML</option>
+          <option value="without-ml">No ML</option>
+        </select>
         {hasHistoryFilters ? (
-          <button type="button" onClick={clearFilters} className="mobile-history-filter-chip mobile-history-filter-chip-clear">
+          <button type="button" onClick={clearFilters} className="mobile-history-filter-clear">
             ✕
           </button>
         ) : null}
-      </nav>
+      </div>
 
       {/* ── Run list ── */}
       {filteredAnalyses.length === 0 ? (

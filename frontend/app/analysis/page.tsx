@@ -594,7 +594,59 @@ export default function AnalysisPage() {
   );
 }
 
-/* ────────────────── Phone-only analysis tab slides ────────────────── */
+/* ────────────────── Phone-only analysis card navigation ────────────────── */
+
+/** Cards shown on the mobile analysis index screen. */
+const mobileAnalysisCards: Array<{
+  key: AnalysisTabKey;
+  label: string;
+  description: string;
+  icon: string;
+  subtabs?: Array<{ key: AnalysisTabKey; label: string }>;
+}> = [
+  {
+    key: "overview",
+    label: "Overview",
+    description: "What the data says, dataset posture, and sample rows.",
+    icon: "📊",
+    subtabs: [
+      { key: "overview", label: "What the data says" },
+      { key: "insights", label: "Key findings" },
+    ],
+  },
+  {
+    key: "quality",
+    label: "Quality",
+    description: "Missingness, duplicates, constants, and cleanup direction.",
+    icon: "🩺",
+    subtabs: [
+      { key: "quality", label: "Issues & fixes" },
+      { key: "statistics", label: "Measures" },
+    ],
+  },
+  {
+    key: "schema",
+    label: "Fields",
+    description: "Column types, roles, identifiers, and target candidates.",
+    icon: "🗂️",
+  },
+  {
+    key: "relationships",
+    label: "Patterns",
+    description: "Correlations, skew, chart views, and modeling cues.",
+    icon: "🔗",
+    subtabs: [
+      { key: "relationships", label: "Correlations" },
+      { key: "visualisations", label: "Charts" },
+    ],
+  },
+  {
+    key: "ml",
+    label: "ML Lab",
+    description: "Run or reopen supervised and unsupervised experiments.",
+    icon: "🧪",
+  },
+];
 
 function AnalysisMobileSections({
   report,
@@ -607,78 +659,126 @@ function AnalysisMobileSections({
   onTabChange: (nextTab: AnalysisTabKey) => void;
   refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
 }) {
-  let activeContent: React.ReactNode = null;
+  const [openCard, setOpenCard] = useState<string | null>(null);
+  const [activeSubtab, setActiveSubtab] = useState<AnalysisTabKey>(activeTab);
 
-  if (activeTab === "overview") {
-    activeContent = (
-      <OverviewTab
-        overview={report.overview}
-        schema={report.schema}
-        quality={report.quality}
-        insights={report.insights}
-      />
-    );
+  /* When a card is opened, sync the active tab for content rendering */
+  function handleOpenCard(card: (typeof mobileAnalysisCards)[number]) {
+    setOpenCard(card.key);
+    setActiveSubtab(card.key);
+    onTabChange(card.key);
   }
 
-  if (activeTab === "insights") {
-    activeContent = <InsightsTab insights={report.insights} />;
+  function handleBack() {
+    setOpenCard(null);
   }
 
-  if (activeTab === "schema") {
-    activeContent = <SchemaTab schema={report.schema} />;
+  function handleSubtabChange(tabKey: AnalysisTabKey) {
+    setActiveSubtab(tabKey);
+    onTabChange(tabKey);
   }
 
-  if (activeTab === "quality") {
-    activeContent = <DataQualityTab overview={report.overview} quality={report.quality} />;
+  /* Resolve content for the currently active subtab */
+  function renderContent(): React.ReactNode {
+    switch (activeSubtab) {
+      case "overview":
+        return (
+          <OverviewTab
+            overview={report.overview}
+            schema={report.schema}
+            quality={report.quality}
+            insights={report.insights}
+          />
+        );
+      case "insights":
+        return <InsightsTab insights={report.insights} />;
+      case "schema":
+        return <SchemaTab schema={report.schema} />;
+      case "quality":
+        return <DataQualityTab overview={report.overview} quality={report.quality} />;
+      case "statistics":
+        return <StatisticsTab statistics={report.statistics} />;
+      case "relationships":
+        return <RelationshipsTab schema={report.schema} statistics={report.statistics} />;
+      case "visualisations":
+        return <VisualisationsTab visualisations={report.visualisations} />;
+      case "ml":
+        return (
+          <MLTab
+            key={`mobile-${report.analysis_id}:${report.ml_experiments.map((e) => e.id).join("|")}`}
+            analysisId={report.analysis_id}
+            capabilities={report.ml_capabilities}
+            experiments={report.ml_experiments || []}
+            readiness={report.insights.modeling_readiness}
+            initialUnsupervised={report.ml_results.unsupervised}
+            initialSupervised={report.ml_results.supervised}
+            onRunUnsupervised={async (nClusters) => {
+              const result = await runUnsupervisedAnalysis(report.analysis_id, nClusters);
+              await refreshAnalyses(report.analysis_id);
+              notifyAnalysesChanged();
+              return result;
+            }}
+            onRunSupervised={async (targetColumn) => {
+              const result = await runSupervisedAnalysis(report.analysis_id, targetColumn);
+              await refreshAnalyses(report.analysis_id);
+              notifyAnalysesChanged();
+              return result;
+            }}
+            onDeleteExperiment={async (experiment) => {
+              await deleteMlExperiment(report.analysis_id, experiment);
+              await refreshAnalyses(report.analysis_id, "ml");
+              notifyAnalysesChanged();
+            }}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
-  if (activeTab === "statistics") {
-    activeContent = <StatisticsTab statistics={report.statistics} />;
-  }
-
-  if (activeTab === "relationships") {
-    activeContent = <RelationshipsTab schema={report.schema} statistics={report.statistics} />;
-  }
-
-  if (activeTab === "visualisations") {
-    activeContent = <VisualisationsTab visualisations={report.visualisations} />;
-  }
-
-  if (activeTab === "ml") {
-    activeContent = (
-      <MLTab
-        key={`mobile-${report.analysis_id}:${report.ml_experiments.map((e) => e.id).join("|")}`}
-        analysisId={report.analysis_id}
-        capabilities={report.ml_capabilities}
-        experiments={report.ml_experiments || []}
-        readiness={report.insights.modeling_readiness}
-        initialUnsupervised={report.ml_results.unsupervised}
-        initialSupervised={report.ml_results.supervised}
-        onRunUnsupervised={async (nClusters) => {
-          const result = await runUnsupervisedAnalysis(report.analysis_id, nClusters);
-          await refreshAnalyses(report.analysis_id);
-          notifyAnalysesChanged();
-          return result;
-        }}
-        onRunSupervised={async (targetColumn) => {
-          const result = await runSupervisedAnalysis(report.analysis_id, targetColumn);
-          await refreshAnalyses(report.analysis_id);
-          notifyAnalysesChanged();
-          return result;
-        }}
-        onDeleteExperiment={async (experiment) => {
-          await deleteMlExperiment(report.analysis_id, experiment);
-          await refreshAnalyses(report.analysis_id, "ml");
-          notifyAnalysesChanged();
-        }}
-      />
-    );
-  }
-
-  const activeTabDef = getAnalysisTabDefinition(activeTab);
-  const activeFocusArea = getAnalysisFocusArea(activeTab);
   const qualityScore = calculateQualityScore(report.overview, report.quality);
+  const currentCard = mobileAnalysisCards.find((c) => c.key === openCard);
 
+  /* ── Detail view (card opened) ── */
+  if (openCard && currentCard) {
+    return (
+      <div className="phone-only mobile-screen-stack">
+        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          All sections
+        </button>
+
+        <div className="mobile-analysis-detail-header">
+          <span className="mobile-analysis-detail-icon">{currentCard.icon}</span>
+          <div>
+            <h2 className="mobile-analysis-detail-title">{currentCard.label}</h2>
+            <p className="mobile-analysis-detail-desc">{currentCard.description}</p>
+          </div>
+        </div>
+
+        {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+          <div className="mobile-analysis-tab-pills">
+            {currentCard.subtabs.map((sub) => (
+              <button
+                key={sub.key}
+                type="button"
+                onClick={() => handleSubtabChange(sub.key)}
+                className={`mobile-analysis-tab-pill${activeSubtab === sub.key ? " mobile-analysis-tab-pill-active" : ""}`}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">
+          {renderContent()}
+        </section>
+      </div>
+    );
+  }
+
+  /* ── Index view (card grid) ── */
   return (
     <div className="phone-only mobile-screen-stack">
       {/* ── Compact dataset banner ── */}
@@ -706,51 +806,24 @@ function AnalysisMobileSections({
         </div>
       </section>
 
-      {/* ── Focus area segmented control ── */}
-      <nav className="mobile-analysis-focus-nav" aria-label="Analysis focus areas">
-        <div className="mobile-analysis-focus-track">
-          {analysisFocusAreas.map((area) => (
-            <button
-              key={area.key}
-              type="button"
-              onClick={() => onTabChange(area.tabKeys[0] as AnalysisTabKey)}
-              className={`mobile-analysis-focus-chip${area.key === activeFocusArea.key ? " mobile-analysis-focus-chip-active" : ""}`}
-            >
-              {area.label}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* ── Tab pills within active focus area ── */}
-      {activeFocusArea.tabKeys.length > 1 ? (
-        <div className="mobile-analysis-tab-pills">
-          {activeFocusArea.tabKeys.map((tabKey) => {
-            const tab = getAnalysisTabDefinition(tabKey);
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => onTabChange(tab.key)}
-                className={`mobile-analysis-tab-pill${activeTab === tab.key ? " mobile-analysis-tab-pill-active" : ""}`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
-
-      {/* ── Section description bar ── */}
-      <div className="mobile-analysis-section-bar">
-        <p className="mobile-analysis-section-label">{activeTabDef.label}</p>
-        <p className="mobile-analysis-section-desc">{analysisTabDescriptions[activeTab]}</p>
+      {/* ── Vertical section cards ── */}
+      <div className="mobile-analysis-card-list">
+        {mobileAnalysisCards.map((card) => (
+          <button
+            key={card.key}
+            type="button"
+            onClick={() => handleOpenCard(card)}
+            className="mobile-analysis-card"
+          >
+            <span className="mobile-analysis-card-icon">{card.icon}</span>
+            <div className="mobile-analysis-card-text">
+              <p className="mobile-analysis-card-label">{card.label}</p>
+              <p className="mobile-analysis-card-desc">{card.description}</p>
+            </div>
+            <svg className="mobile-analysis-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        ))}
       </div>
-
-      {/* ── Tab content ── */}
-      <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">
-        {activeContent}
-      </section>
     </div>
   );
 }
