@@ -28,12 +28,12 @@ type AnalysisResultPopupProps = {
 };
 
 const sections = [
-  { id: "overview", label: "Overview", note: "Posture, findings, and sample rows" },
-  { id: "insights", label: "Insights", note: "Summary, findings, and next steps" },
-  { id: "schema", label: "Schema", note: "Types, roles, and column inventory" },
-  { id: "quality", label: "Data Quality", note: "Missingness, duplicates, and fixes" },
+  { id: "overview", label: "Summary", note: "Posture, findings, and sample rows" },
+  { id: "insights", label: "Findings", note: "Summary, findings, and next steps" },
+  { id: "schema", label: "Fields", note: "Types, roles, and column inventory" },
+  { id: "quality", label: "Quality", note: "Missingness, duplicates, and fixes" },
   { id: "statistics", label: "Statistics", note: "Numeric and categorical summaries" },
-  { id: "relationships", label: "Relationships", note: "Correlations, skew, and targets" },
+  { id: "relationships", label: "Patterns", note: "Correlations, skew, and targets" },
   { id: "visualisations", label: "Charts", note: "Distribution, heatmap, and drift views" },
   { id: "ml", label: "ML Lab", note: "Saved experiments and benchmark outputs" },
 ] as const;

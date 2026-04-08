@@ -286,10 +286,10 @@ export default function BatchPage() {
   return (
     <>
       <AppShell
-        eyebrow="Dataset intake"
+        eyebrow="Dataset library"
         title="Uploads"
-        description="Import and inspect your tabular datasets."
-        mobileDescription="Upload a CSV, save the run, then open it in Analysis."
+        description="Upload CSVs, keep saved datasets in a reusable library, and open the active run in Analysis."
+        mobileDescription="Upload a CSV, save it to the library, then open it in Analysis."
         stats={stats}
       >
         {error ? (
@@ -393,9 +393,9 @@ export default function BatchPage() {
                 <div className="desktop-stack">
                   <section className="desktop-panel">
                     <div className="desktop-panel-header">
-                      <p className="desktop-panel-title">Recent uploads</p>
+                      <p className="desktop-panel-title">Dataset library</p>
                       <ScrollIntentLink href="/history" className="desktop-panel-action">
-                        Manage all
+                        History archive
                       </ScrollIntentLink>
                     </div>
 
@@ -488,7 +488,7 @@ export default function BatchPage() {
                     ) : (
                       <div className="desktop-empty-panel !min-h-[12rem]">
                         <p className="desktop-section-title text-[1.1rem]">
-                          No saved uploads yet
+                          No library datasets yet
                         </p>
                         <p className="desktop-section-text max-w-sm">
                           Upload a CSV to create the first saved analysis run and unlock the quick quality snapshot.
@@ -599,7 +599,7 @@ export default function BatchPage() {
                         </p>
                         <p className="desktop-section-text max-w-md">
                           {analyses.length
-                            ? "Pick a saved run from Recent uploads to make it the current dataset."
+                            ? "Pick a dataset from the library to make it the current dataset."
                             : "Upload a CSV to see missingness, duplicates, and readiness here."}
                         </p>
                       </div>
@@ -848,8 +848,9 @@ function BatchMobileSections({
       <section className="mobile-screen-panel">
         <div className="mobile-screen-panel-header">
           <div>
-            <p className="mobile-screen-kicker">Recent uploads</p>
+            <p className="mobile-screen-kicker">Dataset library</p>
             <h2 className="mobile-screen-title">Saved datasets</h2>
+            <p className="mobile-screen-lead">Keep reusable runs here, set one active, or open it directly in Analysis.</p>
           </div>
         </div>
         {analyses.length === 0 ? (
@@ -898,7 +899,7 @@ function BatchMobileSections({
               onClick={() => setShowAllUploads(true)}
               className="mobile-screen-button mobile-screen-button-secondary"
             >
-              View all {analyses.length} datasets
+              View full library ({analyses.length})
             </button>
           </div>
         ) : null}

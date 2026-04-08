@@ -30,63 +30,19 @@ import {
   setCurrentAnalysisSelection,
 } from "@/lib/currentAnalysis";
 import { calculateQualityScore } from "@/lib/analysisDerived";
+import {
+  type AnalysisTabKey,
+  analysisFocusAreas,
+  analysisTabDescriptions,
+  analysisTabs,
+  getAnalysisFocusArea,
+  getAnalysisTabDefinition,
+  getAnalysisTabOptionLabel,
+  resolveRequestedTab,
+} from "@/lib/analysisNavigation";
 import { formatDate } from "@/lib/helpers";
 import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
-
-type AnalysisTabKey =
-  | "overview"
-  | "schema"
-  | "quality"
-  | "statistics"
-  | "relationships"
-  | "visualisations"
-  | "insights"
-  | "ml";
-
-const tabs: Array<{ key: AnalysisTabKey; label: string }> = [
-  { key: "overview", label: "Overview" },
-  { key: "insights", label: "Insights" },
-  { key: "schema", label: "Schema" },
-  { key: "quality", label: "Data Quality" },
-  { key: "statistics", label: "Statistics" },
-  { key: "relationships", label: "Relationships" },
-  { key: "visualisations", label: "Charts" },
-  { key: "ml", label: "ML Lab" },
-];
-
-const tabDescriptions: Record<AnalysisTabKey, string> = {
-  overview: "Overview stays open as the default surface and shows the current dataset placeholder until a saved analysis exists.",
-  insights: "Plain-language findings, modeling readiness, and the next actions suggested by the run.",
-  schema: "Column roles, inferred types, grouped fields, and the full column-by-column profile.",
-  quality: "Missingness, duplicates, constants, outliers, and the cleanup issues worth addressing first.",
-  statistics: "Numeric and categorical summaries for the computed report.",
-  relationships: "Stronger structural patterns and relationships inside the dataset.",
-  visualisations: "Charts and visual summaries generated from the current run.",
-  ml: "Optional ML experiments that are saved back into the selected analysis run.",
-};
-
-function resolveRequestedTab(requestedTab: string | null): AnalysisTabKey | null {
-  switch (requestedTab) {
-    case "overview":
-    case "insights":
-    case "schema":
-    case "quality":
-    case "statistics":
-    case "relationships":
-    case "visualisations":
-    case "ml":
-      return requestedTab;
-    case "guide":
-      return "overview";
-    case "field-guide":
-      return "schema";
-    case "playbook":
-      return "insights";
-    default:
-      return null;
-  }
-}
 
 function parseAnalysisId(value: string | null): number | null {
   const parsed = Number(value);
@@ -295,7 +251,8 @@ function AnalysisPageContent() {
         }
     : null;
 
-  const activeTabDescription = tabDescriptions[visibleTab];
+  const activeTabDescription = analysisTabDescriptions[visibleTab];
+  const activeFocusArea = getAnalysisFocusArea(visibleTab);
 
   return (
     <>
@@ -391,34 +348,49 @@ function AnalysisPageContent() {
 
             {showWorkspaceNavigation && hasRenderableReport ? (
               <section id="analysis-workspace-navigation" className="tablet-up route-scroll-target desktop-panel" style={{ paddingBottom: 0 }}>
-                <p className="px-1 text-xs uppercase tracking-[0.2em] text-white/42">Report sections</p>
-
-                {/* Tablet+: horizontal scroll tab bar */}
-                <div className="mt-3 scrollbar-hide overflow-x-auto overflow-y-visible pb-2 pt-1">
-                  <div className="analysis-subnav-surface">
-                    <div className="analysis-subnav-track">
-                      {tabs.map((tab) => {
-                        const active = visibleTab === tab.key;
-                        const disabled = tab.key !== "overview" && !hasRenderableReport;
-                        return (
-                          <button
-                            type="button"
-                            key={tab.key}
-                            disabled={disabled}
-                            onClick={() => handleTabChange(tab.key)}
-                            className={`analysis-subnav-link ${
-                              active ? "analysis-subnav-link-active" : ""
-                            } disabled:cursor-not-allowed disabled:opacity-45`}
-                          >
-                            {tab.label}
-                          </button>
-                        );
-                      })}
-                    </div>
+                <div className="px-1">
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/42">Analysis map</p>
+                  <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                    {analysisFocusAreas.map((focusArea) => {
+                      const areaActive = focusArea.key === activeFocusArea.key;
+                      return (
+                        <article
+                          key={focusArea.key}
+                          className={`rounded-xl border px-4 py-4 ${
+                            areaActive
+                              ? "border-[#7c3aed]/35 bg-[#7c3aed]/10"
+                              : "border-white/8 bg-white/[0.02]"
+                          }`}
+                        >
+                          <p className="text-[0.64rem] font-bold uppercase tracking-[0.16em] text-white/40">
+                            {focusArea.label}
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-white/52">{focusArea.description}</p>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {focusArea.tabKeys.map((tabKey) => {
+                              const tab = getAnalysisTabDefinition(tabKey);
+                              const active = visibleTab === tab.key;
+                              return (
+                                <button
+                                  type="button"
+                                  key={tab.key}
+                                  onClick={() => handleTabChange(tab.key)}
+                                  className={`analysis-subnav-link ${active ? "analysis-subnav-link-active" : ""}`}
+                                >
+                                  {tab.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </article>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <p className="analysis-subnav-description px-1 pb-4 pt-3 text-sm leading-6 text-white/50">{activeTabDescription}</p>
+                <p className="analysis-subnav-description px-1 pb-4 pt-4 text-sm leading-6 text-white/50">
+                  <span className="font-semibold text-white/74">{activeFocusArea.label}</span> - {activeTabDescription}
+                </p>
               </section>
             ) : null}
 
@@ -705,7 +677,8 @@ function AnalysisMobileSections({
     );
   }
 
-  const activeTabLabel = tabs.find((tab) => tab.key === activeTab)?.label ?? "Section";
+  const activeTabLabel = getAnalysisTabDefinition(activeTab).label;
+  const activeFocusArea = getAnalysisFocusArea(activeTab);
 
   return (
     <div className="phone-only mobile-screen-stack">
@@ -750,10 +723,10 @@ function AnalysisMobileSections({
       <section className="mobile-screen-panel">
         <div className="mobile-screen-panel-header">
           <div>
-            <p className="mobile-screen-kicker">Report sections</p>
-            <h2 className="mobile-screen-title">Current view</h2>
+            <p className="mobile-screen-kicker">Analysis map</p>
+            <h2 className="mobile-screen-title">Current focus area</h2>
             <p className="mobile-screen-lead">
-              Switch sections and review the full results below.
+              Jump between summary, health, fields, patterns, and ML without losing the full report below.
             </p>
           </div>
         </div>
@@ -765,14 +738,14 @@ function AnalysisMobileSections({
             onChange={(event) => onTabChange(event.target.value as AnalysisTabKey)}
             className="mobile-tab-select"
           >
-            {tabs.map((tab) => (
+            {analysisTabs.map((tab) => (
               <option key={tab.key} value={tab.key}>
-                {tab.label}
+                {getAnalysisTabOptionLabel(tab.key)}
               </option>
             ))}
           </select>
         </div>
-        <p className="mobile-screen-row-note">Showing {activeTabLabel.toLowerCase()}.</p>
+        <p className="mobile-screen-row-note">Focus area: {activeFocusArea.label}. Showing {activeTabLabel.toLowerCase()}.</p>
       </section>
 
       <section className="mobile-screen-panel mobile-analysis-content-panel">
