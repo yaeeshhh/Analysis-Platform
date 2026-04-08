@@ -646,197 +646,147 @@ function HistoryMobileSections({
   onDownloadMlSummary,
 }: HistoryMobileSectionsProps) {
   const [visibleCount, setVisibleCount] = useState(5);
-  const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
-    { value: "all", label: "All readiness" },
-    { value: "ml-ready", label: "ML-ready" },
-    { value: "eda-first", label: "EDA-first" },
-  ];
-  const mlOptions: Array<{ value: MlFilter; label: string }> = [
-    { value: "all", label: "All ML" },
-    { value: "with-ml", label: "With ML" },
-    { value: "without-ml", label: "No ML" },
-  ];
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <section className="mobile-screen-panel section-glow">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Run archive</p>
-            <h2 className="mobile-screen-title">Find a saved run</h2>
-            <p className="mobile-screen-lead">Search, filter, and reopen the run you need.</p>
-          </div>
-        </div>
-        <div className="mobile-screen-field">
-          <label htmlFor="history-search" className="mobile-screen-field-label">Search runs</label>
-          <input
-            id="history-search"
-            type="text"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Dataset, filename, summary, or status"
-            className="mobile-screen-input"
-          />
-        </div>
-        <div className="mobile-screen-field">
-          <label htmlFor="history-readiness" className="mobile-screen-field-label">Readiness</label>
-          <select
-            id="history-readiness"
-            value={readinessFilter}
-            onChange={(event) => setReadinessFilter(event.target.value as ReadinessFilter)}
-            className="mobile-tab-select"
+      {/* ── Compact search bar ── */}
+      <div className="mobile-history-search-bar">
+        <svg className="mobile-history-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search runs…"
+          className="mobile-history-search-input"
+        />
+      </div>
+
+      {/* ── Filter chips ── */}
+      <nav className="mobile-history-filter-track" aria-label="History filters">
+        {([
+          { value: "all", label: "All" },
+          { value: "ml-ready", label: "ML-ready" },
+          { value: "eda-first", label: "EDA-first" },
+        ] as const).map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setReadinessFilter(opt.value)}
+            className={`mobile-history-filter-chip${readinessFilter === opt.value ? " mobile-history-filter-chip-active" : ""}`}
           >
-            {readinessOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mobile-screen-field">
-          <label htmlFor="history-ml-filter" className="mobile-screen-field-label">ML history</label>
-          <select
-            id="history-ml-filter"
-            value={mlFilter}
-            onChange={(event) => setMlFilter(event.target.value as MlFilter)}
-            className="mobile-tab-select"
+            {opt.label}
+          </button>
+        ))}
+        <span className="mobile-history-filter-divider" />
+        {([
+          { value: "all", label: "Any ML" },
+          { value: "with-ml", label: "Has ML" },
+          { value: "without-ml", label: "No ML" },
+        ] as const).map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setMlFilter(opt.value)}
+            className={`mobile-history-filter-chip${mlFilter === opt.value ? " mobile-history-filter-chip-active" : ""}`}
           >
-            {mlOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            {opt.label}
+          </button>
+        ))}
         {hasHistoryFilters ? (
-          <div className="mobile-screen-actions">
-            <button type="button" onClick={clearFilters} className="mobile-screen-button mobile-screen-button-secondary">
-              Clear filters
-            </button>
-          </div>
+          <button type="button" onClick={clearFilters} className="mobile-history-filter-chip mobile-history-filter-chip-clear">
+            ✕
+          </button>
         ) : null}
-      </section>
+      </nav>
 
-      <section className="mobile-screen-panel">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Saved runs</p>
-            <h2 className="mobile-screen-title">Saved runs</h2>
-            <p className="mobile-screen-lead">Tap a run to reveal files, reopen the report, or clean it up.</p>
-          </div>
+      {/* ── Run list ── */}
+      {filteredAnalyses.length === 0 ? (
+        <div className="mobile-history-empty">
+          <p className="mobile-history-empty-title">No matching runs</p>
+          <p className="mobile-history-empty-copy">Try a different search or adjust the filters above.</p>
         </div>
-        {filteredAnalyses.length === 0 ? (
-          <p className="mobile-screen-empty">No runs match the current filters.</p>
-        ) : (
-          <div className="mobile-screen-list">
-            {filteredAnalyses.slice(0, visibleCount).map((analysis) => {
-              const latestExperiment = analysis.latest_experiment;
-              const needsReview = !analysis.insights.modeling_readiness.is_ready;
-              const reviewWarning = needsReview
-                ? getHistoryReviewWarning(analysis.insights.modeling_readiness.target_candidates)
-                : "";
+      ) : (
+        <div className="mobile-history-run-list">
+          {filteredAnalyses.slice(0, visibleCount).map((analysis) => {
+            const latestExperiment = analysis.latest_experiment;
+            const isReady = analysis.insights.modeling_readiness.is_ready;
+            const needsReview = !isReady;
+            const reviewWarning = needsReview
+              ? getHistoryReviewWarning(analysis.insights.modeling_readiness.target_candidates)
+              : "";
 
-              return (
-                <details key={analysis.id} className="mobile-accordion">
-                  <summary>
-                    <div className="mobile-screen-row-header">
-                      <div className="mobile-screen-row-main">
-                        <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
-                        <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
-                      </div>
-                      <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                        {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                      </span>
+            return (
+              <details key={analysis.id} className="mobile-history-card">
+                <summary className="mobile-history-card-summary">
+                  <span className="mobile-history-card-accent" data-tone={isReady ? "teal" : "amber"} />
+                  <div className="mobile-history-card-body">
+                    <div className="mobile-history-card-top">
+                      <h3 className="mobile-history-card-name">{analysis.overview.dataset_name}</h3>
+                      <span className="mobile-history-card-date">{formatDate(analysis.saved_at)}</span>
                     </div>
-                    <p className="mobile-accordion-hint">{truncateHistorySummary(analysis.insights.summary, 104)}</p>
-                    <div className="mobile-screen-pills compact">
-                      <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
-                      <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
-                      <span className="mobile-screen-pill" data-tone="purple">
-                        {analysis.experiment_count === 0
-                          ? "Analysis only"
-                          : `${analysis.experiment_count} ML run${analysis.experiment_count === 1 ? "" : "s"}`}
-                      </span>
-                    </div>
-                  </summary>
-                  <div className="mobile-accordion-body">
-                    <p className="mobile-screen-row-copy" style={{ marginTop: 0 }}>
-                      {analysis.insights.summary}
-                    </p>
-                    {needsReview ? (
-                      <div className="inline-warning-note mt-3">
-                        <p className="inline-warning-note-title">Review advised</p>
-                        <p className="inline-warning-note-copy">{reviewWarning}</p>
-                      </div>
-                    ) : null}
-                    <div className="mobile-screen-actions">
-                      <button
-                        type="button"
-                        onClick={() => onOpenPopup(analysis)}
-                        className="mobile-screen-button mobile-screen-button-primary"
-                      >
-                        Open full run
-                      </button>
-                    </div>
-                    <div className="mobile-screen-actions">
-                      <button
-                        type="button"
-                        onClick={() => onDownloadReport(analysis.id)}
-                        className="mobile-screen-button mobile-screen-button-secondary"
-                      >
-                        Report
-                      </button>
-                      {latestExperiment ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
-                            className="mobile-screen-button mobile-screen-button-secondary"
-                          >
-                            ML report
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
-                            className="mobile-screen-button mobile-screen-button-secondary"
-                          >
-                            ML summary
-                          </button>
-                        </>
+                    <p className="mobile-history-card-file">{analysis.source_filename}</p>
+                    <p className="mobile-history-card-snippet">{truncateHistorySummary(analysis.insights.summary, 120)}</p>
+                    <div className="mobile-history-card-tags">
+                      <span className="mobile-history-tag">{analysis.overview.row_count.toLocaleString()} × {analysis.overview.column_count}</span>
+                      <span className="mobile-history-tag" data-tone={isReady ? "teal" : "amber"}>{isReady ? "ML-ready" : "EDA-first"}</span>
+                      {analysis.experiment_count > 0 ? (
+                        <span className="mobile-history-tag" data-tone="purple">{analysis.experiment_count} ML</span>
                       ) : null}
                     </div>
-                    <div className="mobile-screen-actions">
-                      <button
-                        type="button"
-                        onClick={() => onDeleteRun(analysis.id)}
-                        className="mobile-screen-button mobile-screen-button-danger"
-                      >
-                        Delete run
-                      </button>
-                    </div>
-                    <p className="mobile-screen-row-note">
-                      {latestExperiment
-                        ? `Latest ML: ${latestExperiment.summary}`
-                        : "No ML run is attached to this analysis yet."}
-                    </p>
                   </div>
-                </details>
-              );
-            })}
-          </div>
-        )}
-        {visibleCount < filteredAnalyses.length ? (
-          <div className="mobile-screen-actions">
-            <button
-              type="button"
-              onClick={() => setVisibleCount((prev) => prev + 5)}
-              className="mobile-screen-button mobile-screen-button-secondary"
-            >
-              Show more ({filteredAnalyses.length - visibleCount} remaining)
-            </button>
-          </div>
-        ) : null}
-      </section>
+                </summary>
+
+                <div className="mobile-history-card-detail">
+                  <p className="mobile-history-card-full-summary">{analysis.insights.summary}</p>
+
+                  {needsReview ? (
+                    <div className="mobile-history-card-warning">
+                      <span className="mobile-history-card-warning-label">Review advised</span>
+                      <span className="mobile-history-card-warning-copy">{reviewWarning}</span>
+                    </div>
+                  ) : null}
+
+                  {latestExperiment ? (
+                    <p className="mobile-history-card-ml-note">Latest ML: {latestExperiment.summary}</p>
+                  ) : null}
+
+                  <div className="mobile-history-card-actions">
+                    <button type="button" onClick={() => onOpenPopup(analysis)} className="mobile-history-action-btn mobile-history-action-primary">
+                      Open run
+                    </button>
+                    <button type="button" onClick={() => onDownloadReport(analysis.id)} className="mobile-history-action-btn">
+                      Report
+                    </button>
+                    {latestExperiment ? (
+                      <>
+                        <button type="button" onClick={() => onDownloadMlReport(analysis.id, latestExperiment)} className="mobile-history-action-btn">
+                          ML report
+                        </button>
+                        <button type="button" onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)} className="mobile-history-action-btn">
+                          ML summary
+                        </button>
+                      </>
+                    ) : null}
+                    <button type="button" onClick={() => onDeleteRun(analysis.id)} className="mobile-history-action-btn mobile-history-action-danger">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      )}
+
+      {visibleCount < filteredAnalyses.length ? (
+        <button
+          type="button"
+          onClick={() => setVisibleCount((prev) => prev + 5)}
+          className="mobile-history-load-more"
+        >
+          Show more ({filteredAnalyses.length - visibleCount} remaining)
+        </button>
+      ) : null}
     </div>
   );
 }
