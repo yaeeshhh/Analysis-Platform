@@ -232,10 +232,60 @@ export default function DashboardPage() {
             <DashboardMobileSections analyses={analyses} latest={latest} />
 
             <div className="tablet-up desktop-page-stack">
-              <section className="desktop-hero-panel section-glow">
+              <section className="desktop-hero-panel section-glow" style={{ overflow: "hidden" }}>
+                {/* Decorative data-pipeline SVG — right side of hero */}
+                <svg
+                  viewBox="0 0 220 130"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    right: "1.5rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "200px",
+                    height: "118px",
+                    opacity: 0.52,
+                    pointerEvents: "none",
+                  }}
+                >
+                  {/* Connection lines */}
+                  <line x1="28" y1="65" x2="72" y2="32" stroke="#4f6ef7" strokeWidth="1" opacity="0.7" strokeDasharray="5,4"/>
+                  <line x1="28" y1="65" x2="72" y2="98" stroke="#22c55e" strokeWidth="1" opacity="0.6" strokeDasharray="5,4"/>
+                  <line x1="80" y1="32" x2="126" y2="50" stroke="#a78bfa" strokeWidth="1" opacity="0.65" strokeDasharray="5,4"/>
+                  <line x1="80" y1="98" x2="126" y2="80" stroke="#f59e0b" strokeWidth="1" opacity="0.55" strokeDasharray="5,4"/>
+                  <line x1="134" y1="50" x2="180" y2="65" stroke="#4f6ef7" strokeWidth="1.2" opacity="0.7" strokeDasharray="5,4"/>
+                  <line x1="134" y1="80" x2="180" y2="65" stroke="#a78bfa" strokeWidth="1.2" opacity="0.65" strokeDasharray="5,4"/>
+                  {/* Cross connections */}
+                  <line x1="80" y1="32" x2="80" y2="98" stroke="rgba(255,255,255,0.08)" strokeWidth="0.7"/>
+                  <line x1="126" y1="50" x2="126" y2="80" stroke="rgba(255,255,255,0.08)" strokeWidth="0.7"/>
+                  {/* Outer ring nodes */}
+                  <circle cx="28" cy="65" r="9" fill="rgba(79,110,247,0.14)" stroke="#4f6ef7" strokeWidth="1.6"/>
+                  <circle cx="76" cy="32" r="8" fill="rgba(34,197,94,0.12)" stroke="#22c55e" strokeWidth="1.4"/>
+                  <circle cx="76" cy="98" r="8" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" strokeWidth="1.4"/>
+                  <circle cx="130" cy="50" r="9" fill="rgba(167,139,250,0.16)" stroke="#a78bfa" strokeWidth="1.6"/>
+                  <circle cx="130" cy="80" r="8" fill="rgba(34,197,94,0.1)" stroke="#22c55e" strokeWidth="1.4"/>
+                  {/* Centre hub */}
+                  <circle cx="180" cy="65" r="11" fill="rgba(79,110,247,0.2)" stroke="#4f6ef7" strokeWidth="2"/>
+                  <circle cx="180" cy="65" r="5" fill="#4f6ef7" opacity="0.6"/>
+                  {/* Inner dots */}
+                  <circle cx="28" cy="65" r="3" fill="#4f6ef7" opacity="0.85"/>
+                  <circle cx="76" cy="32" r="2.5" fill="#22c55e" opacity="0.9"/>
+                  <circle cx="76" cy="98" r="2.5" fill="#f59e0b" opacity="0.85"/>
+                  <circle cx="130" cy="50" r="3" fill="#a78bfa" opacity="0.9"/>
+                  <circle cx="130" cy="80" r="2.5" fill="#22c55e" opacity="0.8"/>
+                  {/* Ambient dots */}
+                  <circle cx="12" cy="18" r="1.2" fill="rgba(79,110,247,0.4)"/>
+                  <circle cx="42" cy="8" r="1" fill="rgba(167,139,250,0.35)"/>
+                  <circle cx="10" cy="112" r="1.2" fill="rgba(34,197,94,0.35)"/>
+                  <circle cx="55" cy="122" r="1" fill="rgba(79,110,247,0.3)"/>
+                  <circle cx="200" cy="16" r="1.2" fill="rgba(244,63,94,0.38)"/>
+                  <circle cx="215" cy="105" r="1" fill="rgba(167,139,250,0.3)"/>
+                </svg>
+
                 <span className="desktop-kicker">Getting started</span>
-                <h2 className="desktop-section-title">Navigate the studio from upload to model review</h2>
-                <p className="desktop-section-text">Upload a dataset, review the explanation first, then reopen saved history or export ML outputs when the report is ready.</p>
+                <h2 className="desktop-section-title" style={{ maxWidth: "58%" }}>Navigate the studio from upload to model review</h2>
+                <p className="desktop-section-text" style={{ maxWidth: "54%" }}>Upload a dataset, review the explanation first, then reopen saved history or export ML outputs when the report is ready.</p>
                 <div className="desktop-step-list">
                   {desktopWorkflowPills.map((label, index) => (
                     <span key={label} className="desktop-step-pill">
@@ -247,7 +297,14 @@ export default function DashboardPage() {
               </section>
 
               <div className="desktop-grid-2">
-                <section className="desktop-panel">
+                <section className="desktop-panel" style={{ overflow: "hidden" }}>
+                  {/* Decorative micro sparkline — top-right corner */}
+                  <svg viewBox="0 0 80 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "1.1rem", top: "0.85rem", width: "72px", height: "32px", opacity: 0.38, pointerEvents: "none" }}>
+                    <polyline points="4,28 16,20 28,24 40,10 52,16 64,8 76,12" fill="none" stroke="#4f6ef7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="40" cy="10" r="2.5" fill="#4f6ef7" opacity="0.9"/>
+                    <circle cx="64" cy="8" r="2.5" fill="#22c55e" opacity="0.8"/>
+                    <line x1="0" y1="32" x2="80" y2="32" stroke="rgba(79,110,247,0.2)" strokeWidth="1"/>
+                  </svg>
                   <div className="desktop-panel-header">
                     <p className="desktop-panel-title">Recent uploads</p>
                     <ScrollIntentLink href="/batch" className="desktop-panel-action">Open uploads</ScrollIntentLink>
@@ -308,7 +365,16 @@ export default function DashboardPage() {
                   )}
                 </section>
 
-                <section className="desktop-panel">
+                <section className="desktop-panel" style={{ overflow: "hidden" }}>
+                  {/* Decorative radial rings */}
+                  <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "0.9rem", top: "0.7rem", width: "52px", height: "52px", opacity: 0.36, pointerEvents: "none" }}>
+                    <circle cx="30" cy="30" r="12" fill="none" stroke="#a78bfa" strokeWidth="1.2" strokeDasharray="4,3" opacity="0.7"/>
+                    <circle cx="30" cy="30" r="20" fill="none" stroke="#4f6ef7" strokeWidth="0.8" strokeDasharray="6,4" opacity="0.45"/>
+                    <circle cx="30" cy="30" r="4" fill="#a78bfa" opacity="0.4"/>
+                    <circle cx="30" cy="18" r="2" fill="#4f6ef7" opacity="0.6"/>
+                    <circle cx="42" cy="30" r="1.5" fill="#22c55e" opacity="0.5"/>
+                    <circle cx="18" cy="34" r="1.5" fill="#f59e0b" opacity="0.5"/>
+                  </svg>
                   <div className="desktop-panel-header">
                     <p className="desktop-panel-title">Activity</p>
                     <ScrollIntentLink href="/history" className="desktop-panel-action">History</ScrollIntentLink>
@@ -331,7 +397,21 @@ export default function DashboardPage() {
               </div>
 
               <div className="desktop-grid-2">
-                <section className="desktop-panel">
+                <section className="desktop-panel" style={{ overflow: "hidden" }}>
+                  {/* Decorative grid-map SVG */}
+                  <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "0.9rem", top: "0.7rem", width: "58px", height: "44px", opacity: 0.38, pointerEvents: "none" }}>
+                    <rect x="4" y="4" width="24" height="18" rx="3" fill="none" stroke="#4f6ef7" strokeWidth="1.2" opacity="0.6"/>
+                    <rect x="36" y="4" width="24" height="18" rx="3" fill="none" stroke="#22c55e" strokeWidth="1.2" opacity="0.6"/>
+                    <rect x="4" y="28" width="24" height="16" rx="3" fill="none" stroke="#a78bfa" strokeWidth="1.2" opacity="0.6"/>
+                    <rect x="36" y="28" width="24" height="16" rx="3" fill="none" stroke="#f59e0b" strokeWidth="1.2" opacity="0.6"/>
+                    <line x1="28" y1="13" x2="36" y2="13" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8"/>
+                    <line x1="16" y1="22" x2="16" y2="28" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8"/>
+                    <line x1="48" y1="22" x2="48" y2="28" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8"/>
+                    <circle cx="16" cy="13" r="3" fill="#4f6ef7" opacity="0.5"/>
+                    <circle cx="48" cy="13" r="3" fill="#22c55e" opacity="0.5"/>
+                    <circle cx="16" cy="36" r="3" fill="#a78bfa" opacity="0.5"/>
+                    <circle cx="48" cy="36" r="3" fill="#f59e0b" opacity="0.5"/>
+                  </svg>
                   <div className="desktop-panel-header">
                     <p className="desktop-panel-title">Studio pages</p>
                     <ScrollIntentLink href="/history" className="desktop-panel-action">Open archive</ScrollIntentLink>
@@ -428,8 +508,83 @@ export default function DashboardPage() {
                   </ScrollIntentLink>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {featureMechanics.map((item) => (
-                    <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                  {featureMechanics.map((item, idx) => (
+                    <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.02] p-4" style={{ position: "relative", overflow: "hidden" }}>
+                      {/* Per-card decorative SVG corner */}
+                      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "0.6rem", top: "0.6rem", width: "44px", height: "44px", opacity: 0.45, pointerEvents: "none" }}>
+                        {idx % 6 === 0 && (
+                          // Dataset intake — upload arrows
+                          <>
+                            <circle cx="32" cy="32" r="22" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.4"/>
+                            <path d="M32 42V22" stroke={item.accent} strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
+                            <path d="M24 30l8-8 8 8" stroke={item.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
+                            <path d="M22 44h20" stroke={item.accent} strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+                          </>
+                        )}
+                        {idx % 6 === 1 && (
+                          // Analysis report — document with chart
+                          <>
+                            <rect x="16" y="10" width="32" height="44" rx="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.4"/>
+                            <rect x="22" y="20" width="20" height="2.5" rx="1" fill={item.accent} opacity="0.5"/>
+                            <rect x="22" y="28" width="14" height="2.5" rx="1" fill={item.accent} opacity="0.4"/>
+                            <rect x="22" y="36" width="8" height="8" rx="1.5" fill={item.accent} opacity="0.3"/>
+                            <rect x="34" y="39" width="8" height="5" rx="1.5" fill={item.accent} opacity="0.45"/>
+                          </>
+                        )}
+                        {idx % 6 === 2 && (
+                          // Run archive — stacked layers
+                          <>
+                            <ellipse cx="32" cy="24" rx="18" ry="6" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.35"/>
+                            <ellipse cx="32" cy="32" rx="18" ry="6" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.5"/>
+                            <ellipse cx="32" cy="40" rx="18" ry="6" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.7"/>
+                            <line x1="14" y1="24" x2="14" y2="40" stroke={item.accent} strokeWidth="1.2" opacity="0.5"/>
+                            <line x1="50" y1="24" x2="50" y2="40" stroke={item.accent} strokeWidth="1.2" opacity="0.5"/>
+                          </>
+                        )}
+                        {idx % 6 === 3 && (
+                          // Charts — bar + trend line
+                          <>
+                            <line x1="12" y1="52" x2="52" y2="52" stroke={item.accent} strokeWidth="1" opacity="0.3"/>
+                            <rect x="14" y="38" width="8" height="14" rx="1.5" fill={item.accent} opacity="0.35"/>
+                            <rect x="26" y="28" width="8" height="24" rx="1.5" fill={item.accent} opacity="0.55"/>
+                            <rect x="38" y="20" width="8" height="32" rx="1.5" fill={item.accent} opacity="0.75"/>
+                            <polyline points="14,44 26,32 38,24 50,30" fill="none" stroke={item.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+                          </>
+                        )}
+                        {idx % 6 === 4 && (
+                          // ML lanes — neural network
+                          <>
+                            <circle cx="14" cy="22" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.7"/>
+                            <circle cx="14" cy="42" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.7"/>
+                            <circle cx="32" cy="16" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.5"/>
+                            <circle cx="32" cy="32" r="4.5" fill={item.accent} opacity="0.25" stroke={item.accent} strokeWidth="1.5"/>
+                            <circle cx="32" cy="48" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.5"/>
+                            <circle cx="50" cy="32" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.7"/>
+                            <line x1="18" y1="22" x2="28" y2="18" stroke={item.accent} strokeWidth="0.8" opacity="0.4"/>
+                            <line x1="18" y1="22" x2="28" y2="32" stroke={item.accent} strokeWidth="0.8" opacity="0.4"/>
+                            <line x1="18" y1="42" x2="28" y2="32" stroke={item.accent} strokeWidth="0.8" opacity="0.4"/>
+                            <line x1="18" y1="42" x2="28" y2="48" stroke={item.accent} strokeWidth="0.8" opacity="0.4"/>
+                            <line x1="36" y1="16" x2="46" y2="30" stroke={item.accent} strokeWidth="0.8" opacity="0.4"/>
+                            <line x1="36" y1="32" x2="46" y2="32" stroke={item.accent} strokeWidth="0.8" opacity="0.5"/>
+                            <line x1="36" y1="48" x2="46" y2="34" stroke={item.accent} strokeWidth="0.8" opacity="0.4"/>
+                          </>
+                        )}
+                        {idx % 6 === 5 && (
+                          // Account cleanup — settings gear
+                          <>
+                            <circle cx="32" cy="32" r="10" fill="none" stroke={item.accent} strokeWidth="1.5" opacity="0.65"/>
+                            <circle cx="32" cy="32" r="4" fill={item.accent} opacity="0.35"/>
+                            {[0,60,120,180,240,300].map((angle, i) => {
+                              const rad = (angle * Math.PI) / 180;
+                              const x1 = 32 + 12 * Math.cos(rad);
+                              const y1 = 32 + 12 * Math.sin(rad);
+                              const x2 = 32 + 18 * Math.cos(rad);
+                              const y2 = 32 + 18 * Math.sin(rad);
+                              return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={item.accent} strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>;
+                            })}
+                          </>
+                        )}
+                      </svg>
                       <p className="text-[0.64rem] font-bold uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.title}</p>
                       <p className="mt-2 text-sm leading-6 text-white/58">{item.detail}</p>
                       <p className="mt-1.5 text-sm leading-6 text-white/38">{item.flow}</p>

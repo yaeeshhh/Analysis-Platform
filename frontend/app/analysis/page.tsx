@@ -932,6 +932,9 @@ function AnalysisMobileSections({
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
             Back
           </button>
+          <span style={{ color: accent, fontFamily: "var(--font-mono)", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+            {currentCard.label}
+          </span>
         </div>
 
         {/* SVG card cover as the detail header */}
