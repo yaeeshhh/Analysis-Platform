@@ -1,0 +1,993 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Syne',sans-serif;background:#080c16;min-height:100vh;}
+
+  .stage{display:flex;gap:28px;padding:24px;flex-wrap:wrap;justify-content:center;background:linear-gradient(145deg,#080c16 0%,#0d1224 50%,#080c16 100%);border-radius:18px;position:relative;}
+  .stage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,0.04),transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(13,148,136,0.03),transparent 60%);border-radius:18px;pointer-events:none;}
+
+  .phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .phone-label{font-size:11px;font-family:'DM Mono',monospace;color:#4b5563;letter-spacing:0.1em;text-transform:uppercase;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.06);padding:4px 12px;border-radius:6px;}
+  .phone{width:340px;background:#0d1120;border-radius:44px;border:2.5px solid #161d30;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px rgba(124,58,237,0.05),0 20px 60px rgba(0,0,0,0.5),0 4px 16px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.03);}
+
+  .status-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;flex-shrink:0;}
+  .status-time{font-size:14px;font-weight:700;color:#94a3b8;font-family:'DM Mono',monospace;}
+  .status-icons{display:flex;gap:5px;align-items:center;}
+  .status-icons svg{width:16px;height:16px;}
+
+  .mono{font-family:'DM Mono',monospace;}
+  .tag-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:5px;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.03em;}
+  .tag-pill.g{background:rgba(13,148,136,0.12);color:#2dd4bf;border:0.5px solid rgba(13,148,136,0.2);}
+  .tag-pill.p{background:rgba(124,58,237,0.12);color:#a78bfa;border:0.5px solid rgba(124,58,237,0.2);}
+  .tag-pill.a{background:rgba(217,119,6,0.12);color:#fbbf24;border:0.5px solid rgba(217,119,6,0.2);}
+  .tag-pill.r{background:rgba(220,38,38,0.08);color:#f87171;border:0.5px solid rgba(220,38,38,0.15);}
+  .tag-pill.b{background:rgba(59,130,246,0.1);color:#60a5fa;border:0.5px solid rgba(59,130,246,0.2);}
+
+  .sc{border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;background:#111827;border:0.5px solid rgba(255,255,255,0.05);}
+  .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;border-radius:14px 14px 0 0;}
+  .sc.purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
+  .sc.teal::before{background:linear-gradient(90deg,#0d9488,#2dd4bf);}
+  .sc.amber::before{background:linear-gradient(90deg,#d97706,#fbbf24);}
+  .sc.blue::before{background:linear-gradient(90deg,#2563eb,#60a5fa);}
+  .sc.red::before{background:linear-gradient(90deg,#dc2626,#f87171);}
+  .scl{font-size:11px;color:#4b5563;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+  .scv{font-size:28px;font-weight:700;color:#f1f5f9;line-height:1;margin-bottom:3px;}
+  .sch{font-size:11px;color:#374151;}
+  .sch.ok{color:#2dd4bf;}
+  .sch.warn{color:#fbbf24;}
+
+  .panel{background:#111827;border:0.5px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;}
+  .panel+.panel{margin-top:12px;}
+  .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .ptl{font-size:14px;font-weight:600;color:#94a3b8;}
+  .pa{font-size:11px;color:#7c3aed;font-family:'DM Mono',monospace;cursor:pointer;}
+
+  .bnav{display:flex;background:#0d1120;border-top:0.5px solid rgba(255,255,255,0.06);padding:10px 8px 20px;flex-shrink:0;}
+  .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+  .bnav-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+  .bnav-label{font-size:10px;font-family:'DM Mono',monospace;color:#374151;letter-spacing:0.04em;}
+  .bnav-item.active .bnav-label{color:#a78bfa;}
+
+  .page-hdr{padding:16px 22px 12px;flex-shrink:0;}
+  .page-ey{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:4px;}
+  .page-ey.teal{color:#2dd4bf;}
+  .page-ey.amber{color:#fbbf24;}
+  .page-ey.blue{color:#3b82f6;}
+  .page-ey.gray{color:#4b5563;}
+  .page-title{font-size:24px;font-weight:700;color:#f1f5f9;letter-spacing:-0.02em;}
+  .page-sub{font-size:12px;color:#374151;font-family:'DM Mono',monospace;margin-top:3px;}
+  .scroll-area{flex:1;overflow-y:auto;padding:0 22px 22px;}
+  .scroll-area::-webkit-scrollbar{display:none;}
+
+  .file-bar{margin:0 22px 14px;padding:12px 16px;background:#111827;border:0.5px solid rgba(124,58,237,0.15);border-radius:12px;display:flex;align-items:center;gap:12px;}
+  .fb-icon{width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,0.1);border:0.5px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .fb-name{font-size:13px;font-weight:600;color:#c4b5fd;font-family:'DM Mono',monospace;}
+  .fb-meta{font-size:11px;color:#374151;font-family:'DM Mono',monospace;margin-top:1px;}
+
+  .col-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.03);}
+  .col-row:last-child{border-bottom:none;}
+  .col-name{font-size:13px;color:#94a3b8;flex:1;}
+  .col-type{font-size:10px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;}
+  .col-type.num{background:rgba(59,130,246,0.1);color:#60a5fa;}
+  .col-type.str{background:rgba(13,148,136,0.1);color:#2dd4bf;}
+  .col-type.dt{background:rgba(217,119,6,0.1);color:#fbbf24;}
+  .col-null{font-size:10px;font-family:'DM Mono',monospace;color:#374151;white-space:nowrap;}
+  .cbar-w{width:52px;height:4px;background:rgba(255,255,255,0.04);border-radius:3px;}
+  .cbar{height:100%;border-radius:3px;background:#7c3aed;}
+
+  .chart{height:80px;display:flex;align-items:flex-end;gap:4px;margin-top:6px;}
+  .barm{flex:1;border-radius:3px 3px 0 0;}
+
+  .tog-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+  .tog-row:last-child{border-bottom:none;}
+  .tog-title{font-size:14px;color:#94a3b8;}
+  .tog-sub{font-size:11px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;}
+  .tog{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer;}
+  .tog input{opacity:0;width:0;height:0;position:absolute;}
+  .tog-track{position:absolute;inset:0;border-radius:22px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.08);transition:background 0.2s;}
+  .tog input:checked+.tog-track{background:#2563eb;border-color:#2563eb;}
+  .tog-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#4b5563;transition:transform 0.2s,background 0.2s;}
+  .tog input:checked~.tog-thumb{transform:translateX(18px);background:white;}
+
+  .danger-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid rgba(220,38,38,0.06);}
+  .danger-row:last-child{border-bottom:none;}
+  .danger-txt{font-size:14px;color:#64748b;}
+  .danger-sub{font-size:11px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;}
+  .danger-btn{padding:6px 14px;border-radius:7px;border:0.5px solid rgba(220,38,38,0.25);background:rgba(220,38,38,0.06);color:#f87171;font-size:11px;font-family:'Syne',sans-serif;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+  .track{height:4px;background:rgba(255,255,255,0.04);border-radius:3px;margin-top:8px;}
+  .fill{height:100%;border-radius:3px;}
+
+  .run-row{padding:14px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+  .run-row:last-child{border-bottom:none;}
+  .run-name{font-size:14px;font-weight:600;color:#94a3b8;margin-bottom:3px;}
+  .run-file{font-size:11px;color:#374151;font-family:'DM Mono',monospace;}
+  .run-meta{display:flex;align-items:center;gap:8px;margin-top:8px;}
+  .run-score{display:flex;flex-direction:column;align-items:flex-end;}
+  .run-actions{display:flex;gap:8px;margin-top:10px;}
+  .ab{padding:5px 12px;border-radius:6px;font-size:11px;font-family:'DM Mono',monospace;border:0.5px solid rgba(255,255,255,0.07);color:#4b5563;background:transparent;cursor:pointer;}
+  .ab.pr{border-color:rgba(124,58,237,0.25);color:#a78bfa;}
+  .ab.dr{border-color:rgba(220,38,38,0.15);color:#f87171;}
+
+  .big-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;flex-shrink:0;box-shadow:0 4px 14px rgba(124,58,237,0.25);}
+  .sm-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+
+  .field{margin-bottom:12px;}
+  .field-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#374151;margin-bottom:4px;}
+  .field-val{font-size:13px;color:#64748b;background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px 14px;}
+
+  .search-bar{background:#111827;border:0.5px solid rgba(255,255,255,0.05);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+
+  .screen-view{display:none;}
+  .screen-view.show{display:flex;flex-direction:column;flex:1;}
+
+  .screen-picker{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;padding:0 16px;}
+  .spick{padding:7px 16px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#4b5563;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.2s;}
+  .spick.active{border-color:rgba(124,58,237,0.35);color:#a78bfa;background:rgba(124,58,237,0.08);}
+  .spick:hover{border-color:rgba(255,255,255,0.12);color:#64748b;}
+
+  .act-row{padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:10px;}
+  .act-row:last-child{border-bottom:none;}
+  .act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+  .analysis-dropdown{position:relative;margin:0 22px 14px;}
+  .analysis-dropdown-btn{width:100%;padding:12px 16px;background:#111827;border:0.5px solid rgba(124,58,237,0.15);border-radius:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color 0.2s;}
+  .analysis-dropdown-btn:hover{border-color:rgba(124,58,237,0.3);}
+  .analysis-dropdown-btn .dd-label{font-size:13px;font-family:'DM Mono',monospace;color:#c4b5fd;font-weight:500;}
+  .analysis-dropdown-btn .dd-chevron{transition:transform 0.2s;}
+  .analysis-dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#111827;border:0.5px solid rgba(124,58,237,0.2);border-radius:12px;padding:6px;z-index:5;box-shadow:0 12px 32px rgba(0,0,0,0.4);display:none;}
+  .analysis-dropdown-menu.open{display:block;}
+  .dd-item{padding:10px 14px;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:#4b5563;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.15s,color 0.15s;}
+  .dd-item:hover{background:rgba(124,58,237,0.06);color:#94a3b8;}
+  .dd-item.active{background:rgba(124,58,237,0.1);color:#c4b5fd;}
+  .dd-item .dd-dot{width:6px;height:6px;border-radius:50%;background:#2d3748;flex-shrink:0;}
+  .dd-item.active .dd-dot{background:#7c3aed;box-shadow:0 0 6px rgba(124,58,237,0.5);}
+
+  .dropzone{border:2px dashed rgba(13,148,136,0.25);border-radius:14px;padding:28px 20px;text-align:center;margin-bottom:14px;}
+
+  .login-overlay{position:absolute;inset:0;background:rgba(5,8,18,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:10;border-radius:42px;padding:20px;}
+  .login-card{background:#111827;border:0.5px solid rgba(124,58,237,0.2);border-radius:18px;padding:28px 24px;width:100%;max-width:290px;box-shadow:0 16px 48px rgba(0,0,0,0.5),0 0 0 1px rgba(124,58,237,0.08);}
+  .login-card .lc-eyebrow{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:6px;}
+  .login-card .lc-title{font-size:20px;font-weight:700;color:#f1f5f9;margin-bottom:4px;}
+  .login-card .lc-sub{font-size:12px;color:#374151;font-family:'DM Mono',monospace;margin-bottom:20px;line-height:1.5;}
+  .login-input{width:100%;padding:12px 14px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#94a3b8;font-size:13px;font-family:'DM Mono',monospace;outline:none;margin-bottom:10px;}
+  .login-input::placeholder{color:#2d3748;}
+  .login-input:focus{border-color:rgba(124,58,237,0.35);}
+  .login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#ede9fe;font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;margin-top:4px;transition:opacity 0.2s;}
+  .login-btn:hover{opacity:0.9;}
+  .login-dismiss{font-size:11px;color:#374151;font-family:'DM Mono',monospace;text-align:center;margin-top:14px;cursor:pointer;}
+  .login-dismiss:hover{color:#64748b;}
+
+  .ghost{opacity:0.35;pointer-events:none;}
+  .ghost-bar{height:10px;background:rgba(255,255,255,0.04);border-radius:4px;margin-bottom:8px;}
+  .ghost-bar.w60{width:60%;}
+  .ghost-bar.w80{width:80%;}
+  .ghost-bar.w40{width:40%;}
+  .ghost-bar.w70{width:70%;}
+
+  .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 28px;text-align:center;}
+  .empty-icon{width:64px;height:64px;border-radius:16px;background:rgba(124,58,237,0.06);border:0.5px solid rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .empty-title{font-size:17px;font-weight:700;color:#94a3b8;margin-bottom:6px;}
+  .empty-sub{font-size:12px;color:#374151;font-family:'DM Mono',monospace;line-height:1.6;max-width:220px;margin-bottom:16px;}
+  .empty-btn{padding:10px 24px;border-radius:10px;border:none;background:#7c3aed;color:#ede9fe;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;}
+
+  /* ─── filter pills (from desktop history) ─── */
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .fpill{padding:5px 11px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#4b5563;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.15s;}
+  .fpill.on{border-color:rgba(217,119,6,0.3);color:#d97706;background:rgba(217,119,6,0.08);}
+  .fpill:hover{border-color:rgba(255,255,255,0.12);color:#64748b;}
+
+  /* ─── quality items (from desktop analysis) ─── */
+  .quality-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .qi{background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px;}
+  .ql{font-size:10px;font-family:'DM Mono',monospace;color:#374151;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;}
+  .qv{font-size:18px;font-weight:700;color:#f1f5f9;}
+  .qs{font-size:10px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;}
+  .qtrack{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:7px;}
+  .qfill{height:100%;border-radius:2px;}
+
+  /* ─── data preview table (from desktop analysis) ─── */
+  .ptable{width:100%;border-collapse:collapse;}
+  .ptable th{font-size:9px;font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;color:#374151;text-align:left;padding:0 8px 7px;border-bottom:0.5px solid rgba(255,255,255,0.05);}
+  .ptable td{padding:7px 8px;font-size:10px;color:#64748b;border-bottom:0.5px solid rgba(255,255,255,0.03);font-family:'DM Mono',monospace;}
+  .ptable tr:last-child td{border-bottom:none;}
+
+  /* ─── hero banner (from desktop dashboard) ─── */
+  .hero-banner{border-radius:14px;overflow:hidden;position:relative;background:#0d1829;border:0.5px solid rgba(59,130,246,0.2);padding:18px;margin-bottom:14px;}
+  .hero-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(59,130,246,0.08),transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(124,58,237,0.06),transparent 60%);pointer-events:none;}
+  .hero-tag{font-size:9px;font-family:'DM Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#3b82f6;background:rgba(59,130,246,0.12);border:0.5px solid rgba(59,130,246,0.25);padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:10px;position:relative;}
+  .hero-headline{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:6px;position:relative;}
+  .hero-desc{font-size:11px;color:#64748b;line-height:1.5;position:relative;margin-bottom:12px;}
+  .hero-steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative;}
+  .step-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:5px 10px 5px 6px;font-size:10px;color:#64748b;}
+  .step-num{width:16px;height:16px;border-radius:50%;background:#1e3a5f;border:0.5px solid #2563eb;display:flex;align-items:center;justify-content:center;font-size:9px;color:#93c5fd;font-family:'DM Mono',monospace;flex-shrink:0;}
+  .step-arrow{color:#1e293b;font-size:11px;}
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- SCREEN PICKERS                                                            -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div style="text-align:center;padding:16px 0 10px;">
+  <div style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#374151;margin-bottom:12px;">Analysis Studio — Mobile App Screens</div>
+
+  <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
+    <div>
+      <div style="font-size:10px;font-family:'DM Mono',monospace;color:#f87171;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">● Logged Out</div>
+      <div class="screen-picker" id="picker-lo">
+        <div class="spick active" onclick="showLO('lo-dashboard',this)">Dashboard</div>
+        <div class="spick" onclick="showLO('lo-uploads',this)">Uploads</div>
+        <div class="spick" onclick="showLO('lo-analysis',this)">Analysis</div>
+        <div class="spick" onclick="showLO('lo-history',this)">History</div>
+        <div class="spick" onclick="showLO('lo-account',this)">Account</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-family:'DM Mono',monospace;color:#2dd4bf;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">● Logged In</div>
+      <div class="screen-picker" id="picker-li">
+        <div class="spick active" onclick="showLI('li-dashboard',this)">Dashboard</div>
+        <div class="spick" onclick="showLI('li-uploads',this)">Uploads</div>
+        <div class="spick" onclick="showLI('li-analysis',this)">Analysis</div>
+        <div class="spick" onclick="showLI('li-history',this)">History</div>
+        <div class="spick" onclick="showLI('li-account',this)">Account</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║  PHONE 1 — LOGGED OUT                                                    ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════════╝ -->
+<div class="phone-wrap">
+  <div class="phone-label">● Logged Out</div>
+  <div class="phone" style="min-height:720px;" id="phone-lo">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1.5 10l4-4 2.5 2.5 4-5 2.5 2.5" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="11" height="8" rx="1.5" stroke="#94a3b8" stroke-width="1.1"/><rect x="12.5" y="6.5" width="2" height="3" rx="0.7" fill="#94a3b8"/><rect x="2.5" y="6" width="7" height="4" rx="0.4" fill="#94a3b8"/></svg>
+      </div>
+    </div>
+
+    <!-- ═══ LO: DASHBOARD ═══ -->
+    <div class="screen-view show" id="lo-dashboard">
+      <div class="page-hdr">
+        <div class="page-ey blue">overview</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="page-title">Dashboard</div>
+          <div style="padding:7px 14px;border-radius:8px;border:0.5px solid rgba(124,58,237,0.25);background:rgba(124,58,237,0.06);font-size:11px;font-family:'DM Mono',monospace;color:#a78bfa;cursor:pointer;">Sign in</div>
+        </div>
+        <div class="page-sub">Welcome — sign in to get started</div>
+      </div>
+      <div class="scroll-area">
+        <!-- hero banner from desktop -->
+        <div class="hero-banner">
+          <div class="hero-tag">getting started</div>
+          <div class="hero-headline">Upload to model in 3 steps</div>
+          <div class="hero-desc">Import a dataset, explore insights and statistics, then train an ML model.</div>
+          <div class="hero-steps">
+            <div class="step-pill"><div class="step-num">1</div>Upload</div>
+            <div class="step-arrow">›</div>
+            <div class="step-pill"><div class="step-num">2</div>Analyse</div>
+            <div class="step-arrow">›</div>
+            <div class="step-pill"><div class="step-num">3</div>Export</div>
+          </div>
+        </div>
+
+        <!-- empty stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc blue"><div class="scl">Saved runs</div><div class="scv">0</div><div class="sch">No runs yet</div></div>
+          <div class="sc teal"><div class="scl">ML-ready</div><div class="scv">0</div><div class="sch">—</div></div>
+          <div class="sc purple"><div class="scl">ML runs</div><div class="scv">0</div><div class="sch">—</div></div>
+          <div class="sc amber"><div class="scl">Uploads</div><div class="scv">0</div><div class="sch">Add first file</div></div>
+        </div>
+
+        <!-- empty activity -->
+        <div class="panel">
+          <div class="ph"><div class="ptl">Activity</div></div>
+          <div class="act-row"><div class="act-dot" style="background:#2563eb;"></div><span style="font-size:13px;color:#64748b;flex:1;">Workspace initialised</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">now</span></div>
+          <div class="act-row"><div class="act-dot" style="background:#1e293b;"></div><span style="font-size:13px;color:#374151;flex:1;">Awaiting first upload...</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">—</span></div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#a78bfa"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#a78bfa" opacity="0.35"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#a78bfa" opacity="0.35"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#a78bfa" opacity="0.35"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ LO: UPLOADS ═══ -->
+    <div class="screen-view" id="lo-uploads">
+      <div class="page-hdr">
+        <div class="page-ey teal">dataset intake</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="page-title">Uploads</div>
+          <div style="padding:7px 16px;border-radius:8px;border:none;background:rgba(13,148,136,0.15);color:#4b5563;font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:not-allowed;">+ Upload</div>
+        </div>
+      </div>
+      <div class="scroll-area">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc teal"><div class="scl">Datasets</div><div class="scv">0</div><div class="sch">None yet</div></div>
+          <div class="sc amber"><div class="scl">Missing</div><div class="scv">—</div><div class="sch">No data</div></div>
+          <div class="sc red"><div class="scl">Errors</div><div class="scv">—</div><div class="sch">—</div></div>
+        </div>
+        <!-- disabled drop zone -->
+        <div style="border:2px dashed rgba(255,255,255,0.06);border-radius:14px;padding:28px 20px;text-align:center;margin-bottom:14px;position:relative;">
+          <div style="width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v11M7.5 7.5l3.5-3.5 3.5 3.5" stroke="#2d3748" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v1.5a1.5 1.5 0 001.5 1.5h11a1.5 1.5 0 001.5-1.5V17" stroke="#2d3748" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:14px;font-weight:600;color:#374151;margin-bottom:4px;">Sign in to upload</div>
+          <div style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;margin-bottom:8px;">CSV, XLSX, JSON, Parquet supported</div>
+          <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+            <span class="tag-pill g" style="opacity:0.4;">.CSV</span><span class="tag-pill g" style="opacity:0.4;">.XLSX</span><span class="tag-pill g" style="opacity:0.4;">.JSON</span><span class="tag-pill g" style="opacity:0.4;">.PARQUET</span>
+          </div>
+          <div style="position:absolute;top:10px;right:12px;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="7" rx="1.5" stroke="#374151" stroke-width="1.2"/><path d="M5 6V4.5a2 2 0 014 0V6" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Recent uploads</div></div>
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-size:13px;color:#2d3748;">No files uploaded yet</div>
+            <div style="font-size:11px;color:#1e293b;font-family:'DM Mono',monospace;margin-top:4px;">Sign in to start uploading</div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ LO: ANALYSIS ═══ -->
+    <div class="screen-view" id="lo-analysis">
+      <div class="page-hdr ghost" style="padding-bottom:4px;">
+        <div class="page-ey">analysis workspace</div>
+        <div class="page-title">Analysis</div>
+        <div class="page-sub">Explore, visualise, and model your dataset</div>
+      </div>
+      <div class="ghost" style="margin:0 22px 10px;padding:12px 16px;background:#111827;border:0.5px solid rgba(255,255,255,0.04);border-radius:12px;display:flex;align-items:center;gap:12px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.03);flex-shrink:0;"></div>
+        <div style="flex:1;"><div class="ghost-bar w60"></div><div class="ghost-bar w40" style="margin-bottom:0;"></div></div>
+      </div>
+      <div class="ghost" style="margin:0 22px 10px;padding:12px 16px;background:#111827;border:0.5px solid rgba(255,255,255,0.04);border-radius:10px;display:flex;align-items:center;justify-content:space-between;">
+        <div class="ghost-bar w40" style="margin-bottom:0;"></div>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 5.5l3 3 3-3" stroke="#2d3748" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="ghost scroll-area" style="padding-top:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc purple" style="opacity:0.5;"><div class="scl">Rows</div><div class="scv">—</div><div class="sch">—</div></div>
+          <div class="sc teal" style="opacity:0.5;"><div class="scl">Columns</div><div class="scv">—</div><div class="sch">—</div></div>
+        </div>
+        <div class="panel" style="opacity:0.4;">
+          <div class="ph"><div class="ptl">Column breakdown</div></div>
+          <div class="ghost-bar w80"></div>
+          <div class="ghost-bar w60"></div>
+          <div class="ghost-bar w70"></div>
+          <div class="ghost-bar w40"></div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#a78bfa" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+      <div class="login-overlay" onclick="if(event.target===this)this.style.display='none'">
+        <div class="login-card">
+          <div class="lc-eyebrow">authentication required</div>
+          <div class="lc-title">Sign in</div>
+          <div class="lc-sub">Log in to access your analysis workspace and saved runs</div>
+          <input class="login-input" type="text" placeholder="Username" value="">
+          <input class="login-input" type="password" placeholder="Password" value="">
+          <button class="login-btn">Sign in</button>
+          <div class="login-dismiss">tap outside to dismiss</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LO: HISTORY ═══ -->
+    <div class="screen-view" id="lo-history">
+      <div class="page-hdr ghost">
+        <div class="page-ey amber">run archive</div>
+        <div class="page-title">History</div>
+        <div class="page-sub">Search, reopen, download, and retire saved runs</div>
+      </div>
+      <div class="ghost scroll-area">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc amber" style="opacity:0.5;"><div class="scl">Saved</div><div class="scv">—</div><div class="sch">—</div></div>
+          <div class="sc blue" style="opacity:0.5;"><div class="scl">Filtered</div><div class="scv">—</div><div class="sch">—</div></div>
+          <div class="sc purple" style="opacity:0.5;"><div class="scl">ML runs</div><div class="scv">—</div><div class="sch">—</div></div>
+        </div>
+        <div style="background:#111827;border:0.5px solid rgba(255,255,255,0.04);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+          <div class="ghost-bar" style="width:100%;margin-bottom:0;"></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+          <div class="ghost-bar" style="width:60px;height:24px;border-radius:6px;margin-bottom:0;"></div>
+          <div class="ghost-bar" style="width:70px;height:24px;border-radius:6px;margin-bottom:0;"></div>
+          <div class="ghost-bar" style="width:65px;height:24px;border-radius:6px;margin-bottom:0;"></div>
+        </div>
+        <div class="panel" style="opacity:0.4;">
+          <div class="ph"><div class="ptl">Recent runs</div></div>
+          <div class="ghost-bar w80"></div>
+          <div class="ghost-bar w60"></div>
+          <div style="height:8px;"></div>
+          <div class="ghost-bar w70"></div>
+          <div class="ghost-bar w40"></div>
+          <div style="height:8px;"></div>
+          <div class="ghost-bar w80"></div>
+          <div class="ghost-bar w60"></div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#a78bfa" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+      <div class="login-overlay" onclick="if(event.target===this)this.style.display='none'">
+        <div class="login-card">
+          <div class="lc-eyebrow">authentication required</div>
+          <div class="lc-title">Sign in</div>
+          <div class="lc-sub">Log in to view your run history and saved models</div>
+          <input class="login-input" type="text" placeholder="Username">
+          <input class="login-input" type="password" placeholder="Password">
+          <button class="login-btn">Sign in</button>
+          <div class="login-dismiss">tap outside to dismiss</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LO: ACCOUNT ═══ -->
+    <div class="screen-view" id="lo-account">
+      <div class="page-hdr ghost">
+        <div class="page-ey gray">settings</div>
+        <div class="page-title">Account</div>
+        <div class="page-sub">Manage access, identity, and saved work</div>
+      </div>
+      <div class="ghost scroll-area">
+        <div class="panel" style="opacity:0.4;">
+          <div class="ph"><div class="ptl">Profile</div></div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.04);flex-shrink:0;"></div>
+            <div style="flex:1;"><div class="ghost-bar w60"></div><div class="ghost-bar w40" style="margin-bottom:0;"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div><div class="ghost-bar w80"></div></div>
+            <div><div class="ghost-bar w70"></div></div>
+            <div><div class="ghost-bar w60"></div></div>
+            <div><div class="ghost-bar w80"></div></div>
+          </div>
+        </div>
+        <div class="panel" style="opacity:0.3;">
+          <div class="ph"><div class="ptl">Usage</div></div>
+          <div class="ghost-bar w70"></div>
+          <div class="ghost-bar w80"></div>
+          <div class="ghost-bar w60"></div>
+        </div>
+        <div class="panel" style="opacity:0.25;">
+          <div class="ph"><div class="ptl">Login & Session</div></div>
+          <div class="ghost-bar w80"></div>
+          <div class="ghost-bar w70"></div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#a78bfa" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Account</div></div>
+      </div>
+      <div class="login-overlay" onclick="if(event.target===this)this.style.display='none'">
+        <div class="login-card">
+          <div class="lc-eyebrow">authentication required</div>
+          <div class="lc-title">Sign in</div>
+          <div class="lc-sub">Log in to manage your account settings and preferences</div>
+          <input class="login-input" type="text" placeholder="Username">
+          <input class="login-input" type="password" placeholder="Password">
+          <button class="login-btn">Sign in</button>
+          <div class="login-dismiss">tap outside to dismiss</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║  PHONE 2 — LOGGED IN                                                     ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════════╝ -->
+<div class="phone-wrap">
+  <div class="phone-label">● Logged In</div>
+  <div class="phone" style="min-height:720px;" id="phone-li">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1.5 10l4-4 2.5 2.5 4-5 2.5 2.5" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="11" height="8" rx="1.5" stroke="#94a3b8" stroke-width="1.1"/><rect x="12.5" y="6.5" width="2" height="3" rx="0.7" fill="#94a3b8"/><rect x="2.5" y="6" width="7" height="4" rx="0.4" fill="#94a3b8"/></svg>
+      </div>
+    </div>
+
+    <!-- ═══ LI: DASHBOARD ═══ -->
+    <div class="screen-view show" id="li-dashboard">
+      <div class="page-hdr">
+        <div class="page-ey blue">overview</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="page-title">Dashboard</div>
+          <div class="sm-av">YA</div>
+        </div>
+        <div class="page-sub">Good morning, yaeesh</div>
+      </div>
+      <div class="scroll-area">
+        <!-- hero banner from desktop -->
+        <div class="hero-banner">
+          <div class="hero-tag">tabular workspace</div>
+          <div class="hero-headline">Your analysis hub</div>
+          <div class="hero-desc">Upload datasets, explore insights, and train ML models — all in one place.</div>
+          <div class="hero-steps">
+            <div class="step-pill"><div class="step-num">1</div>Upload</div>
+            <div class="step-arrow">›</div>
+            <div class="step-pill"><div class="step-num">2</div>Analyse</div>
+            <div class="step-arrow">›</div>
+            <div class="step-pill"><div class="step-num">3</div>Export</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc blue"><div class="scl">Saved runs</div><div class="scv">8</div><div class="sch ok">3 this week</div></div>
+          <div class="sc teal"><div class="scl">ML-ready</div><div class="scv">2</div><div class="sch ok">Ready</div></div>
+          <div class="sc purple"><div class="scl">ML runs</div><div class="scv">5</div><div class="sch">2 exported</div></div>
+          <div class="sc amber"><div class="scl">Uploads</div><div class="scv">3</div><div class="sch ok">All processed</div></div>
+        </div>
+
+        <!-- quick actions from desktop page actions -->
+        <div style="display:flex;gap:10px;margin-bottom:14px;">
+          <div style="flex:1;padding:14px;background:rgba(13,148,136,0.06);border:0.5px solid rgba(13,148,136,0.15);border-radius:12px;text-align:center;cursor:pointer;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="margin:0 auto 6px;display:block;"><path d="M11 4v11M7.5 7.5l3.5-3.5 3.5 3.5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v1.5a1.5 1.5 0 001.5 1.5h11a1.5 1.5 0 001.5-1.5V17" stroke="#2dd4bf" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div style="font-size:12px;font-weight:600;color:#2dd4bf;">Import CSV</div>
+          </div>
+          <div style="flex:1;padding:14px;background:rgba(124,58,237,0.06);border:0.5px solid rgba(124,58,237,0.15);border-radius:12px;text-align:center;cursor:pointer;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="margin:0 auto 6px;display:block;"><circle cx="11" cy="11" r="8" stroke="#a78bfa" stroke-width="1.5"/><path d="M8 11h6M11 8v6" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div style="font-size:12px;font-weight:600;color:#a78bfa;">+ New Run</div>
+          </div>
+          <div style="flex:1;padding:14px;background:rgba(59,130,246,0.06);border:0.5px solid rgba(59,130,246,0.15);border-radius:12px;text-align:center;cursor:pointer;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="margin:0 auto 6px;display:block;"><rect x="3" y="3" width="16" height="16" rx="3" stroke="#60a5fa" stroke-width="1.5"/><path d="M7 14l3-4 2.5 2.5L16 8" stroke="#60a5fa" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="font-size:12px;font-weight:600;color:#60a5fa;">History</div>
+          </div>
+        </div>
+
+        <!-- recent uploads panel from desktop -->
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="ph"><div class="ptl">Recent Uploads</div><div class="pa">all →</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.03);">
+            <div><div style="font-size:13px;font-weight:600;color:#94a3b8;">sales_q3_2024.csv</div><div style="font-size:10px;color:#374151;font-family:'DM Mono',monospace;margin-top:1px;">12,840 rows · 9 cols</div></div>
+            <span class="tag-pill g">Ready</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.03);">
+            <div><div style="font-size:13px;font-weight:600;color:#94a3b8;">customer_data.xlsx</div><div style="font-size:10px;color:#374151;font-family:'DM Mono',monospace;margin-top:1px;">8,392 rows · 14 cols</div></div>
+            <span class="tag-pill g">Ready</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+            <div><div style="font-size:13px;font-weight:600;color:#94a3b8;">returns_nov.csv</div><div style="font-size:10px;color:#374151;font-family:'DM Mono',monospace;margin-top:1px;">3,210 rows · 7 cols</div></div>
+            <span class="tag-pill a">142 missing</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div class="ptl">Recent Activity</div></div>
+          <div class="act-row"><div class="act-dot" style="background:#7c3aed;"></div><span style="font-size:13px;color:#94a3b8;flex:1;">ML model trained — RF v2</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">2h</span></div>
+          <div class="act-row"><div class="act-dot" style="background:#0d9488;"></div><span style="font-size:13px;color:#64748b;flex:1;">sales_q3_2024.csv uploaded</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">5h</span></div>
+          <div class="act-row"><div class="act-dot" style="background:#2563eb;"></div><span style="font-size:13px;color:#64748b;flex:1;">Analysis run completed</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">1d</span></div>
+          <div class="act-row"><div class="act-dot" style="background:#d97706;"></div><span style="font-size:13px;color:#64748b;flex:1;">APAC Segmentation saved</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">2d</span></div>
+          <div class="act-row"><div class="act-dot" style="background:#1e293b;"></div><span style="font-size:13px;color:#374151;flex:1;">Workspace initialised</span><span style="font-size:11px;color:#2d3748;font-family:'DM Mono',monospace;">3d</span></div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#a78bfa"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#a78bfa" opacity="0.35"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#a78bfa" opacity="0.35"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#a78bfa" opacity="0.35"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ LI: UPLOADS ═══ -->
+    <div class="screen-view" id="li-uploads">
+      <div class="page-hdr">
+        <div class="page-ey teal">dataset intake</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="page-title">Uploads</div>
+          <div style="display:flex;gap:8px;">
+            <div style="padding:7px 12px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.1);background:transparent;font-size:11px;font-family:'Syne',sans-serif;color:#718096;cursor:pointer;">Export all</div>
+            <div style="padding:7px 16px;border-radius:8px;border:none;background:#0d9488;color:#f0fdfa;font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">+ Upload</div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-area">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc teal"><div class="scl">Datasets</div><div class="scv">3</div><div class="sch ok">2 ML-ready</div></div>
+          <div class="sc amber"><div class="scl">Missing</div><div class="scv">142</div><div class="sch warn">Review</div></div>
+          <div class="sc red"><div class="scl">Errors</div><div class="scv">0</div><div class="sch ok">Clean</div></div>
+        </div>
+        <div class="dropzone">
+          <div style="width:44px;height:44px;border-radius:10px;background:rgba(13,148,136,0.08);border:0.5px solid rgba(13,148,136,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v11M7.5 7.5l3.5-3.5 3.5 3.5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v1.5a1.5 1.5 0 001.5 1.5h11a1.5 1.5 0 001.5-1.5V17" stroke="#2dd4bf" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:14px;font-weight:600;color:#94a3b8;margin-bottom:6px;">Drop dataset here</div>
+          <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+            <span class="tag-pill g">.CSV</span><span class="tag-pill g">.XLSX</span><span class="tag-pill g">.JSON</span><span class="tag-pill g">.PARQUET</span>
+          </div>
+        </div>
+
+        <!-- data quality snapshot from desktop -->
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="ph"><div class="ptl">Data quality</div><div class="pa">full report →</div></div>
+          <div class="quality-row">
+            <div class="qi"><div class="ql">Completeness</div><div class="qv">98.9%</div><div class="qs">142 missing cells</div><div class="qtrack"><div class="qfill" style="width:98.9%;background:#0d9488;"></div></div></div>
+            <div class="qi"><div class="ql">Uniqueness</div><div class="qv">100%</div><div class="qs">No duplicates</div><div class="qtrack"><div class="qfill" style="width:100%;background:#7c3aed;"></div></div></div>
+            <div class="qi"><div class="ql">Consistency</div><div class="qv">97.4%</div><div class="qs">8 format issues</div><div class="qtrack"><div class="qfill" style="width:97.4%;background:#2563eb;"></div></div></div>
+            <div class="qi"><div class="ql">ML readiness</div><div class="qv">High</div><div class="qs">Passes all checks</div><div class="qtrack"><div class="qfill" style="width:88%;background:#d97706;"></div></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div class="ptl">Recent uploads</div><div class="pa">all →</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);">
+            <div><div style="font-size:14px;font-weight:600;color:#94a3b8;">sales_q3_2024.csv</div><div style="font-size:11px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;">12,840 rows · 9 cols · uploaded 2h ago</div></div>
+            <span class="tag-pill g">Ready</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);">
+            <div><div style="font-size:14px;font-weight:600;color:#94a3b8;">customer_data.xlsx</div><div style="font-size:11px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;">8,392 rows · 14 cols · uploaded 1d ago</div></div>
+            <span class="tag-pill g">Ready</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+            <div><div style="font-size:14px;font-weight:600;color:#94a3b8;">returns_nov.csv</div><div style="font-size:11px;color:#374151;font-family:'DM Mono',monospace;margin-top:2px;">3,210 rows · 7 cols · uploaded 3d ago</div></div>
+            <span class="tag-pill a">142 missing</span>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ LI: ANALYSIS ═══ -->
+    <div class="screen-view" id="li-analysis">
+      <div class="page-hdr" style="padding-bottom:4px;">
+        <div class="page-ey">analysis workspace</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="page-title">Analysis</div>
+          <div style="display:flex;gap:8px;">
+            <div style="padding:6px 12px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.1);background:transparent;font-size:11px;font-family:'Syne',sans-serif;color:#718096;cursor:pointer;">← Change</div>
+            <div style="padding:6px 14px;border-radius:6px;border:none;background:#7c3aed;color:#ede9fe;font-size:11px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;">Run ML</div>
+          </div>
+        </div>
+        <div class="page-sub">Explore, visualise, and model your dataset</div>
+      </div>
+      <div class="file-bar">
+        <div class="fb-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1.5" width="12" height="13" rx="2" stroke="#a78bfa" stroke-width="1.2"/><path d="M4 5h8M4 8h8M4 11h5" stroke="#a78bfa" stroke-width="0.9" stroke-linecap="round" opacity="0.6"/></svg></div>
+        <div style="flex:1;min-width:0;"><div class="fb-name">sales_q3_2024.csv</div><div class="fb-meta">12,840 rows · 9 columns · uploaded 2h ago</div></div>
+        <div style="display:flex;gap:4px;">
+          <span class="tag-pill g">ML-ready</span>
+          <span class="tag-pill p">Active</span>
+        </div>
+      </div>
+      <div class="analysis-dropdown" id="analysis-dd">
+        <div class="analysis-dropdown-btn" onclick="document.getElementById('analysis-dd-menu').classList.toggle('open')">
+          <span class="dd-label">Overview</span>
+          <svg class="dd-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6l3.5 3.5L11.5 6" stroke="#a78bfa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="analysis-dropdown-menu" id="analysis-dd-menu">
+          <div class="dd-item active" onclick="selectTab(this)"><div class="dd-dot"></div>Overview</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>Insights</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>Schema</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>Data Quality</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>Statistics</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>Relationships</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>Charts</div>
+          <div class="dd-item" onclick="selectTab(this)"><div class="dd-dot"></div>ML Lab</div>
+        </div>
+      </div>
+      <div class="scroll-area" style="padding-top:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc purple"><div class="scl">Rows</div><div class="scv">12,840</div><div class="sch ok">No dupes</div></div>
+          <div class="sc teal"><div class="scl">Columns</div><div class="scv">9</div><div class="sch">3 num · 4 str · 2 date</div></div>
+          <div class="sc amber"><div class="scl">Missing</div><div class="scv">142</div><div class="sch warn">1.1%</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div class="ptl">Column breakdown</div><div class="pa">schema →</div></div>
+          <div class="col-row"><span class="col-name">order_id</span><span class="col-type num">INT</span><span class="col-null">0 null</span><div class="cbar-w"><div class="cbar" style="width:100%"></div></div></div>
+          <div class="col-row"><span class="col-name">revenue</span><span class="col-type num">FLOAT</span><span class="col-null">12 null</span><div class="cbar-w"><div class="cbar" style="width:88%"></div></div></div>
+          <div class="col-row"><span class="col-name">region</span><span class="col-type str">STR</span><span class="col-null">0 null</span><div class="cbar-w"><div class="cbar" style="width:74%;background:#0d9488"></div></div></div>
+          <div class="col-row"><span class="col-name">order_date</span><span class="col-type dt">DATE</span><span class="col-null">0 null</span><div class="cbar-w"><div class="cbar" style="width:95%;background:#d97706"></div></div></div>
+          <div class="col-row"><span class="col-name">customer_id</span><span class="col-type num">INT</span><span class="col-null">130 null</span><div class="cbar-w"><div class="cbar" style="width:60%"></div></div></div>
+        </div>
+
+        <div class="panel" style="margin-top:12px;">
+          <div class="ph"><div class="ptl">Revenue distribution</div><div class="pa">full chart →</div></div>
+          <div class="chart">
+            <div class="barm" style="height:30%;background:rgba(124,58,237,0.35)"></div>
+            <div class="barm" style="height:52%;background:rgba(124,58,237,0.42)"></div>
+            <div class="barm" style="height:78%;background:rgba(124,58,237,0.5)"></div>
+            <div class="barm" style="height:100%;background:rgba(124,58,237,0.6)"></div>
+            <div class="barm" style="height:88%;background:rgba(124,58,237,0.55)"></div>
+            <div class="barm" style="height:64%;background:rgba(124,58,237,0.48)"></div>
+            <div class="barm" style="height:44%;background:rgba(124,58,237,0.4)"></div>
+            <div class="barm" style="height:30%;background:rgba(124,58,237,0.35)"></div>
+            <div class="barm" style="height:18%;background:rgba(124,58,237,0.3)"></div>
+            <div class="barm" style="height:10%;background:rgba(124,58,237,0.25)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$0</span>
+            <span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$5k</span>
+            <span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$10k</span>
+            <span style="font-size:10px;font-family:'DM Mono',monospace;color:#374151;">$15k+</span>
+          </div>
+        </div>
+
+        <!-- data quality snapshot from desktop -->
+        <div class="panel" style="margin-top:12px;">
+          <div class="ph"><div class="ptl">Data quality snapshot</div><div class="pa">full report →</div></div>
+          <div class="quality-row">
+            <div class="qi"><div class="ql">Completeness</div><div class="qv">98.9%</div><div class="qs">142 missing cells</div><div class="qtrack"><div class="qfill" style="width:98.9%;background:#0d9488;"></div></div></div>
+            <div class="qi"><div class="ql">Uniqueness</div><div class="qv">100%</div><div class="qs">No duplicates</div><div class="qtrack"><div class="qfill" style="width:100%;background:#7c3aed;"></div></div></div>
+            <div class="qi"><div class="ql">Consistency</div><div class="qv">97.4%</div><div class="qs">8 format issues</div><div class="qtrack"><div class="qfill" style="width:97.4%;background:#2563eb;"></div></div></div>
+            <div class="qi"><div class="ql">ML readiness</div><div class="qv">High</div><div class="qs">Passes all checks</div><div class="qtrack"><div class="qfill" style="width:88%;background:#d97706;"></div></div></div>
+          </div>
+        </div>
+
+        <!-- data preview table from desktop -->
+        <div class="panel" style="margin-top:12px;">
+          <div class="ph"><div class="ptl">Data preview — first 4 rows</div><div class="pa">full table →</div></div>
+          <div style="overflow-x:auto;">
+            <table class="ptable">
+              <thead><tr><th>order_id</th><th>revenue</th><th>region</th><th>order_date</th><th>cust_id</th></tr></thead>
+              <tbody>
+                <tr><td>10042</td><td>$8,420</td><td>APAC</td><td>2024-07-03</td><td>C-4821</td></tr>
+                <tr><td>10043</td><td>$1,206</td><td>EMEA</td><td>2024-07-03</td><td>C-2047</td></tr>
+                <tr><td>10044</td><td>$12,980</td><td>NA</td><td>2024-07-04</td><td>C-9912</td></tr>
+                <tr><td>10045</td><td>$340</td><td>APAC</td><td>2024-07-04</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#a78bfa" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ LI: HISTORY ═══ -->
+    <div class="screen-view" id="li-history">
+      <div class="page-hdr">
+        <div class="page-ey amber">run archive</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="page-title">History</div>
+          <div style="padding:7px 12px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.1);background:transparent;font-size:11px;font-family:'Syne',sans-serif;color:#718096;cursor:pointer;">Export all</div>
+        </div>
+        <div class="page-sub">Search, reopen, download, and retire saved runs</div>
+      </div>
+      <div class="scroll-area">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc amber"><div class="scl">Saved</div><div class="scv">8</div><div class="sch">3 this week</div></div>
+          <div class="sc blue"><div class="scl">Filtered</div><div class="scv">5</div><div class="sch">ML runs only</div></div>
+          <div class="sc purple"><div class="scl">ML runs</div><div class="scv">5</div><div class="sch">2 exported</div></div>
+        </div>
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="#374151" stroke-width="1.3"/><path d="M10.5 10.5l3 3" stroke="#374151" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span style="font-size:13px;color:#374151;font-family:'DM Mono',monospace;">Search runs by name, file, or model...</span>
+        </div>
+        <!-- filter pills from desktop -->
+        <div class="filter-row">
+          <div class="fpill on">ML only</div>
+          <div class="fpill">This week</div>
+          <div class="fpill">Exported</div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Recent runs</div></div>
+          <div class="run-row">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="run-name">Q3 Revenue — RF v2</div>
+              <span style="font-size:10px;color:#2d3748;font-family:'DM Mono',monospace;">Today, 11:42</span>
+            </div>
+            <div class="run-file">sales_q3_2024.csv</div>
+            <div class="run-meta">
+              <span class="tag-pill p">Random Forest</span>
+              <span class="tag-pill g">Saved</span>
+              <div style="margin-left:auto;text-align:right;">
+                <div style="font-size:13px;font-weight:700;color:#f1f5f9;">94.2%</div>
+                <div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;">F1: 0.91</div>
+              </div>
+            </div>
+            <div class="run-actions"><button class="ab pr">Reopen</button><button class="ab">Download</button><button class="ab dr">Retire</button></div>
+          </div>
+          <div class="run-row">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="run-name">Customer Churn — XGB</div>
+              <span style="font-size:10px;color:#2d3748;font-family:'DM Mono',monospace;">Yesterday, 15:20</span>
+            </div>
+            <div class="run-file">customer_data.xlsx</div>
+            <div class="run-meta">
+              <span class="tag-pill p">XGBoost</span>
+              <span class="tag-pill g">Saved</span>
+              <div style="margin-left:auto;text-align:right;">
+                <div style="font-size:13px;font-weight:700;color:#f1f5f9;">88.7%</div>
+                <div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;">F1: 0.85</div>
+              </div>
+            </div>
+            <div class="run-actions"><button class="ab pr">Reopen</button><button class="ab">Download</button><button class="ab dr">Retire</button></div>
+          </div>
+          <div class="run-row">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="run-name">Returns Forecast</div>
+              <span style="font-size:10px;color:#2d3748;font-family:'DM Mono',monospace;">Mon, 09:05</span>
+            </div>
+            <div class="run-file">returns_nov.csv</div>
+            <div class="run-meta">
+              <span class="tag-pill b">Linear Reg.</span>
+              <span class="tag-pill g">Saved</span>
+              <div style="margin-left:auto;text-align:right;">
+                <div style="font-size:13px;font-weight:700;color:#f1f5f9;">76.1%</div>
+                <div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;">R²: 0.71</div>
+              </div>
+            </div>
+            <div class="run-actions"><button class="ab pr">Reopen</button><button class="ab">Download</button><button class="ab dr">Retire</button></div>
+          </div>
+          <div class="run-row">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="run-name">APAC Segmentation</div>
+              <span style="font-size:10px;color:#2d3748;font-family:'DM Mono',monospace;">Sun, 14:30</span>
+            </div>
+            <div class="run-file">sales_q3_2024.csv</div>
+            <div class="run-meta">
+              <span class="tag-pill p">K-Means</span>
+              <span class="tag-pill g">Saved</span>
+              <div style="margin-left:auto;text-align:right;">
+                <div style="font-size:13px;font-weight:700;color:#f1f5f9;">—</div>
+                <div style="font-size:9px;color:#374151;font-family:'DM Mono',monospace;">Silhouette: 0.62</div>
+              </div>
+            </div>
+            <div class="run-actions"><button class="ab pr">Reopen</button><button class="ab">Download</button><button class="ab dr">Retire</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#a78bfa" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">History</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#374151" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Account</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ LI: ACCOUNT ═══ -->
+    <div class="screen-view" id="li-account">
+      <div class="page-hdr">
+        <div class="page-ey gray">settings</div>
+        <div class="page-title">Account</div>
+        <div class="page-sub">Manage access, identity, and saved work</div>
+      </div>
+      <div class="scroll-area">
+        <div class="panel">
+          <div class="ph"><div class="ptl">Profile</div><div class="pa">edit →</div></div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div class="big-av">YA</div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:#f1f5f9;">yaeesh</div>
+              <div style="font-size:12px;color:#4b5563;font-family:'DM Mono',monospace;margin-top:2px;">yaeesh@studio.app</div>
+              <div style="margin-top:4px;"><span class="tag-pill b">free plan</span></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="field" style="margin-bottom:0;"><div class="field-lbl">Full name</div><div class="field-val">Yaeesh Mahomed</div></div>
+            <div class="field" style="margin-bottom:0;"><div class="field-lbl">Email</div><div class="field-val">yaeesh@studio.app</div></div>
+            <div class="field" style="margin-bottom:0;"><div class="field-lbl">Member since</div><div class="field-val">March 2024</div></div>
+            <div class="field" style="margin-bottom:0;"><div class="field-lbl">Timezone</div><div class="field-val">UTC+10 — Sydney</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Usage</div></div>
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:#64748b;">Uploads</span><span style="font-size:11px;color:#374151;font-family:'DM Mono',monospace;">3 / 5</span></div>
+            <div class="track"><div class="fill" style="width:60%;background:#2563eb;"></div></div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:#374151;margin-top:4px;">2 uploads remaining this month</div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:#64748b;">Analysis runs</span><span style="font-size:11px;color:#374151;font-family:'DM Mono',monospace;">8 / 10</span></div>
+            <div class="track"><div class="fill" style="width:80%;background:#d97706;"></div></div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:#374151;margin-top:4px;">2 runs remaining — resets 1 May</div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:#64748b;">ML runs</span><span style="font-size:11px;color:#dc2626;font-family:'DM Mono',monospace;">5 / 5 — limit</span></div>
+            <div class="track"><div class="fill" style="width:100%;background:#dc2626;"></div></div>
+            <div style="font-size:9px;font-family:'DM Mono',monospace;color:#dc2626;margin-top:4px;">Limit reached — upgrade to run more</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><div class="ptl">Login & Session</div></div>
+          <div class="tog-row">
+            <div><div class="tog-title">Remember login</div><div class="tog-sub">Stay signed in for 30 days on this device</div></div>
+            <label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label>
+          </div>
+          <div class="tog-row">
+            <div><div class="tog-title">Email notifications</div><div class="tog-sub">Receive alerts when analysis runs complete</div></div>
+            <label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label>
+          </div>
+          <div class="tog-row">
+            <div><div class="tog-title">Two-factor authentication</div><div class="tog-sub">Require a code on each new login</div></div>
+            <label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label>
+          </div>
+        </div>
+        <div class="panel" style="border-color:rgba(220,38,38,0.12);">
+          <div class="ph"><div class="ptl" style="color:#f87171;">Danger zone</div></div>
+          <div class="danger-row">
+            <div><div class="danger-txt">Delete all saved runs</div><div class="danger-sub">Permanently removes all history and ML results</div></div>
+            <button class="danger-btn">Delete runs</button>
+          </div>
+          <div class="danger-row">
+            <div><div class="danger-txt">Delete account</div><div class="danger-sub">Irreversible — all data lost</div></div>
+            <button class="danger-btn">Delete</button>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2.5" fill="#374151"/><rect x="13" y="3" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="3" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="#374151" opacity="0.5"/></svg></div><div class="bnav-label">Home</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Uploads</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M9 12h6M12 9v6" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">Analysis</div></div>
+        <div class="bnav-item"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#374151" stroke-width="1.7"/><path d="M12 7v5l3 3" stroke="#374151" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label">History</div></div>
+        <div class="bnav-item active"><div class="bnav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#a78bfa" stroke-width="1.7"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8" stroke="#a78bfa" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="bnav-label" style="color:#a78bfa;">Account</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end stage -->
+
+<script>
+function selectTab(el){
+  el.parentElement.querySelectorAll('.dd-item').forEach(function(i){i.classList.remove('active')});
+  el.classList.add('active');
+  el.parentElement.previousElementSibling.querySelector('.dd-label').textContent = el.textContent.trim();
+  el.parentElement.classList.remove('open');
+}
+function showLO(id, el){
+  document.querySelectorAll('#phone-lo .screen-view').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  var ov = document.querySelector('#'+id+' .login-overlay');
+  if(ov) ov.style.display='';
+  document.querySelectorAll('#picker-lo .spick').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+}
+function showLI(id, el){
+  document.querySelectorAll('#phone-li .screen-view').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  document.querySelectorAll('#picker-li .spick').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+}
+// filter pill toggle
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('fpill')){
+    e.target.classList.toggle('on');
+  }
+});
+</script>

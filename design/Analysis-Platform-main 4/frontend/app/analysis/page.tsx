@@ -873,26 +873,22 @@ function AnalysisMobileSections({
           style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
         >
           {cardCovers[currentCard.key]}
-        </div>
-
-        {/* Subtab dropdown below the card, styled with the card accent */}
-        {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
-          <div
-            className="mobile-analysis-detail-dropdown"
-            style={{ "--analysis-card-accent": accent } as React.CSSProperties}
-          >
-            <select
-              value={activeSubIdx}
-              onChange={(e) => setActiveSubIdx(Number(e.target.value))}
-            >
+          {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+            <div className="mobile-analysis-detail-subtabs">
               {currentCard.subtabs.map((sub, idx) => (
-                <option key={sub.label} value={idx}>
+                <button
+                  key={sub.label}
+                  type="button"
+                  onClick={() => setActiveSubIdx(idx)}
+                  className={`mobile-analysis-detail-subtab${activeSubIdx === idx ? " mobile-analysis-detail-subtab-active" : ""}`}
+                  style={{ "--subtab-accent": accent } as React.CSSProperties}
+                >
                   {sub.label}
-                </option>
+                </button>
               ))}
-            </select>
-          </div>
-        ) : null}
+            </div>
+          ) : null}
+        </div>
 
         <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content" style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}>
           {renderContent()}
