@@ -34,10 +34,8 @@ import {
   type AnalysisTabKey,
   analysisFocusAreas,
   analysisTabDescriptions,
-  analysisTabs,
   getAnalysisFocusArea,
   getAnalysisTabDefinition,
-  getAnalysisTabOptionLabel,
   resolveRequestedTab,
 } from "@/lib/analysisNavigation";
 import { formatDate } from "@/lib/helpers";
@@ -677,77 +675,79 @@ function AnalysisMobileSections({
     );
   }
 
-  const activeTabLabel = getAnalysisTabDefinition(activeTab).label;
+  const activeTabDef = getAnalysisTabDefinition(activeTab);
   const activeFocusArea = getAnalysisFocusArea(activeTab);
+  const qualityScore = calculateQualityScore(report.overview, report.quality);
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <section className="mobile-screen-panel section-glow">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Active dataset</p>
-            <h2 className="mobile-screen-title">{report.source_filename || report.overview.dataset_name}</h2>
-            <p className="mobile-screen-meta">
-              {report.overview.dataset_name}
-            </p>
+      {/* ── Compact dataset banner ── */}
+      <section className="mobile-analysis-hero">
+        <div className="mobile-analysis-hero-top">
+          <div className="mobile-analysis-hero-info">
+            <h2 className="mobile-analysis-hero-name">{report.source_filename || report.overview.dataset_name}</h2>
+            <div className="mobile-analysis-hero-chips">
+              <span className="mobile-analysis-hero-chip">{report.overview.row_count.toLocaleString()} rows</span>
+              <span className="mobile-analysis-hero-chip">{report.overview.column_count} cols</span>
+              <span className="mobile-analysis-hero-chip">{qualityScore.toFixed(0)}% quality</span>
+              <span className="mobile-analysis-hero-chip" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="analysis-mobile-dataset-meta-list">
-          <span className="analysis-mobile-dataset-meta-item">{report.overview.row_count.toLocaleString()} rows</span>
-          <span className="analysis-mobile-dataset-meta-item">{report.overview.column_count} cols</span>
-          <span className="analysis-mobile-dataset-meta-item">{calculateQualityScore(report.overview, report.quality).toFixed(1)} quality</span>
-          <span className="analysis-mobile-dataset-meta-item">
-            {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-          </span>
-        </div>
-        <div className="mobile-screen-actions">
           <button
             type="button"
-            onClick={() => {
-              void downloadAnalysisReport(report.analysis_id);
-            }}
-            className="mobile-screen-button mobile-screen-button-secondary"
+            onClick={() => { void downloadAnalysisReport(report.analysis_id); }}
+            className="mobile-analysis-hero-action"
+            aria-label="Export report"
           >
-            Export report
-          </button>
-          <button
-            type="button"
-            onClick={() => onTabChange("ml")}
-            className="mobile-screen-button mobile-screen-button-primary"
-          >
-            {activeTab === "ml" ? "ML lab open" : "Go to ML lab"}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
         </div>
       </section>
 
-      <section className="mobile-screen-panel">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Analysis map</p>
-            <h2 className="mobile-screen-title">Current focus area</h2>
-            <p className="mobile-screen-lead">
-              Jump between summary, health, fields, patterns, and ML without losing the full report below.
-            </p>
-          </div>
+      {/* ── Focus area segmented control ── */}
+      <nav className="mobile-analysis-focus-nav" aria-label="Analysis focus areas">
+        <div className="mobile-analysis-focus-track">
+          {analysisFocusAreas.map((area) => (
+            <button
+              key={area.key}
+              type="button"
+              onClick={() => onTabChange(area.tabKeys[0] as AnalysisTabKey)}
+              className={`mobile-analysis-focus-chip${area.key === activeFocusArea.key ? " mobile-analysis-focus-chip-active" : ""}`}
+            >
+              {area.label}
+            </button>
+          ))}
         </div>
-        <div className="mobile-screen-field">
-          <label htmlFor="mobile-analysis-tab" className="mobile-screen-field-label">Section</label>
-          <select
-            id="mobile-analysis-tab"
-            value={activeTab}
-            onChange={(event) => onTabChange(event.target.value as AnalysisTabKey)}
-            className="mobile-tab-select"
-          >
-            {analysisTabs.map((tab) => (
-              <option key={tab.key} value={tab.key}>
-                {getAnalysisTabOptionLabel(tab.key)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <p className="mobile-screen-row-note">Focus area: {activeFocusArea.label}. Showing {activeTabLabel.toLowerCase()}.</p>
-      </section>
+      </nav>
 
+      {/* ── Tab pills within active focus area ── */}
+      {activeFocusArea.tabKeys.length > 1 ? (
+        <div className="mobile-analysis-tab-pills">
+          {activeFocusArea.tabKeys.map((tabKey) => {
+            const tab = getAnalysisTabDefinition(tabKey);
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => onTabChange(tab.key)}
+                className={`mobile-analysis-tab-pill${activeTab === tab.key ? " mobile-analysis-tab-pill-active" : ""}`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {/* ── Section description bar ── */}
+      <div className="mobile-analysis-section-bar">
+        <p className="mobile-analysis-section-label">{activeTabDef.label}</p>
+        <p className="mobile-analysis-section-desc">{analysisTabDescriptions[activeTab]}</p>
+      </div>
+
+      {/* ── Tab content ── */}
       <section className="mobile-screen-panel mobile-analysis-content-panel">
         {activeContent}
       </section>

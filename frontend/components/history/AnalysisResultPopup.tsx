@@ -56,10 +56,9 @@ function SectionFrame({ id, title, note, children }: { id: string; title: string
     <section id={`history-popup-${id}`} className="history-popup-section popup-section-target">
       <div className="history-popup-section-header">
         <div>
-          <span className="desktop-kicker">{title}</span>
           <h3 className="history-popup-section-title">{title}</h3>
+          <p className="history-popup-section-note">{note}</p>
         </div>
-        <p className="history-popup-section-note">{note}</p>
       </div>
       {children}
     </section>
@@ -146,42 +145,39 @@ export default function AnalysisResultPopup({
 
   return (
     <div
-      className="fixed inset-0 z-[135] bg-[#04090d]/82 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[135] bg-[#04090d]/82 backdrop-blur-md history-popup-overlay"
       onMouseDown={onClose}
     >
       <div
-        className="mx-auto flex h-full w-full max-w-[1540px] flex-col overflow-hidden rounded-[34px] border border-white/10 bg-[#09131d]/96 shadow-[0_32px_110px_rgba(0,0,0,0.52)]"
+        className="history-popup-container"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
+        <div ref={scrollContainerRef} className="history-popup-scroll">
+          {/* ── Header ── */}
           <div className="history-popup-header-card">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Archived report</p>
-                <h2 className="mt-2 break-words font-[family:var(--font-display)] text-3xl text-white">
+            <div className="history-popup-header-row">
+              <div className="history-popup-header-info">
+                <p className="history-popup-header-kicker">Archived report</p>
+                <h2 className="history-popup-header-title">
                   {report ? report.overview.dataset_name : "Saved run details"}
                 </h2>
-                <p className="mt-2 max-w-4xl text-sm leading-6 text-white/64">
-                  View the full saved report here without replacing the current analysis.
-                </p>
               </div>
-
-              <div className="flex flex-wrap gap-3">
+              <div className="history-popup-header-actions">
                 {report ? (
                   <button
                     type="button"
                     onClick={onDownloadReport}
-                    className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+                    className="history-popup-btn history-popup-btn-secondary"
                   >
-                    Download report
+                    Download
                   </button>
                 ) : null}
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b]"
+                  className="history-popup-btn history-popup-btn-close"
                 >
-                  Close run
+                  Close
                 </button>
               </div>
             </div>
@@ -189,36 +185,34 @@ export default function AnalysisResultPopup({
             {report ? (
               <div className="history-popup-stat-grid">
                 <div className="history-popup-stat-card">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Saved</p>
-                  <p className="mt-2 text-sm font-medium text-white">{savedAt ? formatDate(savedAt) : "Saved run"}</p>
+                  <p className="history-popup-stat-label">Saved</p>
+                  <p className="history-popup-stat-value">{savedAt ? formatDate(savedAt) : "—"}</p>
                 </div>
                 <div className="history-popup-stat-card">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Rows</p>
-                  <p className="mt-2 text-sm font-medium text-white">{report.overview.row_count.toLocaleString()}</p>
+                  <p className="history-popup-stat-label">Rows</p>
+                  <p className="history-popup-stat-value">{report.overview.row_count.toLocaleString()}</p>
                 </div>
                 <div className="history-popup-stat-card">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Columns</p>
-                  <p className="mt-2 text-sm font-medium text-white">{report.overview.column_count.toLocaleString()}</p>
+                  <p className="history-popup-stat-label">Columns</p>
+                  <p className="history-popup-stat-value">{report.overview.column_count.toLocaleString()}</p>
                 </div>
                 <div className="history-popup-stat-card">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Quality score</p>
-                  <p className="mt-2 text-sm font-medium text-white">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
+                  <p className="history-popup-stat-label">Quality</p>
+                  <p className="history-popup-stat-value">{calculateQualityScore(report.overview, report.quality).toFixed(1)}</p>
                 </div>
                 <div className="history-popup-stat-card">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">Readiness</p>
-                  <p className="mt-2 text-sm font-medium text-white">
-                    {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                  </p>
+                  <p className="history-popup-stat-label">Readiness</p>
+                  <p className="history-popup-stat-value">{report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}</p>
                 </div>
                 <div className="history-popup-stat-card">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/42">ML runs</p>
-                  <p className="mt-2 text-sm font-medium text-white">{report.ml_experiments.length}</p>
+                  <p className="history-popup-stat-label">ML runs</p>
+                  <p className="history-popup-stat-value">{report.ml_experiments.length}</p>
                 </div>
               </div>
             ) : null}
 
             {report && ready ? (
-              <div className="mt-4 max-w-sm">
+              <div className="history-popup-jump">
                 <label className="history-popup-select-shell">
                   <span className="history-popup-select-label">Jump to section</span>
                   <select
