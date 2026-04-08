@@ -252,6 +252,30 @@ function AnalysisPageContent() {
   const activeTabDescription = analysisTabDescriptions[visibleTab];
   const activeFocusArea = getAnalysisFocusArea(visibleTab);
 
+  const tabToAccent: Record<string, string> = {
+    overview: "#4f6ef7",
+    insights: "#4f6ef7",
+    quality: "#22c55e",
+    statistics: "#22c55e",
+    schema: "#a78bfa",
+    relationships: "#f59e0b",
+    visualisations: "#f59e0b",
+    ml: "#f43f5e",
+  };
+  const desktopAccent = tabToAccent[visibleTab] ?? "#4f6ef7";
+
+  const tabToCardKey: Record<string, string> = {
+    overview: "overview",
+    insights: "overview",
+    quality: "data-health",
+    statistics: "data-health",
+    schema: "schema",
+    relationships: "charts",
+    visualisations: "charts",
+    ml: "ml",
+  };
+  const desktopCardKey = tabToCardKey[visibleTab] ?? "overview";
+
   return (
     <>
       <AppShell
@@ -403,7 +427,7 @@ function AnalysisPageContent() {
                     {placeholderState.description}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-lg bg-[#ffb079] px-5 py-2.5 text-sm font-semibold text-[#11273b]">
+                    <ScrollIntentLink href={placeholderState.primaryHref} className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-5 py-2.5 text-sm font-semibold text-[#f3e8ff]">
                       {placeholderState.primaryLabel}
                     </ScrollIntentLink>
                     {placeholderState.secondaryHref && placeholderState.secondaryLabel ? (
@@ -480,7 +504,18 @@ function AnalysisPageContent() {
 
             {/* Inline tab content — tablet+ only (phone uses slide pages) */}
             <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
-            <div className="tablet-up space-y-4">
+            <div className="tablet-up space-y-4 desktop-tab-accent-wrapper" style={{ "--analysis-card-accent": desktopAccent, "--analysis-card-border": `${desktopAccent}33` } as React.CSSProperties}>
+
+            {/* Desktop card cover for active tab */}
+            {hasRenderableReport ? (
+              <div
+                className="desktop-card-cover"
+                style={{ background: `linear-gradient(135deg, ${desktopAccent}08, ${desktopAccent}15)` }}
+              >
+                {cardCovers[desktopCardKey]}
+              </div>
+            ) : null}
+
             {visibleTab === "overview" && hasRenderableReport && report ? (
               <OverviewTab
                 overview={report.overview}

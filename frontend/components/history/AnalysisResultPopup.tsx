@@ -119,12 +119,16 @@ function hasRenderableReport(report: AnalysisReport | null) {
   );
 }
 
-function SectionFrame({ id, title, note, children }: { id: string; title: string; note: string; children: ReactNode }) {
+function SectionFrame({ id, title, note, accent, children }: { id: string; title: string; note: string; accent?: string; children: ReactNode }) {
   return (
-    <section id={`history-popup-${id}`} className="history-popup-section popup-section-target">
+    <section
+      id={`history-popup-${id}`}
+      className="history-popup-section popup-section-target desktop-tab-accent-wrapper"
+      style={accent ? { "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties : undefined}
+    >
       <div className="history-popup-section-header">
         <div>
-          <h3 className="history-popup-section-title">{title}</h3>
+          <h3 className="history-popup-section-title" style={accent ? { color: `color-mix(in srgb, ${accent} 68%, white)` } : undefined}>{title}</h3>
           <p className="history-popup-section-note">{note}</p>
         </div>
       </div>
@@ -346,7 +350,7 @@ export default function AnalysisResultPopup({
           {!loading && !error && report && ready ? (
             <div className="history-popup-content tablet-up">
               <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
-              <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows.">
+              <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows." accent="#4f6ef7">
                 <OverviewTab
                   overview={report.overview}
                   schema={report.schema}
@@ -355,31 +359,31 @@ export default function AnalysisResultPopup({
                 />
               </SectionFrame>
 
-              <SectionFrame id="insights" title="Insights" note="Plain-language findings and recommended next steps.">
+              <SectionFrame id="insights" title="Insights" note="Plain-language findings and recommended next steps." accent="#4f6ef7">
                 <InsightsTab insights={report.insights} />
               </SectionFrame>
 
-              <SectionFrame id="schema" title="Schema" note="Column roles, inferred types, and field inventory.">
+              <SectionFrame id="schema" title="Schema" note="Column roles, inferred types, and field inventory." accent="#a78bfa">
                 <SchemaTab schema={report.schema} />
               </SectionFrame>
 
-              <SectionFrame id="quality" title="Data Quality" note="Missingness, duplicates, and cleanup direction.">
+              <SectionFrame id="quality" title="Data Quality" note="Missingness, duplicates, and cleanup direction." accent="#22c55e">
                 <DataQualityTab overview={report.overview} quality={report.quality} />
               </SectionFrame>
 
-              <SectionFrame id="statistics" title="Statistics" note="Numeric and categorical summaries for key columns.">
+              <SectionFrame id="statistics" title="Statistics" note="Numeric and categorical summaries for key columns." accent="#22c55e">
                 <StatisticsTab statistics={report.statistics} />
               </SectionFrame>
 
-              <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues.">
+              <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues." accent="#f59e0b">
                 <RelationshipsTab schema={report.schema} statistics={report.statistics} />
               </SectionFrame>
 
-              <SectionFrame id="visualisations" title="Charts" note="Distribution views, heatmap signals, and drift checks.">
+              <SectionFrame id="visualisations" title="Charts" note="Distribution views, heatmap signals, and drift checks." accent="#f59e0b">
                 <VisualisationsTab visualisations={report.visualisations} />
               </SectionFrame>
 
-              <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details.">
+              <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details." accent="#f43f5e">
                 <MLTab
                   key={`${report.analysis_id}:${report.ml_experiments.map((experiment) => experiment.id).join("|")}`}
                   analysisId={report.analysis_id}
