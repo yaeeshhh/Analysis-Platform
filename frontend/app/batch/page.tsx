@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 import {
   deleteAnalysis,
   downloadAnalysisReport,
@@ -305,8 +306,8 @@ export default function BatchPage() {
         ) : null}
 
         {loading ? (
-          <div className="py-10 text-center text-sm text-white/55">
-            Loading uploads...
+          <div className="py-10">
+            <SurfaceLoadingIndicator label="Loading uploads..." className="mx-auto" />
           </div>
         ) : null}
 
@@ -374,9 +375,14 @@ export default function BatchPage() {
                         onClick={() => {
                           void handleUpload();
                         }}
-                        className="rounded-lg bg-[#14b8a6] px-5 py-2.5 text-sm font-semibold text-[#052225] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#14b8a6] px-5 py-2.5 text-sm font-semibold text-[#052225] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {uploadBusy ? "Processing dataset..." : "Process upload"}
+                        {uploadBusy ? (
+                          <>
+                            <span className="button-live-loader" aria-hidden="true" />
+                            Processing dataset...
+                          </>
+                        ) : "Process upload"}
                       </button>
                       <button
                         type="button"
@@ -644,9 +650,14 @@ export default function BatchPage() {
                   void handleConfirmClear();
                 }}
                 disabled={clearBusy}
-                className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                {clearBusy ? "Deleting..." : "Delete current dataset"}
+                {clearBusy ? (
+                  <>
+                    <span className="button-live-loader" aria-hidden="true" />
+                    Deleting...
+                  </>
+                ) : "Delete current dataset"}
               </button>
             </div>
           </div>
@@ -756,7 +767,12 @@ function BatchMobileSections({
             }}
             className="mobile-screen-button mobile-screen-button-primary"
           >
-            {uploadBusy ? "Processing..." : "Create run"}
+            {uploadBusy ? (
+              <>
+                <span className="button-live-loader" aria-hidden="true" />
+                Processing...
+              </>
+            ) : "Create run"}
           </button>
           <button
             type="button"
@@ -821,7 +837,7 @@ function BatchMobileSections({
                 <div className="mobile-screen-track"><span className="mobile-screen-fill" style={{ width: `${highlightedDuplicates === 0 ? 100 : Math.max(10, 100 - Math.min(highlightedDuplicates, 100))}%`, background: "#2563eb" }} /></div>
               </div>
             </div>
-            <div className="mobile-screen-actions">
+            <div className="mobile-screen-actions mobile-screen-actions-stack">
               <ScrollIntentLink
                 href={`/analysis?analysisId=${selectedAnalysis.id}`}
                 onClick={() => setSelection(selectedAnalysis.id)}
