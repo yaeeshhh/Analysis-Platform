@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import BackToTopButton from "@/components/ui/BackToTopButton";
 
 type SlidePageEntry = {
   id: string;
@@ -81,6 +82,7 @@ export function MobileSlideProvider({ children }: { children: ReactNode }) {
 
 function SlidePage({ entry, onBack, depth }: { entry: SlidePageEntry; onBack: () => void; depth: number }) {
   const [visible, setVisible] = useState(false);
+  const pageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
@@ -88,6 +90,7 @@ function SlidePage({ entry, onBack, depth }: { entry: SlidePageEntry; onBack: ()
 
   return (
     <div
+      ref={pageRef}
       className="mobile-slide-page"
       style={{
         transform: visible ? "translateX(0)" : "translateX(100%)",
@@ -112,6 +115,7 @@ function SlidePage({ entry, onBack, depth }: { entry: SlidePageEntry; onBack: ()
       <div className="mobile-slide-body">
         {entry.content}
       </div>
+      <BackToTopButton scrollContainerRef={pageRef} threshold={320} className="z-[130]" />
     </div>
   );
 }

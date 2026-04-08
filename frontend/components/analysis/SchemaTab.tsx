@@ -7,6 +7,8 @@ type SchemaTabProps = {
 export default function SchemaTab({ schema }: SchemaTabProps) {
   const collectColumns = (typeName: string) =>
     schema.columns.filter((column) => column.inferred_type === typeName).map((column) => column.name);
+  const previewColumns = schema.columns.slice(0, 4);
+  const remainingColumns = schema.columns.slice(4);
 
   const groups = [
     {
@@ -34,6 +36,23 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
       tone: "#bfb8ff",
     },
   ];
+
+  function renderColumnCard(column: AnalysisSchema["columns"][number]) {
+    return (
+      <div key={column.name} className="mobile-col-card">
+        <div className="mobile-col-card-header">
+          <span className="mobile-col-card-name">{column.name}</span>
+          <span className="mobile-col-card-type">{column.inferred_type}</span>
+        </div>
+        <p className="mobile-col-card-meta">
+          {column.likely_role} · {(column.missing_pct * 100).toFixed(1)}% missing · {(column.unique_pct * 100).toFixed(1)}% unique
+        </p>
+        {column.sample_values.length > 0 ? (
+          <p className="mobile-col-card-samples">{column.sample_values.slice(0, 3).join(", ")}</p>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <section className="analysis-tab-surface space-y-4">
@@ -108,20 +127,27 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
 
       {/* Phone: compact column cards (replaces the wide table) */}
       <div className="phone-only space-y-2">
-        {schema.columns.map((column) => (
-          <div key={column.name} className="mobile-col-card">
-            <div className="mobile-col-card-header">
-              <span className="mobile-col-card-name">{column.name}</span>
-              <span className="mobile-col-card-type">{column.inferred_type}</span>
+        {previewColumns.map((column) => renderColumnCard(column))}
+        {remainingColumns.length > 0 ? (
+          <details className="mobile-accordion">
+            <summary>
+              <div className="min-w-0">
+                <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">More profiled columns</span>
+                <p className="mobile-accordion-hint">Review the remaining {remainingColumns.length} columns when you need the full column-by-column schema scan.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {remainingColumns.slice(0, 3).map((column) => (
+                    <span key={`schema-preview-${column.name}`} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/72">
+                      {column.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </summary>
+            <div className="mobile-accordion-body space-y-2">
+              {remainingColumns.map((column) => renderColumnCard(column))}
             </div>
-            <p className="mobile-col-card-meta">
-              {column.likely_role} · {(column.missing_pct * 100).toFixed(1)}% missing · {(column.unique_pct * 100).toFixed(1)}% unique
-            </p>
-            {column.sample_values.length > 0 ? (
-              <p className="mobile-col-card-samples">{column.sample_values.slice(0, 3).join(", ")}</p>
-            ) : null}
-          </div>
-        ))}
+          </details>
+        ) : null}
       </div>
     </section>
   );
