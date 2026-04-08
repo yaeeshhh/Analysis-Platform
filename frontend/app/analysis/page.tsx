@@ -67,6 +67,17 @@ const tabDescriptions: Record<AnalysisTabKey, string> = {
   ml: "Optional ML experiments that are saved back into the selected analysis run.",
 };
 
+const tabAccents: Record<AnalysisTabKey, string> = {
+  overview: "#7ad6ff",
+  insights: "#9db8ff",
+  schema: "#8bf1a8",
+  quality: "#ffb079",
+  statistics: "#bfb8ff",
+  relationships: "#d7b7ff",
+  visualisations: "#7ce7dd",
+  ml: "#ffd57d",
+};
+
 function resolveRequestedTab(requestedTab: string | null): AnalysisTabKey | null {
   switch (requestedTab) {
     case "overview":
@@ -794,6 +805,37 @@ function AnalysisMobileSections({
 
   const activeTabLabel = tabs.find((tab) => tab.key === activeTab)?.label ?? "Section";
   const activeTabPreview = getAnalysisSectionPreview(report, activeTab);
+  const activeTabAccent = tabAccents[activeTab];
+  const focusedViewContent = (
+    <div className="analysis-mobile-focus-view">
+      <section className="analysis-mobile-focus-hero" style={{ ["--analysis-focus-accent" as string]: activeTabAccent }}>
+        <div>
+          <p className="analysis-mobile-focus-kicker">Focused view</p>
+          <h2 className="analysis-mobile-focus-title">{activeTabLabel}</h2>
+          <p className="analysis-mobile-focus-lead">{tabDescriptions[activeTab]}</p>
+          <p className="analysis-mobile-focus-summary">{activeTabPreview.summary}</p>
+        </div>
+        <div className="analysis-mobile-focus-meta">
+          {activeTabPreview.pills.map((pill) => (
+            <span key={`focus-${activeTab}-${pill}`} className="mobile-screen-pill">
+              {pill}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <section className="analysis-mobile-focus-note">
+        <p className="analysis-mobile-focus-note-title">Expand only what matters</p>
+        <p className="analysis-mobile-focus-note-copy">
+          Longer sections use read-more controls so the important signals stay easy to scan before you open the deeper detail.
+        </p>
+      </section>
+
+      <section className="analysis-mobile-focus-content">
+        {activeContent}
+      </section>
+    </div>
+  );
 
   return (
     <div className="phone-only mobile-screen-stack">
@@ -889,62 +931,41 @@ function AnalysisMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Report sections</p>
-            <h2 className="mobile-screen-title">Browse every section without losing context</h2>
+            <h2 className="mobile-screen-title">Choose a section, then open the full view</h2>
             <p className="mobile-screen-lead">
-              The mobile view keeps the same analysis sections as desktop, but the selected section now stays visible inline instead of hiding behind an extra step.
+              Use the dropdown to move between analysis sections, review the quick summary below, then open the full focused view when you want the complete detail.
             </p>
           </div>
         </div>
-        <div className="mobile-screen-list">
-          {tabs.map((tab) => {
-            const selected = activeTab === tab.key;
-            const preview = getAnalysisSectionPreview(report, tab.key);
-
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => onTabChange(tab.key)}
-                className={`mobile-screen-row mobile-screen-action-row ${selected ? "mobile-screen-row-selected" : ""}`}
-              >
-                <div className="mobile-screen-row-header">
-                  <div className="mobile-screen-row-main">
-                    <p className="mobile-screen-row-title">{tab.label}</p>
-                  </div>
-                  {selected ? (
-                    <span className="mobile-screen-pill" data-tone="purple">Selected</span>
-                  ) : (
-                    <span className="mobile-screen-row-trail">Tap to view</span>
-                  )}
-                </div>
-                <p className="mobile-screen-row-copy">{preview.summary}</p>
-                <div className="mobile-screen-pills compact">
-                  {preview.pills.map((pill) => (
-                    <span key={`${tab.key}-${pill}`} className="mobile-screen-pill">
-                      {pill}
-                    </span>
-                  ))}
-                </div>
-              </button>
-            );
-          })}
+        <div className="mobile-screen-field">
+          <label htmlFor="mobile-analysis-tab" className="mobile-screen-field-label">Current section</label>
+          <select
+            id="mobile-analysis-tab"
+            value={activeTab}
+            onChange={(event) => onTabChange(event.target.value as AnalysisTabKey)}
+            className="mobile-tab-select"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.key} value={tab.key}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
         </div>
-      </section>
-
-      <section className="mobile-screen-panel section-glow">
-        <div className="mobile-screen-panel-header">
-          <div>
-            <p className="mobile-screen-kicker">Selected section</p>
-            <h2 className="mobile-screen-title">{activeTabLabel}</h2>
-            <p className="mobile-screen-lead">{tabDescriptions[activeTab]}</p>
+        <div className="analysis-mobile-tab-spotlight" style={{ ["--analysis-focus-accent" as string]: activeTabAccent }}>
+          <div className="analysis-mobile-tab-spotlight-head">
+            <p className="analysis-mobile-tab-spotlight-kicker">Selected section</p>
+            <h3 className="analysis-mobile-tab-spotlight-title">{activeTabLabel}</h3>
+            <p className="analysis-mobile-tab-spotlight-copy">{tabDescriptions[activeTab]}</p>
           </div>
-        </div>
-        <div className="mobile-screen-pills">
-          {activeTabPreview.pills.map((pill) => (
-            <span key={`${activeTab}-${pill}`} className="mobile-screen-pill">
-              {pill}
-            </span>
-          ))}
+          <p className="analysis-mobile-tab-spotlight-summary">{activeTabPreview.summary}</p>
+          <div className="mobile-screen-pills compact">
+            {activeTabPreview.pills.map((pill) => (
+              <span key={`${activeTab}-${pill}`} className="mobile-screen-pill">
+                {pill}
+              </span>
+            ))}
+          </div>
         </div>
         <div className="mobile-screen-actions">
           <button
@@ -953,25 +974,15 @@ function AnalysisMobileSections({
               push({
                 id: `analysis-${report.analysis_id}-${activeTab}`,
                 title: activeTabLabel,
-                accent: "#9db8ff",
-                content: (
-                  <div className="mobile-screen-stack">
-                    <section className="mobile-screen-panel mobile-analysis-content-panel">
-                      {activeContent}
-                    </section>
-                  </div>
-                ),
+                accent: activeTabAccent,
+                content: focusedViewContent,
               })
             }
-            className="mobile-screen-button mobile-screen-button-secondary"
+            className="mobile-screen-button mobile-screen-button-primary"
           >
             Open focused view
           </button>
         </div>
-      </section>
-
-      <section className="mobile-screen-panel mobile-analysis-content-panel section-glow">
-        {activeContent}
       </section>
     </div>
   );
