@@ -341,7 +341,7 @@ function LoginPageContent() {
               onFocus={(e) => moveInputCaretToEnd(e.currentTarget)}
               onKeyPress={handleKeyPress}
               disabled={loading}
-              className="w-full p-3 rounded-lg bg-[#11141c] border border-[#2a2e3a] focus:outline-none focus:border-blue-500 disabled:opacity-50"
+              className="w-full p-3 rounded-lg bg-[#111827] border border-[#a78bfa]/15 focus:outline-none focus:border-blue-500 disabled:opacity-50"
             />
           </div>
           )}
@@ -361,7 +361,7 @@ function LoginPageContent() {
                 onFocus={(e) => moveInputCaretToEnd(e.currentTarget)}
                 onKeyPress={handleKeyPress}
                 disabled={loading}
-                className="w-full p-3 pr-11 rounded-lg bg-[#11141c] border border-[#2a2e3a] focus:outline-none focus:border-blue-500 disabled:opacity-50"
+                className="w-full p-3 pr-11 rounded-lg bg-[#111827] border border-[#a78bfa]/15 focus:outline-none focus:border-blue-500 disabled:opacity-50"
               />
               <PasswordToggleButton shown={showPassword} onToggle={() => setShowPassword((prev) => !prev)} />
             </div>
@@ -487,7 +487,7 @@ function LoginPageContent() {
               (!awaitingOtp && (!email || (!canSkipPassword && !password))) ||
               (awaitingOtp && (!otpSent || otpCode.trim().length !== 6 || !otpFormatValid))
             }
-            className="w-full p-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:opacity-50 font-medium transition"
+            className="w-full p-3 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:bg-gray-600 disabled:opacity-50 font-medium transition"
           >
             {loading
               ? awaitingOtp

@@ -1108,14 +1108,15 @@ body::after {
 
 .auth-shell-copy {
   background:
-    radial-gradient(circle at top right, rgba(143, 211, 193, 0.14), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(242, 195, 139, 0.1), transparent 26%),
-    linear-gradient(145deg, rgba(14, 21, 29, 0.92), rgba(10, 16, 23, 0.88));
+    radial-gradient(circle at top right, rgba(124, 58, 237, 0.12), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.08), transparent 26%),
+    linear-gradient(145deg, rgba(13, 17, 23, 0.95), rgba(8, 12, 22, 0.92));
   padding: 2rem;
 }
 
 .auth-panel {
-  background: linear-gradient(145deg, rgba(16, 23, 32, 0.88), rgba(11, 17, 24, 0.94));
+  background: linear-gradient(145deg, rgba(17, 24, 39, 0.92), rgba(13, 17, 23, 0.96));
+  border-color: rgba(124, 58, 237, 0.12);
   padding: 1.6rem;
 }
 
@@ -1265,10 +1266,10 @@ a[class*="rounded"]:hover {
 }
 
 .profile-menu-popover {
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(124, 58, 237, 0.18);
   border-radius: 1rem;
-  background: rgba(17, 24, 33, 0.98);
+  background: #0d1117;
   overflow: hidden;
   padding: 1rem;
   position: absolute;
@@ -3202,30 +3203,57 @@ a[class*="rounded"]:hover {
     background: rgba(79, 110, 247, 0.16);
   }
 
-  /* ── Floating back button (always visible on scroll) ── */
-  .mobile-analysis-back-btn-floating {
+  /* ── Fullpage card detail (own page feel) ── */
+  .mobile-analysis-fullpage {
+    background: #080c16;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .mobile-analysis-fullpage-topbar {
     align-items: center;
-    background: rgba(13, 18, 33, 0.88);
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(8, 12, 22, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(79, 110, 247, 0.28);
-    border-radius: 999px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-analysis-back-btn-inline {
+    align-items: center;
+    background: rgba(79, 110, 247, 0.1);
+    border: 1px solid rgba(79, 110, 247, 0.25);
+    border-radius: 0.55rem;
     color: #a5b8ff;
     display: inline-flex;
     font-size: 0.76rem;
     font-weight: 700;
     gap: 0.3rem;
-    left: 1rem;
-    padding: 0.48rem 0.85rem 0.48rem 0.6rem;
-    position: fixed;
-    bottom: 1.2rem;
+    padding: 0.42rem 0.75rem 0.42rem 0.55rem;
     -webkit-tap-highlight-color: transparent;
-    z-index: 120;
   }
 
-  .mobile-analysis-back-btn-floating:active {
+  .mobile-analysis-back-btn-inline:active {
     background: rgba(79, 110, 247, 0.22);
+  }
+
+  .mobile-analysis-fullpage > .mobile-analysis-detail-cover {
+    margin: 0 0.75rem;
+  }
+
+  .mobile-analysis-fullpage > .mobile-analysis-detail-dropdown {
+    margin: 0.5rem 0.75rem 0;
+  }
+
+  .mobile-analysis-fullpage > .mobile-analysis-content-panel {
+    margin: 0.5rem 0.75rem 1rem;
   }
 
   /* ── 1-column SVG card grid ── */
@@ -3799,27 +3827,6 @@ a[class*="rounded"]:hover {
     border-top: 1px solid rgba(79, 110, 247, 0.18);
     padding: 0.9rem 1rem 1rem;
     position: relative;
-  }
-
-  .mobile-history-close-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 0.75rem;
-  }
-
-  .mobile-history-close-btn {
-    background: rgba(79, 110, 247, 0.1);
-    border: 1px solid rgba(79, 110, 247, 0.25);
-    border-radius: 0.5rem;
-    color: #a5b8ff;
-    font-size: 0.78rem;
-    font-weight: 500;
-    padding: 0.4rem 1.1rem;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .mobile-history-close-btn:active {
-    background: rgba(79, 110, 247, 0.22);
   }
 
   .mobile-history-card-full-summary {
@@ -5648,11 +5655,11 @@ details.mobile-accordion > .mobile-accordion-body {
   }
 
   .account-dialog-card {
-    background: #111821 !important;
+    background: #0d1117 !important;
     border: none !important;
-    border-top: 1px solid rgba(122, 214, 255, 0.18) !important;
+    border-top: 1px solid rgba(124, 58, 237, 0.22) !important;
     border-radius: 1.1rem 1.1rem 0 0 !important;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
     max-height: calc(100vh - 2rem) !important;
     padding: 1.2rem 1.1rem 1.4rem !important;
     position: relative;
@@ -5666,19 +5673,19 @@ details.mobile-accordion > .mobile-accordion-body {
     left: 0;
     right: 0;
     height: 3px;
-    background: #7ad6ff;
+    background: linear-gradient(90deg, #7c3aed, #3b82f6);
     border-radius: 1.1rem 1.1rem 0 0;
   }
 
   .account-dialog-header {
-    border-bottom-color: rgba(122, 214, 255, 0.12) !important;
+    border-bottom-color: rgba(124, 58, 237, 0.15) !important;
     flex-direction: column !important;
     gap: 0.5rem !important;
     padding-bottom: 0.85rem !important;
   }
 
   .account-dialog-eyebrow {
-    color: #7ad6ff !important;
+    color: #a78bfa !important;
     font-family: var(--font-mono), monospace;
     font-size: 0.65rem !important;
     letter-spacing: 0.18em !important;
@@ -5686,12 +5693,13 @@ details.mobile-accordion > .mobile-accordion-body {
 
   .account-dialog-title {
     font-size: 1.15rem !important;
+    color: #f1f5f9 !important;
     margin-top: 0.35rem !important;
   }
 
   .account-dialog-desc {
     font-size: 0.8rem !important;
-    color: rgba(242, 247, 251, 0.55) !important;
+    color: #94a3b8 !important;
     margin-top: 0.35rem !important;
   }
 
@@ -5702,12 +5710,42 @@ details.mobile-accordion > .mobile-accordion-body {
     right: 1rem;
     border-radius: 0.65rem !important;
     padding: 0.45rem !important;
-    background: rgba(122, 214, 255, 0.08) !important;
-    border-color: rgba(122, 214, 255, 0.18) !important;
-    color: #7ad6ff !important;
+    background: rgba(124, 58, 237, 0.1) !important;
+    border-color: rgba(124, 58, 237, 0.2) !important;
+    color: #a78bfa !important;
   }
 
   .account-dialog-close:active {
-    background: rgba(122, 214, 255, 0.18) !important;
+    background: rgba(124, 58, 237, 0.2) !important;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   LOGIN MODAL — MOBILE
+   ════════════════════════════════════════════════ */
+@media (max-width: 599px) {
+  .login-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .login-modal-card {
+    border-radius: 1.1rem 1.1rem 0 0 !important;
+    border: none !important;
+    border-top: 1px solid rgba(124, 58, 237, 0.22) !important;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .login-modal-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #3b82f6);
+    border-radius: 1.1rem 1.1rem 0 0;
   }
 }

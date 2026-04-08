@@ -118,24 +118,24 @@ function DialogShell({
 
   return (
     <div
-      className="account-dialog-overlay fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#04090d]/75 p-2 backdrop-blur-md sm:items-center sm:p-4"
+      className="account-dialog-overlay fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#080c16]/80 p-2 backdrop-blur-md sm:items-center sm:p-4"
       onMouseDown={onClose}
     >
       <div
-        className={`account-dialog-card w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-xl border border-white/10 bg-[#111821]/95 p-4 sm:max-h-[calc(100vh-2rem)] sm:rounded-xl sm:p-6`}
+        className={`account-dialog-card w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-xl border border-[#a78bfa]/15 bg-[#0d1117]/98 p-4 sm:max-h-[calc(100vh-2rem)] sm:rounded-xl sm:p-6`}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="account-dialog-header flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="account-dialog-header flex flex-col gap-3 border-b border-[#a78bfa]/12 pb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div>
-            <p className="account-dialog-eyebrow text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">{eyebrow}</p>
-            <h2 className="account-dialog-title mt-2 font-[family:var(--font-display)] text-2xl text-white">{title}</h2>
-            <p className="account-dialog-desc mt-2 max-w-2xl text-sm leading-6 text-white/64">{description}</p>
+            <p className="account-dialog-eyebrow text-xs uppercase tracking-[0.24em] text-[#a78bfa]">{eyebrow}</p>
+            <h2 className="account-dialog-title mt-2 font-[family:var(--font-display)] text-2xl text-[#f1f5f9]">{title}</h2>
+            <p className="account-dialog-desc mt-2 max-w-2xl text-sm leading-6 text-[#94a3b8]">{description}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="account-dialog-close self-end rounded-lg border border-white/10 bg-white/5 p-2 text-white/55 transition hover:bg-white/10 hover:text-white sm:self-auto"
+            className="account-dialog-close self-end rounded-lg border border-[#a78bfa]/15 bg-[#111827] p-2 text-[#a78bfa] transition hover:bg-[#1a2332] hover:text-white sm:self-auto"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6 6 18M6 6l12 12" />
@@ -162,11 +162,11 @@ function FooterActions({
   destructive?: boolean;
 }) {
   return (
-    <div className="flex flex-col-reverse gap-3 border-t border-white/10 pt-4 md:flex-row md:flex-wrap md:justify-end">
+    <div className="flex flex-col-reverse gap-3 border-t border-[#a78bfa]/12 pt-4 md:flex-row md:flex-wrap md:justify-end">
       <button
         type="button"
         onClick={onClose}
-        className="w-full rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-center text-sm font-medium leading-5 text-white/82 transition hover:bg-white/10 md:w-auto"
+        className="w-full rounded-lg border border-white/5 bg-[#111827] px-5 py-3 text-center text-sm font-medium leading-5 text-[#94a3b8] transition hover:bg-[#1a2332] md:w-auto"
       >
         Cancel
       </button>
@@ -178,8 +178,8 @@ function FooterActions({
         disabled={disabled}
         className={`w-full rounded-lg px-5 py-3 text-center text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-55 md:min-w-[12rem] md:w-auto ${
           destructive
-            ? "border border-[#5a2328] bg-[#2a1215] text-[#ffb4ba] hover:bg-[#34171b]"
-            : "bg-[#ffb079] text-[#11273b] hover:bg-[#ffc58f]"
+            ? "border border-[#dc2626]/25 bg-[#dc2626]/10 text-[#f87171] hover:bg-[#dc2626]/15"
+            : "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white hover:from-[#8b5cf6] hover:to-[#7c3aed]"
         }`}
       >
         {confirmLabel}
@@ -192,12 +192,12 @@ function StatusBlock({ error, success }: { error?: string; success?: string }) {
   return (
     <>
       {error ? (
-        <p className="rounded-[16px] border border-[#5a2328] bg-[#2a1215] px-4 py-3 text-sm text-[#ffb4ba]">
+        <p className="rounded-[16px] border border-[#dc2626]/25 bg-[#dc2626]/10 px-4 py-3 text-sm text-[#f87171]">
           {error}
         </p>
       ) : null}
       {success ? (
-        <p className="rounded-[16px] border border-[#224c37] bg-[#13241c] px-4 py-3 text-sm text-[#9ff4c0]">
+        <p className="rounded-[16px] border border-[#0d9488]/25 bg-[#0d9488]/10 px-4 py-3 text-sm text-[#2dd4bf]">
           {success}
         </p>
       ) : null}

@@ -784,11 +784,9 @@ function HistoryMobileSections({
                     <button type="button" onClick={() => onDeleteRun(analysis.id)} className="mobile-history-action-btn mobile-history-action-danger">
                       Delete
                     </button>
-                  </div>
-                  <div className="mobile-history-close-row">
                     <button
                       type="button"
-                      className="mobile-history-close-btn"
+                      className="mobile-history-action-btn"
                       onClick={(e) => {
                         const details = e.currentTarget.closest("details");
                         if (details) details.open = false;
