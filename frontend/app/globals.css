@@ -1853,9 +1853,13 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row-copy {
     color: rgba(242, 247, 251, 0.56);
-    font-size: 0.88rem;
-    line-height: 1.56;
-    margin-top: 0.5rem;
+    display: -webkit-box;
+    font-size: 0.84rem;
+    line-height: 1.48;
+    margin-top: 0.42rem;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .mobile-screen-row-note {
@@ -1868,12 +1872,12 @@ a[class*="rounded"]:hover {
   .mobile-screen-row-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.65rem;
-    margin-top: 0.75rem;
+    gap: 0.45rem;
+    margin-top: 0.6rem;
   }
 
   .mobile-screen-row-actions > * {
-    flex: 1 1 10rem;
+    flex: 1 1 8rem;
     min-width: 0;
   }
 
@@ -1891,7 +1895,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-link-grid {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.65rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 0.2rem;
   }
@@ -1937,14 +1941,14 @@ a[class*="rounded"]:hover {
   .mobile-screen-progress-list {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
-    margin-top: 0.85rem;
+    gap: 0.65rem;
+    margin-top: 0.75rem;
   }
 
   .mobile-screen-progress-item {
     display: flex;
     flex-direction: column;
-    gap: 0.32rem;
+    gap: 0.28rem;
   }
 
   .mobile-screen-progress-copy {
@@ -2851,7 +2855,7 @@ a[class*="rounded"]:hover {
     border-radius: 1.05rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
     overflow: hidden;
-    padding: 0.85rem 0.95rem;
+    padding: 0.72rem 0.88rem;
     position: relative;
   }
 
@@ -2893,8 +2897,8 @@ a[class*="rounded"]:hover {
   .mobile-analysis-hero-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-top: 0.52rem;
+    gap: 0.3rem;
+    margin-top: 0.42rem;
   }
 
   .mobile-analysis-hero-chip {
@@ -2945,7 +2949,7 @@ a[class*="rounded"]:hover {
 
   .mobile-analysis-focus-track {
     display: flex;
-    gap: 0.35rem;
+    gap: 0.5rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding: 0.15rem 1rem 0.15rem 0;
@@ -3018,7 +3022,7 @@ a[class*="rounded"]:hover {
   .mobile-analysis-section-bar {
     background: rgba(255, 255, 255, 0.02);
     border-left: 2px solid rgba(124, 58, 237, 0.4);
-    padding: 0.55rem 0.85rem;
+    padding: 0.42rem 0.85rem;
   }
 
   .mobile-analysis-section-label {
@@ -3030,10 +3034,7 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-analysis-section-desc {
-    color: rgba(242, 247, 251, 0.44);
-    font-size: 0.76rem;
-    line-height: 1.48;
-    margin: 0.22rem 0 0;
+    display: none;
   }
 
   /* ── History mobile rework ── */
@@ -3240,7 +3241,7 @@ a[class*="rounded"]:hover {
 
   .mobile-history-card-snippet {
     color: rgba(242, 247, 251, 0.46);
-    display: -webkit-box;
+    display: none;
     font-size: 0.76rem;
     line-height: 1.48;
     margin: 0.48rem 0 0;
@@ -3294,8 +3295,8 @@ a[class*="rounded"]:hover {
 
   .mobile-history-card-full-summary {
     color: rgba(242, 247, 251, 0.62);
-    font-size: 0.8rem;
-    line-height: 1.58;
+    font-size: 0.78rem;
+    line-height: 1.52;
     margin: 0;
   }
 
@@ -3335,8 +3336,8 @@ a[class*="rounded"]:hover {
   .mobile-history-card-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 0.82rem;
+    gap: 0.38rem;
+    margin-top: 0.72rem;
   }
 
   .mobile-history-action-btn {
@@ -3344,10 +3345,10 @@ a[class*="rounded"]:hover {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.6rem;
     color: rgba(242, 247, 251, 0.62);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    min-height: 2.4rem;
-    padding: 0.4rem 0.72rem;
+    min-height: 2.2rem;
+    padding: 0.32rem 0.62rem;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -3471,6 +3472,16 @@ a[class*="rounded"]:hover {
   .mobile-screen-link-grid,
   .mobile-screen-link-grid-dense {
     grid-template-columns: 1fr;
+  }
+
+  /* Hide third progress bar (duplicates) on very small phones to save space */
+  .mobile-screen-progress-item:nth-child(n + 3) {
+    display: none;
+  }
+
+  /* Tighten history file name to save vertical space */
+  .mobile-history-card-file {
+    display: none;
   }
 }
 
@@ -4567,13 +4578,13 @@ details.mobile-accordion > .mobile-accordion-body {
   }
 
   .history-popup-stat-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.45rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
 
   .history-popup-stat-card {
     min-height: auto;
-    padding: 0.55rem 0.6rem;
+    padding: 0.6rem 0.7rem;
   }
 
   .history-popup-section {
