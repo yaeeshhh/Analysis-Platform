@@ -964,6 +964,75 @@ body::after {
   animation: ml-run-card-flash 860ms ease;
 }
 
+.ml-action-button {
+  align-items: center;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  font-size: 0.88rem;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.3;
+  min-height: 2.85rem;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+  width: 100%;
+}
+
+.ml-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ml-action-button-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(242, 247, 251, 0.82);
+}
+
+.ml-action-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ml-action-button-primary {
+  background: var(--accent-cta);
+  border: 1px solid rgba(157, 184, 255, 0.58);
+  color: var(--accent-cta-ink);
+}
+
+.ml-action-button-danger {
+  background: rgba(52, 24, 26, 0.72);
+  border: 1px solid rgba(90, 35, 40, 0.65);
+  color: #ffb4ba;
+}
+
+.inline-warning-note {
+  background: rgba(191, 184, 255, 0.08);
+  border: 1px solid rgba(191, 184, 255, 0.24);
+  border-radius: 0.95rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.inline-warning-note-title {
+  color: var(--accent-highlight);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.inline-warning-note-copy {
+  color: var(--accent-highlight-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  margin-top: 0.35rem;
+}
+
 @keyframes ml-run-card-flash {
   0% {
     box-shadow: 0 0 0 rgba(122, 214, 255, 0);
@@ -1253,19 +1322,19 @@ a[class*="rounded"]:hover {
 /* Mobile typography scale */
 @media (max-width: 959px) {
   html {
-    font-size: 10.4px;
+    font-size: 11.1px;
   }
 
   .text-\[10px\] {
-    font-size: 6.5px !important;
+    font-size: 7px !important;
   }
 
   .text-\[11px\] {
-    font-size: 7.15px !important;
+    font-size: 7.65px !important;
   }
 
   .text-\[12px\] {
-    font-size: 7.8px !important;
+    font-size: 8.35px !important;
   }
 }
 
@@ -2537,7 +2606,7 @@ a[class*="rounded"]:hover {
 
   .analysis-mobile-focus-content .recharts-text,
   .analysis-mobile-focus-content .recharts-layer text {
-    font-size: 7.5px !important;
+    font-size: 8.05px !important;
   }
 
   .analysis-mobile-focus-content .analysis-chart-frame {
@@ -3539,6 +3608,10 @@ details.mobile-accordion > .mobile-accordion-body {
 }
 
 .desktop-action-button-primary {
+  grid-column: 1 / -1;
+}
+
+.desktop-action-button-wide {
   grid-column: 1 / -1;
 }
 

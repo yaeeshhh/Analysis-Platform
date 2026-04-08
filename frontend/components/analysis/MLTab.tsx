@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import {
+  AnalysisInsights,
   AnalysisMlCapabilities,
   MlExperimentSummary,
   SupervisedResult,
@@ -37,6 +38,7 @@ type MLTabProps = {
   analysisId: number;
   capabilities: AnalysisMlCapabilities;
   experiments: MlExperimentSummary[];
+  readiness: AnalysisInsights["modeling_readiness"];
   initialUnsupervised?: UnsupervisedResult;
   initialSupervised?: SupervisedResult;
   onRunUnsupervised: (nClusters: number) => Promise<UnsupervisedResult>;
@@ -155,6 +157,16 @@ function formatClusterLabel(cluster: number) {
 function truncateSummary(text: string, limit = 92) {
   if (text.length <= limit) return text;
   return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
+function getLabReviewWarning(readiness: AnalysisInsights["modeling_readiness"]) {
+  const highlightedTargets = readiness.target_candidates.slice(0, 2);
+
+  if (highlightedTargets.length > 0) {
+    return `Potential targets like ${highlightedTargets.join(", ")} are still available, but this dataset should be reviewed before you rely on ML results. You can still run the lab.`;
+  }
+
+  return "This dataset should be reviewed before you rely on ML results. You can still run the lab.";
 }
 
 function formatNormalizedPercent(value: number) {
@@ -318,6 +330,7 @@ export default function MLTab({
   analysisId,
   capabilities,
   experiments,
+  readiness,
   initialUnsupervised,
   initialSupervised,
   onRunUnsupervised,
@@ -405,6 +418,8 @@ export default function MLTab({
   const unsupervisedNarratives = getUnsupervisedNarratives(unsupervised);
   const supervisedFailureFactors = getSupervisedFailureFactors(supervised, activeRecommendation);
   const busiestCluster = clusters[0];
+  const shouldWarnAboutReadiness = !readiness.is_ready;
+  const readinessWarning = shouldWarnAboutReadiness ? getLabReviewWarning(readiness) : "";
   const busyMessage =
     busy === "supervised"
       ? "Benchmarking candidate models, compressing rare categories, and saving the experiment into history."
@@ -781,14 +796,14 @@ export default function MLTab({
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-white/62">{experiment.summary}</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
                     {!selected ? (
                       <button
                         type="button"
                         onClick={() => {
                           void handleOpenExperiment(experiment, "downloads");
                         }}
-                        className="rounded-lg border border-white/12 px-4 py-2 text-sm text-white/82"
+                        className="ml-action-button ml-action-button-secondary sm:col-span-2"
                       >
                         Open run
                       </button>
@@ -798,7 +813,7 @@ export default function MLTab({
                       onClick={() => {
                         void handleExperimentDownload(mode, experiment, "report", "downloads");
                       }}
-                      className="rounded-lg border border-white/12 px-4 py-2 text-sm text-white/82"
+                      className="ml-action-button ml-action-button-secondary"
                     >
                       Download report
                     </button>
@@ -807,7 +822,7 @@ export default function MLTab({
                       onClick={() => {
                         void handleExperimentDownload(mode, experiment, "summary", "downloads");
                       }}
-                      className="rounded-lg border border-white/12 px-4 py-2 text-sm text-white/82"
+                      className="ml-action-button ml-action-button-secondary"
                     >
                       Download summary
                     </button>
@@ -817,7 +832,7 @@ export default function MLTab({
                         void handleDeleteSavedExperiment(mode, experiment);
                       }}
                       disabled={deletingExperimentId === experiment.id}
-                      className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-4 py-2 text-sm font-medium text-[#ffb4ba] disabled:cursor-not-allowed disabled:opacity-55"
+                      className="ml-action-button ml-action-button-danger sm:col-span-2"
                     >
                       {deletingExperimentId === experiment.id ? "Deleting..." : "Delete run"}
                     </button>
@@ -840,6 +855,12 @@ export default function MLTab({
   return (
     <>
       <section ref={surfaceRef} className="analysis-tab-surface space-y-4">
+      {shouldWarnAboutReadiness ? (
+        <div className="inline-warning-note">
+          <p className="inline-warning-note-title">Review advised</p>
+          <p className="inline-warning-note-copy">{readinessWarning}</p>
+        </div>
+      ) : null}
       <details className="mobile-accordion">
         <summary>
           <div className="min-w-0">
@@ -1077,7 +1098,7 @@ export default function MLTab({
                   <p className="mt-2 text-sm leading-6 text-white/60">
                     Launch a new supervised benchmark from the selected target, while the pinned downloads stay attached to the currently opened saved run.
                   </p>
-                  <div className="mt-4 flex flex-wrap gap-3">
+                  <div className="mt-4 flex flex-col gap-3">
                     <button
                       type="button"
                       disabled={!targetColumn || busy !== null}
@@ -1116,12 +1137,12 @@ export default function MLTab({
                           setBusy(null);
                         }
                       }}
-                      className="rounded-lg bg-[#ffb079] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:cursor-not-allowed disabled:opacity-55"
+                      className="ml-action-button ml-action-button-primary sm:max-w-[21rem]"
                     >
                       {busy === "supervised" ? "Benchmarking..." : "Run supervised benchmark"}
                     </button>
                     {currentSupervisedExperiment ? (
-                      <>
+                      <div className="grid gap-3 sm:max-w-[28rem] sm:grid-cols-2">
                         <button
                           type="button"
                           onClick={() => {
@@ -1132,7 +1153,7 @@ export default function MLTab({
                               "controls"
                             );
                           }}
-                          className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+                          className="ml-action-button ml-action-button-secondary"
                         >
                           Download report
                         </button>
@@ -1146,11 +1167,11 @@ export default function MLTab({
                               "controls"
                             );
                           }}
-                          className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+                          className="ml-action-button ml-action-button-secondary"
                         >
                           Download summary
                         </button>
-                      </>
+                      </div>
                     ) : null}
                   </div>
 
@@ -1487,7 +1508,7 @@ export default function MLTab({
               </label>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-col gap-3">
               <button
                 type="button"
                 disabled={!capabilities.unsupervised.available || busy !== null}
@@ -1536,12 +1557,12 @@ export default function MLTab({
                     setBusy(null);
                   }
                 }}
-                className="rounded-lg bg-[#7ad6ff] px-5 py-3 text-sm font-semibold text-[#11273b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="ml-action-button ml-action-button-primary sm:max-w-[21rem]"
               >
                 {busy === "unsupervised" ? "Running..." : "Run unsupervised analysis"}
               </button>
               {currentUnsupervisedExperiment ? (
-                <>
+                <div className="grid gap-3 sm:max-w-[28rem] sm:grid-cols-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -1552,7 +1573,7 @@ export default function MLTab({
                         "controls"
                       );
                     }}
-                    className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+                    className="ml-action-button ml-action-button-secondary"
                   >
                     Download report
                   </button>
@@ -1566,11 +1587,11 @@ export default function MLTab({
                         "controls"
                       );
                     }}
-                    className="rounded-lg border border-white/12 px-5 py-3 text-sm text-white/82"
+                    className="ml-action-button ml-action-button-secondary"
                   >
                     Download summary
                   </button>
-                </>
+                </div>
               ) : null}
             </div>
 
