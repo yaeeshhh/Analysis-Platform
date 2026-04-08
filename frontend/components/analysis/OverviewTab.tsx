@@ -6,7 +6,7 @@ type OverviewTabProps = {
   schema: AnalysisSchema;
   quality: AnalysisQuality;
   insights: AnalysisInsights;
-  mobileSection?: string | null;
+  mobileSection?: string | string[] | null;
 };
 
 function formatPreviewValue(value: unknown) {
@@ -32,7 +32,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
   const typeMix = getTypeMix(schema);
   const posture = getDatasetPosture(overview, schema, quality, insights);
 
-  const show = (section: string) => !mobileSection || mobileSection === section;
+  const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
 
   return (
     <section className="analysis-tab-surface space-y-4">

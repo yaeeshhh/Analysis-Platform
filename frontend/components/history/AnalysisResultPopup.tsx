@@ -40,7 +40,7 @@ const sections = [
 
 type PopupSectionId = (typeof sections)[number]["id"];
 
-type PopupCardSubtab = { section: string; label: string; tab?: PopupSectionId };
+type PopupCardSubtab = { section: string | string[]; label: string; tab?: PopupSectionId };
 type PopupCard = {
   key: string;
   label: string;
@@ -54,14 +54,12 @@ const popupCards: PopupCard[] = [
   {
     key: "overview",
     label: "Overview",
-    description: "AI summary, findings, posture, type mix, next steps, and raw data.",
+    description: "Findings, dataset profile, next steps, and raw data preview.",
     icon: "📊",
     defaultTab: "overview",
     subtabs: [
-      { section: "what-the-data-says", label: "Data says" },
-      { section: "dataset-posture", label: "Posture" },
-      { section: "type-mix", label: "Type mix" },
       { section: "findings", label: "Findings", tab: "insights" },
+      { section: ["dataset-posture", "type-mix"], label: "Profile" },
       { section: "what-to-do-next", label: "Next steps", tab: "insights" },
       { section: "raw-data", label: "Raw data" },
     ],
@@ -69,43 +67,36 @@ const popupCards: PopupCard[] = [
   {
     key: "data-health",
     label: "Data Health",
-    description: "Missing values, quality recommendations, numeric and categorical summaries.",
+    description: "Missing values, recommendations, numeric and categorical summaries.",
     icon: "🩺",
     defaultTab: "quality",
     subtabs: [
-      { section: "missingness", label: "Missing" },
-      { section: "recommendations", label: "Fixes" },
-      { section: "numeric-summary", label: "Numeric", tab: "statistics" },
-      { section: "categorical-summary", label: "Categorical", tab: "statistics" },
+      { section: ["missingness", "recommendations"], label: "Quality" },
+      { section: ["numeric-summary", "categorical-summary"], label: "Statistics", tab: "statistics" },
     ],
   },
   {
     key: "schema",
     label: "Schema",
-    description: "Column types, roles, correlations, skew, dominant categories, and signals.",
+    description: "Column inventory, correlations, skew, dominance, and modeling signals.",
     icon: "🗂️",
     defaultTab: "schema",
     subtabs: [
       { section: "__all__", label: "Fields" },
-      { section: "strongest-relationships", label: "Correlations", tab: "relationships" },
-      { section: "skewed-numeric-fields", label: "Skew", tab: "relationships" },
-      { section: "dominant-categories", label: "Dominant", tab: "relationships" },
-      { section: "modeling-signals", label: "Signals", tab: "relationships" },
+      { section: ["strongest-relationships", "skewed-numeric-fields", "dominant-categories", "modeling-signals"], label: "Patterns", tab: "relationships" },
     ],
   },
   {
     key: "charts",
     label: "Charts",
-    description: "Missingness, distributions, categories, boxplots, heatmap, scatter, and drift.",
+    description: "Missingness, distributions, categories, correlations, and drift.",
     icon: "📈",
     defaultTab: "visualisations",
     subtabs: [
       { section: "missingness", label: "Missing" },
-      { section: "distribution", label: "Distrib." },
-      { section: "top-categories", label: "Top cats" },
-      { section: "boxplot-summary", label: "Box" },
-      { section: "correlation-heatmap", label: "Heat" },
-      { section: "pairwise-scatter", label: "Scatter" },
+      { section: ["distribution", "boxplot-summary"], label: "Distributions" },
+      { section: "top-categories", label: "Categories" },
+      { section: ["correlation-heatmap", "pairwise-scatter"], label: "Correlations" },
       { section: "drift-checks", label: "Drift" },
     ],
   },
@@ -448,7 +439,8 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
     if (!card) return null;
     const sub = card.subtabs?.[activeSubIdx];
     const tab = sub?.tab ?? card.defaultTab;
-    const section = sub?.section === "__all__" ? null : (sub?.section ?? null);
+    const rawSection = sub?.section ?? null;
+    const section = rawSection === "__all__" ? null : rawSection;
 
     switch (tab) {
       case "overview":
@@ -507,7 +499,7 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
           <div className="mobile-analysis-tab-pills">
             {currentCard.subtabs.map((sub, idx) => (
               <button
-                key={sub.section}
+                key={sub.label}
                 type="button"
                 onClick={() => setActiveSubIdx(idx)}
                 className={`mobile-analysis-tab-pill${activeSubIdx === idx ? " mobile-analysis-tab-pill-active" : ""}`}
