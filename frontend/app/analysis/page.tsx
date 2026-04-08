@@ -616,7 +616,6 @@ const mobileAnalysisCards: MobileCard[] = [
     icon: "📊",
     defaultTab: "overview",
     subtabs: [
-      { section: "findings", label: "Findings", tab: "insights" },
       { section: ["dataset-posture", "type-mix"], label: "Profile" },
       { section: "what-to-do-next", label: "Next steps", tab: "insights" },
       { section: "raw-data", label: "Raw data" },
@@ -674,6 +673,10 @@ const cardCovers: Record<string, React.ReactElement> = {
       <rect width="300" height="140" fill="#1a1f36"/>
       <circle cx="260" cy="20" r="70" fill="#2d3f8a" opacity="0.5"/>
       <circle cx="40" cy="120" r="45" fill="#2d3f8a" opacity="0.3"/>
+      {/* diagonal-split motif */}
+      <polygon points="0,0 200,0 0,140" fill="#4f6ef7" opacity="0.06"/>
+      <polygon points="300,140 100,140 300,0" fill="#06b6d4" opacity="0.04"/>
+      <line x1="0" y1="140" x2="300" y2="0" stroke="#4f6ef7" strokeWidth="0.8" opacity="0.15"/>
       <rect x="24" y="42" width="52" height="36" rx="5" fill="#4f6ef7" opacity="0.9"/>
       <rect x="84" y="42" width="80" height="36" rx="5" fill="#4f6ef7" opacity="0.5"/>
       <rect x="172" y="42" width="104" height="36" rx="5" fill="#4f6ef7" opacity="0.25"/>
@@ -688,6 +691,16 @@ const cardCovers: Record<string, React.ReactElement> = {
       <rect width="300" height="140" fill="#0d3b2e"/>
       <circle cx="270" cy="20" r="70" fill="#145a42" opacity="0.5"/>
       <circle cx="30" cy="120" r="45" fill="#145a42" opacity="0.3"/>
+      {/* radial-lines motif */}
+      <line x1="240" y1="90" x2="240" y2="20" stroke="#22c55e" strokeWidth="0.8" opacity="0.12"/>
+      <line x1="240" y1="90" x2="280" y2="50" stroke="#22c55e" strokeWidth="0.8" opacity="0.1"/>
+      <line x1="240" y1="90" x2="290" y2="90" stroke="#22c55e" strokeWidth="0.8" opacity="0.08"/>
+      <line x1="240" y1="90" x2="280" y2="130" stroke="#22c55e" strokeWidth="0.8" opacity="0.1"/>
+      <line x1="240" y1="90" x2="200" y2="50" stroke="#22c55e" strokeWidth="0.8" opacity="0.1"/>
+      <line x1="240" y1="90" x2="200" y2="130" stroke="#22c55e" strokeWidth="0.8" opacity="0.08"/>
+      <circle cx="240" cy="90" r="4" fill="#22c55e" opacity="0.18"/>
+      <circle cx="240" cy="90" r="18" fill="none" stroke="#22c55e" strokeWidth="0.6" opacity="0.1"/>
+      <circle cx="240" cy="90" r="35" fill="none" stroke="#22c55e" strokeWidth="0.5" opacity="0.06"/>
       <polyline points="20,72 56,72 74,38 92,108 110,55 128,82 152,72 280,72" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
       <circle cx="74" cy="38" r="4" fill="#22c55e"/>
       <circle cx="92" cy="108" r="4" fill="#22c55e"/>
@@ -700,6 +713,19 @@ const cardCovers: Record<string, React.ReactElement> = {
     <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="140" fill="#1e1535"/>
       <circle cx="260" cy="20" r="65" fill="#2d1f52" opacity="0.5"/>
+      {/* dot-grid motif */}
+      <circle cx="220" cy="42" r="1.5" fill="#a78bfa" opacity="0.18"/>
+      <circle cx="236" cy="42" r="1.5" fill="#a78bfa" opacity="0.14"/>
+      <circle cx="252" cy="42" r="2" fill="#a78bfa" opacity="0.25"/>
+      <circle cx="268" cy="42" r="1.5" fill="#a78bfa" opacity="0.12"/>
+      <circle cx="220" cy="58" r="2" fill="#a78bfa" opacity="0.22"/>
+      <circle cx="236" cy="58" r="1.5" fill="#a78bfa" opacity="0.16"/>
+      <circle cx="252" cy="58" r="1.5" fill="#a78bfa" opacity="0.2"/>
+      <circle cx="268" cy="58" r="2" fill="#a78bfa" opacity="0.28"/>
+      <circle cx="220" cy="74" r="1.5" fill="#a78bfa" opacity="0.14"/>
+      <circle cx="236" cy="74" r="2" fill="#a78bfa" opacity="0.2"/>
+      <circle cx="252" cy="74" r="1.5" fill="#a78bfa" opacity="0.16"/>
+      <circle cx="268" cy="74" r="1.5" fill="#a78bfa" opacity="0.1"/>
       <rect x="24" y="38" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.9"/>
       <rect x="24" y="56" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.45"/>
       <rect x="24" y="74" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.3"/>
@@ -714,6 +740,13 @@ const cardCovers: Record<string, React.ReactElement> = {
     <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="140" fill="#2d1a00"/>
       <circle cx="262" cy="18" r="68" fill="#4a2c00" opacity="0.5"/>
+      {/* scatter-plot trend motif */}
+      <circle cx="248" cy="34" r="2.5" fill="#f59e0b" opacity="0.18"/>
+      <circle cx="260" cy="42" r="3.5" fill="#f59e0b" opacity="0.22"/>
+      <circle cx="272" cy="28" r="2" fill="#f59e0b" opacity="0.15"/>
+      <circle cx="256" cy="54" r="2" fill="#f59e0b" opacity="0.12"/>
+      <circle cx="280" cy="38" r="2.5" fill="#f59e0b" opacity="0.16"/>
+      <line x1="242" y1="60" x2="288" y2="24" stroke="#fcd34d" strokeWidth="0.8" opacity="0.15" strokeDasharray="3,3"/>
       <rect x="24" y="82" width="28" height="38" rx="3" fill="#f59e0b" opacity="0.4"/>
       <rect x="60" y="62" width="28" height="58" rx="3" fill="#f59e0b" opacity="0.6"/>
       <rect x="96" y="44" width="28" height="76" rx="3" fill="#f59e0b" opacity="0.85"/>
@@ -730,6 +763,10 @@ const cardCovers: Record<string, React.ReactElement> = {
       <rect width="300" height="140" fill="#2d0a1a"/>
       <circle cx="258" cy="18" r="70" fill="#4a0f28" opacity="0.5"/>
       <circle cx="20" cy="118" r="45" fill="#4a0f28" opacity="0.3"/>
+      {/* ring-gauge motif */}
+      <circle cx="248" cy="105" r="22" fill="none" stroke="#f43f5e" strokeWidth="3" strokeDasharray="70 69" strokeDashoffset="18" strokeLinecap="round" opacity="0.25"/>
+      <circle cx="248" cy="105" r="14" fill="none" stroke="#f43f5e" strokeWidth="2" strokeDasharray="44 44" strokeDashoffset="12" strokeLinecap="round" opacity="0.15"/>
+      <circle cx="248" cy="105" r="5" fill="#f43f5e" opacity="0.12"/>
       <circle cx="44" cy="42" r="9" fill="#f43f5e" opacity="0.9"/>
       <circle cx="44" cy="70" r="9" fill="#f43f5e" opacity="0.9"/>
       <circle cx="44" cy="98" r="9" fill="#f43f5e" opacity="0.9"/>
@@ -780,7 +817,6 @@ function AnalysisMobileSections({
   function handleOpenCard(card: MobileCard) {
     setOpenCard(card.key);
     setActiveSubIdx(0);
-    onTabChange(card.defaultTab);
   }
 
   function handleBack() {
@@ -862,7 +898,7 @@ function AnalysisMobileSections({
     const accent = cardAccents[currentCard.key] ?? "#4f6ef7";
     return (
       <div className="phone-only mobile-screen-stack">
-        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn">
+        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn-floating">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
           All sections
         </button>

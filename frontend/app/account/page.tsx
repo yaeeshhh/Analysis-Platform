@@ -325,7 +325,14 @@ export default function AccountPage() {
         {!loading && user ? (
           <>
             <div className="phone-only mobile-screen-stack">
-              <section className="mobile-screen-panel section-glow">
+              <section className="mobile-screen-panel section-glow" style={{ position: "relative", overflow: "hidden" }}>
+                {/* ring-gauge motif from design system */}
+                <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "-16px", bottom: "-16px", width: "110px", height: "110px", opacity: 0.3, pointerEvents: "none" }}>
+                  <circle cx="70" cy="70" r="55" fill="none" stroke="#7ad6ff" strokeWidth="8" strokeDasharray="173 173" strokeDashoffset="55" strokeLinecap="round" opacity="0.7"/>
+                  <circle cx="70" cy="70" r="40" fill="none" stroke="#8bf1a8" strokeWidth="5" strokeDasharray="100 151" strokeDashoffset="40" strokeLinecap="round" opacity="0.5"/>
+                  <circle cx="70" cy="70" r="26" fill="none" stroke="#9db8ff" strokeWidth="3.5" strokeDasharray="65 98" strokeDashoffset="28" strokeLinecap="round" opacity="0.35"/>
+                  <circle cx="70" cy="70" r="8" fill="#7ad6ff" opacity="0.25"/>
+                </svg>
                 <div className="mobile-screen-profile">
                   <div className="mobile-screen-avatar">{getAccountInitials(user.username || user.email)}</div>
                   <div className="mobile-screen-profile-copy">
@@ -892,6 +899,7 @@ function AccountMobileSections({
         <section
           key={group.title}
           className={`mobile-screen-panel ${group.items.some((item) => item.destructive) ? "mobile-screen-panel-danger" : ""}`}
+          style={{ "--account-panel-accent": group.accent } as React.CSSProperties}
         >
           <div className="mobile-screen-panel-header">
             <div>

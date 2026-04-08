@@ -58,7 +58,6 @@ const popupCards: PopupCard[] = [
     icon: "📊",
     defaultTab: "overview",
     subtabs: [
-      { section: "findings", label: "Findings", tab: "insights" },
       { section: ["dataset-posture", "type-mix"], label: "Profile" },
       { section: "what-to-do-next", label: "Next steps", tab: "insights" },
       { section: "raw-data", label: "Raw data" },
@@ -147,6 +146,7 @@ export default function AnalysisResultPopup({
   onDeleteExperiment,
 }: AnalysisResultPopupProps) {
   const [activeSectionId, setActiveSectionId] = useState<PopupSectionId>("overview");
+  const [mobileCardOpen, setMobileCardOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const ready = hasRenderableReport(report);
@@ -222,8 +222,8 @@ export default function AnalysisResultPopup({
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div ref={scrollContainerRef} className="history-popup-scroll">
-          {/* ── Header ── */}
-          <div className="history-popup-header-card">
+          {/* ── Header (hidden when a mobile card is open) ── */}
+          <div className={`history-popup-header-card${mobileCardOpen ? " history-popup-header-hidden" : ""}`}>
             <div className="history-popup-header-row">
               <div className="history-popup-header-info">
                 <p className="history-popup-header-kicker">Archived report</p>
@@ -334,6 +334,7 @@ export default function AnalysisResultPopup({
               <PopupMobileCards
                 key={report.analysis_id}
                 report={report}
+                onCardOpenChange={setMobileCardOpen}
                 onRunUnsupervised={onRunUnsupervised}
                 onRunSupervised={onRunSupervised}
                 onDeleteExperiment={onDeleteExperiment}
@@ -414,6 +415,7 @@ export default function AnalysisResultPopup({
 
 type PopupMobileCardsProps = {
   report: AnalysisReport;
+  onCardOpenChange: (isOpen: boolean) => void;
   onRunUnsupervised: (nClusters: number) => Promise<UnsupervisedResult>;
   onRunSupervised: (targetColumn: string) => Promise<SupervisedResult>;
   onDeleteExperiment: (experiment: MlExperimentSummary) => Promise<void>;
@@ -425,6 +427,10 @@ const popupCardCovers: Record<string, React.ReactElement> = {
     <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="130" fill="#1a1f36"/>
       <circle cx="260" cy="16" r="65" fill="#2d3f8a" opacity="0.5"/>
+      {/* diagonal-split motif */}
+      <polygon points="0,0 200,0 0,130" fill="#4f6ef7" opacity="0.06"/>
+      <polygon points="300,130 100,130 300,0" fill="#06b6d4" opacity="0.04"/>
+      <line x1="0" y1="130" x2="300" y2="0" stroke="#4f6ef7" strokeWidth="0.8" opacity="0.15"/>
       <rect x="24" y="36" width="52" height="32" rx="5" fill="#4f6ef7" opacity="0.9"/>
       <rect x="84" y="36" width="80" height="32" rx="5" fill="#4f6ef7" opacity="0.5"/>
       <rect x="172" y="36" width="104" height="32" rx="5" fill="#4f6ef7" opacity="0.25"/>
@@ -438,6 +444,14 @@ const popupCardCovers: Record<string, React.ReactElement> = {
     <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="130" fill="#0d3b2e"/>
       <circle cx="270" cy="16" r="65" fill="#145a42" opacity="0.5"/>
+      {/* radial-lines motif */}
+      <line x1="240" y1="82" x2="240" y2="18" stroke="#22c55e" strokeWidth="0.8" opacity="0.12"/>
+      <line x1="240" y1="82" x2="280" y2="45" stroke="#22c55e" strokeWidth="0.8" opacity="0.1"/>
+      <line x1="240" y1="82" x2="288" y2="82" stroke="#22c55e" strokeWidth="0.8" opacity="0.08"/>
+      <line x1="240" y1="82" x2="280" y2="120" stroke="#22c55e" strokeWidth="0.8" opacity="0.1"/>
+      <line x1="240" y1="82" x2="200" y2="45" stroke="#22c55e" strokeWidth="0.8" opacity="0.1"/>
+      <circle cx="240" cy="82" r="4" fill="#22c55e" opacity="0.15"/>
+      <circle cx="240" cy="82" r="16" fill="none" stroke="#22c55e" strokeWidth="0.6" opacity="0.08"/>
       <polyline points="20,65 56,65 74,32 92,100 110,48 128,75 152,65 280,65" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
       <circle cx="74" cy="32" r="4" fill="#22c55e"/>
       <circle cx="92" cy="100" r="4" fill="#22c55e"/>
@@ -449,6 +463,19 @@ const popupCardCovers: Record<string, React.ReactElement> = {
   schema: (
     <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="130" fill="#1e1535"/>
+      {/* dot-grid motif */}
+      <circle cx="220" cy="36" r="1.5" fill="#a78bfa" opacity="0.18"/>
+      <circle cx="236" cy="36" r="1.5" fill="#a78bfa" opacity="0.14"/>
+      <circle cx="252" cy="36" r="2" fill="#a78bfa" opacity="0.25"/>
+      <circle cx="268" cy="36" r="1.5" fill="#a78bfa" opacity="0.12"/>
+      <circle cx="220" cy="52" r="2" fill="#a78bfa" opacity="0.22"/>
+      <circle cx="236" cy="52" r="1.5" fill="#a78bfa" opacity="0.16"/>
+      <circle cx="252" cy="52" r="1.5" fill="#a78bfa" opacity="0.2"/>
+      <circle cx="268" cy="52" r="2" fill="#a78bfa" opacity="0.28"/>
+      <circle cx="220" cy="68" r="1.5" fill="#a78bfa" opacity="0.14"/>
+      <circle cx="236" cy="68" r="2" fill="#a78bfa" opacity="0.2"/>
+      <circle cx="252" cy="68" r="1.5" fill="#a78bfa" opacity="0.16"/>
+      <circle cx="268" cy="68" r="1.5" fill="#a78bfa" opacity="0.1"/>
       <rect x="24" y="30" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.9"/>
       <rect x="24" y="48" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.45"/>
       <rect x="24" y="66" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.3"/>
@@ -463,6 +490,12 @@ const popupCardCovers: Record<string, React.ReactElement> = {
     <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="130" fill="#2d1a00"/>
       <circle cx="262" cy="14" r="64" fill="#4a2c00" opacity="0.5"/>
+      {/* scatter-plot trend motif */}
+      <circle cx="248" cy="30" r="2.5" fill="#f59e0b" opacity="0.18"/>
+      <circle cx="260" cy="38" r="3" fill="#f59e0b" opacity="0.22"/>
+      <circle cx="272" cy="24" r="2" fill="#f59e0b" opacity="0.15"/>
+      <circle cx="256" cy="48" r="2" fill="#f59e0b" opacity="0.12"/>
+      <line x1="242" y1="54" x2="280" y2="20" stroke="#fcd34d" strokeWidth="0.8" opacity="0.15" strokeDasharray="3,3"/>
       <rect x="24" y="74" width="28" height="36" rx="3" fill="#f59e0b" opacity="0.4"/>
       <rect x="60" y="56" width="28" height="54" rx="3" fill="#f59e0b" opacity="0.6"/>
       <rect x="96" y="38" width="28" height="72" rx="3" fill="#f59e0b" opacity="0.85"/>
@@ -477,6 +510,10 @@ const popupCardCovers: Record<string, React.ReactElement> = {
     <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
       <rect width="300" height="130" fill="#2d0a1a"/>
       <circle cx="260" cy="14" r="66" fill="#4a0f28" opacity="0.5"/>
+      {/* ring-gauge motif */}
+      <circle cx="248" cy="98" r="20" fill="none" stroke="#f43f5e" strokeWidth="3" strokeDasharray="63 63" strokeDashoffset="16" strokeLinecap="round" opacity="0.22"/>
+      <circle cx="248" cy="98" r="12" fill="none" stroke="#f43f5e" strokeWidth="2" strokeDasharray="38 38" strokeDashoffset="10" strokeLinecap="round" opacity="0.14"/>
+      <circle cx="248" cy="98" r="4" fill="#f43f5e" opacity="0.1"/>
       <circle cx="44" cy="36" r="9" fill="#f43f5e" opacity="0.9"/>
       <circle cx="44" cy="65" r="9" fill="#f43f5e" opacity="0.9"/>
       <circle cx="44" cy="94" r="9" fill="#f43f5e" opacity="0.9"/>
@@ -505,18 +542,20 @@ const popupCardAccents: Record<string, string> = {
   "ml": "#f43f5e",
 };
 
-function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDeleteExperiment }: PopupMobileCardsProps) {
+function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSupervised, onDeleteExperiment }: PopupMobileCardsProps) {
   const [openCard, setOpenCard] = useState<string | null>(null);
   const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
 
   function handleOpenCard(card: PopupCard) {
     setOpenCard(card.key);
     setActiveSubIdx(0);
+    onCardOpenChange(true);
   }
 
   function handleBack() {
     setOpenCard(null);
     setActiveSubIdx(0);
+    onCardOpenChange(false);
   }
 
   function renderContent(): ReactNode {
@@ -569,7 +608,7 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
     const accent = popupCardAccents[currentCard.key] ?? "#4f6ef7";
     return (
       <div className="history-popup-mobile-detail">
-        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn">
+        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn-floating">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
           All sections
         </button>

@@ -427,7 +427,15 @@ function DashboardMobileSections({
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <section className="mobile-screen-panel section-glow">
+      <section className="mobile-screen-panel section-glow" style={{ position: "relative", overflow: "hidden" }}>
+        {/* segmented-arc motif from design system */}
+        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "-20px", top: "-20px", width: "130px", height: "130px", opacity: 0.35, pointerEvents: "none" }}>
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#4f6ef7" strokeWidth="10" strokeDasharray="38 188" strokeDashoffset="-8" strokeLinecap="round" opacity="0.7"/>
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#22c55e" strokeWidth="10" strokeDasharray="50 188" strokeDashoffset="-52" strokeLinecap="round" opacity="0.55"/>
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#a78bfa" strokeWidth="10" strokeDasharray="30 188" strokeDashoffset="-108" strokeLinecap="round" opacity="0.45"/>
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#f59e0b" strokeWidth="10" strokeDasharray="42 188" strokeDashoffset="-144" strokeLinecap="round" opacity="0.5"/>
+          <circle cx="80" cy="80" r="42" fill="none" stroke="#0d1221" strokeWidth="6"/>
+        </svg>
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Latest run</p>
