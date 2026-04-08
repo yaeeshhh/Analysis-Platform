@@ -496,18 +496,15 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
         </div>
 
         {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
-          <div className="mobile-analysis-tab-pills">
+          <select
+            value={activeSubIdx}
+            onChange={(e) => setActiveSubIdx(Number(e.target.value))}
+            className="mobile-analysis-section-select"
+          >
             {currentCard.subtabs.map((sub, idx) => (
-              <button
-                key={sub.label}
-                type="button"
-                onClick={() => setActiveSubIdx(idx)}
-                className={`mobile-analysis-tab-pill${activeSubIdx === idx ? " mobile-analysis-tab-pill-active" : ""}`}
-              >
-                {sub.label}
-              </button>
+              <option key={sub.label} value={idx}>{sub.label}</option>
             ))}
-          </div>
+          </select>
         ) : null}
 
         <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">

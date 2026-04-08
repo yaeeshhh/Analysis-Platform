@@ -2640,6 +2640,32 @@ a[class*="rounded"]:hover {
     padding: 0.6rem 0 0.75rem;
   }
 
+  /* ── Card styling for inner content items ── */
+  .analysis-mobile-focus-content .mobile-accordion-body li {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.85rem !important;
+  }
+
+  .analysis-mobile-focus-content .mobile-accordion-body > .space-y-3 > div,
+  .analysis-mobile-focus-content .analysis-tab-surface > .space-y-3 > div,
+  .analysis-mobile-focus-content .analysis-tab-surface > .space-y-4 > div:not(.grid):not(.dq-summary-grid) {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .analysis-mobile-focus-content .analysis-chart-frame {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.75rem;
+    box-shadow: none;
+    overflow: hidden;
+    padding: 0.65rem;
+  }
+
   .analysis-accordion-summary-preview {
     display: none;
   }
@@ -2963,37 +2989,27 @@ a[class*="rounded"]:hover {
   }
 
   /* Tab pills within focus area */
-  .mobile-analysis-tab-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    padding-bottom: 0.15rem;
-  }
-
-  .mobile-analysis-tab-pill {
+  /* ── Section dropdown selector ── */
+  .mobile-analysis-section-select {
+    appearance: none;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 999px;
-    color: rgba(242, 247, 251, 0.52);
-    font-size: 0.72rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(242,247,251,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-position: right 0.7rem center;
+    background-repeat: no-repeat;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 0.65rem;
+    color: var(--text-100);
+    font-size: 0.82rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
-    min-height: 1.9rem;
-    padding: 0.28rem 0.62rem;
-    text-align: center;
-    transition: background 120ms, border-color 120ms, color 120ms;
-    white-space: nowrap;
+    min-height: 2.4rem;
+    padding: 0.4rem 2rem 0.4rem 0.8rem;
+    width: 100%;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .mobile-analysis-tab-pill:active {
-    background: rgba(255, 255, 255, 0.07);
-  }
-
-  .mobile-analysis-tab-pill-active {
-    background: rgba(37, 99, 235, 0.14);
-    border-color: rgba(59, 130, 246, 0.32);
-    color: #dbe8ff;
+  .mobile-analysis-section-select:focus {
+    border-color: rgba(59, 130, 246, 0.4);
+    outline: none;
   }
 
   /* Section description bar */
