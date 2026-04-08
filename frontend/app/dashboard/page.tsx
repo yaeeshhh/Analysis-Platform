@@ -5,6 +5,7 @@ import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import { getAnalyses } from "@/lib/analysisApi";
+import { analysisFocusAreas, getAnalysisTabDefinition } from "@/lib/analysisNavigation";
 import { AnalysisListItem } from "@/lib/analysisTypes";
 import { subscribeToAnalysisStateChanges } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
@@ -13,19 +14,19 @@ import type { User } from "@/lib/auth";
 
 const destinationCards = [
   {
-    title: "Uploads workspace",
-    detail: "Operational page for uploading CSVs, selecting the current dataset, checking quick quality signals, and routing into Analysis Overview.",
+    title: "Dataset library",
+    detail: "Upload CSVs, keep saved datasets in the reusable library, choose the active run, and route it into Analysis.",
     href: "/batch",
-    cta: "Open uploads",
+    cta: "Open library",
   },
   {
     title: "Analysis workspace",
-    detail: "Full tabbed report with Overview, Insights, Schema, Quality, Statistics, Relationships, Charts, and the ML Lab once a dataset is selected.",
+    detail: "Grouped report flow with Summary, Health, Fields, Patterns, and ML once a dataset is selected.",
     href: "/analysis",
     cta: "Open analysis",
   },
   {
-    title: "History library",
+    title: "Run archive",
     detail: "Review older runs, search the archive, filter the list, and download reports when needed.",
     href: "/history",
     cta: "Open history",
@@ -38,56 +39,27 @@ const destinationCards = [
   },
 ];
 
-const analysisTabCards = [
-  {
-    title: "Overview",
-    detail: "High-level dataset posture, shape, density, and the first explanation of what the run is saying.",
-  },
-  {
-    title: "Insights",
-    detail: "Plain-language findings, modeling readiness, and the next actions worth taking after the upload.",
-  },
-  {
-    title: "Schema",
-    detail: "Column roles, inferred types, identifiers, targets, and field-level profiling.",
-  },
-  {
-    title: "Data Quality",
-    detail: "Missingness, duplicates, constants, correlations, outliers, and cleanup recommendations.",
-  },
-  {
-    title: "Statistics",
-    detail: "Numeric, categorical, and datetime summaries for the saved run.",
-  },
-  {
-    title: "Relationships",
-    detail: "Structural relationships and stronger pairwise signals that explain the dataset shape.",
-  },
-  {
-    title: "Charts",
-    detail: "Visual summaries with narrative explanations so the charts explain themselves instead of standing alone.",
-  },
-  {
-    title: "ML Lab",
-    detail: "Supervised and unsupervised experiment lanes with saved run cards, reopen actions, and downloadable outputs.",
-  },
-];
+const analysisBreakdownCards = analysisFocusAreas.map((area) => ({
+  title: area.label,
+  detail: area.description,
+  tabs: area.tabKeys.map((tabKey) => getAnalysisTabDefinition(tabKey).label),
+}));
 
 const featureMechanics = [
   {
     title: "Dataset intake",
     accent: "#7ad6ff",
-    detail: "Upload CSVs, choose the active dataset, and check the first quality signals before opening the full report.",
+    detail: "Upload CSVs, keep them in the library, choose the active dataset, and check the first quality signals before opening the full report.",
     flow: "Start there, then open Analysis when you want the deeper report.",
   },
   {
     title: "Analysis report",
     accent: "#9db8ff",
-    detail: "Start with the overview, then move into the deeper tabs when you want more detail.",
-    flow: "Use the tabs to move from summary to tables, charts, and ML.",
+    detail: "Start with summary and findings, then move into health, fields, patterns, and ML when you need more depth.",
+    flow: "Use the grouped map to move from summary into the deeper report surfaces.",
   },
   {
-    title: "Save history",
+    title: "Run archive",
     accent: "#8bf1a8",
     detail: "Each dataset and ML scan is saved so you can reopen it later from History.",
     flow: "Keep the current dataset in Analysis, or open older runs separately from History.",
@@ -107,7 +79,7 @@ const featureMechanics = [
   {
     title: "Account cleanup",
     accent: "#f59ea7",
-    detail: "Manage profile info, remembered login, saved runs, and deletion tools from one place.",
+    detail: "Manage profile info, remembered login, library cleanup, and deletion tools from one place.",
     flow: "Use the profile menu when you need account, uploads, or history shortcuts.",
   },
 ];
@@ -388,14 +360,21 @@ export default function DashboardPage() {
 
                 <section className="desktop-panel">
                   <div className="desktop-panel-header">
-                    <p className="desktop-panel-title">Analysis tabs</p>
+                    <p className="desktop-panel-title">Analysis breakdown</p>
                     <ScrollIntentLink href="/analysis" className="desktop-panel-action">Open workspace</ScrollIntentLink>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {analysisTabCards.map((item) => (
+                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {analysisBreakdownCards.map((item) => (
                       <div key={item.title} className="rounded-xl border border-white/8 bg-white/[0.02] p-4">
                         <p className="text-sm font-semibold text-white">{item.title}</p>
                         <p className="mt-2 text-sm leading-6 text-white/52">{item.detail}</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {item.tabs.map((tab) => (
+                            <span key={`${item.title}-${tab}`} className="desktop-badge" data-tone="purple">
+                              {tab}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -545,6 +524,74 @@ function DashboardMobileSections({
           </div>
         </section>
       ) : null}
+
+      <section className="mobile-screen-panel">
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Breakdowns</p>
+            <h2 className="mobile-screen-title">See how the studio is organised</h2>
+            <p className="mobile-screen-lead">Tap a header to review the Analysis map or the way the core features fit together.</p>
+          </div>
+        </div>
+
+        <details className="mobile-accordion">
+          <summary>
+            <p className="mobile-screen-row-title">Analysis breakdown</p>
+            <p className="mobile-accordion-hint">Summary, health, fields, patterns, and ML are grouped so the report reads in a clearer order.</p>
+          </summary>
+          <div className="mobile-accordion-body">
+            <div className="mobile-screen-list">
+              {analysisBreakdownCards.map((item) => (
+                <div key={item.title} className="mobile-screen-row">
+                  <p className="mobile-screen-row-title">{item.title}</p>
+                  <p className="mobile-screen-row-copy">{item.detail}</p>
+                  <div className="mobile-screen-pills compact">
+                    {item.tabs.map((tab) => (
+                      <span key={`${item.title}-${tab}`} className="mobile-screen-pill" data-tone="purple">
+                        {tab}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mobile-screen-actions">
+              <ScrollIntentLink
+                href={latest ? `/analysis?analysisId=${latest.id}` : "/analysis"}
+                className="mobile-screen-button mobile-screen-button-primary"
+              >
+                {latest ? "Open latest analysis" : "Open analysis workspace"}
+              </ScrollIntentLink>
+            </div>
+          </div>
+        </details>
+
+        <details className="mobile-accordion">
+          <summary>
+            <p className="mobile-screen-row-title">How features work</p>
+            <p className="mobile-accordion-hint">Review the flow from the dataset library through report reading, charts, ML, and account cleanup.</p>
+          </summary>
+          <div className="mobile-accordion-body">
+            <div className="mobile-screen-list">
+              {featureMechanics.map((item) => (
+                <div key={item.title} className="mobile-screen-row">
+                  <p className="mobile-screen-row-title" style={{ color: item.accent }}>{item.title}</p>
+                  <p className="mobile-screen-row-copy">{item.detail}</p>
+                  <p className="mobile-screen-row-note">{item.flow}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mobile-screen-actions">
+              <ScrollIntentLink
+                href={latest ? `/analysis?analysisId=${latest.id}` : "/batch"}
+                className="mobile-screen-button mobile-screen-button-secondary"
+              >
+                {latest ? "Open latest run" : "Go to dataset library"}
+              </ScrollIntentLink>
+            </div>
+          </div>
+        </details>
+      </section>
     </div>
   );
 }

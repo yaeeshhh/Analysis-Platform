@@ -38,6 +38,10 @@ function getHistoryReviewWarning(targetCandidates: string[]) {
   return "Review this dataset before relying on ML output. You can still run it if needed.";
 }
 
+function truncateHistorySummary(text: string, maxLength: number) {
+  return text.length > maxLength ? `${text.slice(0, maxLength).trimEnd()}…` : text;
+}
+
 export default function HistoryPage() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -642,7 +646,6 @@ function HistoryMobileSections({
   onDownloadMlSummary,
 }: HistoryMobileSectionsProps) {
   const [visibleCount, setVisibleCount] = useState(5);
-  const [expandedActionId, setExpandedActionId] = useState<number | null>(null);
   const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
     { value: "all", label: "All readiness" },
     { value: "ml-ready", label: "ML-ready" },
@@ -719,7 +722,7 @@ function HistoryMobileSections({
           <div>
             <p className="mobile-screen-kicker">Saved runs</p>
             <h2 className="mobile-screen-title">Saved runs</h2>
-            <p className="mobile-screen-lead">Open a run first. Downloads and cleanup stay under More.</p>
+            <p className="mobile-screen-lead">Tap a run to reveal files, reopen the report, or clean it up.</p>
           </div>
         </div>
         {filteredAnalyses.length === 0 ? (
@@ -732,103 +735,92 @@ function HistoryMobileSections({
               const reviewWarning = needsReview
                 ? getHistoryReviewWarning(analysis.insights.modeling_readiness.target_candidates)
                 : "";
-              const actionsExpanded = expandedActionId === analysis.id;
 
               return (
-                <article key={analysis.id} className="mobile-screen-row">
-                  <div className="mobile-screen-row-header">
-                    <div className="mobile-screen-row-main">
-                      <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
-                      <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
-                    </div>
-                    <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                      {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                    </span>
-                  </div>
-
-                  <div className="mobile-screen-pills compact">
-                    <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
-                    <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
-                    <span className="mobile-screen-pill" data-tone="purple">
-                      {analysis.experiment_count === 0
-                        ? "Analysis only"
-                        : `${analysis.experiment_count} ML run${analysis.experiment_count === 1 ? "" : "s"}`}
-                    </span>
-                  </div>
-
-                  <p className="mobile-screen-row-copy">
-                    {analysis.insights.summary.length > 132
-                      ? `${analysis.insights.summary.slice(0, 104).trimEnd()}…`
-                      : analysis.insights.summary}
-                  </p>
-                  {needsReview ? (
-                    <div className="inline-warning-note mt-3">
-                      <p className="inline-warning-note-title">Review advised</p>
-                      <p className="inline-warning-note-copy">{reviewWarning}</p>
-                    </div>
-                  ) : null}
-
-                  <div className="mobile-screen-row-actions">
-                    <button
-                      type="button"
-                      onClick={() => onOpenPopup(analysis)}
-                      className="mobile-screen-button mobile-screen-button-primary"
-                    >
-                      Open run
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setExpandedActionId((current) => (current === analysis.id ? null : analysis.id))}
-                      className="mobile-screen-button mobile-screen-button-secondary"
-                    >
-                      {actionsExpanded ? "Hide more" : "More"}
-                    </button>
-                  </div>
-
-                  {actionsExpanded ? (
-                    <>
-                      <div className="mobile-screen-actions">
-                        <button
-                          type="button"
-                          onClick={() => onDownloadReport(analysis.id)}
-                          className="mobile-screen-button mobile-screen-button-secondary"
-                        >
-                          Report
-                        </button>
-                        {latestExperiment ? (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
-                              className="mobile-screen-button mobile-screen-button-secondary"
-                            >
-                              ML report
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
-                              className="mobile-screen-button mobile-screen-button-secondary"
-                            >
-                              ML summary
-                            </button>
-                          </>
-                        ) : null}
-                        <button
-                          type="button"
-                          onClick={() => onDeleteRun(analysis.id)}
-                          className="mobile-screen-button mobile-screen-button-danger"
-                        >
-                          Delete run
-                        </button>
+                <details key={analysis.id} className="mobile-accordion">
+                  <summary>
+                    <div className="mobile-screen-row-header">
+                      <div className="mobile-screen-row-main">
+                        <p className="mobile-screen-row-title">{analysis.overview.dataset_name}</p>
+                        <p className="mobile-screen-row-meta">{analysis.source_filename} • saved {formatDate(analysis.saved_at)}</p>
                       </div>
-                      <p className="mobile-screen-row-note">
-                        {latestExperiment
-                          ? `Latest ML: ${latestExperiment.summary}`
-                          : "No ML run is attached to this analysis yet."}
-                      </p>
-                    </>
-                  ) : null}
-                </article>
+                      <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                        {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                      </span>
+                    </div>
+                    <p className="mobile-accordion-hint">{truncateHistorySummary(analysis.insights.summary, 104)}</p>
+                    <div className="mobile-screen-pills compact">
+                      <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
+                      <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
+                      <span className="mobile-screen-pill" data-tone="purple">
+                        {analysis.experiment_count === 0
+                          ? "Analysis only"
+                          : `${analysis.experiment_count} ML run${analysis.experiment_count === 1 ? "" : "s"}`}
+                      </span>
+                    </div>
+                  </summary>
+                  <div className="mobile-accordion-body">
+                    <p className="mobile-screen-row-copy" style={{ marginTop: 0 }}>
+                      {analysis.insights.summary}
+                    </p>
+                    {needsReview ? (
+                      <div className="inline-warning-note mt-3">
+                        <p className="inline-warning-note-title">Review advised</p>
+                        <p className="inline-warning-note-copy">{reviewWarning}</p>
+                      </div>
+                    ) : null}
+                    <div className="mobile-screen-actions">
+                      <button
+                        type="button"
+                        onClick={() => onOpenPopup(analysis)}
+                        className="mobile-screen-button mobile-screen-button-primary"
+                      >
+                        Open full run
+                      </button>
+                    </div>
+                    <div className="mobile-screen-actions">
+                      <button
+                        type="button"
+                        onClick={() => onDownloadReport(analysis.id)}
+                        className="mobile-screen-button mobile-screen-button-secondary"
+                      >
+                        Report
+                      </button>
+                      {latestExperiment ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
+                            className="mobile-screen-button mobile-screen-button-secondary"
+                          >
+                            ML report
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
+                            className="mobile-screen-button mobile-screen-button-secondary"
+                          >
+                            ML summary
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                    <div className="mobile-screen-actions">
+                      <button
+                        type="button"
+                        onClick={() => onDeleteRun(analysis.id)}
+                        className="mobile-screen-button mobile-screen-button-danger"
+                      >
+                        Delete run
+                      </button>
+                    </div>
+                    <p className="mobile-screen-row-note">
+                      {latestExperiment
+                        ? `Latest ML: ${latestExperiment.summary}`
+                        : "No ML run is attached to this analysis yet."}
+                    </p>
+                  </div>
+                </details>
               );
             })}
           </div>
