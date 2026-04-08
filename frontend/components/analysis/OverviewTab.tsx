@@ -40,14 +40,12 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
               <p className="mobile-accordion-hint">AI-generated summary and top findings for this dataset</p>
               <div className="phone-only analysis-accordion-summary-preview">
+                <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary, 110)}</p>
                 {headlineFindings.slice(0, 2).map((finding) => (
                   <p key={finding} className="analysis-accordion-summary-text">
                     {truncatePreview(finding)}
                   </p>
                 ))}
-                {headlineFindings.length === 0 ? (
-                  <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary)}</p>
-                ) : null}
               </div>
             </div>
           </summary>
@@ -71,10 +69,10 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</span>
               <p className="mobile-accordion-hint">Shape, size, type mix, and structural character of the dataset</p>
               <div className="phone-only analysis-accordion-summary-preview">
-                {posture.slice(0, 2).map((item) => (
+                {posture.slice(0, 3).map((item) => (
                   <div key={item.title} className="analysis-accordion-summary-row">
                     <strong>{item.title}</strong>
-                    <span>{truncatePreview(item.detail, 72)}</span>
+                    <span>{truncatePreview(item.detail, 84)}</span>
                   </div>
                 ))}
               </div>
@@ -108,16 +106,11 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</span>
               <p className="mobile-accordion-hint">Proportion of numeric, categorical, and other column types</p>
-              <div className="phone-only analysis-accordion-summary-bar-list">
+              <div className="phone-only analysis-accordion-summary-preview">
                 {typeMix.slice(0, 3).map((item) => (
-                  <div key={item.label} className="analysis-accordion-summary-bar-item">
-                    <div className="analysis-accordion-summary-bar-head">
-                      <span>{item.label}</span>
-                      <strong>{item.count}</strong>
-                    </div>
-                    <div className="analysis-accordion-summary-bar-track">
-                      <span className="analysis-accordion-summary-bar-fill" style={{ width: `${Math.min(item.pct, 100)}%`, backgroundColor: "#7ad6ff" }} />
-                    </div>
+                  <div key={item.label} className="analysis-accordion-summary-row">
+                    <strong>{item.label}</strong>
+                    <span>{item.count} columns · {item.pct.toFixed(1)}% of profiled fields</span>
                   </div>
                 ))}
               </div>
@@ -185,6 +178,9 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Raw data</span>
             <p className="mobile-accordion-hint">First 20 rows of the uploaded dataset</p>
+            <p className="phone-only analysis-accordion-summary-text">
+              {overview.preview_rows.length} sampled rows · {previewColumns.length} visible columns in the raw-data preview.
+            </p>
             <div className="phone-only analysis-accordion-summary-chip-list">
               {previewColumns.slice(0, 4).map((column) => (
                 <span key={column} className="analysis-accordion-summary-chip">{column}</span>

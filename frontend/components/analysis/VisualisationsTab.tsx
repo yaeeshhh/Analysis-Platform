@@ -101,8 +101,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
         count: bin.count,
       }))
     : [];
-  const histogramPreview = histogramData.slice(0, 6);
-  const histogramPreviewMax = Math.max(...histogramPreview.map((item) => item.count), 1);
+  const histogramPreview = [...histogramData].sort((left, right) => right.count - left.count).slice(0, 3);
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">
@@ -111,16 +110,11 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
             <p className="mobile-accordion-hint">Columns with the highest missing-value share</p>
-            <div className="phone-only analysis-accordion-summary-bar-list">
+            <div className="phone-only analysis-accordion-summary-preview">
               {missingness.slice(0, 3).map((item) => (
-                <div key={item.column} className="analysis-accordion-summary-bar-item">
-                  <div className="analysis-accordion-summary-bar-head">
-                    <span>{truncateLabel(item.column, 18)}</span>
-                    <strong>{item.missing_pct.toFixed(1)}%</strong>
-                  </div>
-                  <div className="analysis-accordion-summary-bar-track">
-                    <span className="analysis-accordion-summary-bar-fill" style={{ width: `${Math.min(item.missing_pct, 100)}%`, backgroundColor: "#7ad6ff" }} />
-                  </div>
+                <div key={item.column} className="analysis-accordion-summary-row">
+                  <strong>{truncateLabel(item.column, 18)}</strong>
+                  <span>{item.missing_count.toLocaleString()} rows missing · {item.missing_pct.toFixed(1)}%</span>
                 </div>
               ))}
             </div>
@@ -171,10 +165,11 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Distribution</span>
             <p className="mobile-accordion-hint">Value distribution histogram for the most numeric-dense column</p>
             {histogramPreview.length > 0 ? (
-              <div className="phone-only analysis-accordion-summary-spark">
+              <div className="phone-only analysis-accordion-summary-preview">
                 {histogramPreview.map((bin) => (
-                  <div key={`${bin.fullLabel}-${bin.count}`} className="analysis-accordion-summary-spark-column">
-                    <span className="analysis-accordion-summary-spark-bar" style={{ height: `${Math.max((bin.count / histogramPreviewMax) * 100, 12)}%` }} />
+                  <div key={`${bin.fullLabel}-${bin.count}`} className="analysis-accordion-summary-row">
+                    <strong>{truncateLabel(bin.fullLabel, 20)}</strong>
+                    <span>{bin.count.toLocaleString()} rows in {histogram?.column || "the selected histogram"}</span>
                   </div>
                 ))}
               </div>
@@ -279,7 +274,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Boxplot summary</span>
             <p className="mobile-accordion-hint">Quartiles, median, and outlier counts for each numeric column</p>
             <div className="phone-only analysis-accordion-summary-preview">
-              {boxplots.slice(0, 2).map((item) => (
+              {boxplots.slice(0, 3).map((item) => (
                 <div key={item.column} className="analysis-accordion-summary-row">
                   <strong>{item.column}</strong>
                   <span>median {item.median.toFixed(2)} · {item.outlier_count} outliers</span>
@@ -317,7 +312,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Correlation heatmap</span>
             <p className="mobile-accordion-hint">Pearson correlations between all numeric column pairs</p>
             <div className="phone-only analysis-accordion-summary-preview">
-              {heatmapPreview.map((item) => (
+              {heatmapPreview.slice(0, 3).map((item) => (
                 <div key={`${item.x}-${item.y}`} className="analysis-accordion-summary-row">
                   <strong>{truncateLabel(`${item.x} ↔ ${item.y}`, 22)}</strong>
                   <span>{item.value.toFixed(2)}</span>
@@ -385,7 +380,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Pairwise scatter</span>
             <p className="mobile-accordion-hint">Scatter plots for the most strongly correlated numeric pairs</p>
             <div className="phone-only analysis-accordion-summary-preview">
-              {pairwiseScatter.slice(0, 2).map((plot) => (
+              {pairwiseScatter.slice(0, 3).map((plot) => (
                 <div key={`${plot.x}-${plot.y}`} className="analysis-accordion-summary-row">
                   <strong>{truncateLabel(`${plot.x} vs ${plot.y}`, 22)}</strong>
                   <span>corr {plot.correlation.toFixed(2)}</span>
@@ -447,7 +442,7 @@ export default function VisualisationsTab({ visualisations }: VisualisationsTabP
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Drift checks</span>
             <p className="mobile-accordion-hint">Early-vs-late row slice comparison to flag distributional drift</p>
             <div className="phone-only analysis-accordion-summary-preview">
-              {driftChecks.slice(0, 2).map((item) => (
+              {driftChecks.slice(0, 3).map((item) => (
                 <div key={`${item.kind}-${item.column}`} className="analysis-accordion-summary-row">
                   <strong>{item.column}</strong>
                   <span>change {item.change_score.toFixed(2)}</span>

@@ -23,16 +23,11 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Strongest relationships</span>
             <p className="mobile-accordion-hint">Pairs of numeric columns with the highest linear correlation</p>
-            <div className="phone-only analysis-accordion-summary-bar-list">
-              {correlations.slice(0, 2).map((item) => (
-                <div key={`${item.x}-${item.y}`} className="analysis-accordion-summary-bar-item">
-                  <div className="analysis-accordion-summary-bar-head">
-                    <span>{item.x} ↔ {item.y}</span>
-                    <strong>{item.value.toFixed(2)}</strong>
-                  </div>
-                  <div className="analysis-accordion-summary-bar-track">
-                    <span className="analysis-accordion-summary-bar-fill" style={{ width: `${Math.min(Math.abs(item.value) * 100, 100)}%`, backgroundColor: item.value >= 0 ? "#7ad6ff" : "#ff8c8c" }} />
-                  </div>
+            <div className="phone-only analysis-accordion-summary-preview">
+              {correlations.slice(0, 3).map((item) => (
+                <div key={`${item.x}-${item.y}`} className="analysis-accordion-summary-row">
+                  <strong>{item.x} ↔ {item.y}</strong>
+                  <span>{item.value >= 0 ? "positive" : "negative"} corr {item.value.toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -70,10 +65,10 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Skewed numeric fields</span>
               <p className="mobile-accordion-hint">Columns with non-symmetric distributions that may need transformation</p>
               <div className="phone-only analysis-accordion-summary-preview">
-                {skewedFields.slice(0, 2).map((item) => (
+                {skewedFields.slice(0, 3).map((item) => (
                   <div key={item.column} className="analysis-accordion-summary-row">
                     <strong>{item.column}</strong>
-                    <span>skew {item.skew.toFixed(2)}</span>
+                    <span>skew {item.skew.toFixed(2)} · median {item.median.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -103,10 +98,10 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Dominant categories</span>
               <p className="mobile-accordion-hint">Categorical columns where one value appears far more than others</p>
               <div className="phone-only analysis-accordion-summary-preview">
-                {dominantCategories.slice(0, 2).map((item) => (
+                {dominantCategories.slice(0, 3).map((item) => (
                   <div key={item.column} className="analysis-accordion-summary-row">
                     <strong>{item.column}</strong>
-                    <span>{item.top?.value} · {formatPercent(Number(item.top?.pct || 0) * 100)}</span>
+                    <span>{item.top?.value} · {formatPercent(Number(item.top?.pct || 0) * 100)} · {item.unique_count} unique</span>
                   </div>
                 ))}
               </div>
@@ -134,6 +129,16 @@ export default function RelationshipsTab({ schema, statistics }: RelationshipsTa
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Modeling signals</span>
               <p className="mobile-accordion-hint">Inferred identifier and target columns for supervised modeling</p>
+              <div className="phone-only analysis-accordion-summary-preview">
+                <div className="analysis-accordion-summary-row">
+                  <strong>Identifiers</strong>
+                  <span>{schema.identifier_columns.slice(0, 2).join(", ") || "None inferred"}</span>
+                </div>
+                <div className="analysis-accordion-summary-row">
+                  <strong>Targets</strong>
+                  <span>{schema.target_candidates.slice(0, 3).join(", ") || "None inferred"}</span>
+                </div>
+              </div>
               <div className="phone-only analysis-accordion-summary-chip-list">
                 {schema.identifier_columns.slice(0, 2).map((column) => (
                   <span key={`identifier-${column}`} className="analysis-accordion-summary-chip">ID: {column}</span>
