@@ -152,6 +152,11 @@ function formatClusterLabel(cluster: number) {
   return `Cluster ${cluster}`;
 }
 
+function truncateSummary(text: string, limit = 92) {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
 function formatNormalizedPercent(value: number) {
   return `${Math.round(Math.max(0, Math.min(1, value)) * 100)}%`;
 }
@@ -840,6 +845,28 @@ export default function MLTab({
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Lab overview</span>
             <p className="mobile-accordion-hint">Modes, runtime guardrails, and what this ML lab runs on</p>
+            <div className="phone-only analysis-accordion-summary-preview">
+              <div className="analysis-accordion-summary-row">
+                <strong>Saved runs</strong>
+                <span>{experiments.length} total · {supervisedExperiments.length} supervised · {unsupervisedExperiments.length} unsupervised</span>
+              </div>
+              <div className="analysis-accordion-summary-row">
+                <strong>Supervised lane</strong>
+                <span>
+                  {capabilities.supervised.available
+                    ? `${targetOptions.length} target options are ready for benchmarking.`
+                    : truncateSummary(capabilities.supervised.reason, 86)}
+                </span>
+              </div>
+              <div className="analysis-accordion-summary-row">
+                <strong>Unsupervised lane</strong>
+                <span>
+                  {capabilities.unsupervised.available
+                    ? `Start from ${clusterInput || "3"} segments and refine the scan after the first run.`
+                    : truncateSummary(capabilities.unsupervised.reason, 86)}
+                </span>
+              </div>
+            </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">
@@ -918,6 +945,14 @@ export default function MLTab({
               <div className="min-w-0">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Method guide</span>
                 <p className="mobile-accordion-hint">Supported supervised models and what each one is best for</p>
+                <div className="phone-only analysis-accordion-summary-preview">
+                  {methodGuideCards.slice(0, 3).map((item) => (
+                    <div key={`method-${item.name}`} className="analysis-accordion-summary-row">
+                      <strong>{item.name}</strong>
+                      <span>{truncateSummary(item.detail, 88)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </summary>
             <div className="mobile-accordion-body">
@@ -1132,6 +1167,14 @@ export default function MLTab({
               <div className="min-w-0">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">Score interpretation</span>
                 <p className="mobile-accordion-hint">Why low scores usually reflect data difficulty, not model failure</p>
+                <div className="phone-only analysis-accordion-summary-preview">
+                  {supervisedFailureFactors.slice(0, 3).map((item) => (
+                    <div key={`factor-${item.title}`} className="analysis-accordion-summary-row">
+                      <strong>{item.title}</strong>
+                      <span>{truncateSummary(item.detail, 88)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </summary>
             <div className="mobile-accordion-body">

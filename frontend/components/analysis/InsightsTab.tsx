@@ -4,6 +4,11 @@ type InsightsTabProps = {
   insights: AnalysisInsights;
 };
 
+function truncatePreview(text: string, limit = 108) {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
 export default function InsightsTab({ insights }: InsightsTabProps) {
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -13,8 +18,9 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Findings</span>
             <p className="mobile-accordion-hint">Plain-language summary and key findings from the dataset scan</p>
             <div className="phone-only analysis-accordion-summary-preview">
+              <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary)}</p>
               {insights.findings.slice(0, 2).map((finding) => (
-                <p key={finding} className="analysis-accordion-summary-text">{finding}</p>
+                <p key={finding} className="analysis-accordion-summary-text">{truncatePreview(finding, 92)}</p>
               ))}
             </div>
           </div>
@@ -37,13 +43,18 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">What to do next</span>
             <p className="mobile-accordion-hint">Recommended cleanup steps and modeling readiness assessment</p>
             <div className="phone-only analysis-accordion-summary-preview">
-              {insights.recommended_next_steps.slice(0, 2).map((item) => (
-                <p key={item} className="analysis-accordion-summary-text">{item}</p>
+              {insights.recommended_next_steps.slice(0, 3).map((item) => (
+                <p key={item} className="analysis-accordion-summary-text">{truncatePreview(item, 92)}</p>
               ))}
               <div className="analysis-accordion-summary-chip-list">
                 <span className="analysis-accordion-summary-chip">
                   {insights.modeling_readiness.is_ready ? "Ready for ML" : "EDA-first"}
                 </span>
+                {insights.modeling_readiness.target_candidates[0] ? (
+                  <span className="analysis-accordion-summary-chip">
+                    Target: {insights.modeling_readiness.target_candidates[0]}
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>

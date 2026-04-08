@@ -851,6 +851,15 @@ function BatchMobileSections({
                 Clear selection
               </button>
             </div>
+            <div className="mobile-screen-actions">
+              <button
+                type="button"
+                onClick={() => setConfirmAction("selected")}
+                className="mobile-screen-button mobile-screen-button-danger"
+              >
+                Delete current dataset
+              </button>
+            </div>
           </>
         ) : null}
       </section>
@@ -909,17 +918,6 @@ function BatchMobileSections({
               className="mobile-screen-button mobile-screen-button-secondary"
             >
               Show all {analyses.length} datasets
-            </button>
-          </div>
-        ) : null}
-        {selectedAnalysis ? (
-          <div className="mobile-screen-actions">
-            <button
-              type="button"
-              onClick={() => setConfirmAction("selected")}
-              className="mobile-screen-button mobile-screen-button-danger"
-            >
-              Delete current dataset
             </button>
           </div>
         ) : null}
