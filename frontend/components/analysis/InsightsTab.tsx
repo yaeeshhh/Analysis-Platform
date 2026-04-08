@@ -2,6 +2,7 @@ import { AnalysisInsights } from "@/lib/analysisTypes";
 
 type InsightsTabProps = {
   insights: AnalysisInsights;
+  mobileSection?: string | null;
 };
 
 function truncatePreview(text: string, limit = 108) {
@@ -9,10 +10,13 @@ function truncatePreview(text: string, limit = 108) {
   return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
 }
 
-export default function InsightsTab({ insights }: InsightsTabProps) {
+export default function InsightsTab({ insights, mobileSection }: InsightsTabProps) {
+  const show = (section: string) => !mobileSection || mobileSection === section;
+
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-      <details className="mobile-accordion">
+      {show("findings") ? (
+      <details className="mobile-accordion" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Findings</span>
@@ -36,8 +40,10 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
           </div>
         </div>
       </details>
+      ) : null}
 
-      <details className="mobile-accordion">
+      {show("what-to-do-next") ? (
+      <details className="mobile-accordion" open={!!mobileSection}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">What to do next</span>
@@ -78,6 +84,7 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
           </div>
         </div>
       </details>
+      ) : null}
     </section>
   );
 }

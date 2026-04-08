@@ -4,9 +4,10 @@ import { AnalysisOverview, AnalysisQuality } from "@/lib/analysisTypes";
 type DataQualityTabProps = {
   overview: AnalysisOverview;
   quality: AnalysisQuality;
+  mobileSection?: string | null;
 };
 
-export default function DataQualityTab({ overview, quality }: DataQualityTabProps) {
+export default function DataQualityTab({ overview, quality, mobileSection }: DataQualityTabProps) {
   const displayQualityScore = calculateQualityScore(overview, quality);
   const cards = [
     { label: "Quality score", value: displayQualityScore.toFixed(1) },
@@ -15,8 +16,12 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
     { label: "Outlier columns", value: quality.outlier_columns.length.toString() },
   ];
 
+  const show = (section: string) => !mobileSection || mobileSection === section;
+
   return (
     <section className="analysis-tab-surface space-y-4">
+      {!mobileSection ? (
+      <>
       <div className="dq-summary-grid grid gap-4 md:grid-cols-4">
         {cards.map((card) => (
           <article key={card.label} className="border-b border-white/6 pb-3">
@@ -31,9 +36,12 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
         constant or near-constant fields, parsing issues, strong correlations, and widespread outlier-heavy columns.
         Higher scores indicate cleaner data.
       </article>
+      </>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <details className="mobile-accordion">
+        {show("missingness") ? (
+        <details className="mobile-accordion" open={!!mobileSection}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
@@ -73,8 +81,10 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
             </div>
           </div>
         </details>
+        ) : null}
 
-        <details className="mobile-accordion">
+        {show("recommendations") ? (
+        <details className="mobile-accordion" open={!!mobileSection}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Recommendations</span>
@@ -101,6 +111,7 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
             </ul>
           </div>
         </details>
+        ) : null}
       </div>
     </section>
   );
