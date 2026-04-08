@@ -12,6 +12,11 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Findings</span>
             <p className="mobile-accordion-hint">Plain-language summary and key findings from the dataset scan</p>
+            <div className="phone-only analysis-accordion-summary-preview">
+              {insights.findings.slice(0, 2).map((finding) => (
+                <p key={finding} className="analysis-accordion-summary-text">{finding}</p>
+              ))}
+            </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">
@@ -31,6 +36,16 @@ export default function InsightsTab({ insights }: InsightsTabProps) {
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">What to do next</span>
             <p className="mobile-accordion-hint">Recommended cleanup steps and modeling readiness assessment</p>
+            <div className="phone-only analysis-accordion-summary-preview">
+              {insights.recommended_next_steps.slice(0, 2).map((item) => (
+                <p key={item} className="analysis-accordion-summary-text">{item}</p>
+              ))}
+              <div className="analysis-accordion-summary-chip-list">
+                <span className="analysis-accordion-summary-chip">
+                  {insights.modeling_readiness.is_ready ? "Ready for ML" : "EDA-first"}
+                </span>
+              </div>
+            </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">
