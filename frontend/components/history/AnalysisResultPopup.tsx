@@ -11,6 +11,7 @@ const StatisticsTab = lazy(() => import("@/components/analysis/StatisticsTab"));
 const VisualisationsTab = lazy(() => import("@/components/analysis/VisualisationsTab"));
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import { calculateQualityScore } from "@/lib/analysisDerived";
+import { analysisVisualCards } from "@/lib/analysisVisualCards";
 import { AnalysisReport, MlExperimentSummary, SupervisedResult, UnsupervisedResult } from "@/lib/analysisTypes";
 import { formatDate } from "@/lib/helpers";
 
@@ -39,6 +40,17 @@ const sections = [
 ] as const;
 
 type PopupSectionId = (typeof sections)[number]["id"];
+
+const popupSectionToCardKey: Record<PopupSectionId, string> = {
+  overview: "overview",
+  insights: "overview",
+  schema: "schema",
+  quality: "data-health",
+  statistics: "data-health",
+  relationships: "charts",
+  visualisations: "charts",
+  ml: "ml",
+};
 
 type PopupCardSubtab = { section: string | string[]; label: string; tab?: PopupSectionId };
 type PopupCard = {
@@ -154,6 +166,7 @@ export default function AnalysisResultPopup({
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const ready = hasRenderableReport(report);
+  const activeCardKey = popupSectionToCardKey[activeSectionId] ?? "overview";
 
   useEffect(() => {
     if (!open || !ready) return;
@@ -359,6 +372,49 @@ export default function AnalysisResultPopup({
                 onDeleteExperiment={onDeleteExperiment}
               />
             </div>
+          ) : null}
+
+          {!loading && !error && report && ready ? (
+            <section className="history-popup-visual-strip tablet-up">
+              <div className="history-popup-visual-strip-head">
+                <p className="history-popup-select-label">Report map</p>
+                <p className="history-popup-section-note">Jump between the saved report surfaces without leaving the popup.</p>
+              </div>
+              <div className="analysis-visual-grid" data-layout="workspace">
+                {analysisVisualCards.map((card) => {
+                  const areaActive = card.key === activeCardKey;
+                  return (
+                    <article
+                      key={`history-popup-${card.key}`}
+                      className={`analysis-visual-card ${areaActive ? "analysis-visual-card-active" : ""}`}
+                      style={{ "--analysis-card-accent": card.accent, "--analysis-card-border": `${card.accent}33` } as React.CSSProperties}
+                    >
+                      <div className="analysis-visual-cover">{card.cover}</div>
+                      <div className="analysis-visual-body">
+                        <p className="analysis-visual-title">{card.label}</p>
+                        <p className="analysis-visual-copy">{card.description}</p>
+                        <div className="analysis-visual-tabs">
+                          {card.tabKeys.map((tabKey) => {
+                            const section = sections.find((item) => item.id === tabKey);
+                            const active = activeSectionId === tabKey;
+                            return (
+                              <button
+                                type="button"
+                                key={`history-popup-${card.key}-${tabKey}`}
+                                onClick={() => handleScrollToSection(tabKey as PopupSectionId)}
+                                className={`analysis-subnav-link ${active ? "analysis-subnav-link-active" : ""}`}
+                              >
+                                {section?.label ?? tabKey}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
           ) : null}
 
           {/* ── Tablet/Desktop: long scroll with section frames ── */}

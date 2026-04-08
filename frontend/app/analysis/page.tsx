@@ -269,18 +269,6 @@ function AnalysisPageContent() {
   };
   const desktopAccent = tabToAccent[visibleTab] ?? "#4f6ef7";
 
-  const tabToCardKey: Record<string, string> = {
-    overview: "overview",
-    insights: "overview",
-    quality: "data-health",
-    statistics: "data-health",
-    schema: "schema",
-    relationships: "charts",
-    visualisations: "charts",
-    ml: "ml",
-  };
-  const desktopCardKey = tabToCardKey[visibleTab] ?? "overview";
-
   return (
     <>
       <AppShell
@@ -474,7 +462,10 @@ function AnalysisPageContent() {
             ) : null}
 
             {visibleTab === "overview" && hasRenderableReport && report ? (
-              <div className="tablet-up grid gap-4 xl:grid-cols-3">
+              <div
+                className="tablet-up grid gap-4 xl:grid-cols-3 desktop-tab-accent-wrapper"
+                style={{ "--analysis-card-accent": desktopAccent, "--analysis-card-border": `${desktopAccent}33` } as React.CSSProperties}
+              >
                 <article className="desktop-stat-card">
                   <p className="desktop-stat-label">Total rows</p>
                   <p className="desktop-stat-value">{report.overview.row_count.toLocaleString()}</p>
@@ -506,16 +497,6 @@ function AnalysisPageContent() {
             {/* Inline tab content — tablet+ only (phone uses slide pages) */}
             <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
             <div className="tablet-up space-y-4 desktop-tab-accent-wrapper" style={{ "--analysis-card-accent": desktopAccent, "--analysis-card-border": `${desktopAccent}33` } as React.CSSProperties}>
-
-            {/* Desktop card cover for active tab */}
-            {hasRenderableReport ? (
-              <div
-                className="desktop-card-cover"
-                style={{ background: `linear-gradient(135deg, ${desktopAccent}08, ${desktopAccent}15)` }}
-              >
-                {cardCovers[desktopCardKey]}
-              </div>
-            ) : null}
 
             {visibleTab === "overview" && hasRenderableReport && report ? (
               <OverviewTab
