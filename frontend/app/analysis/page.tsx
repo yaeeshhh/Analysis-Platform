@@ -32,12 +32,12 @@ import {
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import {
   type AnalysisTabKey,
-  analysisFocusAreas,
   analysisTabDescriptions,
   getAnalysisFocusArea,
   getAnalysisTabDefinition,
   resolveRequestedTab,
 } from "@/lib/analysisNavigation";
+import { analysisVisualCards } from "@/lib/analysisVisualCards";
 import { formatDate } from "@/lib/helpers";
 import { useApplyNavigationScroll } from "@/lib/navigationScroll";
 import { resolveAuthenticatedUser } from "@/lib/session";
@@ -74,6 +74,11 @@ function AnalysisPageContent() {
 
   function handleTabChange(nextTab: AnalysisTabKey) {
     setActiveTab(nextTab);
+    if (typeof window !== "undefined" && window.innerWidth < 960) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      });
+    }
     if (selectedAnalysisId) {
       const tabQuery = nextTab !== "overview" ? `&tab=${nextTab}` : "";
       router.replace(`/analysis?analysisId=${selectedAnalysisId}${tabQuery}`, { scroll: false });
@@ -322,8 +327,6 @@ function AnalysisPageContent() {
             {showWorkspaceNavigation && hasRenderableReport && report ? (
               <AnalysisMobileSections
                 report={report}
-                activeTab={visibleTab}
-                onTabChange={handleTabChange}
                 refreshAnalyses={refreshAnalyses}
               />
             ) : null}
@@ -372,24 +375,21 @@ function AnalysisPageContent() {
               <section id="analysis-workspace-navigation" className="tablet-up route-scroll-target desktop-panel" style={{ paddingBottom: 0 }}>
                 <div className="px-1">
                   <p className="text-xs uppercase tracking-[0.2em] text-white/42">Analysis map</p>
-                  <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                    {analysisFocusAreas.map((focusArea) => {
-                      const areaActive = focusArea.key === activeFocusArea.key;
+                  <div className="analysis-visual-grid mt-3" data-layout="workspace">
+                    {analysisVisualCards.map((card) => {
+                      const areaActive = card.tabKeys.includes(visibleTab);
                       return (
                         <article
-                          key={focusArea.key}
-                          className={`rounded-xl border px-4 py-4 ${
-                            areaActive
-                              ? "border-[#7c3aed]/35 bg-[#7c3aed]/10"
-                              : "border-white/8 bg-white/[0.02]"
-                          }`}
+                          key={card.key}
+                          className={`analysis-visual-card ${areaActive ? "analysis-visual-card-active" : ""}`}
+                          style={{ "--analysis-card-accent": card.accent, "--analysis-card-border": `${card.accent}33` } as React.CSSProperties}
                         >
-                          <p className="text-[0.64rem] font-bold uppercase tracking-[0.16em] text-white/40">
-                            {focusArea.label}
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-white/52">{focusArea.description}</p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {focusArea.tabKeys.map((tabKey) => {
+                          <div className="analysis-visual-cover">{card.cover}</div>
+                          <div className="analysis-visual-body">
+                            <p className="analysis-visual-title">{card.label}</p>
+                            <p className="analysis-visual-copy">{card.description}</p>
+                            <div className="analysis-visual-tabs">
+                              {card.tabKeys.map((tabKey) => {
                               const tab = getAnalysisTabDefinition(tabKey);
                               const active = visibleTab === tab.key;
                               return (
@@ -403,6 +403,7 @@ function AnalysisPageContent() {
                                 </button>
                               );
                             })}
+                          </div>
                           </div>
                         </article>
                       );
@@ -839,17 +840,27 @@ const cardCovers: Record<string, React.ReactElement> = {
 
 function AnalysisMobileSections({
   report,
-  activeTab: _activeTab,
-  onTabChange,
   refreshAnalyses,
 }: {
   report: AnalysisReport;
-  activeTab: AnalysisTabKey;
-  onTabChange: (nextTab: AnalysisTabKey) => void;
   refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
 }) {
   const [openCard, setOpenCard] = useState<string | null>(null);
   const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
+
+  useEffect(() => {
+    if (!openCard || typeof window === "undefined") {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [openCard]);
 
   function handleOpenCard(card: MobileCard) {
     setOpenCard(card.key);

@@ -1,4 +1,7 @@
-import { Suspense, type CSSProperties, type ReactNode } from "react";
+"use client";
+
+import { Suspense, useEffect, type CSSProperties, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import TopNav from "@/components/ui/TopNav";
 import MobileHeader from "@/components/ui/MobileHeader";
@@ -32,6 +35,34 @@ export default function AppShell({
   children,
 }: AppShellProps) {
   const TitleTag = titleTag;
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window === "undefined" || window.innerWidth >= 960) {
+      return;
+    }
+
+    const previous = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previous;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || window.innerWidth >= 960) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [pathname]);
 
   return (
     <main className="app-shell min-h-screen text-white">
