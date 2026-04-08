@@ -110,6 +110,8 @@ type AnalysisSectionPreview = {
   pills: string[];
 };
 
+type AnalysisPreviewMode = "normal" | "focused";
+
 function getAnalysisSectionPreview(report: AnalysisReport, tab: AnalysisTabKey): AnalysisSectionPreview {
   switch (tab) {
     case "overview":
@@ -189,6 +191,309 @@ function getAnalysisSectionPreview(report: AnalysisReport, tab: AnalysisTabKey):
             : "Supervised blocked",
         ],
       };
+  }
+}
+
+function clipPreviewText(text: string, limit: number) {
+  if (text.length <= limit) {
+    return text;
+  }
+
+  return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
+function formatPreviewCell(value: unknown) {
+  if (value === null || value === undefined || value === "") return "-";
+  if (typeof value === "number") {
+    return Number.isInteger(value) ? value.toString() : value.toFixed(2);
+  }
+
+  return String(value);
+}
+
+function renderAnalysisTabPreview(report: AnalysisReport, tab: AnalysisTabKey, mode: AnalysisPreviewMode) {
+  const detailCount = mode === "focused" ? 4 : 3;
+  const schemaCount = mode === "focused" ? 6 : 4;
+
+  switch (tab) {
+    case "overview": {
+      const previewEntries = Object.entries(report.overview.preview_rows?.[0] ?? {}).slice(0, mode === "focused" ? 6 : 4);
+
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Quick findings</p>
+              <div className="analysis-mobile-preview-list">
+                {report.insights.findings.slice(0, detailCount).map((finding) => (
+                  <p key={finding} className="analysis-mobile-preview-list-item">
+                    {clipPreviewText(finding, mode === "focused" ? 120 : 88)}
+                  </p>
+                ))}
+              </div>
+            </article>
+
+            {previewEntries.length > 0 ? (
+              <article className="analysis-mobile-preview-card">
+                <p className="analysis-mobile-preview-label">First row sample</p>
+                <div className="analysis-mobile-preview-keyline-grid">
+                  {previewEntries.map(([key, value]) => (
+                    <div key={key} className="analysis-mobile-preview-keyline">
+                      <span>{key}</span>
+                      <strong>{clipPreviewText(formatPreviewCell(value), 24)}</strong>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ) : null}
+          </div>
+        </section>
+      );
+    }
+    case "insights":
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Key findings</p>
+              <div className="analysis-mobile-preview-list">
+                {report.insights.findings.slice(0, detailCount).map((finding) => (
+                  <p key={finding} className="analysis-mobile-preview-list-item">
+                    {clipPreviewText(finding, mode === "focused" ? 120 : 88)}
+                  </p>
+                ))}
+              </div>
+            </article>
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Next actions</p>
+              <div className="analysis-mobile-preview-list">
+                {report.insights.recommended_next_steps.slice(0, detailCount).map((step) => (
+                  <p key={step} className="analysis-mobile-preview-list-item">
+                    {clipPreviewText(step, mode === "focused" ? 120 : 88)}
+                  </p>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+      );
+    case "schema": {
+      const previewColumns = report.schema.columns.slice(0, schemaCount);
+
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Sample columns</p>
+              <div className="analysis-mobile-preview-schema-list">
+                {previewColumns.map((column) => (
+                  <div key={column.name} className="analysis-mobile-preview-schema-item">
+                    <strong>{column.name}</strong>
+                    <span>{column.inferred_type} · {column.likely_role}</span>
+                  </div>
+                ))}
+              </div>
+              {report.schema.columns.length > previewColumns.length ? (
+                <p className="analysis-mobile-preview-footnote">
+                  +{report.schema.columns.length - previewColumns.length} more profiled columns in the expanded schema view.
+                </p>
+              ) : null}
+            </article>
+
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Signals</p>
+              <div className="analysis-mobile-preview-chip-list">
+                {report.schema.identifier_columns.slice(0, 3).map((column) => (
+                  <span key={`identifier-${column}`} className="analysis-mobile-preview-chip">ID: {column}</span>
+                ))}
+                {report.schema.target_candidates.slice(0, 3).map((column) => (
+                  <span key={`target-${column}`} className="analysis-mobile-preview-chip">Target: {column}</span>
+                ))}
+                {report.schema.identifier_columns.length === 0 && report.schema.target_candidates.length === 0 ? (
+                  <span className="analysis-mobile-preview-footnote">No strong identifiers or targets inferred yet.</span>
+                ) : null}
+              </div>
+            </article>
+          </div>
+        </section>
+      );
+    }
+    case "quality": {
+      const missingPreview = report.quality.missing_by_column.slice(0, detailCount);
+
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Highest missingness</p>
+              <div className="analysis-mobile-preview-bar-list">
+                {missingPreview.map((item) => (
+                  <div key={item.column} className="analysis-mobile-preview-bar-item">
+                    <div className="analysis-mobile-preview-bar-head">
+                      <span>{item.column}</span>
+                      <strong>{(item.missing_pct * 100).toFixed(1)}%</strong>
+                    </div>
+                    <div className="analysis-mobile-preview-bar-track">
+                      <span className="analysis-mobile-preview-bar-fill" style={{ width: `${Math.min(item.missing_pct * 100, 100)}%`, backgroundColor: "#7ad6ff" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Cleanup priorities</p>
+              <div className="analysis-mobile-preview-list">
+                {report.quality.recommendations.slice(0, detailCount).map((item) => (
+                  <p key={item} className="analysis-mobile-preview-list-item">
+                    {clipPreviewText(item, mode === "focused" ? 112 : 84)}
+                  </p>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+      );
+    }
+    case "statistics":
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Numeric summary</p>
+              <div className="analysis-mobile-preview-list">
+                {report.statistics.numeric_summary.slice(0, detailCount).map((item) => (
+                  <div key={item.column} className="analysis-mobile-preview-stat-row">
+                    <strong>{item.column}</strong>
+                    <span>mean {item.mean.toFixed(2)} · median {item.median.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Top categories</p>
+              <div className="analysis-mobile-preview-list">
+                {report.statistics.categorical_summary.slice(0, Math.max(2, detailCount - 1)).map((item) => (
+                  <div key={item.column} className="analysis-mobile-preview-stat-row">
+                    <strong>{item.column}</strong>
+                    <span>{item.top_values.slice(0, 2).map((value) => value.value).join(" · ") || "No dominant values"}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+      );
+    case "relationships":
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Top correlations</p>
+              <div className="analysis-mobile-preview-bar-list">
+                {report.quality.high_correlations.slice(0, detailCount).map((pair) => (
+                  <div key={`${pair.column_a}-${pair.column_b}`} className="analysis-mobile-preview-bar-item">
+                    <div className="analysis-mobile-preview-bar-head">
+                      <span>{pair.column_a} ↔ {pair.column_b}</span>
+                      <strong>{pair.correlation.toFixed(2)}</strong>
+                    </div>
+                    <div className="analysis-mobile-preview-bar-track">
+                      <span className="analysis-mobile-preview-bar-fill" style={{ width: `${Math.min(Math.abs(pair.correlation) * 100, 100)}%`, backgroundColor: pair.correlation >= 0 ? "#7ad6ff" : "#ff8c8c" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Modeling signals</p>
+              <div className="analysis-mobile-preview-chip-list">
+                {report.schema.identifier_columns.slice(0, 2).map((column) => (
+                  <span key={`relationship-id-${column}`} className="analysis-mobile-preview-chip">ID: {column}</span>
+                ))}
+                {report.schema.target_candidates.slice(0, 3).map((column) => (
+                  <span key={`relationship-target-${column}`} className="analysis-mobile-preview-chip">Target: {column}</span>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+      );
+    case "visualisations": {
+      const missingPreview = report.visualisations.missingness.slice(0, detailCount);
+      const histogramBins = report.visualisations.histograms[0]?.bins.slice(0, mode === "focused" ? 6 : 4) ?? [];
+      const maxCount = Math.max(...histogramBins.map((bin) => bin.count), 1);
+
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Missingness chart</p>
+              <div className="analysis-mobile-preview-bar-list">
+                {missingPreview.map((item) => (
+                  <div key={item.column} className="analysis-mobile-preview-bar-item">
+                    <div className="analysis-mobile-preview-bar-head">
+                      <span>{item.column}</span>
+                      <strong>{item.missing_pct.toFixed(1)}%</strong>
+                    </div>
+                    <div className="analysis-mobile-preview-bar-track">
+                      <span className="analysis-mobile-preview-bar-fill" style={{ width: `${Math.min(item.missing_pct, 100)}%`, backgroundColor: "#7ad6ff" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Histogram preview</p>
+              {histogramBins.length > 0 ? (
+                <div className="analysis-mobile-preview-spark">
+                  {histogramBins.map((bin, index) => (
+                    <div key={`${bin.start}-${bin.end}-${index}`} className="analysis-mobile-preview-spark-column">
+                      <span className="analysis-mobile-preview-spark-bar" style={{ height: `${Math.max((bin.count / maxCount) * 100, 12)}%` }} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="analysis-mobile-preview-footnote">No histogram-ready numeric distribution is available for this run.</p>
+              )}
+            </article>
+          </div>
+        </section>
+      );
+    }
+    case "ml":
+      return (
+        <section className="analysis-mobile-preview" data-preview-mode={mode}>
+          <div className="analysis-mobile-preview-grid">
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Run readiness</p>
+              <div className="analysis-mobile-preview-list">
+                <div className="analysis-mobile-preview-stat-row">
+                  <strong>Unsupervised</strong>
+                  <span>{report.ml_capabilities.unsupervised.available ? "Ready to run" : clipPreviewText(report.ml_capabilities.unsupervised.reason, 80)}</span>
+                </div>
+                <div className="analysis-mobile-preview-stat-row">
+                  <strong>Supervised</strong>
+                  <span>{report.ml_capabilities.supervised.available ? `${report.ml_capabilities.supervised.target_candidates.length} target options` : clipPreviewText(report.ml_capabilities.supervised.reason, 80)}</span>
+                </div>
+              </div>
+            </article>
+            <article className="analysis-mobile-preview-card">
+              <p className="analysis-mobile-preview-label">Recent experiments</p>
+              <div className="analysis-mobile-preview-list">
+                {report.ml_experiments.slice(0, Math.max(2, detailCount - 1)).map((experiment) => (
+                  <div key={experiment.id} className="analysis-mobile-preview-stat-row">
+                    <strong>{experiment.type === "supervised" ? "Supervised" : "Unsupervised"}</strong>
+                    <span>{clipPreviewText(experiment.summary, mode === "focused" ? 112 : 80)}</span>
+                  </div>
+                ))}
+                {report.ml_experiments.length === 0 ? (
+                  <p className="analysis-mobile-preview-footnote">No experiments saved yet. The focused lab view keeps the controls and downloads together.</p>
+                ) : null}
+              </div>
+            </article>
+          </div>
+        </section>
+      );
   }
 }
 
@@ -806,6 +1111,8 @@ function AnalysisMobileSections({
   const activeTabLabel = tabs.find((tab) => tab.key === activeTab)?.label ?? "Section";
   const activeTabPreview = getAnalysisSectionPreview(report, activeTab);
   const activeTabAccent = tabAccents[activeTab];
+  const activeTabNormalPreview = renderAnalysisTabPreview(report, activeTab, "normal");
+  const activeTabFocusedPreview = renderAnalysisTabPreview(report, activeTab, "focused");
   const focusedViewContent = (
     <div className="analysis-mobile-focus-view">
       <section className="analysis-mobile-focus-hero" style={{ ["--analysis-focus-accent" as string]: activeTabAccent }}>
@@ -827,9 +1134,11 @@ function AnalysisMobileSections({
       <section className="analysis-mobile-focus-note">
         <p className="analysis-mobile-focus-note-title">Expand only what matters</p>
         <p className="analysis-mobile-focus-note-copy">
-          Longer sections use read-more controls so the important signals stay easy to scan before you open the deeper detail.
+          The focused page starts with a visible preview, then the deeper sections open only when you ask for more detail.
         </p>
       </section>
+
+      {activeTabFocusedPreview}
 
       <section className="analysis-mobile-focus-content">
         {activeContent}
@@ -966,6 +1275,7 @@ function AnalysisMobileSections({
               </span>
             ))}
           </div>
+          {activeTabNormalPreview}
         </div>
         <div className="mobile-screen-actions">
           <button
