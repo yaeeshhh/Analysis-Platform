@@ -261,7 +261,7 @@ export default function DashboardPage() {
 
         {!loading ? (
           <>
-            <DashboardMobileSections analyses={analyses} latest={latest} totalExperiments={totalExperiments} />
+            <DashboardMobileSections analyses={analyses} latest={latest} />
 
             <div className="tablet-up desktop-page-stack">
               <section className="desktop-hero-panel section-glow">
@@ -439,35 +439,14 @@ export default function DashboardPage() {
 function DashboardMobileSections({
   analyses,
   latest,
-  totalExperiments,
 }: {
   analyses: AnalysisListItem[];
   latest: AnalysisListItem | null;
-  totalExperiments: number;
 }) {
-  const mlReadyRuns = analyses.filter((item) => item.insights.modeling_readiness.is_ready).length;
   const recentAnalyses = analyses.slice(0, 3);
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <div className="mobile-screen-stats">
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">Saved runs</p>
-          <p className="mobile-screen-stat-value">{analyses.length.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Workspace archive</p>
-        </article>
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">ML-ready</p>
-          <p className="mobile-screen-stat-value">{mlReadyRuns.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Ready for modeling</p>
-        </article>
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">ML runs</p>
-          <p className="mobile-screen-stat-value">{totalExperiments.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Saved experiments</p>
-        </article>
-      </div>
-
       <section className="mobile-screen-panel section-glow">
         <div className="mobile-screen-panel-header">
           <div>
@@ -477,7 +456,7 @@ function DashboardMobileSections({
             </h2>
             <p className="mobile-screen-lead">
               {latest
-                ? latest.insights.summary
+                ? truncateText(latest.insights.summary, 112)
                 : "Upload a CSV in Uploads, then return here to reopen the latest saved run and branch into Analysis or History."}
             </p>
           </div>
@@ -487,7 +466,7 @@ function DashboardMobileSections({
             {latest ? `${latest.overview.row_count.toLocaleString()} rows` : "CSV intake"}
           </span>
           <span className="mobile-screen-pill" data-tone="purple">
-            {latest ? `${latest.overview.column_count} columns` : "Guided workflow"}
+            {latest ? `${latest.overview.column_count} columns` : "Open Analysis fast"}
           </span>
           <span className="mobile-screen-pill" data-tone={latest?.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
             {latest ? (latest.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first") : "History saved"}

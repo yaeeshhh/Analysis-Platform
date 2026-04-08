@@ -1322,19 +1322,19 @@ a[class*="rounded"]:hover {
 /* Mobile typography scale */
 @media (max-width: 959px) {
   html {
-    font-size: 11.1px;
+    font-size: 16px;
   }
 
   .text-\[10px\] {
-    font-size: 7px !important;
+    font-size: 10px !important;
   }
 
   .text-\[11px\] {
-    font-size: 7.65px !important;
+    font-size: 11px !important;
   }
 
   .text-\[12px\] {
-    font-size: 8.35px !important;
+    font-size: 12px !important;
   }
 }
 
@@ -1343,7 +1343,7 @@ a[class*="rounded"]:hover {
   input,
   select,
   textarea {
-    font-size: 1em !important;
+    font-size: max(16px, 1em) !important;
   }
 }
 
@@ -1480,15 +1480,32 @@ a[class*="rounded"]:hover {
 }
 
 .mobile-header-title {
-  flex: 1;
   font-family: var(--font-display), sans-serif;
-  font-size: 0.875rem;
+  font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text-100);
+  line-height: 1.12;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.mobile-header-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobile-header-kicker {
+  color: rgba(242, 247, 251, 0.34);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.15;
+  text-transform: uppercase;
 }
 
 /* ── Mobile page label (lightweight hero replacement) ── */
@@ -1516,80 +1533,32 @@ a[class*="rounded"]:hover {
 
 @media (max-width: 959px) {
   .mobile-page-label {
-    padding-bottom: 0.95rem;
+    padding-bottom: 0.55rem;
   }
 
   .mobile-page-intro {
-    background:
-      radial-gradient(circle at top right, rgba(122, 214, 255, 0.14), transparent 34%),
-      linear-gradient(180deg, rgba(13, 19, 33, 0.98), rgba(16, 22, 36, 0.94));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
-    overflow: hidden;
-    padding: 0.95rem 1rem 1rem;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    padding: 0.1rem 0 0;
     position: relative;
-  }
-
-  .mobile-page-intro::before {
-    background: linear-gradient(90deg, #14b8a6, #2563eb 48%, #7c3aed);
-    content: "";
-    height: 2px;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-
-  .mobile-page-intro::after {
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.16), transparent 62%);
-    content: "";
-    height: 6.5rem;
-    pointer-events: none;
-    position: absolute;
-    right: -1.75rem;
-    top: -1.4rem;
-    width: 6.5rem;
-  }
-
-  .mobile-page-eyebrow {
-    color: #7ce7dd;
-    display: inline-flex;
-    font-family: var(--font-mono), monospace;
-    font-size: 0.64rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  .mobile-page-title {
-    color: var(--text-100);
-    font-family: var(--font-display), sans-serif;
-    font-size: clamp(1.68rem, 5.3vw, 2.08rem);
-    font-weight: 700;
-    letter-spacing: -0.06em;
-    line-height: 0.96;
-    margin: 0.3rem 0 0;
-    overflow-wrap: anywhere;
   }
 
   .mobile-page-description {
-    color: rgba(242, 247, 251, 0.54);
-    font-size: 0.78rem;
-    line-height: 1.55;
-    margin-top: 0.52rem;
-    max-width: 38rem;
-    position: relative;
-    z-index: 1;
+    color: rgba(242, 247, 251, 0.62);
+    font-size: 0.94rem;
+    line-height: 1.58;
+    margin-top: 0;
+    max-width: 42rem;
   }
 
   .mobile-page-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
-    margin-top: 0.92rem;
-    position: relative;
-    z-index: 1;
+    gap: 0.65rem;
+    margin-top: 0.75rem;
   }
 
   .mobile-page-actions > * {
@@ -1600,7 +1569,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-stack {
     display: flex;
     flex-direction: column;
-    gap: 1.05rem;
+    gap: 0.95rem;
   }
 
   .mobile-screen-stack-compact {
@@ -1647,7 +1616,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-stat-label {
     color: rgba(242, 247, 251, 0.34);
     font-family: var(--font-mono), monospace;
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1666,7 +1635,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-stat-hint {
     color: rgba(242, 247, 251, 0.24);
-    font-size: 0.64rem;
+    font-size: 0.78rem;
     line-height: 1.35;
     margin-top: 0.18rem;
   }
@@ -1694,7 +1663,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-panel-action {
     color: var(--accent-cta-muted);
-    font-size: 0.77rem;
+    font-size: 0.84rem;
     font-weight: 600;
     line-height: 1.2;
     text-decoration: none;
@@ -1705,7 +1674,7 @@ a[class*="rounded"]:hover {
     color: rgba(242, 247, 251, 0.34);
     display: inline-flex;
     font-family: var(--font-mono), monospace;
-    font-size: 0.66rem;
+    font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1731,7 +1700,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-meta {
     color: rgba(242, 247, 251, 0.3);
     font-family: var(--font-mono), monospace;
-    font-size: 0.68rem;
+    font-size: 0.8rem;
     letter-spacing: 0.04em;
     line-height: 1.45;
     margin-top: 0.3rem;
@@ -1753,7 +1722,7 @@ a[class*="rounded"]:hover {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 999px;
     color: rgba(242, 247, 251, 0.64);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
     line-height: 1.2;
     padding: 0.38rem 0.72rem;
@@ -1785,7 +1754,7 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-screen-actions > * {
-    flex: 1 1 9rem;
+    flex: 1 1 11rem;
     min-width: 0;
   }
 
@@ -1796,12 +1765,12 @@ a[class*="rounded"]:hover {
     border-radius: 0.82rem;
     color: var(--text-100);
     display: inline-flex;
-    font-size: 0.8rem;
+    font-size: 0.94rem;
     font-weight: 600;
     justify-content: center;
     line-height: 1.3;
-    min-height: 2.9rem;
-    padding: 0.75rem 0.95rem;
+    min-height: 3.3rem;
+    padding: 0.82rem 1rem;
     text-align: center;
     text-decoration: none;
   }
@@ -1868,7 +1837,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row-title {
     color: var(--text-100);
-    font-size: 0.88rem;
+    font-size: 0.98rem;
     font-weight: 600;
     line-height: 1.35;
   }
@@ -1876,7 +1845,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-row-meta {
     color: rgba(242, 247, 251, 0.28);
     font-family: var(--font-mono), monospace;
-    font-size: 0.68rem;
+    font-size: 0.8rem;
     letter-spacing: 0.04em;
     line-height: 1.45;
     margin-top: 0.18rem;
@@ -1884,14 +1853,14 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row-copy {
     color: rgba(242, 247, 251, 0.54);
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     line-height: 1.6;
     margin-top: 0.55rem;
   }
 
   .mobile-screen-row-note {
     color: rgba(242, 247, 251, 0.4);
-    font-size: 0.75rem;
+    font-size: 0.84rem;
     line-height: 1.55;
     margin-top: 0.55rem;
   }
@@ -1904,7 +1873,7 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-screen-row-actions > * {
-    flex: 1 1 7.5rem;
+    flex: 1 1 10rem;
     min-width: 0;
   }
 
@@ -1943,7 +1912,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-link-title {
     color: var(--text-100);
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.35;
   }
@@ -1958,7 +1927,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-link-cta {
     color: var(--accent-cta-muted);
     display: inline-flex;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     margin-top: 0.65rem;
@@ -1981,14 +1950,14 @@ a[class*="rounded"]:hover {
   .mobile-screen-progress-copy {
     color: rgba(242, 247, 251, 0.56);
     display: flex;
-    font-size: 0.77rem;
+    font-size: 0.84rem;
     justify-content: space-between;
     gap: 0.75rem;
   }
 
   .mobile-screen-progress-copy strong {
     color: var(--text-100);
-    font-size: 0.76rem;
+    font-size: 0.84rem;
     font-weight: 600;
   }
 
@@ -2007,7 +1976,7 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-empty {
     color: rgba(242, 247, 251, 0.4);
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     line-height: 1.6;
     margin-top: 0.2rem;
   }
@@ -2039,7 +2008,7 @@ a[class*="rounded"]:hover {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.85rem;
     color: var(--text-100);
-    font-size: 0.82rem;
+    font-size: 1rem;
     min-height: 2.95rem;
     padding: 0.8rem 0.95rem;
     width: 100%;
@@ -2606,7 +2575,7 @@ a[class*="rounded"]:hover {
 
   .analysis-mobile-focus-content .recharts-text,
   .analysis-mobile-focus-content .recharts-layer text {
-    font-size: 8.05px !important;
+    font-size: 10.5px !important;
   }
 
   .analysis-mobile-focus-content .analysis-chart-frame {
@@ -2894,11 +2863,15 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-header-title {
-    font-size: 1rem;
+    font-size: 1.04rem;
+  }
+
+  .mobile-header-kicker {
+    font-size: 0.7rem;
   }
 
   .mobile-page-label {
-    padding-bottom: 1rem;
+    padding-bottom: 0.65rem;
   }
 
   .mobile-bottom-nav-item {
@@ -2911,15 +2884,11 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-page-intro {
-    padding: 1.05rem 1.1rem 1.1rem;
-  }
-
-  .mobile-page-title {
-    font-size: clamp(1.85rem, 4.8vw, 2.18rem);
+    padding: 0.15rem 0 0;
   }
 
   .mobile-page-description {
-    font-size: 0.8rem;
+    font-size: 0.98rem;
   }
 
   .mobile-screen-stats {
@@ -2935,7 +2904,7 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-screen-stack {
-    gap: 1.15rem;
+    gap: 1rem;
   }
 
   .mobile-screen-panel {

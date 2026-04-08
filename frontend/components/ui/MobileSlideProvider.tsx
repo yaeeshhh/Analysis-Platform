@@ -29,25 +29,53 @@ export function useMobileSlide() {
 
 export function MobileSlideProvider({ children }: { children: ReactNode }) {
   const [stack, setStack] = useState<SlidePageEntry[]>([]);
+  const stackRef = useRef<SlidePageEntry[]>([]);
   const scrollPositions = useRef<number[]>([]);
   const pathname = usePathname();
 
-  const push = useCallback((entry: SlidePageEntry) => {
-    scrollPositions.current.push(window.scrollY);
-    setStack((prev) => [...prev, entry]);
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-  }, []);
+  useEffect(() => {
+    stackRef.current = stack;
+  }, [stack]);
 
-  const pop = useCallback(() => {
+  const popOne = useCallback(() => {
     setStack((prev) => {
+      if (prev.length === 0) {
+        return prev;
+      }
+
       const next = prev.slice(0, -1);
       const savedScroll = scrollPositions.current.pop();
       if (savedScroll !== undefined) {
         requestAnimationFrame(() => window.scrollTo(0, savedScroll));
       }
+
       return next;
     });
   }, []);
+
+  const push = useCallback((entry: SlidePageEntry) => {
+    scrollPositions.current.push(window.scrollY);
+    window.history.pushState(
+      {
+        ...(window.history.state ?? {}),
+        __mobileSlide: true,
+        mobileSlideDepth: stackRef.current.length + 1,
+        mobileSlideId: entry.id,
+      },
+      ""
+    );
+    setStack((prev) => [...prev, entry]);
+    requestAnimationFrame(() => window.scrollTo(0, 0));
+  }, []);
+
+  const pop = useCallback(() => {
+    if (stackRef.current.length > 0) {
+      window.history.back();
+      return;
+    }
+
+    popOne();
+  }, [popOne]);
 
   // Close all slides on route change
   useEffect(() => {
@@ -61,14 +89,13 @@ export function MobileSlideProvider({ children }: { children: ReactNode }) {
   // Close all slides on browser back
   useEffect(() => {
     const handlePopState = () => {
-      if (stack.length > 0) {
-        setStack([]);
-        scrollPositions.current = [];
+      if (stackRef.current.length > 0) {
+        popOne();
       }
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [stack.length]);
+  }, [popOne]);
 
   return (
     <MobileSlideContext.Provider value={{ push, pop, stack }}>

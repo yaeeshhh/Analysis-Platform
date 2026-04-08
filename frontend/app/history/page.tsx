@@ -271,7 +271,6 @@ export default function HistoryPage() {
           <section className="space-y-4">
             <HistoryMobileSections
               key={`${searchQuery}|${readinessFilter}|${mlFilter}`}
-              analyses={analyses}
               filteredAnalyses={filteredAnalyses}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -609,7 +608,6 @@ export default function HistoryPage() {
 /* ────────────────── Phone-only slide sections ────────────────── */
 
 type HistoryMobileSectionsProps = {
-  analyses: AnalysisListItem[];
   filteredAnalyses: AnalysisListItem[];
   searchQuery: string;
   setSearchQuery: (value: string) => void;
@@ -627,7 +625,6 @@ type HistoryMobileSectionsProps = {
 };
 
 function HistoryMobileSections({
-  analyses,
   filteredAnalyses,
   searchQuery,
   setSearchQuery,
@@ -644,7 +641,7 @@ function HistoryMobileSections({
   onDownloadMlSummary,
 }: HistoryMobileSectionsProps) {
   const [visibleCount, setVisibleCount] = useState(5);
-  const runsWithMl = analyses.filter((analysis) => analysis.experiment_count > 0).length;
+  const [expandedActionId, setExpandedActionId] = useState<number | null>(null);
   const readinessOptions: Array<{ value: ReadinessFilter; label: string }> = [
     { value: "all", label: "All readiness" },
     { value: "ml-ready", label: "ML-ready" },
@@ -658,30 +655,12 @@ function HistoryMobileSections({
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <div className="mobile-screen-stats">
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">Saved runs</p>
-          <p className="mobile-screen-stat-value">{analyses.length.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Archive total</p>
-        </article>
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">Filtered</p>
-          <p className="mobile-screen-stat-value">{filteredAnalyses.length.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Current view</p>
-        </article>
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">With ML</p>
-          <p className="mobile-screen-stat-value">{runsWithMl.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Saved experiments</p>
-        </article>
-      </div>
-
       <section className="mobile-screen-panel section-glow">
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Run archive</p>
-            <h2 className="mobile-screen-title">Search and filter saved runs</h2>
-            <p className="mobile-screen-lead">Search, reopen, download, or retire saved runs.</p>
+            <h2 className="mobile-screen-title">Find a saved run</h2>
+            <p className="mobile-screen-lead">Search, filter, and reopen the run you need.</p>
           </div>
         </div>
         <div className="mobile-screen-field">
@@ -738,10 +717,8 @@ function HistoryMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Saved runs</p>
-            <h2 className="mobile-screen-title">Scan the archive without opening every card</h2>
-            <p className="mobile-screen-lead">
-              Key run details and all download actions stay visible on each card so the mobile archive feels closer to desktop.
-            </p>
+            <h2 className="mobile-screen-title">Open a run, keep extras tucked away</h2>
+            <p className="mobile-screen-lead">Use More actions for downloads and cleanup instead of loading every card with buttons.</p>
           </div>
         </div>
         {filteredAnalyses.length === 0 ? (
@@ -749,17 +726,12 @@ function HistoryMobileSections({
         ) : (
           <div className="mobile-screen-list">
             {filteredAnalyses.slice(0, visibleCount).map((analysis) => {
-              const modeLabel = analysis.latest_experiment
-                ? analysis.latest_experiment.type === "supervised"
-                  ? "Supervised ML"
-                  : "Unsupervised ML"
-                : "Analysis only";
               const latestExperiment = analysis.latest_experiment;
               const needsReview = !analysis.insights.modeling_readiness.is_ready;
               const reviewWarning = needsReview
                 ? getHistoryReviewWarning(analysis.insights.modeling_readiness.target_candidates)
                 : "";
-              const statusValue = analysis.status || "saved";
+              const actionsExpanded = expandedActionId === analysis.id;
 
               return (
                 <article key={analysis.id} className="mobile-screen-row">
@@ -774,71 +746,87 @@ function HistoryMobileSections({
                   </div>
 
                   <div className="mobile-screen-pills compact">
-                    <span className="mobile-screen-pill">{modeLabel}</span>
                     <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
                     <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
-                    <span className="mobile-screen-pill">{statusValue}</span>
                     <span className="mobile-screen-pill" data-tone="purple">
-                      {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
+                      {analysis.experiment_count === 0
+                        ? "Analysis only"
+                        : `${analysis.experiment_count} ML run${analysis.experiment_count === 1 ? "" : "s"}`}
                     </span>
                   </div>
 
-                  <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                  <p className="mobile-screen-row-copy">
+                    {analysis.insights.summary.length > 132
+                      ? `${analysis.insights.summary.slice(0, 132).trimEnd()}…`
+                      : analysis.insights.summary}
+                  </p>
                   {needsReview ? (
                     <div className="inline-warning-note mt-3">
                       <p className="inline-warning-note-title">Review advised</p>
                       <p className="inline-warning-note-copy">{reviewWarning}</p>
                     </div>
                   ) : null}
-                  <p className="mobile-screen-row-note">
-                    {latestExperiment
-                      ? `Latest ML: ${latestExperiment.summary}`
-                      : "No ML experiment is attached to this saved run yet."}
-                  </p>
 
-                  <div className="mobile-screen-actions">
+                  <div className="mobile-screen-row-actions">
                     <button
                       type="button"
                       onClick={() => onOpenPopup(analysis)}
                       className="mobile-screen-button mobile-screen-button-primary"
                     >
-                      Open full run
+                      Open run
                     </button>
-                  </div>
-                  <div className="mobile-screen-row-actions">
                     <button
                       type="button"
-                      onClick={() => onDownloadReport(analysis.id)}
+                      onClick={() => setExpandedActionId((current) => (current === analysis.id ? null : analysis.id))}
                       className="mobile-screen-button mobile-screen-button-secondary"
                     >
-                      Report
-                    </button>
-                    {latestExperiment ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
-                          className="mobile-screen-button mobile-screen-button-secondary"
-                        >
-                          ML report
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
-                          className="mobile-screen-button mobile-screen-button-secondary"
-                        >
-                          ML summary
-                        </button>
-                      </>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => onDeleteRun(analysis.id)}
-                      className="mobile-screen-button mobile-screen-button-danger"
-                    >
-                      Delete run
+                      {actionsExpanded ? "Hide actions" : "More actions"}
                     </button>
                   </div>
+
+                  {actionsExpanded ? (
+                    <>
+                      <div className="mobile-screen-actions">
+                        <button
+                          type="button"
+                          onClick={() => onDownloadReport(analysis.id)}
+                          className="mobile-screen-button mobile-screen-button-secondary"
+                        >
+                          Report
+                        </button>
+                        {latestExperiment ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
+                              className="mobile-screen-button mobile-screen-button-secondary"
+                            >
+                              ML report
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
+                              className="mobile-screen-button mobile-screen-button-secondary"
+                            >
+                              ML summary
+                            </button>
+                          </>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => onDeleteRun(analysis.id)}
+                          className="mobile-screen-button mobile-screen-button-danger"
+                        >
+                          Delete run
+                        </button>
+                      </div>
+                      <p className="mobile-screen-row-note">
+                        {latestExperiment
+                          ? `Latest ML: ${latestExperiment.summary}`
+                          : "No ML experiment is attached to this saved run yet."}
+                      </p>
+                    </>
+                  ) : null}
                 </article>
               );
             })}

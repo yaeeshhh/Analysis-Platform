@@ -708,30 +708,10 @@ function BatchMobileSections({
   setCurrentAnalysisSelection: (id: number) => void;
 }) {
   const [showAllUploads, setShowAllUploads] = useState(false);
-  const readyRuns = analyses.filter((item) => item.insights.modeling_readiness.is_ready).length;
-  const highlightedMissing = highlightedAnalysis?.overview.total_missing_values ?? 0;
   const highlightedDuplicates = highlightedAnalysis?.overview.duplicate_row_count ?? 0;
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <div className="mobile-screen-stats">
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">Datasets</p>
-          <p className="mobile-screen-stat-value">{analyses.length.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Saved uploads</p>
-        </article>
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">Missing</p>
-          <p className="mobile-screen-stat-value">{highlightedMissing.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Current snapshot</p>
-        </article>
-        <article className="mobile-screen-stat">
-          <p className="mobile-screen-stat-label">ML-ready</p>
-          <p className="mobile-screen-stat-value">{readyRuns.toLocaleString()}</p>
-          <p className="mobile-screen-stat-hint">Ready to analyse</p>
-        </article>
-      </div>
-
       <section className="mobile-screen-panel section-glow">
         <div className="mobile-screen-panel-header">
           <div>

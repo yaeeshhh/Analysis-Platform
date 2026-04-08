@@ -324,26 +324,6 @@ export default function AccountPage() {
         {!loading && user ? (
           <>
             <div className="phone-only mobile-screen-stack">
-              <div className="mobile-screen-stats">
-                <article className="mobile-screen-stat">
-                  <p className="mobile-screen-stat-label">Username</p>
-                  <p className="mobile-screen-stat-value">{user.username || "—"}</p>
-                  <p className="mobile-screen-stat-hint">Workspace identity</p>
-                </article>
-                <article className="mobile-screen-stat">
-                  <p className="mobile-screen-stat-label">Remember</p>
-                  <p className="mobile-screen-stat-value">
-                    {rememberStatus.available ? (rememberStatus.enabled ? `${rememberStatus.daysRemaining}d` : "Off") : "N/A"}
-                  </p>
-                  <p className="mobile-screen-stat-hint">Browser memory</p>
-                </article>
-                <article className="mobile-screen-stat">
-                  <p className="mobile-screen-stat-label">2FA</p>
-                  <p className="mobile-screen-stat-value">{user.two_factor_enabled ? "On" : "Off"}</p>
-                  <p className="mobile-screen-stat-hint">Password verification</p>
-                </article>
-              </div>
-
               <section className="mobile-screen-panel section-glow">
                 <div className="mobile-screen-profile">
                   <div className="mobile-screen-avatar">{getAccountInitials(user.username || user.email)}</div>
