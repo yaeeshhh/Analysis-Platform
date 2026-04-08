@@ -1,18 +1,18 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
-import OverviewTab from "@/components/analysis/OverviewTab";
-import SchemaTab from "@/components/analysis/SchemaTab";
-import DataQualityTab from "@/components/analysis/DataQualityTab";
-import StatisticsTab from "@/components/analysis/StatisticsTab";
-import VisualisationsTab from "@/components/analysis/VisualisationsTab";
-import InsightsTab from "@/components/analysis/InsightsTab";
-import RelationshipsTab from "@/components/analysis/RelationshipsTab";
-import MLTab from "@/components/analysis/MLTab";
+const OverviewTab = lazy(() => import("@/components/analysis/OverviewTab"));
+const SchemaTab = lazy(() => import("@/components/analysis/SchemaTab"));
+const DataQualityTab = lazy(() => import("@/components/analysis/DataQualityTab"));
+const StatisticsTab = lazy(() => import("@/components/analysis/StatisticsTab"));
+const VisualisationsTab = lazy(() => import("@/components/analysis/VisualisationsTab"));
+const InsightsTab = lazy(() => import("@/components/analysis/InsightsTab"));
+const RelationshipsTab = lazy(() => import("@/components/analysis/RelationshipsTab"));
+const MLTab = lazy(() => import("@/components/analysis/MLTab"));
 import {
   deleteMlExperiment,
   downloadAnalysisReport,
@@ -479,6 +479,7 @@ function AnalysisPageContent() {
             ) : null}
 
             {/* Inline tab content — tablet+ only (phone uses slide pages) */}
+            <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
             <div className="tablet-up space-y-4">
             {visibleTab === "overview" && hasRenderableReport && report ? (
               <OverviewTab
@@ -555,6 +556,7 @@ function AnalysisPageContent() {
               />
             ) : null}
             </div>
+            </Suspense>
           </>
         ) : null}
 
@@ -897,11 +899,13 @@ function AnalysisMobileSections({
   if (openCard && currentCard) {
     const accent = cardAccents[currentCard.key] ?? "#4f6ef7";
     return (
-      <div className="phone-only mobile-screen-stack">
-        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn-floating">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-          All sections
-        </button>
+      <div className="phone-only mobile-analysis-fullpage">
+        <div className="mobile-analysis-fullpage-topbar">
+          <button type="button" onClick={handleBack} className="mobile-analysis-back-btn-inline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+        </div>
 
         {/* SVG card cover as the detail header */}
         <div
@@ -931,7 +935,9 @@ function AnalysisMobileSections({
         ) : null}
 
         <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content" style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}>
-          {renderContent()}
+          <Suspense fallback={<div className="py-8 text-center text-sm text-white/40">Loading…</div>}>
+            {renderContent()}
+          </Suspense>
         </section>
       </div>
     );

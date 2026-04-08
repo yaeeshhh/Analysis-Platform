@@ -785,21 +785,21 @@ export default function LoginRequiredModal({
 
   const modal = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]"
+      className="login-modal-overlay fixed inset-0 z-[100] flex items-end justify-center bg-[#080c16]/80 px-0 pb-0 backdrop-blur-md sm:items-center sm:px-4"
       onClick={dismissModal}
     >
       <div
-        className="w-full max-w-md rounded-xl border border-white/10 bg-[#15151a] p-6 text-white"
+        className="login-modal-card w-full max-w-md rounded-t-2xl border-t border-[#a78bfa]/20 bg-[#0d1117] p-5 text-[#f1f5f9] sm:rounded-2xl sm:border sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-semibold tracking-tight text-white">{title}</h2>
-        <p className="mt-3 text-sm leading-7 text-white/65">{message}</p>
+        <h2 className="text-2xl font-semibold tracking-tight text-[#f1f5f9]">{title}</h2>
+        <p className="mt-3 text-sm leading-7 text-[#94a3b8]">{message}</p>
 
-        <div className="mt-4 inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+        <div className="mt-4 inline-flex rounded-lg border border-[#a78bfa]/15 bg-[#111827] p-1">
           {mode === "login" && loginStep !== "identifier" ? (
             <span
               aria-current="page"
-              className="rounded-lg bg-white px-4 py-1.5 text-sm font-medium text-black"
+              className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-4 py-1.5 text-sm font-medium text-white"
             >
               Log in
             </span>
@@ -808,7 +808,7 @@ export default function LoginRequiredModal({
               type="button"
               onClick={() => switchMode("login")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                mode === "login" ? "bg-white text-black" : "text-white/75"
+                mode === "login" ? "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white" : "text-[#94a3b8]"
               }`}
             >
               Log in
@@ -819,7 +819,7 @@ export default function LoginRequiredModal({
               type="button"
               onClick={() => switchMode("signup")}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                mode === "signup" ? "bg-white text-black" : "text-white/75"
+                mode === "signup" ? "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white" : "text-[#94a3b8]"
               }`}
             >
               Sign up
@@ -842,10 +842,10 @@ export default function LoginRequiredModal({
                 onKeyDown={handleModalEnter}
                 placeholder="Username"
                 disabled={loading}
-                className={`w-full rounded-[14px] bg-[#111116] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/35 disabled:opacity-60 ${
+                className={`w-full rounded-[14px] bg-[#111827] px-3 py-2.5 text-sm text-white outline-none placeholder:text-[#94a3b8] disabled:opacity-60 ${
                   usernameFieldIsAvailable
                     ? "border border-emerald-400 ring-1 ring-emerald-500/30"
-                    : "border border-white/10"
+                    : "border border-[#a78bfa]/15"
                 }`}
                 style={usernameFieldStyle}
               />
@@ -857,7 +857,7 @@ export default function LoginRequiredModal({
                         ? "text-emerald-300"
                         : usernameErrorMessage
                         ? "text-red-300"
-                        : "text-white/60"
+                        : "text-[#94a3b8]"
                     }`}
                   >
                     {usernameStatusMessage}
@@ -880,10 +880,10 @@ export default function LoginRequiredModal({
                 onKeyDown={handleModalEnter}
                 placeholder="Email"
                 disabled={loading}
-                className={`w-full rounded-[14px] bg-[#111116] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/35 disabled:opacity-60 ${
+                className={`w-full rounded-[14px] bg-[#111827] px-3 py-2.5 text-sm text-white outline-none placeholder:text-[#94a3b8] disabled:opacity-60 ${
                   emailFieldIsAvailable
                     ? "border border-emerald-400 ring-1 ring-emerald-500/30"
-                    : "border border-white/10"
+                    : "border border-[#a78bfa]/15"
                 }`}
                 style={emailFieldStyle}
               />
@@ -895,7 +895,7 @@ export default function LoginRequiredModal({
                         ? "text-emerald-300"
                         : emailErrorMessage
                         ? "text-red-300"
-                        : "text-white/60"
+                        : "text-[#94a3b8]"
                     }`}
                   >
                     {emailStatusMessage}
@@ -919,7 +919,7 @@ export default function LoginRequiredModal({
                   onKeyDown={handleModalEnter}
                   placeholder="Password"
                   disabled={loading}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#111116] px-3 py-2.5 pr-14 text-sm text-white outline-none placeholder:text-white/35 disabled:opacity-60"
+                  className="w-full rounded-[14px] border border-[#a78bfa]/15 bg-[#111827] px-3 py-2.5 pr-14 text-sm text-white outline-none placeholder:text-[#94a3b8] disabled:opacity-60"
                 />
                 <PasswordToggleButton
                   shown={showPassword}
@@ -950,7 +950,7 @@ export default function LoginRequiredModal({
                   onKeyDown={handleModalEnter}
                   placeholder="Confirm password"
                   disabled={loading}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#111116] px-3 py-2.5 pr-14 text-sm text-white outline-none placeholder:text-white/35 disabled:opacity-60"
+                  className="w-full rounded-[14px] border border-[#a78bfa]/15 bg-[#111827] px-3 py-2.5 pr-14 text-sm text-white outline-none placeholder:text-[#94a3b8] disabled:opacity-60"
                 />
                 <PasswordToggleButton
                   shown={showConfirmPassword}
@@ -1035,10 +1035,10 @@ export default function LoginRequiredModal({
                 onKeyDown={handleModalEnter}
                 placeholder="Email or username"
                 disabled={loading}
-                className="w-full rounded-[14px] border border-white/10 bg-[#111116] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/35 disabled:opacity-60"
+                className="w-full rounded-[14px] border border-[#a78bfa]/15 bg-[#111827] px-3 py-2.5 text-sm text-white outline-none placeholder:text-[#94a3b8] disabled:opacity-60"
               />
 
-              <label className="mt-0.5 inline-flex w-fit cursor-pointer items-center gap-1.5 pl-0.5 text-[11px] text-white/60">
+              <label className="mt-0.5 inline-flex w-fit cursor-pointer items-center gap-1.5 pl-0.5 text-[11px] text-[#94a3b8]">
                 <input
                   type="checkbox"
                   checked={rememberMe}
@@ -1063,7 +1063,7 @@ export default function LoginRequiredModal({
                   onKeyDown={handleModalEnter}
                   placeholder="Password"
                   disabled={loading}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#111116] px-3 py-2.5 pr-14 text-sm text-white outline-none placeholder:text-white/35 disabled:opacity-60"
+                  className="w-full rounded-[14px] border border-[#a78bfa]/15 bg-[#111827] px-3 py-2.5 pr-14 text-sm text-white outline-none placeholder:text-[#94a3b8] disabled:opacity-60"
                 />
                 <PasswordToggleButton
                   shown={showPassword}
@@ -1193,7 +1193,7 @@ export default function LoginRequiredModal({
                 setInvalidPasswordAttempts(0);
               }}
               disabled={loading}
-              className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
             >
               Back
             </button>
@@ -1213,7 +1213,7 @@ export default function LoginRequiredModal({
                 setError("");
               }}
               disabled={loading || signupVerifying}
-              className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
             >
               Back
             </button>
@@ -1247,7 +1247,7 @@ export default function LoginRequiredModal({
                   signupOtpCode.trim().length !== 6 ||
                   !signupOtpFormatValid))
             }
-            className="inline-flex rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
+            className="inline-flex rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-5 py-3 text-sm font-medium text-white transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:opacity-50"
           >
             {loading
               ? mode === "login"

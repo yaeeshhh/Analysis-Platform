@@ -259,10 +259,10 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
           }
         >
           <div className="space-y-4">
-            <div className="rounded-[18px] border border-white/10 bg-black/10 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-white/42">Signed in</p>
-              <p className="mt-2 truncate text-sm font-medium text-white">{user.full_name || user.username || "Profile"}</p>
-              <p className="mt-1 truncate text-sm text-white/62">{user.email}</p>
+            <div className="rounded-[18px] border border-[#a78bfa]/20 bg-[#111827] p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#a78bfa]">Signed in</p>
+              <p className="mt-2 truncate text-sm font-medium text-[#f1f5f9]">{user.full_name || user.username || "Profile"}</p>
+              <p className="mt-1 truncate text-sm text-[#94a3b8]">{user.email}</p>
             </div>
 
             <div className="space-y-2">
@@ -270,7 +270,7 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
                 href="/account"
                 targetId="account-first-block"
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+                className="block rounded-lg border border-white/5 bg-[#111827] px-4 py-2.5 text-sm font-medium text-[#f1f5f9] transition hover:bg-[#1a2332]"
               >
                 Account center
               </ScrollIntentLink>
@@ -278,7 +278,7 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
                 href="/batch"
                 targetId="batch-primary-section"
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+                className="block rounded-lg border border-white/5 bg-[#111827] px-4 py-2.5 text-sm font-medium text-[#f1f5f9] transition hover:bg-[#1a2332]"
               >
                 Upload studio
               </ScrollIntentLink>
@@ -286,7 +286,7 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
                 href="/history"
                 targetId="history-first-block"
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"
+                className="block rounded-lg border border-white/5 bg-[#111827] px-4 py-2.5 text-sm font-medium text-[#f1f5f9] transition hover:bg-[#1a2332]"
               >
                 History archive
               </ScrollIntentLink>
@@ -296,7 +296,7 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
               onClick={() => {
                 void handleLogout();
               }}
-              className="w-full rounded-lg border border-[#5a2328] bg-[#2a1215] px-4 py-2.5 text-left text-sm font-medium text-[#ff8b94] transition hover:bg-[#34171b]"
+              className="w-full rounded-lg border border-[#dc2626]/25 bg-[#dc2626]/10 px-4 py-2.5 text-left text-sm font-medium text-[#f87171] transition hover:bg-[#dc2626]/15"
             >
               Log out
             </button>

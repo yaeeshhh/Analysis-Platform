@@ -1,14 +1,14 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
-import DataQualityTab from "@/components/analysis/DataQualityTab";
-import InsightsTab from "@/components/analysis/InsightsTab";
-import MLTab from "@/components/analysis/MLTab";
-import OverviewTab from "@/components/analysis/OverviewTab";
-import RelationshipsTab from "@/components/analysis/RelationshipsTab";
-import SchemaTab from "@/components/analysis/SchemaTab";
-import StatisticsTab from "@/components/analysis/StatisticsTab";
-import VisualisationsTab from "@/components/analysis/VisualisationsTab";
+import { lazy, type ReactNode, Suspense, useEffect, useRef, useState } from "react";
+const DataQualityTab = lazy(() => import("@/components/analysis/DataQualityTab"));
+const InsightsTab = lazy(() => import("@/components/analysis/InsightsTab"));
+const MLTab = lazy(() => import("@/components/analysis/MLTab"));
+const OverviewTab = lazy(() => import("@/components/analysis/OverviewTab"));
+const RelationshipsTab = lazy(() => import("@/components/analysis/RelationshipsTab"));
+const SchemaTab = lazy(() => import("@/components/analysis/SchemaTab"));
+const StatisticsTab = lazy(() => import("@/components/analysis/StatisticsTab"));
+const VisualisationsTab = lazy(() => import("@/components/analysis/VisualisationsTab"));
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import { AnalysisReport, MlExperimentSummary, SupervisedResult, UnsupervisedResult } from "@/lib/analysisTypes";
@@ -345,6 +345,7 @@ export default function AnalysisResultPopup({
           {/* ── Tablet/Desktop: long scroll with section frames ── */}
           {!loading && !error && report && ready ? (
             <div className="history-popup-content tablet-up">
+              <Suspense fallback={<div className="py-12 text-center text-sm text-white/40">Loading tab…</div>}>
               <SectionFrame id="overview" title="Overview" note="Dataset posture, summary, and preview rows.">
                 <OverviewTab
                   overview={report.overview}
@@ -392,6 +393,7 @@ export default function AnalysisResultPopup({
                   onDeleteExperiment={onDeleteExperiment}
                 />
               </SectionFrame>
+              </Suspense>
             </div>
           ) : null}
         </div>
@@ -607,11 +609,13 @@ function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSu
   if (openCard && currentCard) {
     const accent = popupCardAccents[currentCard.key] ?? "#4f6ef7";
     return (
-      <div className="history-popup-mobile-detail">
-        <button type="button" onClick={handleBack} className="mobile-analysis-back-btn-floating">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-          All sections
-        </button>
+      <div className="history-popup-mobile-detail mobile-analysis-fullpage">
+        <div className="mobile-analysis-fullpage-topbar">
+          <button type="button" onClick={handleBack} className="mobile-analysis-back-btn-inline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+        </div>
 
         <div
           className="mobile-analysis-detail-cover"
@@ -643,7 +647,9 @@ function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSu
           className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content"
           style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}
         >
-          {renderContent()}
+          <Suspense fallback={<div className="py-8 text-center text-sm text-white/40">Loading…</div>}>
+            {renderContent()}
+          </Suspense>
         </section>
       </div>
     );
