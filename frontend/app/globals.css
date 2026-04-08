@@ -2965,15 +2965,9 @@ a[class*="rounded"]:hover {
   /* Tab pills within focus area */
   .mobile-analysis-tab-pills {
     display: flex;
-    gap: 0.35rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap;
+    gap: 0.3rem;
     padding-bottom: 0.15rem;
-    scrollbar-width: none;
-  }
-
-  .mobile-analysis-tab-pills::-webkit-scrollbar {
-    display: none;
   }
 
   .mobile-analysis-tab-pill {
@@ -2981,12 +2975,11 @@ a[class*="rounded"]:hover {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 999px;
     color: rgba(242, 247, 251, 0.52);
-    flex-shrink: 0;
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.01em;
-    min-height: 2.1rem;
-    padding: 0.34rem 0.78rem;
+    min-height: 1.9rem;
+    padding: 0.28rem 0.62rem;
     text-align: center;
     transition: background 120ms, border-color 120ms, color 120ms;
     white-space: nowrap;

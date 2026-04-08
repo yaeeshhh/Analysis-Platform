@@ -40,85 +40,71 @@ const sections = [
 
 type PopupSectionId = (typeof sections)[number]["id"];
 
-const popupCards: Array<{
-  key: PopupSectionId;
+type PopupCardSubtab = { section: string; label: string; tab?: PopupSectionId };
+type PopupCard = {
+  key: string;
   label: string;
   description: string;
   icon: string;
-  subtabs?: Array<{ section: string; label: string }>;
-}> = [
+  defaultTab: PopupSectionId;
+  subtabs?: PopupCardSubtab[];
+};
+
+const popupCards: PopupCard[] = [
   {
     key: "overview",
-    label: "Summary",
-    description: "AI summary, dataset posture, type mix, reading order, and raw data preview.",
+    label: "Overview",
+    description: "AI summary, findings, posture, type mix, next steps, and raw data.",
     icon: "📊",
+    defaultTab: "overview",
     subtabs: [
-      { section: "what-the-data-says", label: "What the data says" },
-      { section: "dataset-posture", label: "Dataset posture" },
+      { section: "what-the-data-says", label: "Data says" },
+      { section: "dataset-posture", label: "Posture" },
       { section: "type-mix", label: "Type mix" },
-      { section: "reading-order", label: "Reading order" },
+      { section: "findings", label: "Findings", tab: "insights" },
+      { section: "what-to-do-next", label: "Next steps", tab: "insights" },
       { section: "raw-data", label: "Raw data" },
     ],
   },
   {
-    key: "insights",
-    label: "Findings",
-    description: "Key findings, cleanup steps, and modeling readiness assessment.",
-    icon: "🔍",
-    subtabs: [
-      { section: "findings", label: "Findings" },
-      { section: "what-to-do-next", label: "What to do next" },
-    ],
-  },
-  {
-    key: "quality",
-    label: "Quality",
-    description: "Missing values, duplicates, constants, and quality recommendations.",
+    key: "data-health",
+    label: "Data Health",
+    description: "Missing values, quality recommendations, numeric and categorical summaries.",
     icon: "🩺",
+    defaultTab: "quality",
     subtabs: [
-      { section: "missingness", label: "Missingness" },
-      { section: "recommendations", label: "Recommendations" },
-    ],
-  },
-  {
-    key: "statistics",
-    label: "Statistics",
-    description: "Numeric and categorical column summaries with key distribution metrics.",
-    icon: "📐",
-    subtabs: [
-      { section: "numeric-summary", label: "Numeric summary" },
-      { section: "categorical-summary", label: "Categorical summary" },
+      { section: "missingness", label: "Missing" },
+      { section: "recommendations", label: "Fixes" },
+      { section: "numeric-summary", label: "Numeric", tab: "statistics" },
+      { section: "categorical-summary", label: "Categorical", tab: "statistics" },
     ],
   },
   {
     key: "schema",
-    label: "Fields",
-    description: "Column types, roles, identifiers, and target candidates.",
+    label: "Schema",
+    description: "Column types, roles, correlations, skew, dominant categories, and signals.",
     icon: "🗂️",
-  },
-  {
-    key: "relationships",
-    label: "Patterns",
-    description: "Correlations, skewed fields, dominant categories, and modeling signals.",
-    icon: "🔗",
+    defaultTab: "schema",
     subtabs: [
-      { section: "strongest-relationships", label: "Relationships" },
-      { section: "skewed-numeric-fields", label: "Skew" },
-      { section: "dominant-categories", label: "Dominant categories" },
-      { section: "modeling-signals", label: "Modeling signals" },
+      { section: "__all__", label: "Fields" },
+      { section: "strongest-relationships", label: "Correlations", tab: "relationships" },
+      { section: "skewed-numeric-fields", label: "Skew", tab: "relationships" },
+      { section: "dominant-categories", label: "Dominant", tab: "relationships" },
+      { section: "modeling-signals", label: "Signals", tab: "relationships" },
     ],
   },
   {
-    key: "visualisations",
+    key: "charts",
     label: "Charts",
-    description: "Missingness, histograms, categories, boxplots, heatmap, scatter, and drift.",
+    description: "Missingness, distributions, categories, boxplots, heatmap, scatter, and drift.",
     icon: "📈",
+    defaultTab: "visualisations",
     subtabs: [
-      { section: "missingness", label: "Missingness" },
-      { section: "distribution", label: "Distribution" },
-      { section: "top-categories", label: "Top categories" },
-      { section: "boxplot-summary", label: "Boxplots" },
-      { section: "correlation-heatmap", label: "Heatmap" },
+      { section: "missingness", label: "Missing" },
+      { section: "distribution", label: "Distrib." },
+      { section: "top-categories", label: "Top cats" },
+      { section: "boxplot-summary", label: "Box" },
+      { section: "correlation-heatmap", label: "Heat" },
       { section: "pairwise-scatter", label: "Scatter" },
       { section: "drift-checks", label: "Drift" },
     ],
@@ -128,6 +114,7 @@ const popupCards: Array<{
     label: "ML Lab",
     description: "Saved experiments and benchmark outputs.",
     icon: "🧪",
+    defaultTab: "ml",
   },
 ];
 
@@ -442,36 +429,42 @@ type PopupMobileCardsProps = {
 };
 
 function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDeleteExperiment }: PopupMobileCardsProps) {
-  const [openCard, setOpenCard] = useState<PopupSectionId | null>(null);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [openCard, setOpenCard] = useState<string | null>(null);
+  const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
 
-  function handleOpenCard(card: (typeof popupCards)[number]) {
+  function handleOpenCard(card: PopupCard) {
     setOpenCard(card.key);
-    setActiveSection(card.subtabs?.[0]?.section ?? null);
+    setActiveSubIdx(0);
   }
 
   function handleBack() {
     setOpenCard(null);
-    setActiveSection(null);
+    setActiveSubIdx(0);
   }
 
   function renderContent(): ReactNode {
     if (!openCard) return null;
-    switch (openCard) {
+    const card = popupCards.find((c) => c.key === openCard);
+    if (!card) return null;
+    const sub = card.subtabs?.[activeSubIdx];
+    const tab = sub?.tab ?? card.defaultTab;
+    const section = sub?.section === "__all__" ? null : (sub?.section ?? null);
+
+    switch (tab) {
       case "overview":
-        return <OverviewTab overview={report.overview} schema={report.schema} quality={report.quality} insights={report.insights} mobileSection={activeSection} />;
+        return <OverviewTab overview={report.overview} schema={report.schema} quality={report.quality} insights={report.insights} mobileSection={section} />;
       case "insights":
-        return <InsightsTab insights={report.insights} mobileSection={activeSection} />;
+        return <InsightsTab insights={report.insights} mobileSection={section} />;
       case "schema":
         return <SchemaTab schema={report.schema} />;
       case "quality":
-        return <DataQualityTab overview={report.overview} quality={report.quality} mobileSection={activeSection} />;
+        return <DataQualityTab overview={report.overview} quality={report.quality} mobileSection={section} />;
       case "statistics":
-        return <StatisticsTab statistics={report.statistics} mobileSection={activeSection} />;
+        return <StatisticsTab statistics={report.statistics} mobileSection={section} />;
       case "relationships":
-        return <RelationshipsTab schema={report.schema} statistics={report.statistics} mobileSection={activeSection} />;
+        return <RelationshipsTab schema={report.schema} statistics={report.statistics} mobileSection={section} />;
       case "visualisations":
-        return <VisualisationsTab visualisations={report.visualisations} mobileSection={activeSection} />;
+        return <VisualisationsTab visualisations={report.visualisations} mobileSection={section} />;
       case "ml":
         return (
           <MLTab
@@ -512,12 +505,12 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
 
         {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
           <div className="mobile-analysis-tab-pills">
-            {currentCard.subtabs.map((sub) => (
+            {currentCard.subtabs.map((sub, idx) => (
               <button
                 key={sub.section}
                 type="button"
-                onClick={() => setActiveSection(sub.section)}
-                className={`mobile-analysis-tab-pill${activeSection === sub.section ? " mobile-analysis-tab-pill-active" : ""}`}
+                onClick={() => setActiveSubIdx(idx)}
+                className={`mobile-analysis-tab-pill${activeSubIdx === idx ? " mobile-analysis-tab-pill-active" : ""}`}
               >
                 {sub.label}
               </button>
