@@ -1455,7 +1455,7 @@ a[class*="rounded"]:hover {
 }
 
 .mobile-bottom-nav-label {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1503,7 +1503,7 @@ a[class*="rounded"]:hover {
   font-family: var(--font-mono), monospace;
   font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   line-height: 1.15;
   text-transform: uppercase;
 }
@@ -1547,11 +1547,11 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-page-description {
-    color: rgba(242, 247, 251, 0.62);
-    font-size: 0.94rem;
-    line-height: 1.58;
+    color: rgba(242, 247, 251, 0.58);
+    font-size: 0.9rem;
+    line-height: 1.52;
     margin-top: 0;
-    max-width: 42rem;
+    max-width: 34rem;
   }
 
   .mobile-page-actions {
@@ -1642,11 +1642,11 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-panel {
     background: linear-gradient(180deg, rgba(13, 18, 33, 0.98), rgba(15, 20, 35, 0.92));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.15rem;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 1.05rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
     overflow: hidden;
-    padding: 1.15rem;
+    padding: 1.05rem;
   }
 
   .mobile-screen-panel-danger {
@@ -1674,27 +1674,27 @@ a[class*="rounded"]:hover {
     color: rgba(242, 247, 251, 0.34);
     display: inline-flex;
     font-family: var(--font-mono), monospace;
-    font-size: 0.74rem;
+    font-size: 0.71rem;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .mobile-screen-title {
     color: var(--text-100);
     font-family: var(--font-display), sans-serif;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.08;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
     margin: 0.38rem 0 0;
   }
 
   .mobile-screen-lead {
-    color: rgba(242, 247, 251, 0.54);
-    font-size: 0.84rem;
-    line-height: 1.62;
-    margin-top: 0.6rem;
+    color: rgba(242, 247, 251, 0.58);
+    font-size: 0.88rem;
+    line-height: 1.56;
+    margin-top: 0.52rem;
   }
 
   .mobile-screen-meta {
@@ -1721,8 +1721,8 @@ a[class*="rounded"]:hover {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 999px;
-    color: rgba(242, 247, 251, 0.64);
-    font-size: 0.78rem;
+    color: rgba(242, 247, 251, 0.66);
+    font-size: 0.76rem;
     font-weight: 600;
     line-height: 1.2;
     padding: 0.38rem 0.72rem;
@@ -1802,10 +1802,10 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row {
     background: rgba(255, 255, 255, 0.025);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.055);
     border-radius: 0.95rem;
     color: inherit;
-    padding: 0.95rem 1rem;
+    padding: 0.9rem 0.95rem;
     text-align: left;
     width: 100%;
   }
@@ -1837,32 +1837,32 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row-title {
     color: var(--text-100);
-    font-size: 0.98rem;
+    font-size: 0.96rem;
     font-weight: 600;
-    line-height: 1.35;
+    line-height: 1.32;
   }
 
   .mobile-screen-row-meta {
     color: rgba(242, 247, 251, 0.28);
     font-family: var(--font-mono), monospace;
-    font-size: 0.8rem;
+    font-size: 0.77rem;
     letter-spacing: 0.04em;
     line-height: 1.45;
     margin-top: 0.18rem;
   }
 
   .mobile-screen-row-copy {
-    color: rgba(242, 247, 251, 0.54);
-    font-size: 0.92rem;
-    line-height: 1.6;
-    margin-top: 0.55rem;
+    color: rgba(242, 247, 251, 0.56);
+    font-size: 0.88rem;
+    line-height: 1.56;
+    margin-top: 0.5rem;
   }
 
   .mobile-screen-row-note {
     color: rgba(242, 247, 251, 0.4);
-    font-size: 0.84rem;
-    line-height: 1.55;
-    margin-top: 0.55rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-top: 0.5rem;
   }
 
   .mobile-screen-row-actions {

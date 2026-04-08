@@ -245,6 +245,7 @@ export default function DashboardPage() {
         eyebrow="Overview"
         title="Dashboard"
         description={dashUser?.full_name ? `Welcome back, ${dashUser.full_name}.` : "Good morning - your workspace is ready."}
+        mobileDescription="Saved runs, latest findings, and your next step."
         stats={stats}
       >
         {error ? (
@@ -456,8 +457,8 @@ function DashboardMobileSections({
             </h2>
             <p className="mobile-screen-lead">
               {latest
-                ? truncateText(latest.insights.summary, 112)
-                : "Upload a CSV in Uploads, then return here to reopen the latest saved run and branch into Analysis or History."}
+                ? truncateText(latest.insights.summary, 88)
+                : "Upload a CSV in Uploads, then reopen the saved run here."}
             </p>
           </div>
         </div>
@@ -489,7 +490,7 @@ function DashboardMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Studio map</p>
-            <h2 className="mobile-screen-title">Move between the core workspaces</h2>
+            <h2 className="mobile-screen-title">Core workspaces</h2>
           </div>
         </div>
         <div className="mobile-screen-link-grid">
@@ -507,7 +508,7 @@ function DashboardMobileSections({
           <div className="mobile-screen-panel-header">
             <div>
               <p className="mobile-screen-kicker">Recent uploads</p>
-              <h2 className="mobile-screen-title">Recent saved datasets</h2>
+              <h2 className="mobile-screen-title">Recent datasets</h2>
             </div>
             <ScrollIntentLink href="/batch" className="mobile-screen-panel-action">
               Uploads

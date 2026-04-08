@@ -303,6 +303,7 @@ function AnalysisPageContent() {
         eyebrow="Analysis workspace"
         title="Analysis"
         description="Explore, visualise, and model your dataset."
+        mobileDescription="Review the dataset, charts, and ML tools."
         actions={
           hasRenderableReport && report ? (
             <div className="tablet-up flex flex-wrap gap-3">
@@ -734,14 +735,14 @@ function AnalysisMobileSections({
             }}
             className="mobile-screen-button mobile-screen-button-secondary"
           >
-            Export results
+            Export report
           </button>
           <button
             type="button"
             onClick={() => onTabChange("ml")}
             className="mobile-screen-button mobile-screen-button-primary"
           >
-            {activeTab === "ml" ? "ML lab open" : "Open ML lab"}
+            {activeTab === "ml" ? "ML lab open" : "Go to ML lab"}
           </button>
         </div>
       </section>
@@ -750,14 +751,14 @@ function AnalysisMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Report sections</p>
-            <h2 className="mobile-screen-title">Choose a section</h2>
+            <h2 className="mobile-screen-title">Current view</h2>
             <p className="mobile-screen-lead">
-              Pick a section and the full content renders immediately below.
+              Switch sections and review the full results below.
             </p>
           </div>
         </div>
         <div className="mobile-screen-field">
-          <label htmlFor="mobile-analysis-tab" className="mobile-screen-field-label">Current section</label>
+          <label htmlFor="mobile-analysis-tab" className="mobile-screen-field-label">Section</label>
           <select
             id="mobile-analysis-tab"
             value={activeTab}
@@ -771,7 +772,7 @@ function AnalysisMobileSections({
             ))}
           </select>
         </div>
-        <p className="mobile-screen-row-note">Now showing {activeTabLabel.toLowerCase()}.</p>
+        <p className="mobile-screen-row-note">Showing {activeTabLabel.toLowerCase()}.</p>
       </section>
 
       <section className="mobile-screen-panel mobile-analysis-content-panel">

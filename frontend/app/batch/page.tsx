@@ -289,6 +289,7 @@ export default function BatchPage() {
         eyebrow="Dataset intake"
         title="Uploads"
         description="Import and inspect your tabular datasets."
+        mobileDescription="Upload a CSV, save the run, then open it in Analysis."
         stats={stats}
       >
         {error ? (
@@ -716,8 +717,8 @@ function BatchMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Dataset intake</p>
-            <h2 className="mobile-screen-title">Upload a CSV and route it into Analysis</h2>
-            <p className="mobile-screen-lead">Choose a file, process it, then open the saved report.</p>
+            <h2 className="mobile-screen-title">Upload a dataset</h2>
+            <p className="mobile-screen-lead">Choose a CSV, create a saved run, then open it in Analysis.</p>
           </div>
         </div>
         <label className="mobile-upload-dropzone">
@@ -734,11 +735,11 @@ function BatchMobileSections({
               <path d="M5 16v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" />
             </svg>
           </span>
-          <span className="mobile-upload-dropzone-title">{selectedFile ? selectedFile.name : "Drop dataset here or browse files"}</span>
-          <span className="mobile-upload-dropzone-copy">CSV only • max file size 50 MB</span>
+          <span className="mobile-upload-dropzone-title">{selectedFile ? selectedFile.name : "Choose a CSV file"}</span>
+          <span className="mobile-upload-dropzone-copy">CSV only • up to 50 MB</span>
           <span className="mobile-screen-pills compact">
             <span className="mobile-screen-pill" data-tone="teal">.CSV</span>
-            <span className="mobile-screen-pill">Saved to history</span>
+            <span className="mobile-screen-pill">Saved run</span>
           </span>
         </label>
         <div className="mobile-screen-actions">
@@ -750,7 +751,7 @@ function BatchMobileSections({
             }}
             className="mobile-screen-button mobile-screen-button-primary"
           >
-            {uploadBusy ? "Processing..." : "Process upload"}
+            {uploadBusy ? "Processing..." : "Create run"}
           </button>
           <button
             type="button"
@@ -772,10 +773,10 @@ function BatchMobileSections({
             </h2>
             <p className="mobile-screen-lead">
               {selectedAnalysis
-                ? truncateText(selectedAnalysis.insights.summary, 150)
+                ? truncateText(selectedAnalysis.insights.summary, 108)
                 : selectedFile
-                  ? `Ready to analyse ${selectedFile.name}. Process the upload to generate the saved report.`
-                  : "Pick a saved run below or upload a new CSV."}
+                  ? `Ready to analyse ${selectedFile.name}. Create the run to continue.`
+                  : "Select a saved run below or upload a new CSV."}
             </p>
           </div>
         </div>
@@ -848,7 +849,7 @@ function BatchMobileSections({
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Recent uploads</p>
-            <h2 className="mobile-screen-title">Reopen or swap the active dataset</h2>
+            <h2 className="mobile-screen-title">Saved datasets</h2>
           </div>
         </div>
         {analyses.length === 0 ? (
@@ -865,24 +866,24 @@ function BatchMobileSections({
                       <p className="mobile-screen-row-meta">Saved {formatDate(analysis.saved_at)} • {analysis.overview.row_count.toLocaleString()} rows</p>
                     </div>
                     <span className="mobile-screen-pill" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                      {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "Ready" : "Review"}
+                        {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                     </span>
                   </div>
-                  <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 100)}</p>
+                    <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 90)}</p>
                   <div className="mobile-screen-row-actions">
                     <button
                       type="button"
                       onClick={() => handleSelectSavedUpload(analysis.id)}
                       className="mobile-screen-button mobile-screen-button-secondary"
                     >
-                      {selected ? "Selected" : "Select"}
+                        {selected ? "Selected" : "Set active"}
                     </button>
                     <ScrollIntentLink
                       href={`/analysis?analysisId=${analysis.id}`}
                       onClick={() => setSelection(analysis.id)}
                       className="mobile-screen-button mobile-screen-button-primary"
                     >
-                      Analyse
+                        Open analysis
                     </ScrollIntentLink>
                   </div>
                 </div>
@@ -897,7 +898,7 @@ function BatchMobileSections({
               onClick={() => setShowAllUploads(true)}
               className="mobile-screen-button mobile-screen-button-secondary"
             >
-              Show all {analyses.length} datasets
+              View all {analyses.length} datasets
             </button>
           </div>
         ) : null}
