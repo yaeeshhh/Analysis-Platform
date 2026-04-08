@@ -33,7 +33,7 @@ export default function AppShell({
 
   return (
     <main className="app-shell min-h-screen text-white">
-      <MobileHeader />
+      <MobileHeader eyebrow={eyebrow} title={title} />
 
       <div className="desktop-shell">
         <aside className="tablet-up desktop-sidebar" data-desktop-sidebar="true" data-collapsed="true">
@@ -73,9 +73,8 @@ export default function AppShell({
 
           <section className="app-content-shell px-4 py-6 md:px-6 md:py-6 mobile-shell-body">
             <div className="mobile-page-label phone-only">
+              <TitleTag className="sr-only">{title}</TitleTag>
               <div className="mobile-page-intro">
-                <span className="mobile-page-eyebrow">{eyebrow}</span>
-                <TitleTag className="mobile-page-title">{title}</TitleTag>
                 <div className="mobile-page-description">{description}</div>
                 {actions ? <div className="mobile-page-actions">{actions}</div> : null}
               </div>
