@@ -28,6 +28,16 @@ import { resolveAuthenticatedUser } from "@/lib/session";
 type ReadinessFilter = "all" | "ml-ready" | "eda-first";
 type MlFilter = "all" | "with-ml" | "without-ml";
 
+function getHistoryReviewWarning(targetCandidates: string[]) {
+  const highlightedTargets = targetCandidates.slice(0, 2);
+
+  if (highlightedTargets.length > 0) {
+    return `Potential targets like ${highlightedTargets.join(", ")} are available, but review this dataset before relying on ML output. You can still run it if needed.`;
+  }
+
+  return "Review this dataset before relying on ML output. You can still run it if needed.";
+}
+
 export default function HistoryPage() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -371,6 +381,10 @@ export default function HistoryPage() {
                             : "Analysis only";
                           const modeTone = analysis.latest_experiment ? "purple" : "teal";
                           const readinessTone = analysis.insights.modeling_readiness.is_ready ? "teal" : "amber";
+                          const needsReview = !analysis.insights.modeling_readiness.is_ready;
+                          const reviewWarning = needsReview
+                            ? getHistoryReviewWarning(analysis.insights.modeling_readiness.target_candidates)
+                            : "";
                           const statusValue = analysis.status || "saved";
                           const statusTone = statusValue.toLowerCase().includes("error")
                             ? "red"
@@ -411,6 +425,12 @@ export default function HistoryPage() {
                                   <div className="desktop-history-metric-note">
                                     {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
                                   </div>
+                                  {needsReview ? (
+                                    <div className="inline-warning-note mt-2">
+                                      <p className="inline-warning-note-title">Review advised</p>
+                                      <p className="inline-warning-note-copy">{reviewWarning}</p>
+                                    </div>
+                                  ) : null}
                                 </div>
                               </td>
                               <td className="desktop-history-metric-cell">
@@ -464,7 +484,7 @@ export default function HistoryPage() {
                                   <button
                                     type="button"
                                     onClick={() => setDeleteTargetId(analysis.id)}
-                                    className="desktop-action-button rounded-md border border-[#5a2328]/60 px-3 py-1.5 text-[0.72rem] text-[#ffb4ba]"
+                                    className={`desktop-action-button rounded-md border border-[#5a2328]/60 px-3 py-1.5 text-[0.72rem] text-[#ffb4ba] ${analysis.latest_experiment ? "desktop-action-button-wide" : ""}`}
                                   >
                                     Delete
                                   </button>
@@ -735,6 +755,10 @@ function HistoryMobileSections({
                   : "Unsupervised ML"
                 : "Analysis only";
               const latestExperiment = analysis.latest_experiment;
+              const needsReview = !analysis.insights.modeling_readiness.is_ready;
+              const reviewWarning = needsReview
+                ? getHistoryReviewWarning(analysis.insights.modeling_readiness.target_candidates)
+                : "";
               const statusValue = analysis.status || "saved";
 
               return (
@@ -760,6 +784,12 @@ function HistoryMobileSections({
                   </div>
 
                   <p className="mobile-screen-row-copy">{analysis.insights.summary}</p>
+                  {needsReview ? (
+                    <div className="inline-warning-note mt-3">
+                      <p className="inline-warning-note-title">Review advised</p>
+                      <p className="inline-warning-note-copy">{reviewWarning}</p>
+                    </div>
+                  ) : null}
                   <p className="mobile-screen-row-note">
                     {latestExperiment
                       ? `Latest ML: ${latestExperiment.summary}`
@@ -783,6 +813,24 @@ function HistoryMobileSections({
                     >
                       Report
                     </button>
+                    {latestExperiment ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
+                          className="mobile-screen-button mobile-screen-button-secondary"
+                        >
+                          ML report
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
+                          className="mobile-screen-button mobile-screen-button-secondary"
+                        >
+                          ML summary
+                        </button>
+                      </>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => onDeleteRun(analysis.id)}
@@ -791,24 +839,6 @@ function HistoryMobileSections({
                       Delete run
                     </button>
                   </div>
-                  {latestExperiment ? (
-                    <div className="mobile-screen-row-actions">
-                      <button
-                        type="button"
-                        onClick={() => onDownloadMlReport(analysis.id, latestExperiment)}
-                        className="mobile-screen-button mobile-screen-button-secondary"
-                      >
-                        ML report
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDownloadMlSummary(analysis.id, latestExperiment)}
-                        className="mobile-screen-button mobile-screen-button-secondary"
-                      >
-                        ML summary
-                      </button>
-                    </div>
-                  ) : null}
                 </article>
               );
             })}

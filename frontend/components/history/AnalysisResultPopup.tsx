@@ -305,6 +305,7 @@ export default function AnalysisResultPopup({
                   analysisId={report.analysis_id}
                   capabilities={report.ml_capabilities}
                   experiments={report.ml_experiments || []}
+                  readiness={report.insights.modeling_readiness}
                   initialUnsupervised={report.ml_results.unsupervised}
                   initialSupervised={report.ml_results.supervised}
                   onRunUnsupervised={onRunUnsupervised}
