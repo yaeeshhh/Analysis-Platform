@@ -1788,16 +1788,19 @@ a[class*="rounded"]:hover {
     border-radius: 0.85rem;
     color: #ffffff;
     display: inline-flex;
-    font-size: 0.92rem;
+    font-size: 0.82rem;
     font-weight: 700;
     justify-content: center;
     letter-spacing: 0.01em;
     line-height: 1.3;
     min-height: 3.2rem;
-    padding: 0.8rem 1rem;
+    overflow: hidden;
+    padding: 0.8rem 0.6rem;
     text-align: center;
     text-decoration: none;
+    text-overflow: ellipsis;
     transition: background 140ms ease, border-color 140ms ease;
+    white-space: nowrap;
   }
 
   .mobile-screen-button-primary {
@@ -3268,15 +3271,15 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-analysis-fullpage > .mobile-analysis-detail-cover {
-    margin: 0 0.75rem;
+    margin: 0;
   }
 
   .mobile-analysis-fullpage > .mobile-analysis-detail-dropdown {
-    margin: 0.5rem 0.75rem 0;
+    margin: 0.5rem 0 0;
   }
 
   .mobile-analysis-fullpage > .mobile-analysis-content-panel {
-    margin: 0.5rem 0.75rem 1rem;
+    margin: 0.5rem 0 1rem;
   }
 
   /* ── 1-column SVG card grid ── */
@@ -3520,7 +3523,7 @@ a[class*="rounded"]:hover {
     padding-right: 0.5rem;
     text-align: center;
     white-space: nowrap;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
   }
 
   .mobile-batch-card-badge {

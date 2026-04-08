@@ -528,13 +528,6 @@ export default function AccountPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveDialog("remember")}
-                    className="mobile-screen-button mobile-screen-button-secondary"
-                  >
-                    Manage remember login
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => {
                       void handleLogout();
                     }}
