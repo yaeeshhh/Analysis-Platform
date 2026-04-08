@@ -154,12 +154,14 @@ function FooterActions({
   confirmLabel,
   disabled,
   destructive = false,
+  loading = false,
 }: {
   onClose: () => void;
   onConfirm: () => void | Promise<void>;
   confirmLabel: string;
   disabled?: boolean;
   destructive?: boolean;
+  loading?: boolean;
 }) {
   return (
     <div className="flex flex-col-reverse gap-3 border-t border-[#a78bfa]/12 pt-4 md:flex-row md:flex-wrap md:justify-end">
@@ -176,13 +178,18 @@ function FooterActions({
           void onConfirm();
         }}
         disabled={disabled}
-        className={`w-full rounded-lg px-5 py-3 text-center text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-55 md:min-w-[12rem] md:w-auto ${
+        className={`inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-center text-sm font-semibold leading-5 transition disabled:cursor-not-allowed disabled:opacity-55 md:min-w-[12rem] md:w-auto ${
           destructive
             ? "border border-[#dc2626]/25 bg-[#dc2626]/10 text-[#f87171] hover:bg-[#dc2626]/15"
             : "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white hover:from-[#8b5cf6] hover:to-[#7c3aed]"
         }`}
       >
-        {confirmLabel}
+        {loading ? (
+          <>
+            <span className="button-live-loader" aria-hidden="true" />
+            {confirmLabel}
+          </>
+        ) : confirmLabel}
       </button>
     </div>
   );
@@ -517,6 +524,7 @@ function IdentityChangeDialog({
         onClose={onClose}
         onConfirm={handlePrimaryAction}
         confirmLabel={primaryLabel}
+        loading={loading}
         disabled={loading || (otpSent ? codeInput.trim().length !== 6 || !otpFormatValid : false)}
       />
     </DialogShell>
@@ -750,6 +758,7 @@ function PasswordChangeDialog({
         onClose={onClose}
         onConfirm={handleSave}
         confirmLabel={loading ? "Updating password..." : "Update password"}
+        loading={loading}
         disabled={loading || !currentPassword.trim() || !nextPassword.trim() || !confirmPassword.trim()}
       />
     </DialogShell>
@@ -897,6 +906,7 @@ function RememberLoginDialog({
         onClose={onClose}
         onConfirm={handleSave}
         confirmLabel={saving ? "Saving browser state..." : "Save browser settings"}
+        loading={saving}
         disabled={saving || (!resetRequested && draftEnabled === rememberStatus.enabled)}
       />
     </DialogShell>
@@ -957,6 +967,7 @@ function ConfirmDangerDialog({
         onClose={onClose}
         onConfirm={handleConfirm}
         confirmLabel={loading ? loadingLabel : confirmLabel}
+        loading={loading}
         destructive={destructive}
         disabled={loading}
       />
@@ -1124,6 +1135,7 @@ function DeleteAccountDialog({
                 ? "Send confirmation code"
                 : "Delete account"
         }
+              loading={loading}
         destructive
         disabled={loading || (otpSent ? codeInput.trim().length !== 6 || !otpFormatValid : false)}
       />

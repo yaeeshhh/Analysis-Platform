@@ -834,7 +834,12 @@ export default function MLTab({
                       disabled={deletingExperimentId === experiment.id}
                       className="ml-action-button ml-action-button-danger sm:col-span-2"
                     >
-                      {deletingExperimentId === experiment.id ? "Deleting..." : "Delete run"}
+                      {deletingExperimentId === experiment.id ? (
+                        <>
+                          <span className="button-live-loader" aria-hidden="true" />
+                          Deleting...
+                        </>
+                      ) : "Delete run"}
                     </button>
                   </div>
                 </div>
@@ -1793,9 +1798,14 @@ export default function MLTab({
                   void confirmDeleteSavedExperiment();
                 }}
                 disabled={!!deletingExperimentId}
-                className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                {deletingExperimentId ? "Deleting..." : "Delete saved run"}
+                {deletingExperimentId ? (
+                  <>
+                    <span className="button-live-loader" aria-hidden="true" />
+                    Deleting...
+                  </>
+                ) : "Delete saved run"}
               </button>
             </div>
           </div>

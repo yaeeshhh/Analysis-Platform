@@ -22,7 +22,7 @@ const destinationCards = [
     cta: "Open library",
   },
   {
-    title: "Analysis",
+    title: "Analysis workspace",
     detail: "Grouped report flow with Summary, Health, Fields, Patterns, and ML once a dataset is selected.",
     href: "/analysis",
     cta: "Open analysis",
@@ -206,56 +206,42 @@ export default function DashboardPage() {
       hint: "Persisted across analysis history",
     },
   ];
-  const studioRouteChecks = [
+  const studioFollowupItems = [
     {
-      label: "Uploads",
-      value: analyses.length ? `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}` : "Waiting on the first CSV",
+      label: "Archive hand-off",
+      value: analyses.length ? `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}` : "First route still pending",
       note: analyses.length
-        ? "Keep reusable datasets in the library before opening the working report."
-        : "Start here to create the first reusable dataset lane.",
+        ? "Saved datasets keep the library and archive in sync once the report is worth keeping."
+        : "The archive starts filling in after the first CSV is processed.",
     },
     {
-      label: "Analysis",
-      value: latest ? truncateText(latest.overview.dataset_name, 28) : "No active report yet",
+      label: "Current focus",
+      value: latest ? (latest.insights.modeling_readiness.is_ready ? "Ready for ML" : "Stay in analysis") : "Upload first",
       note: latest
         ? latest.insights.modeling_readiness.is_ready
-          ? "This run already looks stable enough to hand off into ML when needed."
-          : "Stay in Findings, Quality, and Charts before moving into experiments."
-        : "The report view fills in once a dataset has been processed.",
+          ? "The current run has cleared the explanation phase and can move into the red lab lane."
+          : "Use Findings, Quality, and Charts before pushing the run into experiments."
+        : "The active route appears after the first saved dataset is available.",
     },
     {
-      label: "History",
-      value: totalExperiments ? `${totalExperiments} ML artifact${totalExperiments === 1 ? "" : "s"}` : "Archive still empty",
-      note: totalExperiments
-        ? "Older reports and experiment exports remain recoverable from the archive."
-        : "Saved runs and experiment files will collect here after the first pass.",
+      label: "Account tools",
+      value: dashUser ? "Profile shortcuts ready" : "Login tools",
+      note: dashUser
+        ? "Profile, cleanup, and remembered-session tools sit outside the reporting lane."
+        : "Once signed in, the account lane keeps the session and cleanup controls close by.",
     },
   ];
-  const breakdownSidecarItems = [
-    {
-      label: "Latest lane",
-      value: latest ? (latest.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first") : "Standby",
-      note: latest ? truncateText(latest.overview.dataset_name, 34) : "No saved dataset has claimed the active lane yet.",
-    },
-    {
-      label: "Saved experiments",
-      value: totalExperiments.toLocaleString(),
-      note: totalExperiments ? "Reopen or download them from the red lab surface." : "The ML lane stays quiet until you choose to run it.",
-    },
-    {
-      label: "Recommended next move",
-      value: latest
-        ? latest.insights.modeling_readiness.is_ready
-          ? "Open ML Lab"
-          : "Review Findings"
-        : "Open Uploads",
-      note: latest
-        ? latest.insights.modeling_readiness.is_ready
-          ? "The report is stable enough to benchmark without leaving the flow."
-          : "Work left-to-right through summary, health, and charts before modeling."
-        : "Create the first run before the right-hand lane comes alive.",
-    },
-  ];
+  const breakdownSidecarTone = latest?.insights.modeling_readiness.is_ready ? "teal" : latest ? "amber" : "purple";
+  const breakdownSidecarLabel = latest
+    ? latest.insights.modeling_readiness.is_ready
+      ? "ML-ready"
+      : "EDA-first"
+    : "Standby";
+  const breakdownSidecarCopy = latest
+    ? latest.insights.modeling_readiness.is_ready
+      ? "This run has cleared the earlier lanes, so the red lab card can act as the final hand-off."
+      : "The ML lane stays muted until the report has been checked through the summary, health, and charts stages."
+    : "Once a dataset is uploaded, the right lane wakes up as the last step in the report map.";
 
   return (
     <>
@@ -496,8 +482,32 @@ export default function DashboardPage() {
                         </span>
                       ))}
                     </div>
-                    <div className="desktop-studio-route-checks">
-                      {studioRouteChecks.map((item) => (
+                  </div>
+                  <div className="desktop-studio-followup">
+                    <div className="desktop-studio-followup-art" aria-hidden="true">
+                      <svg viewBox="0 0 120 82" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="10" width="32" height="22" rx="4" fill="none" stroke="#4f6ef7" strokeWidth="1.4" opacity="0.72"/>
+                        <rect x="46" y="10" width="28" height="22" rx="4" fill="none" stroke="#22c55e" strokeWidth="1.4" opacity="0.6"/>
+                        <rect x="80" y="10" width="32" height="22" rx="4" fill="none" stroke="#a78bfa" strokeWidth="1.4" opacity="0.72"/>
+                        <rect x="25" y="48" width="28" height="18" rx="4" fill="none" stroke="#f59e0b" strokeWidth="1.4" opacity="0.58"/>
+                        <rect x="66" y="48" width="28" height="18" rx="4" fill="none" stroke="#f43f5e" strokeWidth="1.4" opacity="0.68"/>
+                        <line x1="40" y1="21" x2="46" y2="21" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
+                        <line x1="74" y1="21" x2="80" y2="21" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
+                        <line x1="31" y1="32" x2="39" y2="48" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
+                        <line x1="89" y1="32" x2="81" y2="48" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
+                        <circle cx="31" cy="21" r="3.5" fill="#4f6ef7" opacity="0.6"/>
+                        <circle cx="60" cy="21" r="3.5" fill="#22c55e" opacity="0.5"/>
+                        <circle cx="96" cy="21" r="3.5" fill="#a78bfa" opacity="0.58"/>
+                        <circle cx="39" cy="57" r="3.5" fill="#f59e0b" opacity="0.52"/>
+                        <circle cx="80" cy="57" r="3.5" fill="#f43f5e" opacity="0.62"/>
+                      </svg>
+                    </div>
+                    <div className="desktop-studio-followup-copy">
+                      <p className="desktop-studio-followup-kicker">Route support</p>
+                      <p className="desktop-studio-followup-title">The supporting lanes sit underneath the main route instead of interrupting it.</p>
+                    </div>
+                    <div className="desktop-studio-followup-grid">
+                      {studioFollowupItems.map((item) => (
                         <article key={item.label} className="desktop-studio-route-card">
                           <p className="desktop-studio-route-card-label">{item.label}</p>
                           <p className="desktop-studio-route-card-value">{item.value}</p>
@@ -539,16 +549,16 @@ export default function DashboardPage() {
                     ))}
                     <article className="analysis-breakdown-sidecar">
                       <p className="analysis-breakdown-sidecar-kicker">Right lane</p>
-                      <p className="analysis-breakdown-sidecar-title">Keep the ML hand-off on the edge of the map.</p>
-                      <p className="analysis-breakdown-sidecar-copy">That empty slot now tracks whether the current run is ready to move from explanation into experiments, so the red lab surface feels like a deliberate final stage instead of a disconnected add-on.</p>
-                      <div className="analysis-breakdown-sidecar-list">
-                        {breakdownSidecarItems.map((item) => (
-                          <div key={item.label} className="analysis-breakdown-sidecar-item">
-                            <span className="analysis-breakdown-sidecar-label">{item.label}</span>
-                            <strong className="analysis-breakdown-sidecar-value">{item.value}</strong>
-                            <p className="analysis-breakdown-sidecar-note">{item.note}</p>
-                          </div>
-                        ))}
+                      <p className="analysis-breakdown-sidecar-title">ML closes the report only after the earlier lanes settle.</p>
+                      <p className="analysis-breakdown-sidecar-copy">{breakdownSidecarCopy}</p>
+                      <div className="analysis-breakdown-sidecar-mini">
+                        <span className="desktop-badge" data-tone={breakdownSidecarTone}>
+                          <span className="desktop-status-dot" />
+                          {breakdownSidecarLabel}
+                        </span>
+                        <p className="analysis-breakdown-sidecar-note">
+                          {latest ? truncateText(latest.overview.dataset_name, 36) : "Waiting for the first uploaded dataset."}
+                        </p>
                       </div>
                     </article>
                   </div>
@@ -805,40 +815,42 @@ function DashboardMobileSections({
           <div>
             <p className="mobile-screen-kicker">Breakdowns</p>
             <h2 className="mobile-screen-title">See how the studio is organised</h2>
-            <p className="mobile-screen-lead">Tap a header to review the Analysis map or the way the core features fit together.</p>
+            <p className="mobile-screen-lead">The Analysis map stays open here, and the feature block below can still be expanded when you need the flow summary.</p>
           </div>
         </div>
 
-        <details className="mobile-accordion" open>
-          <summary>
+        <div className="mobile-breakdown-block">
+          <div className="mobile-breakdown-block-head">
             <p className="mobile-screen-row-title">Analysis breakdown</p>
-          </summary>
-          <div className="mobile-accordion-body">
-            <div className="mobile-analysis-svg-grid">
-              {analysisVisualCards.map((card) => (
-                <article
-                  key={card.key}
-                  className="mobile-analysis-svg-card mobile-analysis-svg-card-static"
-                  style={{ "--analysis-card-accent": card.accent } as CSSProperties}
-                >
-                  {card.cover}
-                </article>
-              ))}
-            </div>
-            <div className="mobile-screen-actions">
-              <ScrollIntentLink
-                href={latest ? `/analysis?analysisId=${latest.id}` : "/analysis"}
-                className="mobile-screen-button mobile-screen-button-primary"
-              >
-                {latest ? "Open latest analysis" : "Open analysis"}
-              </ScrollIntentLink>
-            </div>
+            <p className="mobile-accordion-hint">Summary, health, fields, patterns, and ML stay visible here so the structure reads as one open map.</p>
           </div>
-        </details>
+          <div className="mobile-analysis-svg-grid">
+            {analysisVisualCards.map((card) => (
+              <article
+                key={card.key}
+                className="mobile-analysis-svg-card mobile-analysis-svg-card-static"
+                style={{ "--analysis-card-accent": card.accent } as CSSProperties}
+              >
+                {card.cover}
+              </article>
+            ))}
+          </div>
+          <div className="mobile-screen-actions">
+            <ScrollIntentLink
+              href={latest ? `/analysis?analysisId=${latest.id}` : "/analysis"}
+              className="mobile-screen-button mobile-screen-button-primary"
+            >
+              {latest ? "Open latest analysis" : "Open analysis"}
+            </ScrollIntentLink>
+          </div>
+        </div>
 
         <details className="mobile-accordion">
           <summary>
-            <p className="mobile-screen-row-title">How features work</p>
+            <div>
+              <p className="mobile-screen-row-title">How features work</p>
+              <p className="mobile-accordion-hint">Review how uploads, report reading, charts, ML, and account cleanup fit together.</p>
+            </div>
           </summary>
           <div className="mobile-accordion-body">
             <div className="mobile-screen-list">

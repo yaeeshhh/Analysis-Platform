@@ -1010,9 +1010,14 @@ export default function LoginRequiredModal({
                   type="button"
                   onClick={handleSignupSendCode}
                   disabled={loading || signupVerifying || signupOtpCountdown > 0}
-                  className="underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
+                  className="inline-flex items-center gap-2 underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
                 >
-                  {signupOtpSent ? "Resend code" : "Send code"}
+                  {loading ? (
+                    <>
+                      <span className="button-live-loader" aria-hidden="true" />
+                      Sending...
+                    </>
+                  ) : signupOtpSent ? "Resend code" : "Send code"}
                 </button>
                 {signupOtpSent && (
                   <span>
@@ -1112,9 +1117,14 @@ export default function LoginRequiredModal({
                   type="button"
                   onClick={handleSendCode}
                   disabled={loading || otpCountdown > 0}
-                  className="underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
+                  className="inline-flex items-center gap-2 underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
                 >
-                  {otpSent ? "Resend code" : "Send code"}
+                  {loading ? (
+                    <>
+                      <span className="button-live-loader" aria-hidden="true" />
+                      Sending...
+                    </>
+                  ) : otpSent ? "Resend code" : "Send code"}
                 </button>
                 {otpSent && (
                   <span>
@@ -1133,10 +1143,15 @@ export default function LoginRequiredModal({
                 type="button"
                 onClick={handleForgotPassword}
                 disabled={forgotLoading || loading || forgotCountdown > 0}
-                className="text-left text-sm text-white/75 underline decoration-white/35 underline-offset-4 hover:text-white disabled:no-underline disabled:opacity-50"
+                className="inline-flex items-center gap-2 text-left text-sm text-white/75 underline decoration-white/35 underline-offset-4 hover:text-white disabled:no-underline disabled:opacity-50"
               >
                 {forgotLoading
-                  ? `Sending reset link to ${maskEmailAddress(resolvedLoginEmail || (identifier.trim().includes("@") ? identifier.trim() : "your email"))}...`
+                  ? (
+                    <>
+                      <span className="button-live-loader" aria-hidden="true" />
+                      {`Sending reset link to ${maskEmailAddress(resolvedLoginEmail || (identifier.trim().includes("@") ? identifier.trim() : "your email"))}...`}
+                    </>
+                  )
                   : forgotCountdown > 0
                     ? "Reset link sent"
                     : "Forgot password?"}
@@ -1193,9 +1208,14 @@ export default function LoginRequiredModal({
                 setInvalidPasswordAttempts(0);
               }}
               disabled={loading}
-              className="inline-flex rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
             >
-              Back
+              {loading ? (
+                <>
+                  <span className="button-live-loader" aria-hidden="true" />
+                  Back
+                </>
+              ) : "Back"}
             </button>
           )}
 
@@ -1213,9 +1233,14 @@ export default function LoginRequiredModal({
                 setError("");
               }}
               disabled={loading || signupVerifying}
-              className="inline-flex rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
             >
-              Back
+              {loading || signupVerifying ? (
+                <>
+                  <span className="button-live-loader" aria-hidden="true" />
+                  Back
+                </>
+              ) : "Back"}
             </button>
           )}
 
@@ -1247,27 +1272,28 @@ export default function LoginRequiredModal({
                   signupOtpCode.trim().length !== 6 ||
                   !signupOtpFormatValid))
             }
-            className="inline-flex rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-5 py-3 text-sm font-medium text-white transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-5 py-3 text-sm font-medium text-white transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:opacity-50"
           >
-            {loading
-              ? mode === "login"
-                ? loginStep === "identifier"
-                  ? "Checking..."
-                  : loginStep === "password"
-                  ? "Logging in..."
-                  : "Verifying..."
-                : signupAwaitingOtp
-                ? "Verifying..."
-                : "Creating account..."
-              : mode === "login"
-              ? loginStep === "identifier"
-                ? "Continue"
-                : loginStep === "password"
-                ? "Log in"
-                : "Verify code"
-              : signupAwaitingOtp
-              ? "Verify code"
-              : "Sign up"}
+            {loading || signupVerifying ? (
+              <>
+                <span className="button-live-loader" aria-hidden="true" />
+                {mode === "login"
+                  ? loginStep === "identifier"
+                    ? "Checking..."
+                    : loginStep === "password"
+                    ? "Logging in..."
+                    : "Verifying..."
+                  : signupAwaitingOtp
+                  ? "Verifying..."
+                  : "Creating account..."}
+              </>
+            ) : mode === "login" ? (
+              loginStep === "identifier" ? "Continue" : loginStep === "password" ? "Log in" : "Verify code"
+            ) : signupAwaitingOtp ? (
+              "Verify code"
+            ) : (
+              "Sign up"
+            )}
           </button>
         </div>
       </div>

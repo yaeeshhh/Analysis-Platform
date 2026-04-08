@@ -28,6 +28,13 @@ function getInitials(user: User | null) {
     .join("") || source.charAt(0).toUpperCase();
 }
 
+function getCompactLabel(user: User | null) {
+  if (!user) return "Log in";
+
+  const primary = user.full_name || user.username || user.email || "Profile";
+  return primary.split(/\s+/).filter(Boolean)[0] || primary;
+}
+
 export default function ProfileMenu({ variant = "default", onSidebarAction, disabled = false }: ProfileMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -36,24 +43,24 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [popoverStyle, setPopoverStyle] = useState<CSSProperties | null>(null);
 
   const currentPath = pathname || "/dashboard";
   const isSidebar = variant === "sidebar";
-  const initials = getInitials(user);
+  const loading = user === undefined;
+  const resolvedUser = user ?? null;
+  const initials = getInitials(resolvedUser);
+  const compactLabel = getCompactLabel(resolvedUser);
 
   useEffect(() => {
     let active = true;
 
     const bootstrap = async () => {
       if (!active) return;
-      setLoading(true);
       const authenticatedUser = await resolveAuthenticatedUser();
       if (!active) return;
       setUser(authenticatedUser);
-      setLoading(false);
     };
 
     void bootstrap();
@@ -169,17 +176,24 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
 
   if (loading) {
     return (
-      <div className={isSidebar ? "profile-menu-sidebar-button" : "rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70"}>
+      <div className={isSidebar ? "profile-menu-sidebar-button profile-menu-sidebar-button-loading" : "profile-menu-compact-button profile-menu-compact-button-loading"}>
         {isSidebar ? (
           <>
-            <span className="profile-menu-avatar">...</span>
+            <span className="profile-menu-avatar profile-menu-avatar-loading">
+              <span className="button-live-loader" aria-hidden="true" />
+            </span>
             <span className="profile-menu-copy">
               <span className="profile-menu-name">Loading</span>
               <span className="profile-menu-subtitle">Account tools</span>
             </span>
           </>
         ) : (
-          "Profile"
+          <>
+            <span className="profile-menu-compact-avatar">
+              <span className="button-live-loader" aria-hidden="true" />
+            </span>
+            <span className="profile-menu-compact-label">Loading</span>
+          </>
         )}
       </div>
     );
@@ -226,7 +240,7 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
 
           setMenuOpen((previous) => !previous);
         }}
-        className={isSidebar ? "profile-menu-sidebar-button" : "max-w-[12rem] rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/10"}
+        className={isSidebar ? "profile-menu-sidebar-button" : "profile-menu-compact-button"}
         disabled={disabled}
         aria-haspopup={!isSidebar && user ? "menu" : undefined}
         aria-expanded={!isSidebar && user ? menuOpen : undefined}
@@ -242,7 +256,15 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
             </span>
           </>
         ) : (
-          <span className="block truncate">{user ? user.username || "Profile" : "Log in"}</span>
+          <>
+            <span className="profile-menu-compact-avatar">{user ? initials : "?"}</span>
+            <span className="profile-menu-compact-label">{compactLabel}</span>
+            <span className="profile-menu-compact-chevron" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m9 6 6 6-6 6" />
+              </svg>
+            </span>
+          </>
         )}
       </button>
 

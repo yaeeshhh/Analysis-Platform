@@ -423,9 +423,14 @@ function LoginPageContent() {
                   type="button"
                   onClick={handleSendCode}
                   disabled={loading || otpCountdown > 0}
-                  className="underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
+                  className="inline-flex items-center gap-2 underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
                 >
-                  {otpSent ? "Resend code" : "Send code"}
+                  {loading ? (
+                    <>
+                      <span className="button-live-loader" aria-hidden="true" />
+                      Sending...
+                    </>
+                  ) : otpSent ? "Resend code" : "Send code"}
                 </button>
                 {otpSent && (
                   <span>
@@ -444,10 +449,15 @@ function LoginPageContent() {
                 type="button"
                 onClick={handleForgotPassword}
                 disabled={forgotLoading || loading || forgotCountdown > 0}
-                className="text-left text-sm text-white/75 underline decoration-white/35 underline-offset-4 hover:text-white disabled:no-underline disabled:opacity-50"
+                className="inline-flex items-center gap-2 text-left text-sm text-white/75 underline decoration-white/35 underline-offset-4 hover:text-white disabled:no-underline disabled:opacity-50"
               >
                 {forgotLoading
-                  ? `Sending reset link to ${maskedForgotEmail}...`
+                  ? (
+                    <>
+                      <span className="button-live-loader" aria-hidden="true" />
+                      {`Sending reset link to ${maskedForgotEmail}...`}
+                    </>
+                  )
                   : forgotCountdown > 0
                     ? "Reset link sent"
                     : "Forgot password?"}
@@ -487,13 +497,14 @@ function LoginPageContent() {
               (!awaitingOtp && (!email || (!canSkipPassword && !password))) ||
               (awaitingOtp && (!otpSent || otpCode.trim().length !== 6 || !otpFormatValid))
             }
-            className="w-full p-3 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:bg-gray-600 disabled:opacity-50 font-medium transition"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] p-3 font-medium transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:bg-gray-600 disabled:opacity-50"
           >
-            {loading
-              ? awaitingOtp
-                ? "Verifying..."
-                : "Logging in..."
-              : awaitingOtp
+            {loading ? (
+              <>
+                <span className="button-live-loader" aria-hidden="true" />
+                {awaitingOtp ? "Verifying..." : "Logging in..."}
+              </>
+            ) : awaitingOtp
               ? "Verify code"
               : canSkipPassword
               ? "Continue"
@@ -514,9 +525,14 @@ function LoginPageContent() {
                 setError("");
               }}
               disabled={loading}
-              className="w-full p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-50 font-medium transition"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 p-3 font-medium transition hover:bg-white/10 disabled:opacity-50"
             >
-              Back
+              {loading ? (
+                <>
+                  <span className="button-live-loader" aria-hidden="true" />
+                  Back
+                </>
+              ) : "Back"}
             </button>
           )}
         </div>
