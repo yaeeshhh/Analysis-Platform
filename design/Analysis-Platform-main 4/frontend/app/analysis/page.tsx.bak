@@ -667,102 +667,6 @@ const mobileAnalysisCards: MobileCard[] = [
   },
 ];
 
-/* ── SVG card cover art for each of the 5 analysis sections ── */
-const cardCovers: Record<string, React.ReactElement> = {
-  overview: (
-    <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-      <rect width="300" height="140" fill="#1a1f36"/>
-      <circle cx="260" cy="20" r="70" fill="#2d3f8a" opacity="0.5"/>
-      <circle cx="40" cy="120" r="45" fill="#2d3f8a" opacity="0.3"/>
-      <rect x="24" y="42" width="52" height="36" rx="5" fill="#4f6ef7" opacity="0.9"/>
-      <rect x="84" y="42" width="80" height="36" rx="5" fill="#4f6ef7" opacity="0.5"/>
-      <rect x="172" y="42" width="104" height="36" rx="5" fill="#4f6ef7" opacity="0.25"/>
-      <rect x="24" y="86" width="252" height="9" rx="3" fill="#4f6ef7" opacity="0.2"/>
-      <rect x="24" y="102" width="190" height="9" rx="3" fill="#4f6ef7" opacity="0.14"/>
-      <text x="24" y="130" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Overview</text>
-      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(165,184,255,0.6)" letterSpacing="2">SUMMARY · METRICS · KPIs</text>
-    </svg>
-  ),
-  "data-health": (
-    <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-      <rect width="300" height="140" fill="#0d3b2e"/>
-      <circle cx="270" cy="20" r="70" fill="#145a42" opacity="0.5"/>
-      <circle cx="30" cy="120" r="45" fill="#145a42" opacity="0.3"/>
-      <polyline points="20,72 56,72 74,38 92,108 110,55 128,82 152,72 280,72" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="74" cy="38" r="4" fill="#22c55e"/>
-      <circle cx="92" cy="108" r="4" fill="#22c55e"/>
-      <circle cx="110" cy="55" r="4" fill="#22c55e"/>
-      <text x="24" y="130" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Data Health</text>
-      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(134,239,172,0.6)" letterSpacing="2">QUALITY · NULLS · ANOMALIES</text>
-    </svg>
-  ),
-  schema: (
-    <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-      <rect width="300" height="140" fill="#1e1535"/>
-      <circle cx="260" cy="20" r="65" fill="#2d1f52" opacity="0.5"/>
-      <rect x="24" y="38" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.9"/>
-      <rect x="24" y="56" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.45"/>
-      <rect x="24" y="74" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.3"/>
-      <rect x="24" y="92" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.18"/>
-      <line x1="108" y1="38" x2="108" y2="102" stroke="#a78bfa" strokeWidth="1" opacity="0.35"/>
-      <line x1="192" y1="38" x2="192" y2="102" stroke="#a78bfa" strokeWidth="1" opacity="0.35"/>
-      <text x="24" y="125" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Schema</text>
-      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(196,181,253,0.6)" letterSpacing="2">TABLES · COLUMNS · TYPES</text>
-    </svg>
-  ),
-  charts: (
-    <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-      <rect width="300" height="140" fill="#2d1a00"/>
-      <circle cx="262" cy="18" r="68" fill="#4a2c00" opacity="0.5"/>
-      <rect x="24" y="82" width="28" height="38" rx="3" fill="#f59e0b" opacity="0.4"/>
-      <rect x="60" y="62" width="28" height="58" rx="3" fill="#f59e0b" opacity="0.6"/>
-      <rect x="96" y="44" width="28" height="76" rx="3" fill="#f59e0b" opacity="0.85"/>
-      <rect x="132" y="55" width="28" height="65" rx="3" fill="#f59e0b" opacity="0.7"/>
-      <rect x="168" y="68" width="28" height="52" rx="3" fill="#f59e0b" opacity="0.5"/>
-      <rect x="204" y="76" width="28" height="44" rx="3" fill="#f59e0b" opacity="0.35"/>
-      <line x1="14" y1="120" x2="286" y2="120" stroke="#f59e0b" strokeWidth="1" opacity="0.2"/>
-      <text x="24" y="135" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">Charts</text>
-      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(253,211,77,0.6)" letterSpacing="2">VISUALISE · EXPLORE · COMPARE</text>
-    </svg>
-  ),
-  ml: (
-    <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
-      <rect width="300" height="140" fill="#2d0a1a"/>
-      <circle cx="258" cy="18" r="70" fill="#4a0f28" opacity="0.5"/>
-      <circle cx="20" cy="118" r="45" fill="#4a0f28" opacity="0.3"/>
-      <circle cx="44" cy="42" r="9" fill="#f43f5e" opacity="0.9"/>
-      <circle cx="44" cy="70" r="9" fill="#f43f5e" opacity="0.9"/>
-      <circle cx="44" cy="98" r="9" fill="#f43f5e" opacity="0.9"/>
-      <circle cx="110" cy="32" r="9" fill="#f43f5e" opacity="0.65"/>
-      <circle cx="110" cy="60" r="9" fill="#f43f5e" opacity="0.65"/>
-      <circle cx="110" cy="88" r="9" fill="#f43f5e" opacity="0.65"/>
-      <circle cx="110" cy="108" r="9" fill="#f43f5e" opacity="0.65"/>
-      <circle cx="176" cy="42" r="9" fill="#f43f5e" opacity="0.5"/>
-      <circle cx="176" cy="70" r="9" fill="#f43f5e" opacity="0.5"/>
-      <circle cx="176" cy="98" r="9" fill="#f43f5e" opacity="0.5"/>
-      <circle cx="242" cy="56" r="9" fill="#f43f5e" opacity="0.9"/>
-      <circle cx="242" cy="84" r="9" fill="#f43f5e" opacity="0.9"/>
-      <line x1="53" y1="42" x2="101" y2="32" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="53" y1="42" x2="101" y2="60" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="53" y1="70" x2="101" y2="60" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="53" y1="70" x2="101" y2="88" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="53" y1="98" x2="101" y2="88" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="53" y1="98" x2="101" y2="108" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="119" y1="32" x2="167" y2="42" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="119" y1="60" x2="167" y2="42" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="119" y1="60" x2="167" y2="70" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="119" y1="88" x2="167" y2="70" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="119" y1="88" x2="167" y2="98" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
-      <line x1="185" y1="42" x2="233" y2="56" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-      <line x1="185" y1="70" x2="233" y2="56" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-      <line x1="185" y1="70" x2="233" y2="84" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-      <line x1="185" y1="98" x2="233" y2="84" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
-      <text x="24" y="130" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9" letterSpacing="0.5">ML Lab</text>
-      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(253,164,175,0.6)" letterSpacing="2">TRAIN · EVALUATE · PREDICT</text>
-    </svg>
-  ),
-};
-
 function AnalysisMobileSections({
   report,
   activeTab: _activeTab,
@@ -777,6 +681,7 @@ function AnalysisMobileSections({
   const [openCard, setOpenCard] = useState<string | null>(null);
   const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
 
+  /* When a card is opened, default to its first subtab. */
   function handleOpenCard(card: MobileCard) {
     setOpenCard(card.key);
     setActiveSubIdx(0);
@@ -788,6 +693,7 @@ function AnalysisMobileSections({
     setActiveSubIdx(0);
   }
 
+  /* Render the appropriate tab component for the currently active subtab. */
   function renderContent(): React.ReactNode {
     if (!openCard) return null;
     const card = mobileAnalysisCards.find((c) => c.key === openCard);
@@ -799,7 +705,15 @@ function AnalysisMobileSections({
 
     switch (tab) {
       case "overview":
-        return <OverviewTab overview={report.overview} schema={report.schema} quality={report.quality} insights={report.insights} mobileSection={section} />;
+        return (
+          <OverviewTab
+            overview={report.overview}
+            schema={report.schema}
+            quality={report.quality}
+            insights={report.insights}
+            mobileSection={section}
+          />
+        );
       case "insights":
         return <InsightsTab insights={report.insights} mobileSection={section} />;
       case "schema":
@@ -867,44 +781,40 @@ function AnalysisMobileSections({
           All sections
         </button>
 
-        {/* SVG card cover as the detail header */}
         <div
-          className="mobile-analysis-detail-cover"
+          className="mobile-analysis-detail-header"
           style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
         >
-          {cardCovers[currentCard.key]}
+          <span className="mobile-analysis-detail-icon">{currentCard.icon}</span>
+          <div>
+            <h2 className="mobile-analysis-detail-title">{currentCard.label}</h2>
+            <p className="mobile-analysis-detail-desc">{currentCard.description}</p>
+          </div>
         </div>
 
-        {/* Subtab dropdown below the card, styled with the card accent */}
         {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
-          <div
-            className="mobile-analysis-detail-dropdown"
-            style={{ "--analysis-card-accent": accent } as React.CSSProperties}
+          <select
+            value={activeSubIdx}
+            onChange={(e) => setActiveSubIdx(Number(e.target.value))}
+            className="mobile-analysis-section-select"
           >
-            <select
-              value={activeSubIdx}
-              onChange={(e) => setActiveSubIdx(Number(e.target.value))}
-            >
-              {currentCard.subtabs.map((sub, idx) => (
-                <option key={sub.label} value={idx}>
-                  {sub.label}
-                </option>
-              ))}
-            </select>
-          </div>
+            {currentCard.subtabs.map((sub, idx) => (
+              <option key={sub.label} value={idx}>{sub.label}</option>
+            ))}
+          </select>
         ) : null}
 
-        <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content" style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}>
+        <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">
           {renderContent()}
         </section>
       </div>
     );
   }
 
-  /* ── Index view: 2-col grid of SVG card covers ── */
+  /* ── Index view (card grid) ── */
   return (
     <div className="phone-only mobile-screen-stack">
-      {/* Dataset hero banner */}
+      {/* ── Compact dataset banner ── */}
       <section className="mobile-analysis-hero">
         <div className="mobile-analysis-hero-top">
           <div className="mobile-analysis-hero-info">
@@ -929,8 +839,8 @@ function AnalysisMobileSections({
         </div>
       </section>
 
-      {/* 2-column SVG card grid */}
-      <div className="mobile-analysis-svg-grid">
+      {/* ── Vertical section cards with per-card accent colour ── */}
+      <div className="mobile-analysis-card-list">
         {mobileAnalysisCards.map((card) => {
           const accent = cardAccents[card.key] ?? "#4f6ef7";
           return (
@@ -938,11 +848,15 @@ function AnalysisMobileSections({
               key={card.key}
               type="button"
               onClick={() => handleOpenCard(card)}
-              className="mobile-analysis-svg-card"
-              style={{ "--analysis-card-accent": accent } as React.CSSProperties}
+              className="mobile-analysis-card"
+              style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}38` } as React.CSSProperties}
             >
-              {cardCovers[card.key]}
-              <span className="mobile-analysis-svg-card-tap">Tap to open</span>
+              <span className="mobile-analysis-card-icon">{card.icon}</span>
+              <div className="mobile-analysis-card-text">
+                <p className="mobile-analysis-card-label">{card.label}</p>
+                <p className="mobile-analysis-card-desc">{card.description}</p>
+              </div>
+              <svg className="mobile-analysis-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           );
         })}

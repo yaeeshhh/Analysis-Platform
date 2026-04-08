@@ -1860,10 +1860,8 @@ a[class*="rounded"]:hover {
 
   .mobile-screen-row-title {
     color: #ffffff;
-    font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
     font-size: 0.96rem;
-    font-weight: 650;
-    letter-spacing: -0.01em;
+    font-weight: 600;
     line-height: 1.32;
   }
 
@@ -1880,8 +1878,7 @@ a[class*="rounded"]:hover {
     color: rgba(242, 247, 251, 0.52);
     display: -webkit-box;
     font-size: 0.84rem;
-    letter-spacing: 0.005em;
-    line-height: 1.55;
+    line-height: 1.5;
     margin-top: 0.4rem;
     overflow: hidden;
     -webkit-box-orient: vertical;
@@ -1891,8 +1888,7 @@ a[class*="rounded"]:hover {
   .mobile-screen-row-note {
     color: rgba(242, 247, 251, 0.36);
     font-size: 0.8rem;
-    letter-spacing: 0.005em;
-    line-height: 1.55;
+    line-height: 1.5;
     margin-top: 0.5rem;
   }
 
@@ -3201,10 +3197,10 @@ a[class*="rounded"]:hover {
     background: rgba(79, 110, 247, 0.16);
   }
 
-  /* ── 1-column SVG card grid ── */
+  /* ── 2-column SVG card grid ── */
   .mobile-analysis-svg-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.65rem;
   }
 
@@ -3239,7 +3235,7 @@ a[class*="rounded"]:hover {
     display: none;
   }
 
-  /* ── Detail cover: full-width SVG ── */
+  /* ── Detail cover: full-width SVG with subtab pills below ── */
   .mobile-analysis-detail-cover {
     border-radius: 1rem;
     overflow: hidden;
@@ -3247,61 +3243,39 @@ a[class*="rounded"]:hover {
   }
 
   .mobile-analysis-detail-cover .mobile-analysis-card-svg {
-    border-radius: 1rem;
+    border-radius: 1rem 1rem 0 0;
     display: block;
     width: 100%;
   }
 
-  /* ── Subtab dropdown below the card cover ── */
-  .mobile-analysis-detail-dropdown {
-    margin-top: 0.55rem;
-    position: relative;
-  }
-
-  .mobile-analysis-detail-dropdown select {
-    appearance: none;
-    background: color-mix(in srgb, var(--analysis-card-accent, #4f6ef7) 10%, #0d1221);
-    border: 1px solid color-mix(in srgb, var(--analysis-card-accent, #4f6ef7) 35%, transparent);
-    border-radius: 0.75rem;
-    color: #ffffff;
-    font-family: var(--font-body), system-ui, sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    padding: 0.6rem 2.4rem 0.6rem 0.9rem;
-    width: 100%;
-    -webkit-tap-highlight-color: transparent;
-    transition: border-color 120ms ease, background 120ms ease;
-  }
-
-  .mobile-analysis-detail-dropdown select:focus {
-    border-color: color-mix(in srgb, var(--analysis-card-accent, #4f6ef7) 60%, transparent);
-    outline: none;
-  }
-
-  .mobile-analysis-detail-dropdown::after {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 5px solid rgba(242, 247, 251, 0.5);
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    right: 0.9rem;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  /* Legacy subtab pills (kept for backwards compat) */
   .mobile-analysis-detail-subtabs {
-    display: none;
+    background: #1a1f36;
+    border: 1px solid var(--analysis-card-border, rgba(79, 110, 247, 0.3));
+    border-top: none;
+    border-radius: 0 0 1rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding: 0.75rem 0.9rem;
   }
 
   .mobile-analysis-detail-subtab {
-    display: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    color: rgba(242, 247, 251, 0.62);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 0.36rem 0.75rem;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
   }
 
   .mobile-analysis-detail-subtab-active {
-    display: none;
+    background: color-mix(in srgb, var(--subtab-accent, #4f6ef7) 18%, transparent);
+    border-color: color-mix(in srgb, var(--subtab-accent, #4f6ef7) 45%, transparent);
+    color: #ffffff;
   }
 
   .mobile-analysis-detail-subtab:active {
@@ -3430,19 +3404,8 @@ a[class*="rounded"]:hover {
 
   .mobile-batch-card-actions {
     display: flex;
-    flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 0.6rem;
-  }
-
-  .mobile-batch-card-actions .mobile-screen-button {
-    flex: 1 1 0;
-    min-width: 0;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    text-align: center;
-    white-space: nowrap;
-    font-size: 0.78rem;
   }
 
   .mobile-batch-card-badge {
@@ -3866,6 +3829,155 @@ a[class*="rounded"]:hover {
   .mobile-history-load-more:active {
     background: rgba(79, 110, 247, 0.12);
   }
+    white-space: nowrap;
+  }
+
+  .mobile-history-card-snippet {
+    color: rgba(242, 247, 251, 0.46);
+    display: -webkit-box;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    margin: 0.45rem 0 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .mobile-history-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.32rem;
+    margin-top: 0.55rem;
+  }
+
+  .mobile-history-tag {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 999px;
+    color: rgba(242, 247, 251, 0.52);
+    font-size: 0.64rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.24rem 0.48rem;
+  }
+
+  .mobile-history-tag[data-tone="teal"] {
+    background: rgba(20, 184, 166, 0.08);
+    border-color: rgba(20, 184, 166, 0.18);
+    color: #5eead4;
+  }
+
+  .mobile-history-tag[data-tone="amber"] {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.18);
+    color: #fcd34d;
+  }
+
+  .mobile-history-tag[data-tone="purple"] {
+    background: rgba(124, 58, 237, 0.08);
+    border-color: rgba(124, 58, 237, 0.18);
+    color: #c4b5fd;
+  }
+
+  /* History card detail (expanded) */
+  .mobile-history-card-detail {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.85rem 0.92rem 0.92rem;
+    margin-left: 3px;
+  }
+
+  .mobile-history-card-full-summary {
+    color: rgba(242, 247, 251, 0.62);
+    font-size: 0.78rem;
+    line-height: 1.52;
+    margin: 0;
+  }
+
+  .mobile-history-card-warning {
+    background: rgba(191, 184, 255, 0.06);
+    border: 1px solid rgba(191, 184, 255, 0.18);
+    border-radius: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.72rem;
+    padding: 0.65rem 0.78rem;
+  }
+
+  .mobile-history-card-warning-label {
+    color: #bfb8ff;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mobile-history-card-warning-copy {
+    color: rgba(242, 247, 251, 0.48);
+    font-size: 0.74rem;
+    line-height: 1.48;
+  }
+
+  .mobile-history-card-ml-note {
+    color: rgba(196, 181, 253, 0.6);
+    font-size: 0.74rem;
+    line-height: 1.45;
+    margin: 0.6rem 0 0;
+  }
+
+  .mobile-history-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.38rem;
+    margin-top: 0.72rem;
+  }
+
+  .mobile-history-action-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.6rem;
+    color: rgba(242, 247, 251, 0.62);
+    font-size: 0.72rem;
+    font-weight: 600;
+    min-height: 2.2rem;
+    padding: 0.32rem 0.62rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-history-action-btn:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-history-action-primary {
+    background: rgba(124, 58, 237, 0.14);
+    border-color: rgba(124, 58, 237, 0.32);
+    color: #c4b5fd;
+  }
+
+  .mobile-history-action-danger {
+    background: rgba(90, 35, 40, 0.12);
+    border-color: rgba(90, 35, 40, 0.36);
+    color: #ffb4ba;
+  }
+
+  .mobile-history-load-more {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.8rem;
+    color: rgba(242, 247, 251, 0.48);
+    font-size: 0.78rem;
+    font-weight: 600;
+    min-height: 2.8rem;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-history-load-more:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
 }
 
 @media (min-width: 600px) and (max-width: 959px) {
@@ -4018,9 +4130,9 @@ summary::-webkit-details-marker {
   color: rgba(122, 214, 255, 0.5);
   font-family: var(--font-mono), monospace;
   font-size: 0.72rem;
-  letter-spacing: 0.015em;
-  line-height: 1.5;
-  margin-top: 0.22rem;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  margin-top: 0.18rem;
 }
 
 /* Base section appearance — clean divider-separated sections, no boxes */
@@ -4032,7 +4144,6 @@ details.mobile-accordion {
 
 details.mobile-accordion > summary {
   padding: 1rem 0;
-  cursor: pointer;
 }
 
 details.mobile-accordion > .mobile-accordion-body {
