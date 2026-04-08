@@ -15,7 +15,7 @@ export default function MobileHeader({ eyebrow, title }: MobileHeaderProps) {
         {eyebrow ? <span className="mobile-header-kicker">{eyebrow}</span> : null}
         <span className="mobile-header-title">{title || "Analysis Studio"}</span>
       </div>
-      <Suspense fallback={<div className="h-9 w-16 rounded-lg border border-white/10 bg-white/5" />}>
+      <Suspense fallback={<div className="profile-menu-compact-button profile-menu-compact-button-loading" />}>
         <ProfileMenu />
       </Suspense>
     </header>

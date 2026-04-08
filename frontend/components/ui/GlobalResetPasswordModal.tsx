@@ -18,6 +18,7 @@ import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import { queuePasswordChangedNotice } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 
 function withQueryRemoved(
   pathname: string,
@@ -192,7 +193,7 @@ export default function GlobalResetPasswordModal() {
 
         <div className="mt-3 rounded-[12px] border border-white/10 bg-[#111116] px-3 py-2 text-xs text-white/70">
           {contextLoading ? (
-            <p>Loading account details...</p>
+            <SurfaceLoadingIndicator label="Loading account details..." className="justify-start" />
           ) : (
             <>
               <p>Email: {accountEmail || "Unavailable"}</p>
@@ -285,9 +286,14 @@ export default function GlobalResetPasswordModal() {
             type="button"
             onClick={closeModal}
             disabled={loading}
-            className="inline-flex rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
           >
-            Cancel
+            {loading ? (
+              <>
+                <span className="button-live-loader" aria-hidden="true" />
+                Cancel
+              </>
+            ) : "Cancel"}
           </button>
           <button
             type="button"
@@ -301,9 +307,14 @@ export default function GlobalResetPasswordModal() {
               !confirmPassword ||
               !passwordsMatch
             }
-            className="inline-flex rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
           >
-            {loading ? "Resetting..." : "Reset password"}
+            {loading ? (
+              <>
+                <span className="button-live-loader button-live-loader-dark" aria-hidden="true" />
+                Resetting...
+              </>
+            ) : "Reset password"}
           </button>
         </div>
       </div>

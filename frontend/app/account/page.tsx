@@ -6,6 +6,7 @@ import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import {
   getRememberStatus,
@@ -308,17 +309,22 @@ export default function AccountPage() {
                   void handleLogout();
                 }}
                 disabled={loggingOut}
-                className="rounded-lg border border-[#5a2328]/60 bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-45"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#5a2328]/60 bg-[#2a1215] px-5 py-3 text-sm font-medium text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-45"
               >
-                {loggingOut ? "Logging out..." : "Log out"}
+                {loggingOut ? (
+                  <>
+                    <span className="button-live-loader" aria-hidden="true" />
+                    Logging out...
+                  </>
+                ) : "Log out"}
               </button>
             </div>
           ) : undefined
         }
       >
         {loading ? (
-          <div className="py-10 text-center text-sm text-white/55">
-            Loading account tools...
+          <div className="py-10">
+            <SurfaceLoadingIndicator label="Loading account tools..." className="mx-auto" />
           </div>
         ) : null}
 
@@ -454,7 +460,12 @@ export default function AccountPage() {
                         }}
                         className="mobile-screen-button mobile-screen-button-primary"
                       >
-                        {savingProfile ? "Saving..." : "Save profile"}
+                        {savingProfile ? (
+                          <>
+                            <span className="button-live-loader" aria-hidden="true" />
+                            Saving...
+                          </>
+                        ) : "Save profile"}
                       </button>
                       <button
                         type="button"
@@ -534,7 +545,12 @@ export default function AccountPage() {
                     disabled={loggingOut}
                     className="mobile-screen-button mobile-screen-button-danger"
                   >
-                    {loggingOut ? "Logging out..." : "Log out"}
+                    {loggingOut ? (
+                      <>
+                        <span className="button-live-loader" aria-hidden="true" />
+                        Logging out...
+                      </>
+                    ) : "Log out"}
                   </button>
                 </div>
               </section>
@@ -679,9 +695,14 @@ export default function AccountPage() {
                               setSavingProfile(false);
                             }
                           }}
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
                         >
-                          {savingProfile ? "Saving..." : "Save"}
+                          {savingProfile ? (
+                            <>
+                              <span className="button-live-loader" aria-hidden="true" />
+                              Saving...
+                            </>
+                          ) : "Save"}
                         </button>
                         <button
                           type="button"

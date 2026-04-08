@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/ui/AppShell";
 import AnalysisResultPopup from "@/components/history/AnalysisResultPopup";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
+import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
 import {
   deleteAnalysis,
   deleteMlExperiment,
@@ -267,8 +268,8 @@ export default function HistoryPage() {
         ) : null}
 
         {loading ? (
-          <div className="py-10 text-center text-sm text-white/55">
-            Loading history...
+          <div className="py-10">
+            <SurfaceLoadingIndicator label="Loading history..." className="mx-auto" />
           </div>
         ) : null}
 
@@ -589,9 +590,14 @@ export default function HistoryPage() {
                   void handleDeleteAnalysis();
                 }}
                 disabled={deleteBusy}
-                className="rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#5a2328] bg-[#2a1215] px-5 py-3 text-sm font-semibold text-[#ffb4ba] transition hover:bg-[#34171b] disabled:cursor-not-allowed disabled:opacity-55"
               >
-                {deleteBusy ? "Deleting..." : "Delete saved run"}
+                {deleteBusy ? (
+                  <>
+                    <span className="button-live-loader" aria-hidden="true" />
+                    Deleting...
+                  </>
+                ) : "Delete saved run"}
               </button>
             </div>
           </div>

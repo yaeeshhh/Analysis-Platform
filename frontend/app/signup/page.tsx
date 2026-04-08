@@ -594,9 +594,14 @@ function SignupPageContent() {
                     type="button"
                     onClick={handleSendCode}
                     disabled={loading || sendingCode || otpCountdown > 0}
-                    className="underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
+                    className="inline-flex items-center gap-2 underline decoration-white/25 underline-offset-4 disabled:no-underline disabled:opacity-50"
                   >
-                    {sendingCode ? "Sending..." : otpSent ? "Resend code" : "Send code"}
+                    {sendingCode ? (
+                      <>
+                        <span className="button-live-loader" aria-hidden="true" />
+                        Sending...
+                      </>
+                    ) : otpSent ? "Resend code" : "Send code"}
                   </button>
                   {otpSent && (
                     <span>
@@ -634,15 +639,21 @@ function SignupPageContent() {
                   ? verifying || !otpSent || otpCode.trim().length !== 6 || !otpFormatValid
                   : loading || !signupReady
               }
-              className="w-full p-3 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:bg-gray-600 disabled:opacity-50 font-medium transition"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] p-3 font-medium transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:bg-gray-600 disabled:opacity-50"
             >
-              {awaitingOtp
-                ? verifying
-                  ? "Verifying..."
-                  : "Verify code"
-                : loading
-                ? "Creating account..."
-                : "Sign Up"}
+              {awaitingOtp ? (
+                verifying ? (
+                  <>
+                    <span className="button-live-loader" aria-hidden="true" />
+                    Verifying...
+                  </>
+                ) : "Verify code"
+              ) : loading ? (
+                <>
+                  <span className="button-live-loader" aria-hidden="true" />
+                  Creating account...
+                </>
+              ) : "Sign Up"}
             </button>
 
             {awaitingOtp && (
@@ -650,9 +661,14 @@ function SignupPageContent() {
                 type="button"
                 onClick={resetOtpState}
                 disabled={loading || verifying}
-                className="w-full p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-50 font-medium transition"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 p-3 font-medium transition hover:bg-white/10 disabled:opacity-50"
               >
-                Back
+                {loading || verifying ? (
+                  <>
+                    <span className="button-live-loader" aria-hidden="true" />
+                    Back
+                  </>
+                ) : "Back"}
               </button>
             )}
           </div>
