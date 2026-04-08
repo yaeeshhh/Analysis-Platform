@@ -748,7 +748,7 @@ function AnalysisMobileSections({
       </div>
 
       {/* ── Tab content ── */}
-      <section className="mobile-screen-panel mobile-analysis-content-panel">
+      <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">
         {activeContent}
       </section>
     </div>
