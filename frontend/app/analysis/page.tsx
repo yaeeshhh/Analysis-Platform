@@ -1040,7 +1040,6 @@ function AnalysisMobileSections({
   refreshAnalyses: (nextId?: number, nextTab?: AnalysisTabKey) => Promise<void>;
 }) {
   const { push } = useMobileSlide();
-  const [datasetExpanded, setDatasetExpanded] = useState(false);
   let activeContent: React.ReactNode = null;
 
   if (activeTab === "overview") {
@@ -1173,48 +1172,16 @@ function AnalysisMobileSections({
             <h2 className="mobile-screen-title">{report.source_filename || report.overview.dataset_name}</h2>
             <p className="mobile-screen-meta">
               {report.overview.dataset_name}
-              {report.saved_at ? ` • saved ${formatDate(report.saved_at)}` : ""}
-            </p>
-            <p className="mobile-screen-lead">
-              {datasetExpanded
-                ? report.insights.summary
-                : report.insights.summary.length > 120
-                  ? `${report.insights.summary.slice(0, 120)}…`
-                  : report.insights.summary}
-              {report.insights.summary.length > 120 && !datasetExpanded ? (
-                <button
-                  type="button"
-                  onClick={() => setDatasetExpanded(true)}
-                  style={{ background: "none", border: "none", color: "var(--accent-cta-muted)", cursor: "pointer", fontSize: "inherit", fontWeight: 600, marginLeft: "0.3rem", padding: 0 }}
-                >
-                  Read more
-                </button>
-              ) : null}
-              {datasetExpanded && report.insights.summary.length > 120 ? (
-                <button
-                  type="button"
-                  onClick={() => setDatasetExpanded(false)}
-                  style={{ background: "none", border: "none", color: "var(--accent-cta-muted)", cursor: "pointer", fontSize: "inherit", fontWeight: 600, marginLeft: "0.3rem", padding: 0 }}
-                >
-                  Show less
-                </button>
-              ) : null}
             </p>
           </div>
         </div>
-        <div className="mobile-screen-pills">
-          <span className="mobile-screen-pill" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+        <div className="analysis-mobile-dataset-meta-list">
+          <span className="analysis-mobile-dataset-meta-item">{report.overview.row_count.toLocaleString()} rows</span>
+          <span className="analysis-mobile-dataset-meta-item">{report.overview.column_count} cols</span>
+          <span className="analysis-mobile-dataset-meta-item">
             {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
           </span>
-          {report.overview.total_missing_values > 0 ? (
-            <span className="mobile-screen-pill">{report.overview.total_missing_values.toLocaleString()} missing</span>
-          ) : null}
-          {report.overview.duplicate_row_count > 0 ? (
-            <span className="mobile-screen-pill">{report.overview.duplicate_row_count.toLocaleString()} duplicates</span>
-          ) : null}
-          <span className="mobile-screen-pill" data-tone="purple">
-            {report.ml_experiments.length} ML experiment{report.ml_experiments.length === 1 ? "" : "s"}
-          </span>
+          {report.saved_at ? <span className="analysis-mobile-dataset-meta-item">saved {formatDate(report.saved_at)}</span> : null}
         </div>
         <div className="mobile-screen-actions">
           <button

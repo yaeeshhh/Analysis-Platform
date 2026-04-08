@@ -38,6 +38,19 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
               <p className="mobile-accordion-hint">How many values are missing per column, shown as a percentage and fill bar</p>
+              <div className="phone-only analysis-accordion-summary-bar-list">
+                {quality.missing_by_column.slice(0, 3).map((item) => (
+                  <div key={item.column} className="analysis-accordion-summary-bar-item">
+                    <div className="analysis-accordion-summary-bar-head">
+                      <span>{item.column}</span>
+                      <strong>{(item.missing_pct * 100).toFixed(1)}%</strong>
+                    </div>
+                    <div className="analysis-accordion-summary-bar-track">
+                      <span className="analysis-accordion-summary-bar-fill" style={{ width: `${Math.min(item.missing_pct * 100, 100)}%`, backgroundColor: "#7ad6ff" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">
@@ -68,6 +81,11 @@ export default function DataQualityTab({ overview, quality }: DataQualityTabProp
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Recommendations</span>
               <p className="mobile-accordion-hint">Suggested actions to clean and improve overall dataset quality</p>
+              <div className="phone-only analysis-accordion-summary-preview">
+                {quality.recommendations.slice(0, 2).map((item) => (
+                  <p key={item} className="analysis-accordion-summary-text">{item}</p>
+                ))}
+              </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">

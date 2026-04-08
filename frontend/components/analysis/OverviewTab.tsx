@@ -14,6 +14,11 @@ function formatPreviewValue(value: unknown) {
   return String(value);
 }
 
+function truncatePreview(text: string, limit = 96) {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
 export default function OverviewTab({ overview, schema, quality, insights }: OverviewTabProps) {
   const previewColumns = Object.keys(overview.preview_rows?.[0] ?? {});
   const headlineFindings = insights.findings.slice(0, 3);
@@ -34,6 +39,16 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
               <p className="mobile-accordion-hint">AI-generated summary and top findings for this dataset</p>
+              <div className="phone-only analysis-accordion-summary-preview">
+                {headlineFindings.slice(0, 2).map((finding) => (
+                  <p key={finding} className="analysis-accordion-summary-text">
+                    {truncatePreview(finding)}
+                  </p>
+                ))}
+                {headlineFindings.length === 0 ? (
+                  <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary)}</p>
+                ) : null}
+              </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">
@@ -55,6 +70,14 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</span>
               <p className="mobile-accordion-hint">Shape, size, type mix, and structural character of the dataset</p>
+              <div className="phone-only analysis-accordion-summary-preview">
+                {posture.slice(0, 2).map((item) => (
+                  <div key={item.title} className="analysis-accordion-summary-row">
+                    <strong>{item.title}</strong>
+                    <span>{truncatePreview(item.detail, 72)}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">
@@ -85,6 +108,19 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</span>
               <p className="mobile-accordion-hint">Proportion of numeric, categorical, and other column types</p>
+              <div className="phone-only analysis-accordion-summary-bar-list">
+                {typeMix.slice(0, 3).map((item) => (
+                  <div key={item.label} className="analysis-accordion-summary-bar-item">
+                    <div className="analysis-accordion-summary-bar-head">
+                      <span>{item.label}</span>
+                      <strong>{item.count}</strong>
+                    </div>
+                    <div className="analysis-accordion-summary-bar-track">
+                      <span className="analysis-accordion-summary-bar-fill" style={{ width: `${Math.min(item.pct, 100)}%`, backgroundColor: "#7ad6ff" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">
@@ -109,6 +145,16 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Reading order</span>
               <p className="mobile-accordion-hint">Recommended tab order from plain-language summary through to ML Lab</p>
+              <div className="phone-only analysis-accordion-summary-chip-list">
+                {[
+                  "Overview first",
+                  "Validate schema",
+                  "Check quality",
+                  "Use ML last",
+                ].map((item) => (
+                  <span key={item} className="analysis-accordion-summary-chip">{item}</span>
+                ))}
+              </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">
@@ -139,6 +185,11 @@ export default function OverviewTab({ overview, schema, quality, insights }: Ove
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Raw data</span>
             <p className="mobile-accordion-hint">First 20 rows of the uploaded dataset</p>
+            <div className="phone-only analysis-accordion-summary-chip-list">
+              {previewColumns.slice(0, 4).map((column) => (
+                <span key={column} className="analysis-accordion-summary-chip">{column}</span>
+              ))}
+            </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">

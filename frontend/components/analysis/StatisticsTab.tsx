@@ -16,6 +16,14 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Numeric summary</span>
             <p className="mobile-accordion-hint">Mean, median, std, quartiles and skew for each numeric column</p>
+            <div className="phone-only analysis-accordion-summary-preview">
+              {statistics.numeric_summary.slice(0, 2).map((item) => (
+                <div key={item.column} className="analysis-accordion-summary-row">
+                  <strong>{item.column}</strong>
+                  <span>mean {metric(item.mean)} · median {metric(item.median)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">
@@ -43,6 +51,14 @@ export default function StatisticsTab({ statistics }: StatisticsTabProps) {
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Categorical summary</span>
             <p className="mobile-accordion-hint">Top values and unique counts for each text or category column</p>
+            <div className="phone-only analysis-accordion-summary-preview">
+              {statistics.categorical_summary.slice(0, 2).map((item) => (
+                <div key={item.column} className="analysis-accordion-summary-row">
+                  <strong>{item.column}</strong>
+                  <span>{item.top_values.slice(0, 2).map((value) => value.value).join(" · ")}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">
