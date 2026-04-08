@@ -419,6 +419,92 @@ type PopupMobileCardsProps = {
   onDeleteExperiment: (experiment: MlExperimentSummary) => Promise<void>;
 };
 
+/* ── Shared SVG card covers (popup reuses the same art) ── */
+const popupCardCovers: Record<string, React.ReactElement> = {
+  overview: (
+    <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
+      <rect width="300" height="130" fill="#1a1f36"/>
+      <circle cx="260" cy="16" r="65" fill="#2d3f8a" opacity="0.5"/>
+      <rect x="24" y="36" width="52" height="32" rx="5" fill="#4f6ef7" opacity="0.9"/>
+      <rect x="84" y="36" width="80" height="32" rx="5" fill="#4f6ef7" opacity="0.5"/>
+      <rect x="172" y="36" width="104" height="32" rx="5" fill="#4f6ef7" opacity="0.25"/>
+      <rect x="24" y="76" width="252" height="9" rx="3" fill="#4f6ef7" opacity="0.2"/>
+      <rect x="24" y="93" width="190" height="9" rx="3" fill="#4f6ef7" opacity="0.14"/>
+      <text x="24" y="120" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9">Overview</text>
+      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(165,184,255,0.6)" letterSpacing="2">SUMMARY · METRICS</text>
+    </svg>
+  ),
+  "data-health": (
+    <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
+      <rect width="300" height="130" fill="#0d3b2e"/>
+      <circle cx="270" cy="16" r="65" fill="#145a42" opacity="0.5"/>
+      <polyline points="20,65 56,65 74,32 92,100 110,48 128,75 152,65 280,65" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx="74" cy="32" r="4" fill="#22c55e"/>
+      <circle cx="92" cy="100" r="4" fill="#22c55e"/>
+      <circle cx="110" cy="48" r="4" fill="#22c55e"/>
+      <text x="24" y="120" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9">Data Health</text>
+      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(134,239,172,0.6)" letterSpacing="2">QUALITY · NULLS</text>
+    </svg>
+  ),
+  schema: (
+    <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
+      <rect width="300" height="130" fill="#1e1535"/>
+      <rect x="24" y="30" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.9"/>
+      <rect x="24" y="48" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.45"/>
+      <rect x="24" y="66" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.3"/>
+      <rect x="24" y="84" width="252" height="10" rx="2" fill="#a78bfa" opacity="0.18"/>
+      <line x1="108" y1="30" x2="108" y2="94" stroke="#a78bfa" strokeWidth="1" opacity="0.35"/>
+      <line x1="192" y1="30" x2="192" y2="94" stroke="#a78bfa" strokeWidth="1" opacity="0.35"/>
+      <text x="24" y="118" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9">Schema</text>
+      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(196,181,253,0.6)" letterSpacing="2">COLUMNS · TYPES</text>
+    </svg>
+  ),
+  charts: (
+    <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
+      <rect width="300" height="130" fill="#2d1a00"/>
+      <circle cx="262" cy="14" r="64" fill="#4a2c00" opacity="0.5"/>
+      <rect x="24" y="74" width="28" height="36" rx="3" fill="#f59e0b" opacity="0.4"/>
+      <rect x="60" y="56" width="28" height="54" rx="3" fill="#f59e0b" opacity="0.6"/>
+      <rect x="96" y="38" width="28" height="72" rx="3" fill="#f59e0b" opacity="0.85"/>
+      <rect x="132" y="50" width="28" height="60" rx="3" fill="#f59e0b" opacity="0.7"/>
+      <rect x="168" y="62" width="28" height="48" rx="3" fill="#f59e0b" opacity="0.5"/>
+      <line x1="14" y1="110" x2="276" y2="110" stroke="#f59e0b" strokeWidth="1" opacity="0.2"/>
+      <text x="24" y="122" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9">Charts</text>
+      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(253,211,77,0.6)" letterSpacing="2">VISUALISE · EXPLORE</text>
+    </svg>
+  ),
+  ml: (
+    <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="mobile-analysis-card-svg">
+      <rect width="300" height="130" fill="#2d0a1a"/>
+      <circle cx="260" cy="14" r="66" fill="#4a0f28" opacity="0.5"/>
+      <circle cx="44" cy="36" r="9" fill="#f43f5e" opacity="0.9"/>
+      <circle cx="44" cy="65" r="9" fill="#f43f5e" opacity="0.9"/>
+      <circle cx="44" cy="94" r="9" fill="#f43f5e" opacity="0.9"/>
+      <circle cx="110" cy="28" r="9" fill="#f43f5e" opacity="0.65"/>
+      <circle cx="110" cy="57" r="9" fill="#f43f5e" opacity="0.65"/>
+      <circle cx="110" cy="86" r="9" fill="#f43f5e" opacity="0.65"/>
+      <circle cx="176" cy="36" r="9" fill="#f43f5e" opacity="0.5"/>
+      <circle cx="176" cy="65" r="9" fill="#f43f5e" opacity="0.5"/>
+      <circle cx="242" cy="50" r="9" fill="#f43f5e" opacity="0.9"/>
+      <circle cx="242" cy="79" r="9" fill="#f43f5e" opacity="0.9"/>
+      <line x1="53" y1="36" x2="101" y2="28" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
+      <line x1="53" y1="65" x2="101" y2="57" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
+      <line x1="119" y1="57" x2="167" y2="65" stroke="#f43f5e" strokeWidth="0.8" opacity="0.3"/>
+      <line x1="185" y1="65" x2="233" y2="50" stroke="#f43f5e" strokeWidth="0.8" opacity="0.4"/>
+      <text x="24" y="118" fontFamily="system-ui,sans-serif" fontSize="11" fontWeight="700" fill="white" opacity="0.9">ML Lab</text>
+      <text x="24" y="12" fontFamily="system-ui,sans-serif" fontSize="7" fontWeight="700" fill="rgba(253,164,175,0.6)" letterSpacing="2">TRAIN · PREDICT</text>
+    </svg>
+  ),
+};
+
+const popupCardAccents: Record<string, string> = {
+  "overview": "#4f6ef7",
+  "data-health": "#22c55e",
+  "schema": "#a78bfa",
+  "charts": "#f59e0b",
+  "ml": "#f43f5e",
+};
+
 function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDeleteExperiment }: PopupMobileCardsProps) {
   const [openCard, setOpenCard] = useState<string | null>(null);
   const [activeSubIdx, setActiveSubIdx] = useState<number>(0);
@@ -480,6 +566,7 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
   const currentCard = popupCards.find((c) => c.key === openCard);
 
   if (openCard && currentCard) {
+    const accent = popupCardAccents[currentCard.key] ?? "#4f6ef7";
     return (
       <div className="history-popup-mobile-detail">
         <button type="button" onClick={handleBack} className="mobile-analysis-back-btn">
@@ -487,27 +574,32 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
           All sections
         </button>
 
-        <div className="mobile-analysis-detail-header">
-          <span className="mobile-analysis-detail-icon">{currentCard.icon}</span>
-          <div>
-            <h2 className="mobile-analysis-detail-title">{currentCard.label}</h2>
-            <p className="mobile-analysis-detail-desc">{currentCard.description}</p>
-          </div>
+        <div
+          className="mobile-analysis-detail-cover"
+          style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
+        >
+          {popupCardCovers[currentCard.key]}
+          {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+            <div className="mobile-analysis-detail-subtabs">
+              {currentCard.subtabs.map((sub, idx) => (
+                <button
+                  key={sub.label}
+                  type="button"
+                  onClick={() => setActiveSubIdx(idx)}
+                  className={`mobile-analysis-detail-subtab${activeSubIdx === idx ? " mobile-analysis-detail-subtab-active" : ""}`}
+                  style={{ "--subtab-accent": accent } as React.CSSProperties}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
-        {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
-          <select
-            value={activeSubIdx}
-            onChange={(e) => setActiveSubIdx(Number(e.target.value))}
-            className="mobile-analysis-section-select"
-          >
-            {currentCard.subtabs.map((sub, idx) => (
-              <option key={sub.label} value={idx}>{sub.label}</option>
-            ))}
-          </select>
-        ) : null}
-
-        <section className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content">
+        <section
+          className="mobile-screen-panel mobile-analysis-content-panel analysis-mobile-focus-content"
+          style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}33` } as React.CSSProperties}
+        >
           {renderContent()}
         </section>
       </div>
@@ -515,22 +607,22 @@ function PopupMobileCards({ report, onRunUnsupervised, onRunSupervised, onDelete
   }
 
   return (
-    <div className="mobile-analysis-card-list">
-      {popupCards.map((card) => (
-        <button
-          key={card.key}
-          type="button"
-          onClick={() => handleOpenCard(card)}
-          className="mobile-analysis-card"
-        >
-          <span className="mobile-analysis-card-icon">{card.icon}</span>
-          <div className="mobile-analysis-card-text">
-            <p className="mobile-analysis-card-label">{card.label}</p>
-            <p className="mobile-analysis-card-desc">{card.description}</p>
-          </div>
-          <svg className="mobile-analysis-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      ))}
+    <div className="mobile-analysis-svg-grid">
+      {popupCards.map((card) => {
+        const accent = popupCardAccents[card.key] ?? "#4f6ef7";
+        return (
+          <button
+            key={card.key}
+            type="button"
+            onClick={() => handleOpenCard(card)}
+            className="mobile-analysis-svg-card"
+            style={{ "--analysis-card-accent": accent } as React.CSSProperties}
+          >
+            {popupCardCovers[card.key]}
+            <span className="mobile-analysis-svg-card-tap">Tap to open</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
