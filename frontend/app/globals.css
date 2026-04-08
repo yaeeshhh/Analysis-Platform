@@ -3801,20 +3801,21 @@ a[class*="rounded"]:hover {
     position: relative;
   }
 
+  .mobile-history-close-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+  }
+
   .mobile-history-close-btn {
-    align-items: center;
     background: rgba(79, 110, 247, 0.1);
     border: 1px solid rgba(79, 110, 247, 0.25);
-    border-radius: 999px;
+    border-radius: 0.5rem;
     color: #a5b8ff;
-    display: flex;
-    height: 1.65rem;
-    justify-content: center;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.4rem 1.1rem;
     -webkit-tap-highlight-color: transparent;
-    width: 1.65rem;
   }
 
   .mobile-history-close-btn:active {
@@ -5633,5 +5634,80 @@ details.mobile-accordion > .mobile-accordion-body {
     font-size: 0.82rem;
     font-weight: 500;
     text-align: right;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   ACCOUNT DIALOGS — MOBILE
+   Match mobile-screen-panel visual language.
+   ════════════════════════════════════════════════ */
+@media (max-width: 959px) {
+  .account-dialog-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .account-dialog-card {
+    background: #111821 !important;
+    border: none !important;
+    border-top: 1px solid rgba(122, 214, 255, 0.18) !important;
+    border-radius: 1.1rem 1.1rem 0 0 !important;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+    max-height: calc(100vh - 2rem) !important;
+    padding: 1.2rem 1.1rem 1.4rem !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .account-dialog-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #7ad6ff;
+    border-radius: 1.1rem 1.1rem 0 0;
+  }
+
+  .account-dialog-header {
+    border-bottom-color: rgba(122, 214, 255, 0.12) !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    padding-bottom: 0.85rem !important;
+  }
+
+  .account-dialog-eyebrow {
+    color: #7ad6ff !important;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.18em !important;
+  }
+
+  .account-dialog-title {
+    font-size: 1.15rem !important;
+    margin-top: 0.35rem !important;
+  }
+
+  .account-dialog-desc {
+    font-size: 0.8rem !important;
+    color: rgba(242, 247, 251, 0.55) !important;
+    margin-top: 0.35rem !important;
+  }
+
+  .account-dialog-close {
+    align-self: flex-end !important;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border-radius: 0.65rem !important;
+    padding: 0.45rem !important;
+    background: rgba(122, 214, 255, 0.08) !important;
+    border-color: rgba(122, 214, 255, 0.18) !important;
+    color: #7ad6ff !important;
+  }
+
+  .account-dialog-close:active {
+    background: rgba(122, 214, 255, 0.18) !important;
   }
 }

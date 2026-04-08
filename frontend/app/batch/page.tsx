@@ -713,7 +713,12 @@ function BatchMobileSections({
 
   return (
     <div className="phone-only mobile-screen-stack">
-      <section className="mobile-screen-panel section-glow">
+      <section className="mobile-screen-panel section-glow" style={{ overflow: "hidden" }}>
+        {/* Motif — step chart */}
+        <svg viewBox="0 0 300 100" style={{ position: "absolute", top: 0, right: 0, width: 160, height: 55, opacity: 0.10, pointerEvents: "none" }} aria-hidden="true">
+          <polyline points="10,85 50,85 50,60 100,60 100,40 150,40 150,55 200,55 200,25 250,25 250,15 290,15" fill="none" stroke="#14b8a6" strokeWidth="2.5" strokeLinejoin="round"/>
+          <line x1="10" y1="90" x2="290" y2="90" stroke="#14b8a6" strokeWidth="1" opacity="0.4"/>
+        </svg>
         <div className="mobile-screen-panel-header">
           <div>
             <p className="mobile-screen-kicker">Dataset intake</p>

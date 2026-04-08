@@ -649,6 +649,31 @@ function HistoryMobileSections({
 
   return (
     <div className="phone-only mobile-screen-stack">
+      {/* ── Hero panel ── */}
+      <section className="mobile-screen-panel section-glow" style={{ overflow: "hidden" }}>
+        {/* Motif — topology network */}
+        <svg viewBox="0 0 300 100" style={{ position: "absolute", top: 0, right: 0, width: 180, height: 60, opacity: 0.10, pointerEvents: "none" }} aria-hidden="true">
+          <circle cx="40" cy="30" r="3" fill="#14b8a6"/><circle cx="100" cy="20" r="3" fill="#14b8a6"/>
+          <circle cx="160" cy="50" r="3" fill="#14b8a6"/><circle cx="220" cy="25" r="3" fill="#14b8a6"/>
+          <circle cx="260" cy="60" r="3" fill="#14b8a6"/><circle cx="70" cy="70" r="3" fill="#14b8a6"/>
+          <circle cx="190" cy="80" r="3" fill="#14b8a6"/>
+          <line x1="40" y1="30" x2="100" y2="20" stroke="#14b8a6" strokeWidth="1"/>
+          <line x1="100" y1="20" x2="160" y2="50" stroke="#14b8a6" strokeWidth="1"/>
+          <line x1="160" y1="50" x2="220" y2="25" stroke="#14b8a6" strokeWidth="1"/>
+          <line x1="220" y1="25" x2="260" y2="60" stroke="#14b8a6" strokeWidth="1"/>
+          <line x1="40" y1="30" x2="70" y2="70" stroke="#14b8a6" strokeWidth="1"/>
+          <line x1="70" y1="70" x2="160" y2="50" stroke="#14b8a6" strokeWidth="1"/>
+          <line x1="160" y1="50" x2="190" y2="80" stroke="#14b8a6" strokeWidth="1"/>
+        </svg>
+        <div className="mobile-screen-panel-header">
+          <div>
+            <p className="mobile-screen-kicker">Run archive</p>
+            <h2 className="mobile-screen-title">Past analyses</h2>
+            <p className="mobile-screen-lead">Search, filter, and revisit every dataset run.</p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Compact search bar ── */}
       <div className="mobile-history-search-bar">
         <svg className="mobile-history-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -726,17 +751,6 @@ function HistoryMobileSections({
                 </summary>
 
                 <div className="mobile-history-card-detail">
-                  <button
-                    type="button"
-                    className="mobile-history-close-btn"
-                    onClick={(e) => {
-                      const details = e.currentTarget.closest("details");
-                      if (details) details.open = false;
-                    }}
-                    aria-label="Close"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
                   <p className="mobile-history-card-full-summary">{analysis.insights.summary}</p>
 
                   {needsReview ? (
@@ -769,6 +783,18 @@ function HistoryMobileSections({
                     ) : null}
                     <button type="button" onClick={() => onDeleteRun(analysis.id)} className="mobile-history-action-btn mobile-history-action-danger">
                       Delete
+                    </button>
+                  </div>
+                  <div className="mobile-history-close-row">
+                    <button
+                      type="button"
+                      className="mobile-history-close-btn"
+                      onClick={(e) => {
+                        const details = e.currentTarget.closest("details");
+                        if (details) details.open = false;
+                      }}
+                    >
+                      Close
                     </button>
                   </div>
                 </div>

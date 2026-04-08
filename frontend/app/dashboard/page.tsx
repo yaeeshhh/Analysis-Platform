@@ -20,7 +20,7 @@ const destinationCards = [
     cta: "Open library",
   },
   {
-    title: "Analysis workspace",
+    title: "Analysis",
     detail: "Grouped report flow with Summary, Health, Fields, Patterns, and ML once a dataset is selected.",
     href: "/analysis",
     cta: "Open analysis",
@@ -545,7 +545,6 @@ function DashboardMobileSections({
         <details className="mobile-accordion">
           <summary>
             <p className="mobile-screen-row-title">Analysis breakdown</p>
-            <p className="mobile-accordion-hint">Summary, health, fields, patterns, and ML are grouped so the report reads in a clearer order.</p>
           </summary>
           <div className="mobile-accordion-body">
             <div className="mobile-screen-list">
@@ -568,7 +567,7 @@ function DashboardMobileSections({
                 href={latest ? `/analysis?analysisId=${latest.id}` : "/analysis"}
                 className="mobile-screen-button mobile-screen-button-primary"
               >
-                {latest ? "Open latest analysis" : "Open analysis workspace"}
+                {latest ? "Open latest analysis" : "Open analysis"}
               </ScrollIntentLink>
             </div>
           </div>
@@ -577,7 +576,6 @@ function DashboardMobileSections({
         <details className="mobile-accordion">
           <summary>
             <p className="mobile-screen-row-title">How features work</p>
-            <p className="mobile-accordion-hint">Review the flow from the dataset library through report reading, charts, ML, and account cleanup.</p>
           </summary>
           <div className="mobile-accordion-body">
             <div className="mobile-screen-list">
