@@ -505,7 +505,7 @@ function DashboardMobileSections({
                     {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                   </span>
                 </div>
-                <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 120)}</p>
+                <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 80)}</p>
                 <div className="mobile-screen-pills compact">
                   <span className="mobile-screen-pill">{analysis.overview.row_count.toLocaleString()} rows</span>
                   <span className="mobile-screen-pill">{analysis.overview.column_count} cols</span>
