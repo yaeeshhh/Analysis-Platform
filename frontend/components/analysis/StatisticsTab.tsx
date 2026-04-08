@@ -2,7 +2,7 @@ import { AnalysisStatistics } from "@/lib/analysisTypes";
 
 type StatisticsTabProps = {
   statistics: AnalysisStatistics;
-  mobileSection?: string | null;
+  mobileSection?: string | string[] | null;
 };
 
 function metric(value: number) {
@@ -10,7 +10,7 @@ function metric(value: number) {
 }
 
 export default function StatisticsTab({ statistics, mobileSection }: StatisticsTabProps) {
-  const show = (section: string) => !mobileSection || mobileSection === section;
+  const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">

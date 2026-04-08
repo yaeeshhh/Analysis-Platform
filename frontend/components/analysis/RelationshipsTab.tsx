@@ -9,7 +9,7 @@ import {
 type RelationshipsTabProps = {
   schema: AnalysisSchema;
   statistics: AnalysisStatistics;
-  mobileSection?: string | null;
+  mobileSection?: string | string[] | null;
 };
 
 export default function RelationshipsTab({ schema, statistics, mobileSection }: RelationshipsTabProps) {
@@ -17,7 +17,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
   const skewedFields = getSkewedFields(statistics);
   const dominantCategories = getDominantCategories(statistics);
 
-  const show = (section: string) => !mobileSection || mobileSection === section;
+  const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">

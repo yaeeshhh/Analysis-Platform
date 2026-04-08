@@ -4,7 +4,7 @@ import { AnalysisOverview, AnalysisQuality } from "@/lib/analysisTypes";
 type DataQualityTabProps = {
   overview: AnalysisOverview;
   quality: AnalysisQuality;
-  mobileSection?: string | null;
+  mobileSection?: string | string[] | null;
 };
 
 export default function DataQualityTab({ overview, quality, mobileSection }: DataQualityTabProps) {
@@ -16,7 +16,7 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
     { label: "Outlier columns", value: quality.outlier_columns.length.toString() },
   ];
 
-  const show = (section: string) => !mobileSection || mobileSection === section;
+  const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
 
   return (
     <section className="analysis-tab-surface space-y-4">

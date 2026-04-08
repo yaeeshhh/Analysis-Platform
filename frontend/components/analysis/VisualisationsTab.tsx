@@ -17,7 +17,7 @@ import { getVisualGuides, getVisualNarratives, getVisualStory } from "@/lib/anal
 
 type VisualisationsTabProps = {
   visualisations: AnalysisVisualisations;
-  mobileSection?: string | null;
+  mobileSection?: string | string[] | null;
 };
 
 const chartPalette = ["#7ad6ff", "#9db8ff", "#8bf1a8", "#bfb8ff", "#d7b7ff"];
@@ -104,7 +104,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
     : [];
   const histogramPreview = [...histogramData].sort((left, right) => right.count - left.count).slice(0, 3);
 
-  const show = (section: string) => !mobileSection || mobileSection === section;
+  const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">

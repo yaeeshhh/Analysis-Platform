@@ -2,7 +2,7 @@ import { AnalysisInsights } from "@/lib/analysisTypes";
 
 type InsightsTabProps = {
   insights: AnalysisInsights;
-  mobileSection?: string | null;
+  mobileSection?: string | string[] | null;
 };
 
 function truncatePreview(text: string, limit = 108) {
@@ -11,7 +11,7 @@ function truncatePreview(text: string, limit = 108) {
 }
 
 export default function InsightsTab({ insights, mobileSection }: InsightsTabProps) {
-  const show = (section: string) => !mobileSection || mobileSection === section;
+  const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
