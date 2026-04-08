@@ -118,24 +118,24 @@ function DialogShell({
 
   return (
     <div
-      className="fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#04090d]/75 p-2 backdrop-blur-md sm:items-center sm:p-4"
+      className="account-dialog-overlay fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#04090d]/75 p-2 backdrop-blur-md sm:items-center sm:p-4"
       onMouseDown={onClose}
     >
       <div
-        className={`w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-xl border border-white/10 bg-[#111821]/95 p-4 sm:max-h-[calc(100vh-2rem)] sm:rounded-xl sm:p-6`}
+        className={`account-dialog-card w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-xl border border-white/10 bg-[#111821]/95 p-4 sm:max-h-[calc(100vh-2rem)] sm:rounded-xl sm:p-6`}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="account-dialog-header flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">{eyebrow}</p>
-            <h2 className="mt-2 font-[family:var(--font-display)] text-2xl text-white">{title}</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/64">{description}</p>
+            <p className="account-dialog-eyebrow text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">{eyebrow}</p>
+            <h2 className="account-dialog-title mt-2 font-[family:var(--font-display)] text-2xl text-white">{title}</h2>
+            <p className="account-dialog-desc mt-2 max-w-2xl text-sm leading-6 text-white/64">{description}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="self-end rounded-lg border border-white/10 bg-white/5 p-2 text-white/55 transition hover:bg-white/10 hover:text-white sm:self-auto"
+            className="account-dialog-close self-end rounded-lg border border-white/10 bg-white/5 p-2 text-white/55 transition hover:bg-white/10 hover:text-white sm:self-auto"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6 6 18M6 6l12 12" />
