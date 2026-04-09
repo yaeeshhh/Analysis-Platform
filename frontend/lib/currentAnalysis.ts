@@ -1,3 +1,5 @@
+import { invalidateAnalysisCache } from "./analysisApi";
+
 const CURRENT_ANALYSIS_STORAGE_KEY = "currentAnalysisId";
 const CURRENT_ANALYSIS_EVENT = "analysis:current-selection-changed";
 const ANALYSES_UPDATED_STORAGE_KEY = "analysisRecordsUpdatedAt";
@@ -53,6 +55,7 @@ export function clearCurrentAnalysisSelection() {
 export function notifyAnalysesChanged() {
   if (typeof window === "undefined") return;
 
+  invalidateAnalysisCache();
   localStorage.setItem(ANALYSES_UPDATED_STORAGE_KEY, Date.now().toString());
   dispatchWindowEvent(ANALYSES_UPDATED_EVENT);
 }
@@ -76,10 +79,16 @@ export function subscribeToAnalysisStateChanges(
 
   const handleStorage = (event: StorageEvent) => {
     if (!isAnalysisStateStorageEvent(event)) return;
+
+    if (event.key === ANALYSES_UPDATED_STORAGE_KEY) {
+      invalidateAnalysisCache();
+    }
+
     listener();
   };
 
   const handleAnalysesChanged = () => {
+    invalidateAnalysisCache();
     listener();
   };
 

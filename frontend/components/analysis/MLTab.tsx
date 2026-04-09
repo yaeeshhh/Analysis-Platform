@@ -170,10 +170,10 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
     <div className="analysis-guide-scroll mt-4" data-swipe-ignore="true">
       <div className="analysis-guide-track">
         {items.map((item) => (
-          <div key={item.name} className="analysis-guide-card">
-            <p className="font-medium text-white">{item.name}</p>
-            <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-          </div>
+          <article key={item.name} className="analysis-guide-card">
+            <p className="analysis-guide-card-title">{item.name}</p>
+            <p className="analysis-guide-card-copy">{item.detail}</p>
+          </article>
         ))}
       </div>
     </div>

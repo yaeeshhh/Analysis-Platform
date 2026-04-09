@@ -98,7 +98,7 @@ export default function AppShell({
       <MobileHeader eyebrow={eyebrow} title={title} />
 
       <div className="desktop-shell">
-        <aside className="tablet-up desktop-sidebar" data-desktop-sidebar="true" data-collapsed="false" data-interactive="true">
+        <aside className="tablet-up desktop-sidebar" data-desktop-sidebar="true" data-collapsed="true" data-interactive="false">
           <Suspense fallback={<div className="desktop-sidebar-skeleton" />}>
             <TopNav />
           </Suspense>
