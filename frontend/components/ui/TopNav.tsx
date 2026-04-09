@@ -155,6 +155,8 @@ export default function TopNav() {
         }
       }}
     >
+      <span className="nav-surface-glare" aria-hidden="true" />
+
       <div className="desktop-sidebar-brand">
         <div className="desktop-sidebar-brand-lockup">
           <BrandMark compact={contentCollapsed} withCopy={!contentCollapsed} withTagline={false} />

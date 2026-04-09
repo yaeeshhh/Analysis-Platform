@@ -717,11 +717,16 @@ export default function MobileNav() {
       onPointerCancel={appMode ? handleAppNavPointerEnd : undefined}
     >
       {appMode ? (
-        <span
-          aria-hidden="true"
-          className="mobile-bottom-nav-liquid-blob"
-          style={liquidBlobStyle}
-        />
+        <>
+          <span aria-hidden="true" className="mobile-bottom-nav-glass-sheen" />
+          <span aria-hidden="true" className="mobile-bottom-nav-glass-edge" />
+          <span aria-hidden="true" className="mobile-bottom-nav-glass-glare" />
+          <span
+            aria-hidden="true"
+            className="mobile-bottom-nav-liquid-blob"
+            style={liquidBlobStyle}
+          />
+        </>
       ) : null}
 
       {navItems.map((item, index) => {
@@ -746,6 +751,8 @@ export default function MobileNav() {
               onClick={handleAppNavClick(index, item.href)}
               onPointerDown={handleAppNavPointerDown(index)}
             >
+              <span aria-hidden="true" className="mobile-bottom-nav-item-glass-fill" />
+              <span aria-hidden="true" className="mobile-bottom-nav-item-glass-edge" />
               {item.icon}
               <span className="mobile-bottom-nav-label">{item.label}</span>
             </button>
