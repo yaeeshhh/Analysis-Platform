@@ -417,6 +417,7 @@ body::after {
     display: flex;
     flex-shrink: 0;
     height: 100vh;
+    margin-right: 0;
     min-height: 100vh;
     overflow: visible;
     position: sticky;
@@ -433,7 +434,13 @@ body::after {
     border-right: 1px solid var(--chrome-matte-border);
     box-shadow: 16px 0 44px rgba(0, 0, 0, 0.18), inset -1px 0 0 rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(28px) saturate(132%);
+    flex: 0 0 auto;
     -webkit-backdrop-filter: blur(28px) saturate(132%);
+    width: 216px;
+  }
+
+  .desktop-sidebar[data-collapsed="false"] {
+    margin-right: -144px;
     width: 216px;
   }
 
