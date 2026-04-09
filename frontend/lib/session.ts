@@ -6,7 +6,22 @@ const PASSWORD_CHANGED_NOTICE_KEY = "auth:password-changed-notice";
 const LAST_SEEN_PASSWORD_CHANGED_NOTICE_KEY = "auth:last-password-changed-notice-id";
 const FORCED_PASSWORD_CHANGED_NOTICE_KEY = "auth:force-password-changed-notice-id";
 const PASSWORD_CHANGED_REAUTH_DETAIL = "Your password was changed. Please log in again.";
+const AUTHENTICATED_USER_CACHE_WINDOW_MS = 4000;
 export const PASSWORD_CHANGED_QUERY_PARAM = "password_changed";
+
+type CachedAuthenticatedUser = {
+  cacheKey: string;
+  expiresAt: number;
+  user: User | null;
+};
+
+let cachedAuthenticatedUser: CachedAuthenticatedUser | null = null;
+let authenticatedUserPromise:
+  | {
+      cacheKey: string;
+      promise: Promise<User | null>;
+    }
+  | null = null;
 
 export type PasswordChangedNoticePayload = {
   id: string;
@@ -33,6 +48,32 @@ export function getActiveAccountEmail(): string | null {
 export function clearActiveAccountEmail(): void {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(ACTIVE_ACCOUNT_EMAIL_SESSION_KEY);
+}
+
+function getAuthenticatedUserCacheKey(): string {
+  return getAccessToken() ?? "__anonymous__";
+}
+
+function readCachedAuthenticatedUser(cacheKey: string): User | null | undefined {
+  if (
+    cachedAuthenticatedUser &&
+    cachedAuthenticatedUser.cacheKey === cacheKey &&
+    cachedAuthenticatedUser.expiresAt > Date.now()
+  ) {
+    return cachedAuthenticatedUser.user;
+  }
+
+  return undefined;
+}
+
+function storeCachedAuthenticatedUser(user: User | null): User | null {
+  cachedAuthenticatedUser = {
+    cacheKey: getAuthenticatedUserCacheKey(),
+    expiresAt: Date.now() + AUTHENTICATED_USER_CACHE_WINDOW_MS,
+    user,
+  };
+
+  return user;
 }
 
 function getPendingPasswordChangedNotice(): PasswordChangedNoticePayload | null {
@@ -151,41 +192,66 @@ export function shouldSuppressDefaultLoginModal(): boolean {
 }
 
 export async function resolveAuthenticatedUser(): Promise<User | null> {
-  const existingToken = getAccessToken();
+  const cacheKey = getAuthenticatedUserCacheKey();
+  const cachedUser = readCachedAuthenticatedUser(cacheKey);
 
-  if (existingToken) {
+  if (cachedUser !== undefined) {
+    return cachedUser;
+  }
+
+  if (authenticatedUserPromise?.cacheKey === cacheKey) {
+    return authenticatedUserPromise.promise;
+  }
+
+  const request = (async () => {
+    const existingToken = getAccessToken();
+
+    if (existingToken) {
+      try {
+        const user = await getCurrentUser(existingToken);
+        setActiveAccountEmail(user.email);
+        return storeCachedAuthenticatedUser(user);
+      } catch (error) {
+        if (isPasswordChangedReauthMessage(error instanceof Error ? error.message : "")) {
+          clearAccessToken();
+          clearActiveAccountEmail();
+          storeCachedAuthenticatedUser(null);
+          redirectToPasswordChangedLogin();
+          return null;
+        }
+
+        // If the old access token is bad, I try refresh before giving up.
+      }
+    }
+
     try {
-      const user = await getCurrentUser(existingToken);
+      const refreshResponse = await refreshAccessToken();
+      setAccessToken(refreshResponse.access_token);
+      const user = await getCurrentUser(refreshResponse.access_token);
       setActiveAccountEmail(user.email);
-      return user;
+      return storeCachedAuthenticatedUser(user);
     } catch (error) {
       if (isPasswordChangedReauthMessage(error instanceof Error ? error.message : "")) {
         clearAccessToken();
         clearActiveAccountEmail();
+        storeCachedAuthenticatedUser(null);
         redirectToPasswordChangedLogin();
         return null;
       }
 
-      // If the old access token is bad, I try refresh before giving up.
-    }
-  }
-
-  try {
-    const refreshResponse = await refreshAccessToken();
-    setAccessToken(refreshResponse.access_token);
-    const user = await getCurrentUser(refreshResponse.access_token);
-    setActiveAccountEmail(user.email);
-    return user;
-  } catch (error) {
-    if (isPasswordChangedReauthMessage(error instanceof Error ? error.message : "")) {
       clearAccessToken();
       clearActiveAccountEmail();
-      redirectToPasswordChangedLogin();
-      return null;
+      return storeCachedAuthenticatedUser(null);
     }
+  })();
 
-    clearAccessToken();
-    clearActiveAccountEmail();
-    return null;
+  authenticatedUserPromise = { cacheKey, promise: request };
+
+  try {
+    return await request;
+  } finally {
+    if (authenticatedUserPromise?.promise === request) {
+      authenticatedUserPromise = null;
+    }
   }
 }

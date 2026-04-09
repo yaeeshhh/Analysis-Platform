@@ -1,4 +1,4 @@
-import { fetchWithAuth, parseJsonSafely } from "./api";
+import { fetchWithAuth, getAccessToken, parseJsonSafely } from "./api";
 import { getApiBaseUrl } from "./apiBaseUrl";
 import {
   AnalysisInsights,
@@ -113,6 +113,68 @@ const EMPTY_REPORT: AnalysisReport = {
   ml_results: {},
   ml_experiments: [],
 };
+
+const ANALYSIS_CACHE_WINDOW_MS = 5000;
+
+type CachedAnalysisValue<T> = {
+  cacheKey: string;
+  expiresAt: number;
+  value: T;
+};
+
+let cachedAnalyses: CachedAnalysisValue<AnalysisListItem[]> | null = null;
+let analysesRequest:
+  | {
+      cacheKey: string;
+      promise: Promise<AnalysisListItem[]>;
+    }
+  | null = null;
+const cachedReports = new Map<string, CachedAnalysisValue<AnalysisReport>>();
+const reportRequests = new Map<
+  string,
+  {
+    cacheKey: string;
+    promise: Promise<AnalysisReport>;
+  }
+>();
+
+function getAnalysisCacheKey(): string {
+  return getAccessToken() ?? "__anonymous__";
+}
+
+function readCachedAnalysisValue<T>(
+  entry: CachedAnalysisValue<T> | null | undefined,
+  cacheKey: string
+): T | undefined {
+  if (entry && entry.cacheKey === cacheKey && entry.expiresAt > Date.now()) {
+    return entry.value;
+  }
+
+  return undefined;
+}
+
+function storeCachedAnalysisValue<T>(value: T): CachedAnalysisValue<T> {
+  return {
+    cacheKey: getAnalysisCacheKey(),
+    expiresAt: Date.now() + ANALYSIS_CACHE_WINDOW_MS,
+    value,
+  };
+}
+
+export function invalidateAnalysisCache(id?: number | string): void {
+  cachedAnalyses = null;
+  analysesRequest = null;
+
+  if (id === undefined) {
+    cachedReports.clear();
+    reportRequests.clear();
+    return;
+  }
+
+  const reportKey = String(id);
+  cachedReports.delete(reportKey);
+  reportRequests.delete(reportKey);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -434,26 +496,82 @@ async function downloadBlob(url: string, filename: string) {
 }
 
 export async function getAnalyses(): Promise<AnalysisListItem[]> {
-  const response = await fetchWithAuth(`${API_BASE_URL}/analysis`, {
-    cache: "no-store",
-    suppressAuthRedirect: true,
-  });
-  const payload = await parseJsonSafely(response);
-  if (!response.ok) {
-    throw new Error(resolveAnalysisError(response, payload, "Failed to load analysis history."));
+  const cacheKey = getAnalysisCacheKey();
+  const cachedValue = readCachedAnalysisValue(cachedAnalyses, cacheKey);
+
+  if (cachedValue !== undefined) {
+    return cachedValue;
   }
-  return Array.isArray(payload) ? payload.map((item) => normalizeAnalysisListItem(item)) : [];
+
+  if (analysesRequest?.cacheKey === cacheKey) {
+    return analysesRequest.promise;
+  }
+
+  const request = (async () => {
+    const response = await fetchWithAuth(`${API_BASE_URL}/analysis`, {
+      cache: "no-store",
+      suppressAuthRedirect: true,
+    });
+    const payload = await parseJsonSafely(response);
+    if (!response.ok) {
+      throw new Error(resolveAnalysisError(response, payload, "Failed to load analysis history."));
+    }
+
+    const normalized = Array.isArray(payload)
+      ? payload.map((item) => normalizeAnalysisListItem(item))
+      : [];
+    cachedAnalyses = storeCachedAnalysisValue(normalized);
+    return normalized;
+  })();
+
+  analysesRequest = { cacheKey, promise: request };
+
+  try {
+    return await request;
+  } finally {
+    if (analysesRequest?.promise === request) {
+      analysesRequest = null;
+    }
+  }
 }
 
 export async function getAnalysisById(id: number | string): Promise<AnalysisReport> {
-  const response = await fetchWithAuth(`${API_BASE_URL}/analysis/${id}`, {
-    cache: "no-store",
-  });
-  const payload = await parseJsonSafely(response);
-  if (!response.ok) {
-    throw new Error(resolveAnalysisError(response, payload, "Failed to load analysis."));
+  const reportKey = String(id);
+  const cacheKey = getAnalysisCacheKey();
+  const cachedValue = readCachedAnalysisValue(cachedReports.get(reportKey), cacheKey);
+
+  if (cachedValue !== undefined) {
+    return cachedValue;
   }
-  return normalizeAnalysisReport(payload);
+
+  const inFlightRequest = reportRequests.get(reportKey);
+  if (inFlightRequest?.cacheKey === cacheKey) {
+    return inFlightRequest.promise;
+  }
+
+  const request = (async () => {
+    const response = await fetchWithAuth(`${API_BASE_URL}/analysis/${id}`, {
+      cache: "no-store",
+    });
+    const payload = await parseJsonSafely(response);
+    if (!response.ok) {
+      throw new Error(resolveAnalysisError(response, payload, "Failed to load analysis."));
+    }
+
+    const normalized = normalizeAnalysisReport(payload);
+    cachedReports.set(reportKey, storeCachedAnalysisValue(normalized));
+    return normalized;
+  })();
+
+  reportRequests.set(reportKey, { cacheKey, promise: request });
+
+  try {
+    return await request;
+  } finally {
+    if (reportRequests.get(reportKey)?.promise === request) {
+      reportRequests.delete(reportKey);
+    }
+  }
 }
 
 export async function uploadAnalysisCsv(file: File): Promise<AnalysisReport> {
@@ -468,6 +586,7 @@ export async function uploadAnalysisCsv(file: File): Promise<AnalysisReport> {
   if (!response.ok) {
     throw new Error(resolveAnalysisError(response, payload, "Failed to upload dataset."));
   }
+  invalidateAnalysisCache();
   return normalizeAnalysisReport(payload);
 }
 
@@ -486,6 +605,7 @@ export async function runUnsupervisedAnalysis(
   if (!response.ok) {
     throw new Error(resolveAnalysisError(response, payload, "Failed to run unsupervised analysis."));
   }
+  invalidateAnalysisCache(id);
   return normalizeUnsupervisedResult(payload);
 }
 
@@ -504,6 +624,7 @@ export async function runSupervisedAnalysis(
   if (!response.ok) {
     throw new Error(resolveAnalysisError(response, payload, "Failed to run supervised analysis."));
   }
+  invalidateAnalysisCache(id);
   return normalizeSupervisedResult(payload);
 }
 
@@ -515,6 +636,8 @@ export async function deleteAnalysis(id: number | string): Promise<void> {
   if (!response.ok) {
     throw new Error(resolveAnalysisError(response, payload, "Failed to delete saved run."));
   }
+
+  invalidateAnalysisCache(id);
 }
 
 export async function deleteAllAnalyses(): Promise<void> {
@@ -525,6 +648,8 @@ export async function deleteAllAnalyses(): Promise<void> {
   if (!response.ok) {
     throw new Error(resolveAnalysisError(response, payload, "Failed to clear saved runs."));
   }
+
+  invalidateAnalysisCache();
 }
 
 export async function deleteMlExperiment(
@@ -542,6 +667,8 @@ export async function deleteMlExperiment(
   if (!response.ok) {
     throw new Error(resolveAnalysisError(response, payload, "Failed to delete saved ML run."));
   }
+
+  invalidateAnalysisCache(analysisId);
 }
 
 export async function getMlExperimentDetail(
