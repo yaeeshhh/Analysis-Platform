@@ -7,7 +7,6 @@ import ProfileMenu from "@/components/ui/ProfileMenu";
 import BrandMark from "@/components/ui/BrandMark";
 
 const SIDEBAR_OPEN_DELAY_MS = 220;
-const SIDEBAR_TRANSITION_MS = 260;
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", match: "/dashboard", icon: "dashboard" },
@@ -67,8 +66,6 @@ export default function TopNav() {
   const [collapsed, setCollapsed] = useState(true);
   const [interactive, setInteractive] = useState(false);
 
-  const transitionTimerRef = useRef<number | null>(null);
-
   const clearInteractiveTimer = () => {
     if (interactiveTimerRef.current === null) {
       return;
@@ -78,25 +75,11 @@ export default function TopNav() {
     interactiveTimerRef.current = null;
   };
 
-  const markTransitioning = () => {
-    const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
-    if (!sidebar) return;
-    sidebar.classList.add("sidebar-transitioning");
-    if (transitionTimerRef.current !== null) {
-      window.clearTimeout(transitionTimerRef.current);
-    }
-    transitionTimerRef.current = window.setTimeout(() => {
-      sidebar.classList.remove("sidebar-transitioning");
-      transitionTimerRef.current = null;
-    }, SIDEBAR_TRANSITION_MS);
-  };
-
   const openNav = () => {
     if (!collapsed && interactive) {
       return;
     }
 
-    markTransitioning();
     setCollapsed(false);
 
     if (interactive) {
@@ -112,7 +95,6 @@ export default function TopNav() {
 
   const closeNav = () => {
     clearInteractiveTimer();
-    markTransitioning();
     setInteractive(false);
     setCollapsed(true);
   };
@@ -120,9 +102,6 @@ export default function TopNav() {
   useEffect(() => {
     return () => {
       clearInteractiveTimer();
-      if (transitionTimerRef.current !== null) {
-        window.clearTimeout(transitionTimerRef.current);
-      }
     };
   }, []);
 
