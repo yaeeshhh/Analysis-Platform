@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const MOBILE_BREAKPOINT = 960;
 const FIELD_SELECTOR = "input, textarea, select";
@@ -53,6 +54,8 @@ function revealActiveField() {
 }
 
 export default function ViewportInsetManager() {
+  const pathname = usePathname();
+
   useEffect(() => {
     if (typeof window === "undefined" || typeof document === "undefined") {
       return undefined;
@@ -80,6 +83,18 @@ export default function ViewportInsetManager() {
     scheduleSync();
 
     const viewport = window.visualViewport;
+    const mobileHeader = document.querySelector<HTMLElement>(".mobile-header");
+    const headerResizeObserver =
+      typeof ResizeObserver !== "undefined" && mobileHeader
+        ? new ResizeObserver(() => {
+            scheduleSync();
+          })
+        : null;
+
+    if (headerResizeObserver && mobileHeader) {
+      headerResizeObserver.observe(mobileHeader);
+    }
+
     viewport?.addEventListener("resize", handleViewportChange);
     viewport?.addEventListener("scroll", handleViewportChange);
     window.addEventListener("resize", handleViewportChange);
@@ -88,14 +103,9 @@ export default function ViewportInsetManager() {
     document.addEventListener("focusin", handleFocusIn);
     document.addEventListener("focusout", scheduleSync);
 
-    const mutationObserver = new MutationObserver(scheduleSync);
-    mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
     return () => {
       window.cancelAnimationFrame(frameId);
+      headerResizeObserver?.disconnect();
       viewport?.removeEventListener("resize", handleViewportChange);
       viewport?.removeEventListener("scroll", handleViewportChange);
       window.removeEventListener("resize", handleViewportChange);
@@ -103,9 +113,8 @@ export default function ViewportInsetManager() {
       window.removeEventListener("pageshow", scheduleSync);
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("focusout", scheduleSync);
-      mutationObserver.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
