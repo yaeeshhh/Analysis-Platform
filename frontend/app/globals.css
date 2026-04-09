@@ -3117,6 +3117,7 @@ a[class*="rounded"]:hover {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+    overflow-x: clip;
   }
 
   .analysis-mobile-focus-content .recharts-text,
@@ -3777,6 +3778,7 @@ a[class*="rounded"]:hover {
   .analysis-guide-scroll {
     margin-left: -1rem;
     margin-right: -1rem;
+    max-width: 100vw;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     padding: 0 1rem 0.5rem;
