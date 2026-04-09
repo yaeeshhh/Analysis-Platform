@@ -1,5 +1,6 @@
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import { AnalysisOverview, AnalysisQuality } from "@/lib/analysisTypes";
+import { useDesktopAccordionsExpanded } from "@/lib/useDesktopAccordionsExpanded";
 
 type DataQualityTabProps = {
   overview: AnalysisOverview;
@@ -17,6 +18,7 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
   ];
 
   const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
+  const accordionOpen = useDesktopAccordionsExpanded() || mobileSection !== undefined;
 
   return (
     <section className="analysis-tab-surface space-y-4">
@@ -41,7 +43,7 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
 
       <div className="grid gap-4 lg:grid-cols-2">
         {show("missingness") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
@@ -84,7 +86,7 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
         ) : null}
 
         {show("recommendations") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Recommendations</span>

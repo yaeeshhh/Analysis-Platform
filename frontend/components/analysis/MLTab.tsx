@@ -39,6 +39,7 @@ import {
   isMissingAnalysisSourceError,
 } from "@/lib/analysisApi";
 import { triggerElementNavigationScroll, triggerNavigationScroll } from "@/lib/navigationScroll";
+import { useDesktopAccordionsExpanded } from "@/lib/useDesktopAccordionsExpanded";
 
 type MLTabProps = {
   analysisId: number;
@@ -440,6 +441,7 @@ export default function MLTab({
     id: string;
     token: number;
   } | null>(null);
+  const accordionOpen = useDesktopAccordionsExpanded();
 
   const clusters = getTopClusters(unsupervised);
   const anomalies = getTopAnomalies(unsupervised);
@@ -927,7 +929,7 @@ export default function MLTab({
           <p className="inline-warning-note-copy">{readinessWarning}</p>
         </div>
       ) : null}
-      <details className="mobile-accordion">
+      <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Lab overview</span>
@@ -1027,7 +1029,7 @@ export default function MLTab({
 
       {activeLab === "supervised" ? (
         <>
-          <details className="mobile-accordion min-w-0 self-start">
+          <details className="mobile-accordion min-w-0 self-start" open={accordionOpen ? true : undefined}>
             <summary>
               <div className="min-w-0">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Method guide</span>
@@ -1240,7 +1242,7 @@ export default function MLTab({
 
           {renderSavedRunsBlock("supervised", supervisedExperiments)}
 
-          <details className="mobile-accordion">
+          <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
             <summary>
               <div className="min-w-0">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#ffd76d]">Score interpretation</span>

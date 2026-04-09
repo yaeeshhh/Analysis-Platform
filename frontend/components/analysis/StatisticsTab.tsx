@@ -1,4 +1,5 @@
 import { AnalysisStatistics } from "@/lib/analysisTypes";
+import { useDesktopAccordionsExpanded } from "@/lib/useDesktopAccordionsExpanded";
 
 type StatisticsTabProps = {
   statistics: AnalysisStatistics;
@@ -11,11 +12,12 @@ function metric(value: number) {
 
 export default function StatisticsTab({ statistics, mobileSection }: StatisticsTabProps) {
   const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
+  const accordionOpen = useDesktopAccordionsExpanded() || mobileSection !== undefined;
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-2">
       {show("numeric-summary") ? (
-      <details className="mobile-accordion" open={!!mobileSection}>
+      <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Numeric summary</span>
@@ -52,7 +54,7 @@ export default function StatisticsTab({ statistics, mobileSection }: StatisticsT
       ) : null}
 
       {show("categorical-summary") ? (
-      <details className="mobile-accordion" open={!!mobileSection}>
+      <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Categorical summary</span>

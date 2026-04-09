@@ -1,4 +1,5 @@
 import { AnalysisInsights } from "@/lib/analysisTypes";
+import { useDesktopAccordionsExpanded } from "@/lib/useDesktopAccordionsExpanded";
 
 type InsightsTabProps = {
   insights: AnalysisInsights;
@@ -12,11 +13,12 @@ function truncatePreview(text: string, limit = 108) {
 
 export default function InsightsTab({ insights, mobileSection }: InsightsTabProps) {
   const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
+  const accordionOpen = useDesktopAccordionsExpanded() || mobileSection !== undefined;
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
       {show("findings") ? (
-      <details className="mobile-accordion" open={!!mobileSection}>
+      <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Findings</span>
@@ -43,7 +45,7 @@ export default function InsightsTab({ insights, mobileSection }: InsightsTabProp
       ) : null}
 
       {show("what-to-do-next") ? (
-      <details className="mobile-accordion" open={!!mobileSection}>
+      <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">What to do next</span>
