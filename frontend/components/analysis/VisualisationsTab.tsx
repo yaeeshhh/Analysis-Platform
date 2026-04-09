@@ -152,7 +152,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
                 labelFormatter={(label) => String(label)}
                 formatter={(value) => [`${Number(value).toFixed(1)}%`, "Missing share"]}
               />
-              <Bar dataKey="missing_pct" radius={[0, 8, 8, 0]} minPointSize={8}>
+              <Bar dataKey="missing_pct" radius={[0, 8, 8, 0]} minPointSize={8} isAnimationActive={false}>
                 {missingness.map((entry, index) => (
                   <Cell key={entry.column} fill={chartPalette[index % chartPalette.length]} />
                 ))}
@@ -210,7 +210,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
                   cursor={{ fill: "rgba(255,255,255,0.05)" }}
                   labelFormatter={(_, payload) => String(payload?.[0]?.payload?.fullLabel || "")}
                 />
-                <Bar dataKey="count" fill="#9db8ff" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" fill="#9db8ff" radius={[8, 8, 0, 0]} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -260,7 +260,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
                   tickFormatter={(value: string) => truncateLabel(String(value), 24)}
                 />
                 <Tooltip cursor={{ fill: "rgba(255,255,255,0.05)" }} labelFormatter={(label) => String(label)} />
-                <Bar dataKey="count" radius={[0, 8, 8, 0]} minPointSize={8}>
+                <Bar dataKey="count" radius={[0, 8, 8, 0]} minPointSize={8} isAnimationActive={false}>
                   {categories.values.map((entry, index) => (
                     <Cell key={entry.label} fill={chartPalette[index % chartPalette.length]} />
                   ))}
@@ -435,7 +435,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
                       name={plot.y}
                     />
                     <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-                    <Scatter data={plot.points} fill="#7ad6ff" />
+                    <Scatter data={plot.points} fill="#7ad6ff" isAnimationActive={false} />
                   </ScatterChart>
                 </ResponsiveContainer>
               </div>

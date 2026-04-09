@@ -5,8 +5,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type PointerEvent as ReactPointerEvent,
-  type SyntheticEvent,
 } from "react";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
@@ -133,7 +131,7 @@ const normalizedRangeTicks = [0, 0.25, 0.5, 0.75, 1];
 const sliderTrackClassName =
   "grid min-w-max grid-flow-col auto-cols-[minmax(240px,82vw)] gap-3 sm:auto-cols-[minmax(260px,46vw)] xl:auto-cols-[18rem]";
 const guideTrackClassName =
-  "analysis-guide-track";
+  "grid min-w-max grid-flow-col auto-cols-[minmax(240px,78vw)] gap-3 sm:auto-cols-[minmax(260px,22rem)]";
 const verticalBarChartMargin = { top: 12, right: 16, bottom: 12, left: 8 };
 const SUPERVISED_RESULTS_TARGET_ID = "ml-supervised-results-start";
 const UNSUPERVISED_RESULTS_TARGET_ID = "ml-unsupervised-results-start";
@@ -148,23 +146,6 @@ type PendingDeleteExperiment = {
 type GuideScrollerItem = {
   name: string;
   detail: string;
-};
-
-type GuideScrollState = {
-  pointerId: number | null;
-  captured: boolean;
-  lockedAxis: "x" | "y" | null;
-  startX: number;
-  startY: number;
-  startScrollLeft: number;
-};
-
-type GuideTouchState = {
-  active: boolean;
-  lockedAxis: "x" | "y" | null;
-  startX: number;
-  startY: number;
-  startScrollLeft: number;
 };
 
 function formatDisplayNumber(value: number, maximumFractionDigits = 2) {
@@ -186,240 +167,9 @@ function formatClusterLabel(cluster: number) {
   return `Cluster ${cluster}`;
 }
 
-function stopScrollGesturePropagation(event: SyntheticEvent<HTMLDivElement>) {
-  event.stopPropagation();
-}
-
-function createGuideScrollState(): GuideScrollState {
-  return {
-    pointerId: null,
-    captured: false,
-    lockedAxis: null,
-    startX: 0,
-    startY: 0,
-    startScrollLeft: 0,
-  };
-}
-
-function createGuideTouchState(): GuideTouchState {
-  return {
-    active: false,
-    lockedAxis: null,
-    startX: 0,
-    startY: 0,
-    startScrollLeft: 0,
-  };
-}
-
 function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const dragStateRef = useRef<GuideScrollState>(createGuideScrollState());
-  const touchStateRef = useRef<GuideTouchState>(createGuideTouchState());
-  const [dragging, setDragging] = useState(false);
-
-  function resetGuideScrollState(element?: HTMLDivElement) {
-    const currentState = dragStateRef.current;
-
-    if (
-      element &&
-      currentState.pointerId !== null &&
-      currentState.captured &&
-      element.hasPointerCapture(currentState.pointerId)
-    ) {
-      element.releasePointerCapture(currentState.pointerId);
-    }
-
-    dragStateRef.current = createGuideScrollState();
-    setDragging(false);
-  }
-
-  function resetGuideTouchState() {
-    touchStateRef.current = createGuideTouchState();
-    setDragging(false);
-  }
-
-  useEffect(() => {
-    const element = scrollerRef.current;
-    if (!element) {
-      return undefined;
-    }
-
-    const handleTouchStart = (event: TouchEvent) => {
-      const touch = event.touches[0];
-      if (!touch) {
-        return;
-      }
-
-      touchStateRef.current = {
-        active: true,
-        lockedAxis: null,
-        startX: touch.clientX,
-        startY: touch.clientY,
-        startScrollLeft: element.scrollLeft,
-      };
-
-      event.stopPropagation();
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      const currentState = touchStateRef.current;
-      if (!currentState.active) {
-        return;
-      }
-
-      const touch = event.touches[0];
-      if (!touch) {
-        return;
-      }
-
-      const deltaX = touch.clientX - currentState.startX;
-      const deltaY = touch.clientY - currentState.startY;
-
-      if (currentState.lockedAxis === null) {
-        if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
-          return;
-        }
-
-        if (Math.abs(deltaX) >= Math.abs(deltaY)) {
-          currentState.lockedAxis = "x";
-          setDragging(true);
-        } else {
-          resetGuideTouchState();
-          return;
-        }
-      }
-
-      if (currentState.lockedAxis !== "x") {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-      element.scrollLeft = currentState.startScrollLeft - deltaX;
-    };
-
-    const handleTouchEnd = () => {
-      resetGuideTouchState();
-    };
-
-    element.addEventListener("touchstart", handleTouchStart, { passive: true });
-    element.addEventListener("touchmove", handleTouchMove, { passive: false });
-    element.addEventListener("touchend", handleTouchEnd);
-    element.addEventListener("touchcancel", handleTouchEnd);
-
-    return () => {
-      element.removeEventListener("touchstart", handleTouchStart);
-      element.removeEventListener("touchmove", handleTouchMove);
-      element.removeEventListener("touchend", handleTouchEnd);
-      element.removeEventListener("touchcancel", handleTouchEnd);
-    };
-  }, []);
-
-  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "touch") {
-      return;
-    }
-
-    if (event.pointerType === "mouse" && event.button !== 0) {
-      return;
-    }
-
-    dragStateRef.current = {
-      pointerId: event.pointerId,
-      captured: false,
-      lockedAxis: null,
-      startX: event.clientX,
-      startY: event.clientY,
-      startScrollLeft: event.currentTarget.scrollLeft,
-    };
-
-    event.stopPropagation();
-  }
-
-  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "touch") {
-      return;
-    }
-
-    const currentState = dragStateRef.current;
-    if (currentState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    const deltaX = event.clientX - currentState.startX;
-    const deltaY = event.clientY - currentState.startY;
-
-    if (currentState.lockedAxis === null) {
-      if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
-        return;
-      }
-
-      if (Math.abs(deltaX) >= Math.abs(deltaY)) {
-        currentState.lockedAxis = "x";
-        if (!currentState.captured) {
-          event.currentTarget.setPointerCapture(event.pointerId);
-          currentState.captured = true;
-        }
-        setDragging(true);
-      } else {
-        resetGuideScrollState();
-        return;
-      }
-    }
-
-    if (currentState.lockedAxis !== "x") {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.scrollLeft = currentState.startScrollLeft - deltaX;
-  }
-
-  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "touch") {
-      return;
-    }
-
-    if (dragStateRef.current.pointerId !== event.pointerId) {
-      return;
-    }
-
-    resetGuideScrollState(event.currentTarget);
-    event.stopPropagation();
-  }
-
-  function handlePointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "touch") {
-      return;
-    }
-
-    if (dragStateRef.current.pointerId !== event.pointerId) {
-      return;
-    }
-
-    resetGuideScrollState(event.currentTarget);
-    event.stopPropagation();
-  }
-
   return (
-    <div
-      ref={scrollerRef}
-      className={`analysis-guide-scroll mt-4 pb-2 ${dragging ? "analysis-guide-scroll-dragging" : ""}`}
-      data-swipe-ignore="true"
-      onTouchStartCapture={stopScrollGesturePropagation}
-      onTouchMoveCapture={stopScrollGesturePropagation}
-      onTouchEndCapture={stopScrollGesturePropagation}
-      onTouchCancelCapture={stopScrollGesturePropagation}
-      onPointerDownCapture={stopScrollGesturePropagation}
-      onPointerMoveCapture={stopScrollGesturePropagation}
-      onPointerUpCapture={stopScrollGesturePropagation}
-      onPointerCancelCapture={stopScrollGesturePropagation}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
-    >
+    <div className="mt-4 overflow-x-auto pb-2" data-swipe-ignore="true">
       <div className={guideTrackClassName}>
         {items.map((item) => (
           <div key={item.name} className="analysis-guide-card">
