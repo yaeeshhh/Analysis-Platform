@@ -3762,21 +3762,27 @@ a[class*="rounded"]:hover {
     gap: 0.65rem;
   }
 
-  .mobile-batch-card {
+  .mobile-batch-card-shell {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1rem;
-    align-items: start;
-    display: grid;
-    gap: 0.7rem;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.72rem;
     padding: 0.9rem 1rem;
     position: relative;
     transition: background 120ms, border-color 120ms;
   }
 
-  .mobile-batch-card-active {
+  .mobile-batch-card-shell-active {
     border-color: rgba(124, 58, 237, 0.32);
+  }
+
+  .mobile-batch-card {
+    align-items: start;
+    display: grid;
+    gap: 0.7rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .mobile-batch-card-icon {
@@ -3808,19 +3814,16 @@ a[class*="rounded"]:hover {
     margin: 0.15rem 0 0;
   }
 
-  .mobile-batch-card-actions {
+  .mobile-batch-card-actions-block {
     align-items: stretch;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
-    margin-top: 0.35rem;
+    padding-top: 0.72rem;
   }
 
-  .mobile-batch-card-actions-spread {
-    grid-column: 1 / -1;
-  }
-
-  .mobile-batch-card-actions .mobile-screen-button {
+  .mobile-batch-card-actions-block .mobile-screen-button {
     flex: 1 1 0;
     min-height: 3.3rem;
     min-width: 0;
@@ -5136,6 +5139,7 @@ details.mobile-accordion > .mobile-accordion-body {
   border-radius: 0.95rem;
   display: grid;
   gap: 0.85rem;
+  margin-top: 1rem;
   overflow: hidden;
   padding: 0.95rem 1rem 1rem;
   position: relative;
@@ -6382,10 +6386,18 @@ details.mobile-accordion > .mobile-accordion-body {
 
   .history-popup-mobile-detail.mobile-analysis-fullpage {
     gap: 0;
-    margin: -0.85rem;
-    min-height: calc(100% + 1.7rem);
+    margin: -0.55rem -0.85rem -0.85rem;
+    min-height: calc(100% + 1.4rem);
     padding-top: 0;
     width: calc(100% + 1.7rem);
+  }
+
+  .history-popup-mobile-detail.mobile-analysis-fullpage .mobile-analysis-fullpage-topbar {
+    padding-bottom: 0.7rem;
+  }
+
+  .history-popup-mobile-detail.mobile-analysis-fullpage .mobile-analysis-detail-stage {
+    gap: 0.7rem;
   }
 }
 

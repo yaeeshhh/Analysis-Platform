@@ -7,6 +7,7 @@ from .config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SERVER_START_TS = int(datetime.now(timezone.utc).timestamp())
+PASSWORD_CHANGED_REAUTH_DETAIL = "Your password was changed. Please log in again."
 
 
 def hash_password(password: str) -> str:
@@ -32,7 +33,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    issued_at = int(datetime.now(timezone.utc).timestamp())
+    issued_at = datetime.now(timezone.utc).timestamp()
     to_encode.update({"exp": expire, "iat": issued_at, "type": "access"})
 
     encoded_jwt = jwt.encode(
@@ -54,7 +55,7 @@ def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> 
 
     # Generate unique token JTI for database tracking
     jti = str(uuid.uuid4())
-    issued_at = int(datetime.now(timezone.utc).timestamp())
+    issued_at = datetime.now(timezone.utc).timestamp()
     to_encode.update(
         {"exp": expire, "iat": issued_at, "jti": jti, "type": "refresh"}
     )
@@ -85,3 +86,20 @@ def verify_token_freshness(payload: dict) -> bool:
         return False
 
     return int(issued_at) >= SERVER_START_TS
+
+
+def was_token_issued_before(payload: dict, cutoff: datetime | None) -> bool:
+    """Return True when a token predates a server-side security cutoff."""
+    if cutoff is None:
+        return False
+
+    issued_at = payload.get("iat")
+    if not isinstance(issued_at, (int, float)):
+        return True
+
+    cutoff_utc = (
+        cutoff.replace(tzinfo=timezone.utc)
+        if cutoff.tzinfo is None
+        else cutoff.astimezone(timezone.utc)
+    )
+    return float(issued_at) < cutoff_utc.timestamp()

@@ -29,11 +29,11 @@ export default function PasswordChangedNoticeModal({ open, onContinue }: Props) 
         </div>
 
         <h2 className="text-2xl font-semibold tracking-tight text-white">
-          Password changed
+          Password updated
         </h2>
         <p className="mt-2 text-sm leading-7 text-white/65">
-          Your password has been successfully changed. You&apos;ve been signed out for
-          security. Please log in again to continue.
+          Your password was reset or changed recently. For security, this session has
+          been signed out. Please log in again to continue.
         </p>
 
         <div className="mt-6">

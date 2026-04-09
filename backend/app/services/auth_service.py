@@ -10,10 +10,12 @@ from ..models.user import User
 from ..models.refresh_token import RefreshToken
 from ..models.password_reset_token import PasswordResetToken
 from ..models.remember_login_token import RememberLoginToken
+from ..models.user_security_state import UserSecurityState
 from ..models.login_verification_code import LoginVerificationCode
 from ..models.profile_update_verification_code import ProfileUpdateVerificationCode
 from ..models.account_deletion_verification_code import AccountDeletionVerificationCode
 from ..core.security import (
+    PASSWORD_CHANGED_REAUTH_DETAIL,
     hash_password,
     verify_password,
     create_access_token,
@@ -21,6 +23,7 @@ from ..core.security import (
     decode_token,
     verify_token_type,
     verify_token_freshness,
+    was_token_issued_before,
 )
 from ..core.config import settings
 from ..core.email import (
@@ -73,6 +76,26 @@ class AuthService:
     @staticmethod
     def _hash_code(raw_code: str) -> str:
         return hashlib.sha256(raw_code.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _mark_password_changed(user_id: int, db: Session) -> None:
+        changed_at = datetime.utcnow()
+        security_state = (
+            db.query(UserSecurityState)
+            .filter(UserSecurityState.user_id == user_id)
+            .first()
+        )
+
+        if security_state:
+            security_state.password_changed_at = changed_at
+            return
+
+        db.add(
+            UserSecurityState(
+                user_id=user_id,
+                password_changed_at=changed_at,
+            )
+        )
 
     @staticmethod
     def _normalize_identifier(value: str) -> str:
@@ -644,6 +667,7 @@ class AuthService:
             RememberLoginToken.revoked == False,
         ).update({"revoked": True})
 
+        AuthService._mark_password_changed(user.id, db)
         db.add(user)
         db.commit()
 
@@ -703,6 +727,18 @@ class AuthService:
         if not user_id or not jti:
             raise HTTPException(status_code=401, detail="Invalid token payload")
 
+        user = db.query(User).filter(User.id == int(user_id)).first()
+        if not user or not user.is_active:
+            raise HTTPException(status_code=401, detail="User not found or inactive")
+
+        security_state = (
+            db.query(UserSecurityState)
+            .filter(UserSecurityState.user_id == user.id)
+            .first()
+        )
+        if security_state and was_token_issued_before(payload, security_state.password_changed_at):
+            raise HTTPException(status_code=401, detail=PASSWORD_CHANGED_REAUTH_DETAIL)
+
         # Check if token exists and is not revoked
         db_token = (
             db.query(RefreshToken)
@@ -720,11 +756,6 @@ class AuthService:
         # Check if token is expired
         if AuthService._is_expired(db_token.expires_at):
             raise HTTPException(status_code=401, detail="Refresh token expired")
-
-        # Get user
-        user = db.query(User).filter(User.id == int(user_id)).first()
-        if not user or not user.is_active:
-            raise HTTPException(status_code=401, detail="User not found or inactive")
 
         # Update last used timestamp
         db_token.last_used_at = datetime.now(timezone.utc)
@@ -880,6 +911,7 @@ class AuthService:
                 RememberLoginToken.user_id == user.id,
                 RememberLoginToken.revoked == False,
             ).update({"revoked": True})
+            AuthService._mark_password_changed(user.id, db)
 
         db.add(user)
         db.commit()

@@ -506,21 +506,6 @@ export default function DashboardPage() {
                       </ScrollIntentLink>
                     ))}
                   </div>
-                  <div className="desktop-studio-note">
-                    <div>
-                      <p className="desktop-studio-note-kicker">Suggested route</p>
-                      <p className="desktop-studio-note-title">Start in the library, move through the report, finish in the archive.</p>
-                      <p className="desktop-studio-note-copy">Uploads is the intake lane, Analysis is the working surface, History is the long-term record, and Account handles the cleanup tools around it.</p>
-                    </div>
-                    <div className="desktop-studio-route">
-                      {desktopWorkflowPills.map((label, index) => (
-                        <span key={`studio-route-${label}`} className="desktop-step-pill">
-                          <strong>{index + 1}</strong>
-                          {label}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
                   <div className="desktop-studio-followup">
                     <div className="desktop-studio-followup-head">
                       <p className="desktop-studio-followup-kicker">Support cards</p>

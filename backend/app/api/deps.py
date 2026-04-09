@@ -3,7 +3,14 @@ from jose import JWTError
 from sqlalchemy.orm import Session
 
 from ..core.database import get_db
-from ..core.security import decode_token, verify_token_type, verify_token_freshness
+from ..core.security import (
+    PASSWORD_CHANGED_REAUTH_DETAIL,
+    decode_token,
+    verify_token_type,
+    verify_token_freshness,
+    was_token_issued_before,
+)
+from ..models.user_security_state import UserSecurityState
 from ..models.user import User
 
 
@@ -53,5 +60,13 @@ def get_current_user(
 
     if not user.is_active:
         raise HTTPException(status_code=403, detail="User account is inactive")
+
+    security_state = (
+        db.query(UserSecurityState)
+        .filter(UserSecurityState.user_id == user.id)
+        .first()
+    )
+    if security_state and was_token_issued_before(payload, security_state.password_changed_at):
+        raise HTTPException(status_code=401, detail=PASSWORD_CHANGED_REAUTH_DETAIL)
 
     return user
