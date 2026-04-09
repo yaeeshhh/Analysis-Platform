@@ -217,6 +217,12 @@ body::after {
 .app-shell {
   position: relative;
   min-height: 100vh;
+  --chrome-matte-bg: rgba(12, 16, 24, 0.58);
+  --chrome-matte-bg-strong: rgba(10, 14, 22, 0.72);
+  --chrome-matte-border: rgba(255, 255, 255, 0.08);
+  --chrome-matte-highlight: rgba(255, 255, 255, 0.04);
+  --chrome-matte-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
+  --chrome-matte-accent: rgba(157, 184, 255, 0.14);
 }
 
 .app-shell::before {
@@ -251,8 +257,10 @@ body::after {
 
 .desktop-sidebar-skeleton {
   min-height: 100vh;
-  background: linear-gradient(180deg, rgba(11, 17, 32, 0.98), rgba(10, 15, 28, 0.96));
-  border-right: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, rgba(10, 14, 22, 0.72), rgba(8, 12, 18, 0.84));
+  border-right: 1px solid var(--chrome-matte-border);
+  backdrop-filter: blur(24px) saturate(128%);
+  -webkit-backdrop-filter: blur(24px) saturate(128%);
 }
 
 .desktop-main {
@@ -269,6 +277,18 @@ body::after {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1.5rem;
+  background:
+    radial-gradient(circle at 10% 16%, rgba(79, 110, 247, 0.1), transparent 30%),
+    radial-gradient(circle at 84% 0%, rgba(167, 139, 250, 0.08), transparent 26%),
+    linear-gradient(180deg, var(--chrome-matte-bg), var(--chrome-matte-bg-strong));
+  border: 1px solid var(--chrome-matte-border);
+  border-radius: 1.35rem;
+  box-shadow: var(--chrome-matte-shadow), inset 0 1px 0 var(--chrome-matte-highlight);
+  overflow: hidden;
+  padding: 1.25rem 1.35rem;
+  position: relative;
+  backdrop-filter: blur(24px) saturate(128%);
+  -webkit-backdrop-filter: blur(24px) saturate(128%);
 }
 
 .desktop-page-heading {
@@ -395,9 +415,11 @@ body::after {
   .desktop-sidebar {
     align-self: flex-start;
     background:
-      radial-gradient(ellipse 100% 30% at 50% 0%, rgba(124, 58, 237, 0.08), transparent 55%),
-      linear-gradient(180deg, rgba(8, 12, 22, 0.98), rgba(10, 14, 24, 0.98));
-    border-right: 1px solid rgba(124, 58, 237, 0.13);
+      radial-gradient(ellipse 96% 30% at 50% 0%, rgba(79, 110, 247, 0.1), transparent 58%),
+      radial-gradient(ellipse 88% 24% at 50% 100%, rgba(167, 139, 250, 0.06), transparent 62%),
+      linear-gradient(180deg, rgba(10, 14, 21, 0.62), rgba(8, 12, 18, 0.8));
+    border-right: 1px solid var(--chrome-matte-border);
+    box-shadow: 16px 0 44px rgba(0, 0, 0, 0.18), inset -1px 0 0 rgba(255, 255, 255, 0.02);
     display: flex;
     flex-shrink: 0;
     height: 100vh;
@@ -409,6 +431,8 @@ body::after {
     will-change: width;
     z-index: 24;
     width: 216px;
+    backdrop-filter: blur(28px) saturate(132%);
+    -webkit-backdrop-filter: blur(28px) saturate(132%);
   }
 
   .desktop-sidebar[data-collapsed="true"] {
@@ -794,7 +818,8 @@ body::after {
 
 .nav-link {
   align-items: center;
-  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 0.72rem;
   color: rgba(242, 247, 251, 0.52);
   display: flex;
@@ -809,7 +834,22 @@ body::after {
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
-    color 180ms ease;
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.nav-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(157, 184, 255, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
 }
 
 .desktop-sidebar[data-interactive="false"] .nav-link,
@@ -829,25 +869,36 @@ body::after {
 }
 
 .nav-link:hover {
-  background: transparent;
-  border-color: transparent;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 20px rgba(3, 7, 14, 0.14);
   color: var(--text-100);
 }
 
-.nav-link-active {
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.14), rgba(37, 99, 235, 0.08));
-  border-color: rgba(59, 130, 246, 0.26);
-  box-shadow: inset 3px 0 0 rgba(79, 110, 247, 0.7), 0 2px 8px rgba(37, 99, 235, 0.08);
-  color: #dbe8ff;
+.nav-link:hover::before {
+  opacity: 0.55;
 }
 
-.nav-link-active::after {
-  display: none;
+.nav-link-active {
+  background:
+    radial-gradient(circle at 14% 50%, rgba(157, 184, 255, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border-color: rgba(157, 184, 255, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+    0 14px 28px rgba(3, 7, 14, 0.18);
+  color: #dbe8ff;
+  transform: translateX(1px);
+}
+
+.nav-link-active::before {
+  opacity: 0.9;
 }
 
 .desktop-sidebar-brand {
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   gap: 0.75rem;
   padding: 1.1rem 1rem 0.95rem;
@@ -904,7 +955,7 @@ body::after {
 }
 
 .desktop-sidebar-profile {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
   margin-top: auto;
   overflow: visible;
@@ -916,14 +967,16 @@ body::after {
 .analysis-subnav-surface {
   align-items: center;
   background:
-    radial-gradient(ellipse 60% 50% at 0% 50%, rgba(124, 58, 237, 0.06), transparent 60%),
-    linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(13, 17, 32, 0.96));
-  border: 1px solid rgba(124, 58, 237, 0.15);
+    radial-gradient(circle at 10% 50%, rgba(79, 110, 247, 0.12), transparent 28%),
+    linear-gradient(180deg, var(--chrome-matte-bg), var(--chrome-matte-bg-strong));
+  border: 1px solid var(--chrome-matte-border);
   border-radius: 0.95rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: var(--chrome-matte-shadow), inset 0 1px 0 var(--chrome-matte-highlight);
   display: inline-flex;
   min-width: 100%;
   padding: 0.35rem;
+  backdrop-filter: blur(20px) saturate(124%);
+  -webkit-backdrop-filter: blur(20px) saturate(124%);
 }
 
 .analysis-subnav-track {
@@ -957,15 +1010,18 @@ body::after {
 }
 
 .analysis-subnav-link:hover {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.12);
   color: rgba(242, 247, 251, 0.84);
 }
 
 .analysis-subnav-link-active {
-  background: rgba(124, 58, 237, 0.11);
-  border-color: rgba(124, 58, 237, 0.22);
+  background:
+    radial-gradient(circle at 14% 50%, rgba(157, 184, 255, 0.18), transparent 36%),
+    rgba(255, 255, 255, 0.05);
+  border-color: rgba(157, 184, 255, 0.18);
   color: #ede9fe;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 20px rgba(3, 7, 14, 0.14);
 }
 
 .analysis-subnav-description {
@@ -1351,9 +1407,12 @@ a[class*="rounded"]:hover {
 
 .profile-menu-sidebar-button {
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 12% 50%, rgba(79, 110, 247, 0.1), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--chrome-matte-border);
   border-radius: 0.82rem;
+  box-shadow: inset 0 1px 0 var(--chrome-matte-highlight);
   color: var(--text-100);
   display: flex;
   gap: 0.7rem;
@@ -1370,7 +1429,9 @@ a[class*="rounded"]:hover {
 }
 
 .profile-menu-sidebar-button:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(circle at 12% 50%, rgba(79, 110, 247, 0.14), transparent 34%),
+    rgba(255, 255, 255, 0.055);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -1443,11 +1504,11 @@ a[class*="rounded"]:hover {
 .profile-menu-compact-button {
   align-items: center;
   background:
-    radial-gradient(circle at top right, rgba(124, 58, 237, 0.22), transparent 56%),
-    linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(13, 18, 33, 0.94));
-  border: 1px solid rgba(167, 139, 250, 0.16);
+    radial-gradient(circle at top right, rgba(79, 110, 247, 0.14), transparent 58%),
+    linear-gradient(180deg, var(--chrome-matte-bg), var(--chrome-matte-bg-strong));
+  border: 1px solid var(--chrome-matte-border);
   border-radius: 0.95rem;
-  box-shadow: 0 14px 30px rgba(4, 8, 16, 0.28);
+  box-shadow: var(--chrome-matte-shadow), inset 0 1px 0 var(--chrome-matte-highlight);
   color: #f1f5f9;
   display: inline-flex;
   gap: 0.65rem;
@@ -1461,11 +1522,13 @@ a[class*="rounded"]:hover {
     box-shadow 180ms ease,
     border-color 180ms ease,
     background-color 180ms ease;
+  backdrop-filter: blur(20px) saturate(124%);
+  -webkit-backdrop-filter: blur(20px) saturate(124%);
 }
 
 .profile-menu-compact-button:hover {
-  border-color: rgba(167, 139, 250, 0.3);
-  box-shadow: 0 18px 34px rgba(4, 8, 16, 0.34);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 34px rgba(4, 8, 16, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transform: translateY(-1px);
 }
 
@@ -1513,14 +1576,18 @@ a[class*="rounded"]:hover {
 }
 
 .profile-menu-popover {
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(124, 58, 237, 0.18);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
+  border: 1px solid var(--chrome-matte-border);
   border-radius: 1rem;
-  background: #0d1117;
+  background:
+    radial-gradient(circle at 10% 12%, rgba(79, 110, 247, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(11, 15, 23, 0.84), rgba(10, 14, 22, 0.9));
   overflow: hidden;
   padding: 1rem;
   position: absolute;
   z-index: 120;
+  backdrop-filter: blur(24px) saturate(128%);
+  -webkit-backdrop-filter: blur(24px) saturate(128%);
 }
 
 .profile-menu-popover-default {
@@ -1734,6 +1801,13 @@ a[class*="rounded"]:hover {
 }
 
 .mobile-bottom-nav-app {
+  --nav-lens-center-x: 50%;
+  --nav-lens-underlay-opacity: 0;
+  --nav-lens-shadow-opacity: 0;
+  --nav-lens-highlight-opacity: 0;
+  --nav-lens-blur: 0px;
+  --nav-lens-offset-x: 0px;
+  --nav-lens-ripple-opacity: 0;
   bottom: calc(clamp(0.35rem, 1.8vh, 0.7rem) + env(safe-area-inset-bottom, 0px));
   left: calc(clamp(0.55rem, 4vw, 0.95rem) + env(safe-area-inset-left, 0px));
   right: calc(clamp(0.55rem, 4vw, 0.95rem) + env(safe-area-inset-right, 0px));
@@ -1742,41 +1816,45 @@ a[class*="rounded"]:hover {
   isolation: isolate;
   overflow: hidden;
   touch-action: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: clamp(1.95rem, 8.8vw, 2.8rem);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.025) 28%, rgba(255, 255, 255, 0.01) 52%),
-    rgba(15, 19, 27, 0.82);
+    radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.02), transparent 54%),
+    linear-gradient(180deg, rgba(19, 23, 31, 0.9), rgba(10, 13, 20, 0.86));
   box-shadow:
-    0 20px 42px rgba(0, 0, 0, 0.28),
-    0 8px 20px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(24px) saturate(116%) contrast(1.02);
-  -webkit-backdrop-filter: blur(24px) saturate(116%) contrast(1.02);
+    0 18px 38px rgba(0, 0, 0, 0.26),
+    0 6px 16px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(22px) saturate(112%) contrast(1.01);
+  -webkit-backdrop-filter: blur(22px) saturate(112%) contrast(1.01);
   padding: clamp(0.28rem, 1.2vw, 0.4rem) clamp(0.46rem, 2.2vw, 0.68rem);
 }
 
 .mobile-bottom-nav-app::before {
   content: "";
   position: absolute;
-  inset: 1px 1px auto 1px;
-  height: 46%;
+  inset: 2px;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 40%, rgba(255, 255, 255, 0));
-  opacity: 0.78;
+  background:
+    radial-gradient(circle at var(--nav-lens-center-x) 46%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 18%),
+    radial-gradient(circle at calc(var(--nav-lens-center-x) + var(--nav-lens-offset-x)) 58%, rgba(5, 9, 17, 0.18), rgba(5, 9, 17, 0) 22%);
+  filter: blur(var(--nav-lens-blur));
+  opacity: var(--nav-lens-underlay-opacity);
   pointer-events: none;
 }
 
 .mobile-bottom-nav-app::after {
   content: "";
   position: absolute;
-  inset: auto 12% -22% 12%;
-  height: 60%;
+  inset: auto 10% 4px 10%;
+  height: 34%;
   border-radius: 999px;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0) 68%);
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0) 72%),
+    radial-gradient(circle at var(--nav-lens-center-x) 50%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 16%);
   filter: blur(10px);
-  opacity: 0.72;
+  opacity: calc(0.58 + var(--nav-lens-highlight-opacity));
   pointer-events: none;
 }
 
@@ -1789,8 +1867,8 @@ a[class*="rounded"]:hover {
   position: relative;
   z-index: 2;
   border-radius: clamp(1.08rem, 4.6vw, 1.4rem);
-  color: rgba(247, 251, 255, 0.68);
-  transition: transform 140ms ease, color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  color: rgba(247, 251, 255, 0.66);
+  transition: transform 140ms ease, color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, filter 140ms ease;
   user-select: none;
   white-space: nowrap;
 }
@@ -1801,9 +1879,9 @@ a[class*="rounded"]:hover {
   inset: 1px;
   border-radius: inherit;
   background:
-    radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03) 48%, rgba(255, 255, 255, 0) 74%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02) 52%, rgba(255, 255, 255, 0));
-  opacity: 0;
+    radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02) 52%, rgba(255, 255, 255, 0) 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 72%);
+  opacity: var(--nav-item-shell-opacity, 0);
   pointer-events: none;
   transition: opacity 160ms ease, transform 160ms ease;
 }
@@ -1819,16 +1897,17 @@ a[class*="rounded"]:hover {
   z-index: 1;
   border-radius: clamp(1.1rem, 4.5vw, 1.45rem);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05)),
-    rgba(255, 255, 255, 0.05);
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03) 30%, rgba(255, 255, 255, 0) 68%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.035);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-    0 14px 30px rgba(7, 11, 21, 0.22),
-    0 2px 10px rgba(7, 11, 21, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 30px rgba(7, 11, 21, 0.18),
+    0 2px 10px rgba(7, 11, 21, 0.1),
     0 0 0 var(--liquid-edge-wave, 0px) rgba(255, 255, 255, var(--liquid-edge-opacity, 0));
-  backdrop-filter: blur(18px) saturate(172%) brightness(1.16) contrast(1.08);
-  -webkit-backdrop-filter: blur(18px) saturate(172%) brightness(1.16) contrast(1.08);
+  backdrop-filter: blur(20px) saturate(162%) brightness(1.12) contrast(1.06);
+  -webkit-backdrop-filter: blur(20px) saturate(162%) brightness(1.12) contrast(1.06);
   pointer-events: none;
   transition:
     transform 260ms cubic-bezier(0.22, 0.9, 0.24, 1),
@@ -1845,10 +1924,10 @@ a[class*="rounded"]:hover {
   inset: calc(1px - var(--liquid-edge-wave, 0px));
   border-radius: inherit;
   background:
-    radial-gradient(circle at var(--liquid-sheen-x, 50%) 18%, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.18) 24%, rgba(255, 255, 255, 0) 48%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06) 44%, rgba(255, 255, 255, 0));
-  opacity: calc(0.92 + (var(--liquid-distortion, 0) * 0.12));
-  filter: blur(calc(var(--liquid-edge-wave, 0px) * 0.95));
+    radial-gradient(circle at var(--liquid-sheen-x, 50%) 24%, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0.12) 24%, rgba(255, 255, 255, 0) 48%),
+    radial-gradient(circle at var(--liquid-sheen-x, 50%) 66%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 56%);
+  opacity: var(--liquid-highlight-opacity, 0.28);
+  filter: blur(var(--liquid-blur, 6px));
 }
 
 .mobile-bottom-nav-liquid-blob::after {
@@ -1859,12 +1938,12 @@ a[class*="rounded"]:hover {
   background:
     radial-gradient(circle at calc(50% + (var(--liquid-drift, 0) * 24%)) 22%, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08) 34%, rgba(255, 255, 255, 0) 58%),
     radial-gradient(circle at calc(50% - (var(--liquid-drift, 0) * 18%)) 80%, rgba(126, 182, 255, 0.26), rgba(126, 182, 255, 0) 52%);
-  filter: blur(calc(6px + (var(--liquid-distortion, 0) * 4px)));
-  opacity: calc(0.72 + (var(--liquid-distortion, 0) * 0.16));
+  filter: blur(var(--liquid-blur, 6px));
+  opacity: var(--liquid-focus, 0.72);
   transform:
-    translateX(calc(var(--liquid-drift, 0) * 7px))
-    scaleX(calc(1 + (var(--liquid-distortion, 0) * 0.08)))
-    scaleY(calc(1 - (var(--liquid-distortion, 0) * 0.04)));
+    translateX(var(--liquid-translate-x, 0px))
+    scaleX(var(--liquid-scale-x, 1))
+    scaleY(var(--liquid-scale-y, 1));
 }
 
 .mobile-bottom-nav-app-dragging .mobile-bottom-nav-liquid-blob {
@@ -1883,11 +1962,11 @@ a[class*="rounded"]:hover {
   color: rgba(255, 255, 255, 0.9);
   background: transparent;
   box-shadow: none;
-  text-shadow: 0 0 18px rgba(255, 255, 255, 0.14);
+  text-shadow: 0 0 18px rgba(255, 255, 255, var(--nav-item-shadow-opacity, 0.14));
 }
 
 .mobile-bottom-nav-app .mobile-bottom-nav-item-active::before {
-  opacity: 0.84;
+  opacity: var(--nav-item-shell-opacity, 0.24);
   transform: scale(0.98);
 }
 
@@ -1898,6 +1977,8 @@ a[class*="rounded"]:hover {
 .mobile-bottom-nav-app .mobile-bottom-nav-item svg,
 .mobile-bottom-nav-app .mobile-bottom-nav-item .mobile-bottom-nav-label {
   transition: transform 200ms ease, filter 200ms ease, opacity 160ms ease;
+  transform: translateY(var(--nav-item-shift-y, 0px)) scale(var(--nav-item-scale, 1));
+  filter: saturate(var(--nav-item-saturate, 1)) brightness(var(--nav-item-brightness, 1));
 }
 
 .mobile-bottom-nav-app-dragging .mobile-bottom-nav-item-active::before {
@@ -1910,14 +1991,12 @@ a[class*="rounded"]:hover {
 
 .mobile-bottom-nav-app-dragging .mobile-bottom-nav-item-drag-target svg,
 .mobile-bottom-nav-app-dragging .mobile-bottom-nav-item-drag-target .mobile-bottom-nav-label {
-  transform: translateY(-1px) scale(1.1);
-  filter: brightness(1.08);
+  filter: saturate(1.14) brightness(1.12);
 }
 
 .mobile-bottom-nav-app-gliding .mobile-bottom-nav-item-glide-target svg,
 .mobile-bottom-nav-app-gliding .mobile-bottom-nav-item-glide-target .mobile-bottom-nav-label {
-  transform: translateY(-1px) scale(1.08);
-  filter: brightness(1.06);
+  filter: saturate(1.12) brightness(1.1);
 }
 
 .mobile-bottom-nav-app .mobile-bottom-nav-label {
@@ -1930,13 +2009,13 @@ a[class*="rounded"]:hover {
 @supports (-webkit-touch-callout: none) {
   .mobile-bottom-nav-app {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 24%, rgba(255, 255, 255, 0.02) 52%),
-      rgba(11, 17, 31, 0.42);
+      radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.025), transparent 58%),
+      linear-gradient(180deg, rgba(18, 22, 30, 0.84), rgba(10, 13, 20, 0.76));
     box-shadow:
-      0 22px 44px rgba(0, 0, 0, 0.3),
+      0 22px 44px rgba(0, 0, 0, 0.28),
       0 6px 22px rgba(0, 0, 0, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.02);
   }
 }
 
@@ -1952,10 +2031,13 @@ a[class*="rounded"]:hover {
   padding-top: calc(0.65rem + env(safe-area-inset-top, 0px));
   padding-left: calc(1.15rem + env(safe-area-inset-left, 0px));
   padding-right: calc(1.15rem + env(safe-area-inset-right, 0px));
-  background: rgba(14, 18, 36, 0.97);
-  border-bottom: 1px solid rgba(124, 58, 237, 0.18);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(79, 110, 247, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(12, 16, 24, 0.72), rgba(10, 14, 22, 0.82));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px) saturate(126%);
+  -webkit-backdrop-filter: blur(24px) saturate(126%);
 }
 
 .mobile-header-title {
@@ -3852,6 +3934,8 @@ a[class*="rounded"]:hover {
     display: flex;
     flex-wrap: nowrap;
     gap: 0.75rem;
+    grid-auto-columns: auto;
+    grid-auto-flow: unset;
     min-width: max-content;
     width: max-content;
   }
@@ -6538,15 +6622,16 @@ details.mobile-accordion > .mobile-accordion-body {
 .history-popup-container {
   animation: popup-surface-enter 240ms cubic-bezier(0.22, 1, 0.36, 1);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04) 18%, rgba(255, 255, 255, 0.02) 38%),
-    rgba(10, 14, 22, 0.54);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+    radial-gradient(circle at 10% 8%, rgba(79, 110, 247, 0.12), transparent 26%),
+    radial-gradient(circle at 88% 4%, rgba(167, 139, 250, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(12, 16, 24, 0.76), rgba(10, 14, 22, 0.84));
+  border: 1px solid var(--chrome-matte-border);
   box-shadow:
-    0 32px 110px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(34px) saturate(150%) contrast(1.04);
-  -webkit-backdrop-filter: blur(34px) saturate(150%) contrast(1.04);
+    0 32px 110px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(30px) saturate(132%) contrast(1.02);
+  -webkit-backdrop-filter: blur(30px) saturate(132%) contrast(1.02);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -6562,25 +6647,26 @@ details.mobile-accordion > .mobile-accordion-body {
 .history-popup-container::before {
   content: "";
   position: absolute;
-  inset: 1px 1px auto 1px;
-  height: 26%;
+  inset: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06) 42%, rgba(255, 255, 255, 0));
-  opacity: 0.9;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 30%);
+  opacity: 0.72;
   pointer-events: none;
 }
 
 .history-popup-container::after {
   content: "";
   position: absolute;
-  right: -12%;
-  bottom: -18%;
+  right: -10%;
+  bottom: -14%;
   width: 36%;
   aspect-ratio: 1;
   border-radius: 999px;
-  background: radial-gradient(circle at center, rgba(122, 214, 255, 0.12), rgba(122, 214, 255, 0) 68%);
-  filter: blur(10px);
-  opacity: 0.7;
+  background: radial-gradient(circle at center, rgba(122, 214, 255, 0.1), rgba(122, 214, 255, 0) 68%);
+  filter: blur(14px);
+  opacity: 0.56;
   pointer-events: none;
 }
 
