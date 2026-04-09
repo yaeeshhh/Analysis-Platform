@@ -6,7 +6,7 @@ const PASSWORD_CHANGED_NOTICE_KEY = "auth:password-changed-notice";
 const LAST_SEEN_PASSWORD_CHANGED_NOTICE_KEY = "auth:last-password-changed-notice-id";
 const FORCED_PASSWORD_CHANGED_NOTICE_KEY = "auth:force-password-changed-notice-id";
 const PASSWORD_CHANGED_REAUTH_DETAIL = "Your password was changed. Please log in again.";
-const AUTHENTICATED_USER_CACHE_WINDOW_MS = 4000;
+const AUTHENTICATED_USER_CACHE_WINDOW_MS = 30000;
 export const PASSWORD_CHANGED_QUERY_PARAM = "password_changed";
 
 type CachedAuthenticatedUser = {

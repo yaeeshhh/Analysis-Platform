@@ -136,14 +136,21 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
       });
     };
 
+    let scrollRafId = 0;
+    const debouncedUpdate = () => {
+      window.cancelAnimationFrame(scrollRafId);
+      scrollRafId = window.requestAnimationFrame(updateSidebarPopoverPosition);
+    };
+
     const frame = window.requestAnimationFrame(updateSidebarPopoverPosition);
-    window.addEventListener("resize", updateSidebarPopoverPosition);
-    window.addEventListener("scroll", updateSidebarPopoverPosition, true);
+    window.addEventListener("resize", debouncedUpdate);
+    window.addEventListener("scroll", debouncedUpdate, true);
 
     return () => {
       window.cancelAnimationFrame(frame);
-      window.removeEventListener("resize", updateSidebarPopoverPosition);
-      window.removeEventListener("scroll", updateSidebarPopoverPosition, true);
+      window.cancelAnimationFrame(scrollRafId);
+      window.removeEventListener("resize", debouncedUpdate);
+      window.removeEventListener("scroll", debouncedUpdate, true);
     };
   }, [isSidebar, menuOpen]);
 

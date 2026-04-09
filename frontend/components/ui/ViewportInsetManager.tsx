@@ -82,10 +82,11 @@ export default function ViewportInsetManager() {
 
     scheduleSync();
 
+    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
     const viewport = window.visualViewport;
     const mobileHeader = document.querySelector<HTMLElement>(".mobile-header");
     const headerResizeObserver =
-      typeof ResizeObserver !== "undefined" && mobileHeader
+      isMobile && typeof ResizeObserver !== "undefined" && mobileHeader
         ? new ResizeObserver(() => {
             scheduleSync();
           })
@@ -95,24 +96,28 @@ export default function ViewportInsetManager() {
       headerResizeObserver.observe(mobileHeader);
     }
 
-    viewport?.addEventListener("resize", handleViewportChange);
-    viewport?.addEventListener("scroll", handleViewportChange);
+    if (isMobile) {
+      viewport?.addEventListener("resize", handleViewportChange);
+      viewport?.addEventListener("scroll", handleViewportChange);
+      document.addEventListener("focusin", handleFocusIn);
+      document.addEventListener("focusout", scheduleSync);
+    }
     window.addEventListener("resize", handleViewportChange);
     window.addEventListener("orientationchange", handleViewportChange);
     window.addEventListener("pageshow", scheduleSync);
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("focusout", scheduleSync);
 
     return () => {
       window.cancelAnimationFrame(frameId);
       headerResizeObserver?.disconnect();
-      viewport?.removeEventListener("resize", handleViewportChange);
-      viewport?.removeEventListener("scroll", handleViewportChange);
+      if (isMobile) {
+        viewport?.removeEventListener("resize", handleViewportChange);
+        viewport?.removeEventListener("scroll", handleViewportChange);
+        document.removeEventListener("focusin", handleFocusIn);
+        document.removeEventListener("focusout", scheduleSync);
+      }
       window.removeEventListener("resize", handleViewportChange);
       window.removeEventListener("orientationchange", handleViewportChange);
       window.removeEventListener("pageshow", scheduleSync);
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("focusout", scheduleSync);
     };
   }, [pathname]);
 
