@@ -1,3 +1,5 @@
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
+
 import { clearCurrentAnalysisSelection } from "./currentAnalysis";
 import { clearActiveAccountEmail } from "./session";
 export function formatDate(value?: string): string {
@@ -46,4 +48,27 @@ export function moveInputCaretToEnd(input: HTMLInputElement): void {
       // Some inputs do not support this, so I just leave the caret alone.
     }
   });
+}
+
+export function commitMobileTextFieldAndCloseKeyboard(
+  event: ReactKeyboardEvent<HTMLElement>
+): boolean {
+  if (event.key !== "Enter") return false;
+  if (typeof window === "undefined" || window.innerWidth >= 960) return false;
+
+  const target = event.target;
+  if (
+    !(target instanceof HTMLInputElement) &&
+    !(target instanceof HTMLTextAreaElement) &&
+    !(target instanceof HTMLSelectElement)
+  ) {
+    return false;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  window.requestAnimationFrame(() => {
+    target.blur();
+  });
+  return true;
 }

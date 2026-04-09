@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import BrandMark from "@/components/ui/BrandMark";
+import { commitMobileTextFieldAndCloseKeyboard } from "@/lib/helpers";
 
 type AuthShellSignal = {
   label: string;
@@ -64,7 +65,7 @@ export default function AuthShell({
           </div>
         </div>
 
-        <div className="auth-panel">{children}</div>
+        <div className="auth-panel" onKeyDownCapture={commitMobileTextFieldAndCloseKeyboard}>{children}</div>
       </div>
 
       <BackToTopButton />

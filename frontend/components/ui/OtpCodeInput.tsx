@@ -174,6 +174,7 @@ export default function OtpCodeInput({
                 inputRefs.current[index] = node;
               }}
               type="text"
+              enterKeyHint="done"
               inputMode="numeric"
               autoComplete="one-time-code"
               pattern="[0-9]*"

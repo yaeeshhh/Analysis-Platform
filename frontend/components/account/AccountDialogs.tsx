@@ -26,6 +26,7 @@ import {
 import { getEmailValidationError, isSignupEmailValid } from "@/lib/emailValidation";
 import {
   clearUserScopedFrontendState,
+  commitMobileTextFieldAndCloseKeyboard,
   formatCountdown,
   maskEmailAddress,
   moveInputCaretToEnd,
@@ -124,6 +125,9 @@ function DialogShell({
     <div
       className="account-dialog-overlay modal-viewport-overlay fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#080c16]/80 px-2 backdrop-blur-md sm:items-center sm:px-4"
       style={{
+        top: "var(--app-viewport-offset-top, 0px)",
+        bottom: "auto",
+        height: "var(--app-viewport-height, 100vh)",
         paddingTop: "max(0.5rem, env(safe-area-inset-top))",
         paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
       }}
@@ -132,6 +136,7 @@ function DialogShell({
       <div
         className={`account-dialog-card modal-viewport-card w-full ${maxWidthClassName} rounded-xl border border-[#a78bfa]/15 bg-[#0d1117]/98 text-[#f1f5f9]`}
         onMouseDown={(event) => event.stopPropagation()}
+        onKeyDownCapture={commitMobileTextFieldAndCloseKeyboard}
       >
         <div className="account-dialog-header flex flex-col gap-3 border-b border-[#a78bfa]/12 px-4 pb-5 pt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:px-6 sm:pb-5 sm:pt-6">
           <div>
@@ -440,6 +445,7 @@ function IdentityChangeDialog({
         <div className="space-y-3 border-b border-white/6 pb-3">
           <input
             type={field === "email" ? "email" : "text"}
+            enterKeyHint="done"
             value={value}
             onChange={(event) => {
               setValue(event.target.value);
@@ -466,6 +472,7 @@ function IdentityChangeDialog({
           ) : null}
           <input
             type={field === "email" ? "email" : "text"}
+            enterKeyHint="done"
             value={confirmValue}
             onChange={(event) => {
               setConfirmValue(event.target.value);
@@ -681,6 +688,7 @@ function PasswordChangeDialog({
           <div className="relative">
             <input
               type={showCurrentPassword ? "text" : "password"}
+              enterKeyHint="done"
               value={currentPassword}
               onChange={(event) => setCurrentPassword(event.target.value)}
               onFocus={(event) => moveInputCaretToEnd(event.currentTarget)}
@@ -692,6 +700,7 @@ function PasswordChangeDialog({
           <div className="relative">
             <input
               type={showNextPassword ? "text" : "password"}
+              enterKeyHint="done"
               value={nextPassword}
               onChange={(event) => setNextPassword(event.target.value)}
               onFocus={(event) => {
@@ -719,6 +728,7 @@ function PasswordChangeDialog({
           <div className="relative">
             <input
               type={showConfirmPassword ? "text" : "password"}
+              enterKeyHint="done"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               onFocus={(event) => moveInputCaretToEnd(event.currentTarget)}

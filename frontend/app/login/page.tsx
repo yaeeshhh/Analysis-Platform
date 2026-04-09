@@ -335,6 +335,7 @@ function LoginPageContent() {
             <input
               id="email"
               type="email"
+              enterKeyHint="done"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -355,6 +356,7 @@ function LoginPageContent() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
+                enterKeyHint="done"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

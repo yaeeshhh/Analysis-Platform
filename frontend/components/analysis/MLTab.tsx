@@ -26,6 +26,7 @@ import {
   getTopFeatures,
   getUnsupervisedNarratives,
 } from "@/lib/analysisDerived";
+import { commitMobileTextFieldAndCloseKeyboard } from "@/lib/helpers";
 import {
   downloadMlExperimentReport,
   downloadMlExperimentSummary,
@@ -988,10 +989,10 @@ export default function MLTab({
                 </h3>
                 <span className="text-xs text-white/50">Slide to review the method cards</span>
               </div>
-              <div className="mt-4 overflow-x-auto pb-2">
-                <div className={sliderTrackClassName}>
+              <div className="analysis-guide-scroll mt-4 pb-2">
+                <div className="analysis-guide-track">
                   {methodGuideCards.map((item) => (
-                    <div key={item.name} className="border-b border-white/6 pb-3">
+                    <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
                       <p className="font-medium text-white">{item.name}</p>
                       <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                     </div>
@@ -1467,10 +1468,10 @@ export default function MLTab({
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Unsupervised guide</p>
               <span className="text-xs text-white/50">Slide to review the method cards</span>
             </div>
-            <div className="mt-4 overflow-x-auto pb-2">
-              <div className={sliderTrackClassName}>
+            <div className="analysis-guide-scroll mt-4 pb-2">
+              <div className="analysis-guide-track">
                 {unsupervisedGuide.map((item) => (
-                  <div key={item.name} className="border-b border-white/6 pb-3">
+                  <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
                     <p className="font-medium text-white">{item.name}</p>
                     <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
                   </div>
@@ -1497,11 +1498,13 @@ export default function MLTab({
                 <p className="text-xs uppercase tracking-[0.14em] text-white/42">Segments</p>
                 <input
                   type="number"
+                  enterKeyHint="done"
                   inputMode="numeric"
                   pattern="[0-9]*"
                   min={2}
                   max={8}
                   value={clusterInput}
+                  onKeyDown={commitMobileTextFieldAndCloseKeyboard}
                   onChange={(event) => {
                     const nextValue = event.target.value;
                     if (/^\d*$/.test(nextValue)) {

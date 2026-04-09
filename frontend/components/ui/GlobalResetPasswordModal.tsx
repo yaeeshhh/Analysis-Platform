@@ -13,7 +13,11 @@ import {
   getPasswordStrengthState,
   validatePasswordPolicy,
 } from "@/lib/passwordPolicy";
-import { clearUserScopedFrontendState, moveInputCaretToEnd } from "@/lib/helpers";
+import {
+  clearUserScopedFrontendState,
+  commitMobileTextFieldAndCloseKeyboard,
+  moveInputCaretToEnd,
+} from "@/lib/helpers";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import { PASSWORD_CHANGED_QUERY_PARAM, queuePasswordChangedNotice } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
@@ -190,6 +194,9 @@ export default function GlobalResetPasswordModal() {
     <div
       className="modal-viewport-overlay fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-black/50 px-0 backdrop-blur-[2px] sm:items-center sm:px-4"
       style={{
+        top: "var(--app-viewport-offset-top, 0px)",
+        bottom: "auto",
+        height: "var(--app-viewport-height, 100vh)",
         paddingTop: "max(0.5rem, env(safe-area-inset-top))",
         paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
       }}
@@ -198,6 +205,7 @@ export default function GlobalResetPasswordModal() {
       <div
         className="global-reset-modal-card modal-viewport-card w-full max-w-md rounded-t-2xl border border-white/10 bg-[#15151a] text-white sm:rounded-xl"
         onClick={(e) => e.stopPropagation()}
+        onKeyDownCapture={commitMobileTextFieldAndCloseKeyboard}
       >
         <div className="border-b border-white/10 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
           <h2 className="text-2xl font-semibold tracking-tight text-white">Reset Password</h2>
@@ -224,6 +232,7 @@ export default function GlobalResetPasswordModal() {
               <input
                 id="global-reset-new-password"
                 type={showPassword ? "text" : "password"}
+                enterKeyHint="done"
                 placeholder="Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -259,6 +268,7 @@ export default function GlobalResetPasswordModal() {
               <input
                 id="global-reset-confirm-password"
                 type={showConfirmPassword ? "text" : "password"}
+                enterKeyHint="done"
                 placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

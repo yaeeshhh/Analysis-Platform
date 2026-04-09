@@ -27,7 +27,13 @@ import {
 } from "@/lib/passwordPolicy";
 import { getEmailValidationError, isSignupEmailValid } from "@/lib/emailValidation";
 import OtpCodeInput from "@/components/ui/OtpCodeInput";
-import { clearUserScopedFrontendState, formatCountdown, maskEmailAddress, moveInputCaretToEnd } from "@/lib/helpers";
+import {
+  clearUserScopedFrontendState,
+  commitMobileTextFieldAndCloseKeyboard,
+  formatCountdown,
+  maskEmailAddress,
+  moveInputCaretToEnd,
+} from "@/lib/helpers";
 import { setAccessToken } from "@/lib/api";
 import { setActiveAccountEmail, shouldSuppressDefaultLoginModal } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
@@ -787,6 +793,9 @@ export default function LoginRequiredModal({
     <div
       className="login-modal-overlay modal-viewport-overlay fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-[#080c16]/80 px-0 backdrop-blur-md sm:items-center sm:px-4"
       style={{
+        top: "var(--app-viewport-offset-top, 0px)",
+        bottom: "auto",
+        height: "var(--app-viewport-height, 100vh)",
         paddingTop: "max(0.5rem, env(safe-area-inset-top))",
         paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
       }}
@@ -795,6 +804,7 @@ export default function LoginRequiredModal({
       <div
         className="login-modal-card modal-viewport-card w-full max-w-md rounded-t-2xl border-t border-[#a78bfa]/20 bg-[#0d1117] text-[#f1f5f9] sm:rounded-2xl sm:border"
         onClick={(e) => e.stopPropagation()}
+        onKeyDownCapture={commitMobileTextFieldAndCloseKeyboard}
       >
         <div className="border-b border-[#a78bfa]/12 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
           <h2 className="text-2xl font-semibold tracking-tight text-[#f1f5f9]">{title}</h2>
@@ -839,6 +849,7 @@ export default function LoginRequiredModal({
             <div>
               <input
                 type="text"
+                enterKeyHint="done"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onFocus={(e) => {
@@ -877,6 +888,7 @@ export default function LoginRequiredModal({
             <div>
               <input
                 type="email"
+                enterKeyHint="done"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onFocus={(e) => {
@@ -916,6 +928,7 @@ export default function LoginRequiredModal({
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  enterKeyHint="done"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={(e) => {
@@ -951,6 +964,7 @@ export default function LoginRequiredModal({
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
+                  enterKeyHint="done"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onFocus={(e) => moveInputCaretToEnd(e.currentTarget)}
@@ -1041,6 +1055,7 @@ export default function LoginRequiredModal({
             <>
               <input
                 type="text"
+                enterKeyHint="done"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 onFocus={(e) => moveInputCaretToEnd(e.currentTarget)}
@@ -1069,6 +1084,7 @@ export default function LoginRequiredModal({
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  enterKeyHint="done"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={(e) => moveInputCaretToEnd(e.currentTarget)}
