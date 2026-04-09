@@ -122,14 +122,18 @@ function DialogShell({
 
   return (
     <div
-      className="account-dialog-overlay fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#080c16]/80 p-2 backdrop-blur-md sm:items-center sm:p-4"
+      className="account-dialog-overlay modal-viewport-overlay fixed inset-0 z-[140] flex items-end justify-center overflow-y-auto bg-[#080c16]/80 px-2 backdrop-blur-md sm:items-center sm:px-4"
+      style={{
+        paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+      }}
       onMouseDown={onClose}
     >
       <div
-        className={`account-dialog-card w-full ${maxWidthClassName} max-h-[calc(100vh-1rem)] overflow-y-auto rounded-xl border border-[#a78bfa]/15 bg-[#0d1117]/98 p-4 sm:max-h-[calc(100vh-2rem)] sm:rounded-xl sm:p-6`}
+        className={`account-dialog-card modal-viewport-card w-full ${maxWidthClassName} rounded-xl border border-[#a78bfa]/15 bg-[#0d1117]/98 text-[#f1f5f9]`}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="account-dialog-header flex flex-col gap-3 border-b border-[#a78bfa]/12 pb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="account-dialog-header flex flex-col gap-3 border-b border-[#a78bfa]/12 px-4 pb-5 pt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:px-6 sm:pb-5 sm:pt-6">
           <div>
             <p className="account-dialog-eyebrow text-xs uppercase tracking-[0.24em] text-[#a78bfa]">{eyebrow}</p>
             <h2 className="account-dialog-title mt-2 font-[family:var(--font-display)] text-2xl text-[#f1f5f9]">{title}</h2>
@@ -146,7 +150,7 @@ function DialogShell({
             </svg>
           </button>
         </div>
-        <div className="mt-5 space-y-4">{children}</div>
+        <div className="account-dialog-body modal-viewport-scroll space-y-4 px-4 pb-4 pt-5 sm:px-6 sm:pb-6">{children}</div>
       </div>
     </div>
   );
@@ -168,7 +172,10 @@ function FooterActions({
   loading?: boolean;
 }) {
   return (
-    <div className="flex flex-col-reverse gap-3 border-t border-[#a78bfa]/12 pt-4 md:flex-row md:flex-wrap md:justify-end">
+    <div
+      className="sticky bottom-0 z-10 mt-6 flex flex-col-reverse gap-3 border-t border-[#a78bfa]/12 bg-[#0d1117]/96 pt-4 backdrop-blur md:static md:mt-4 md:flex-row md:flex-wrap md:justify-end"
+      style={{ paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))" }}
+    >
       <button
         type="button"
         onClick={onClose}

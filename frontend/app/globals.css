@@ -1204,6 +1204,12 @@ body::after {
   padding: 1.5rem;
 }
 
+@supports (min-height: 100dvh) {
+  .auth-shell {
+    min-height: 100dvh;
+  }
+}
+
 .auth-shell-inner {
   display: grid;
   gap: 1.25rem;
@@ -1232,6 +1238,57 @@ body::after {
   background: linear-gradient(145deg, rgba(17, 24, 39, 0.92), rgba(13, 17, 23, 0.96));
   border-color: rgba(124, 58, 237, 0.12);
   padding: 1.6rem;
+}
+
+.modal-viewport-overlay {
+  min-height: 100vh;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@supports (min-height: 100dvh) {
+  .modal-viewport-overlay {
+    min-height: 100dvh;
+  }
+}
+
+.modal-viewport-card {
+  --modal-viewport-offset: calc(1rem + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: calc(100vh - var(--modal-viewport-offset));
+}
+
+@supports (max-height: 100dvh) {
+  .modal-viewport-card {
+    max-height: calc(100dvh - var(--modal-viewport-offset));
+  }
+}
+
+.modal-viewport-scroll {
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.login-modal-card {
+  --modal-viewport-offset: calc(0.75rem + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+}
+
+.account-dialog-card,
+.global-reset-modal-card {
+  --modal-viewport-offset: calc(1rem + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 640px) {
+  .login-modal-card,
+  .account-dialog-card,
+  .global-reset-modal-card {
+    --modal-viewport-offset: calc(2rem + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+  }
 }
 
 .auth-title {
@@ -1539,6 +1596,23 @@ a[class*="rounded"]:hover {
 
 /* Prevent iOS Safari from zooming in on input focus (tablets too) */
 @media (max-width: 767px) {
+  .auth-shell {
+    align-items: flex-start;
+    padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .auth-shell-inner {
+    gap: 0.9rem;
+  }
+
+  .auth-panel {
+    order: -1;
+  }
+
+  .auth-signal-grid {
+    display: none;
+  }
+
   input,
   select,
   textarea {
@@ -4375,20 +4449,47 @@ a[class*="rounded"]:hover {
 }
 
 @media (min-width: 960px) and (max-width: 1279px) {
-  .desktop-shell {
-    --desktop-scale: clamp(0.75, calc(100vw / 1280), 1);
-    zoom: var(--desktop-scale);
+  .desktop-page-shell {
+    padding: 1.1rem 1.15rem 0;
   }
-}
 
-@supports not (zoom: 1) {
-  @media (min-width: 960px) and (max-width: 1279px) {
-    .desktop-shell {
-      --desktop-scale: clamp(0.75, calc(100vw / 1280), 1);
-      transform: scale(var(--desktop-scale));
-      transform-origin: top left;
-      width: calc(100% / var(--desktop-scale));
-    }
+  .desktop-page-header {
+    gap: 1rem;
+  }
+
+  .desktop-page-description {
+    font-size: 0.8rem;
+    line-height: 1.62;
+    max-width: 40rem;
+  }
+
+  .desktop-page-actions {
+    gap: 0.55rem;
+  }
+
+  .desktop-page-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .desktop-stat-card {
+    padding: 0.82rem 0.9rem 0.8rem;
+  }
+
+  .desktop-stat-label {
+    font-size: 0.58rem;
+  }
+
+  .desktop-stat-value {
+    font-size: clamp(1.55rem, 1.4vw + 0.72rem, 1.95rem);
+  }
+
+  .desktop-stat-hint {
+    font-size: 0.68rem;
+    line-height: 1.45;
+  }
+
+  .app-content-shell {
+    padding: 1rem 1.15rem 1.55rem;
   }
 }
 

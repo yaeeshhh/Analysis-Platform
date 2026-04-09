@@ -785,49 +785,56 @@ export default function LoginRequiredModal({
 
   const modal = (
     <div
-      className="login-modal-overlay fixed inset-0 z-[100] flex items-end justify-center bg-[#080c16]/80 px-0 pb-0 backdrop-blur-md sm:items-center sm:px-4"
+      className="login-modal-overlay modal-viewport-overlay fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-[#080c16]/80 px-0 backdrop-blur-md sm:items-center sm:px-4"
+      style={{
+        paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+      }}
       onClick={dismissModal}
     >
       <div
-        className="login-modal-card w-full max-w-md rounded-t-2xl border-t border-[#a78bfa]/20 bg-[#0d1117] p-5 text-[#f1f5f9] sm:rounded-2xl sm:border sm:p-6"
+        className="login-modal-card modal-viewport-card w-full max-w-md rounded-t-2xl border-t border-[#a78bfa]/20 bg-[#0d1117] text-[#f1f5f9] sm:rounded-2xl sm:border"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-semibold tracking-tight text-[#f1f5f9]">{title}</h2>
-        <p className="mt-3 text-sm leading-7 text-[#94a3b8]">{message}</p>
+        <div className="border-b border-[#a78bfa]/12 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
+          <h2 className="text-2xl font-semibold tracking-tight text-[#f1f5f9]">{title}</h2>
+          <p className="mt-3 text-sm leading-7 text-[#94a3b8]">{message}</p>
 
-        <div className="mt-4 inline-flex rounded-lg border border-[#a78bfa]/15 bg-[#111827] p-1">
-          {mode === "login" && loginStep !== "identifier" ? (
-            <span
-              aria-current="page"
-              className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-4 py-1.5 text-sm font-medium text-white"
-            >
-              Log in
-            </span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => switchMode("login")}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                mode === "login" ? "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white" : "text-[#94a3b8]"
-              }`}
-            >
-              Log in
-            </button>
-          )}
-          {!(mode === "login" && loginStep !== "identifier") && (
-            <button
-              type="button"
-              onClick={() => switchMode("signup")}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                mode === "signup" ? "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white" : "text-[#94a3b8]"
-              }`}
-            >
-              Sign up
-            </button>
-          )}
+          <div className="mt-4 inline-flex rounded-lg border border-[#a78bfa]/15 bg-[#111827] p-1">
+            {mode === "login" && loginStep !== "identifier" ? (
+              <span
+                aria-current="page"
+                className="rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-4 py-1.5 text-sm font-medium text-white"
+              >
+                Log in
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => switchMode("login")}
+                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
+                  mode === "login" ? "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white" : "text-[#94a3b8]"
+                }`}
+              >
+                Log in
+              </button>
+            )}
+            {!(mode === "login" && loginStep !== "identifier") && (
+              <button
+                type="button"
+                onClick={() => switchMode("signup")}
+                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
+                  mode === "signup" ? "bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] text-white" : "text-[#94a3b8]"
+                }`}
+              >
+                Sign up
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="mt-5 space-y-3">
+        <div className="login-modal-body modal-viewport-scroll px-5 py-5 sm:px-6 sm:py-5">
+          <div className="space-y-3">
           {mode === "signup" && !signupAwaitingOtp && (
             <div>
               <input
@@ -1184,8 +1191,10 @@ export default function LoginRequiredModal({
             </p>
           )}
         </div>
+        </div>
 
-        <div className="mt-6 flex items-center gap-3">
+        <div className="border-t border-[#a78bfa]/12 bg-[#0d1117]/96 px-5 py-4 backdrop-blur sm:px-6">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           {mode === "login" && loginStep !== "identifier" && (
             <button
               type="button"
@@ -1208,7 +1217,7 @@ export default function LoginRequiredModal({
                 setInvalidPasswordAttempts(0);
               }}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#a78bfa]/15 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50 sm:w-auto"
             >
               {loading ? (
                 <>
@@ -1272,7 +1281,7 @@ export default function LoginRequiredModal({
                   signupOtpCode.trim().length !== 6 ||
                   !signupOtpFormatValid))
             }
-            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-5 py-3 text-sm font-medium text-white transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] px-5 py-3 text-sm font-medium text-white transition hover:from-[#8b5cf6] hover:to-[#7c3aed] disabled:opacity-50 sm:w-auto"
           >
             {loading || signupVerifying ? (
               <>
@@ -1295,6 +1304,7 @@ export default function LoginRequiredModal({
               "Sign up"
             )}
           </button>
+          </div>
         </div>
       </div>
     </div>
