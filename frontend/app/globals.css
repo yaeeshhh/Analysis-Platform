@@ -427,10 +427,16 @@ body::after {
     overflow: visible;
     position: sticky;
     top: 0;
+    transition: width 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: width;
     z-index: 24;
     width: 216px;
     backdrop-filter: blur(28px) saturate(132%);
     -webkit-backdrop-filter: blur(28px) saturate(132%);
+  }
+
+  .desktop-sidebar[data-collapsed="true"] {
+    width: 72px;
   }
 
   .desktop-main {

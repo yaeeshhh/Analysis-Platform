@@ -166,8 +166,43 @@ function formatClusterLabel(cluster: number) {
 }
 
 function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const scrollStart = useRef(0);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el || e.button !== 0) return;
+    dragging.current = true;
+    startX.current = e.clientX;
+    scrollStart.current = el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+    el.classList.add("analysis-guide-scroll-dragging");
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging.current || !scrollRef.current) return;
+    scrollRef.current.scrollLeft = scrollStart.current - (e.clientX - startX.current);
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    scrollRef.current?.releasePointerCapture(e.pointerId);
+    scrollRef.current?.classList.remove("analysis-guide-scroll-dragging");
+  };
+
   return (
-    <div className="analysis-guide-scroll mt-4" data-swipe-ignore="true">
+    <div
+      ref={scrollRef}
+      className="analysis-guide-scroll mt-4"
+      data-swipe-ignore="true"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
       <div className="analysis-guide-track">
         {items.map((item) => (
           <article key={item.name} className="analysis-guide-card">
