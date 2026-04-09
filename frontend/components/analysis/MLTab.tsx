@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   Bar,
@@ -153,6 +153,10 @@ function formatSliceLabel(label: string) {
 
 function formatClusterLabel(cluster: number) {
   return `Cluster ${cluster}`;
+}
+
+function stopScrollGesturePropagation(event: SyntheticEvent<HTMLDivElement>) {
+  event.stopPropagation();
 }
 
 function truncateSummary(text: string, limit = 92) {
@@ -989,8 +993,19 @@ export default function MLTab({
                 </h3>
                 <span className="text-xs text-white/50">Slide to review the method cards</span>
               </div>
-              <div className="analysis-guide-scroll mt-4 pb-2" data-swipe-ignore="true">
-                <div className="analysis-guide-track">
+              <div
+                className="analysis-guide-scroll mt-4 pb-2"
+                data-swipe-ignore="true"
+                onTouchStart={stopScrollGesturePropagation}
+                onTouchMove={stopScrollGesturePropagation}
+                onTouchEnd={stopScrollGesturePropagation}
+                onTouchCancel={stopScrollGesturePropagation}
+                onPointerDown={stopScrollGesturePropagation}
+                onPointerMove={stopScrollGesturePropagation}
+                onPointerUp={stopScrollGesturePropagation}
+                onPointerCancel={stopScrollGesturePropagation}
+              >
+                <div className={sliderTrackClassName}>
                   {methodGuideCards.map((item) => (
                     <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
                       <p className="font-medium text-white">{item.name}</p>
@@ -1468,8 +1483,19 @@ export default function MLTab({
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Unsupervised guide</p>
               <span className="text-xs text-white/50">Slide to review the method cards</span>
             </div>
-            <div className="analysis-guide-scroll mt-4 pb-2" data-swipe-ignore="true">
-              <div className="analysis-guide-track">
+            <div
+              className="analysis-guide-scroll mt-4 pb-2"
+              data-swipe-ignore="true"
+              onTouchStart={stopScrollGesturePropagation}
+              onTouchMove={stopScrollGesturePropagation}
+              onTouchEnd={stopScrollGesturePropagation}
+              onTouchCancel={stopScrollGesturePropagation}
+              onPointerDown={stopScrollGesturePropagation}
+              onPointerMove={stopScrollGesturePropagation}
+              onPointerUp={stopScrollGesturePropagation}
+              onPointerCancel={stopScrollGesturePropagation}
+            >
+              <div className={sliderTrackClassName}>
                 {unsupervisedGuide.map((item) => (
                   <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
                     <p className="font-medium text-white">{item.name}</p>

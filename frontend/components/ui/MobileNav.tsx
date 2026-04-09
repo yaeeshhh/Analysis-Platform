@@ -1,12 +1,105 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 
 type NavigatorWithStandalone = Navigator & {
   standalone?: boolean;
 };
+
+type NavMetric = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  center: number;
+};
+
+type LiquidDragState = {
+  active: boolean;
+  startIndex: number;
+  targetIndex: number;
+  startX: number;
+  currentX: number;
+};
+
+const NAV_DRAG_THRESHOLD = 12;
+
+function createIdleDragState(): LiquidDragState {
+  return {
+    active: false,
+    startIndex: -1,
+    targetIndex: -1,
+    startX: 0,
+    currentX: 0,
+  };
+}
+
+function isItemActive(pathname: string, match: string) {
+  return pathname === match || pathname.startsWith(`${match}/`);
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getLiquidBlobStyle(
+  metrics: Array<NavMetric | null>,
+  activeIndex: number,
+  dragState: LiquidDragState
+): CSSProperties {
+  const fallbackMetric =
+    (activeIndex >= 0 ? metrics[activeIndex] : null) ??
+    metrics.find((metric): metric is NavMetric => metric !== null);
+
+  if (!fallbackMetric) {
+    return { opacity: 0 };
+  }
+
+  if (!dragState.active) {
+    return {
+      transform: `translate3d(${fallbackMetric.left}px, ${fallbackMetric.top}px, 0)`,
+      width: `${fallbackMetric.width}px`,
+      height: `${fallbackMetric.height}px`,
+      opacity: 1,
+      ["--liquid-sheen-x" as string]: "50%",
+      ["--liquid-stretch" as string]: "0",
+    };
+  }
+
+  const startMetric = metrics[dragState.startIndex] ?? fallbackMetric;
+  const centers = metrics
+    .filter((metric): metric is NavMetric => metric !== null)
+    .map((metric) => metric.center);
+  const minCenter = centers.length ? Math.min(...centers) : startMetric.center;
+  const maxCenter = centers.length ? Math.max(...centers) : startMetric.center;
+  const pointerCenter = clamp(dragState.currentX, minCenter, maxCenter);
+  const left = Math.min(startMetric.center, pointerCenter) - startMetric.width / 2;
+  const right = Math.max(startMetric.center, pointerCenter) + startMetric.width / 2;
+  const width = right - left;
+  const stretch = Math.min(
+    1,
+    Math.abs(pointerCenter - startMetric.center) / Math.max(startMetric.width * 1.2, 1)
+  );
+  const sheenPosition = width > 0 ? ((pointerCenter - left) / width) * 100 : 50;
+
+  return {
+    transform: `translate3d(${left}px, ${startMetric.top}px, 0)`,
+    width: `${width}px`,
+    height: `${startMetric.height}px`,
+    opacity: 1,
+    ["--liquid-sheen-x" as string]: `${sheenPosition}%`,
+    ["--liquid-stretch" as string]: stretch.toFixed(3),
+  };
+}
 
 const navItems = [
   {
@@ -70,7 +163,147 @@ const navItems = [
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const navRef = useRef<HTMLElement | null>(null);
+  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const suppressClickRef = useRef(false);
+  const dragStateRef = useRef<LiquidDragState>(createIdleDragState());
   const [appMode, setAppMode] = useState(false);
+  const [itemMetrics, setItemMetrics] = useState<Array<NavMetric | null>>([]);
+  const [dragState, setDragState] = useState<LiquidDragState>(createIdleDragState());
+
+  const activeIndex = navItems.findIndex((item) => isItemActive(pathname, item.match));
+
+  function updateDragState(nextState: LiquidDragState) {
+    dragStateRef.current = nextState;
+    setDragState(nextState);
+  }
+
+  function measureItemMetrics() {
+    const navElement = navRef.current;
+    if (!navElement) {
+      return;
+    }
+
+    const navRect = navElement.getBoundingClientRect();
+    setItemMetrics(
+      navItems.map((_, index) => {
+        const item = itemRefs.current[index];
+        if (!item) {
+          return null;
+        }
+
+        const rect = item.getBoundingClientRect();
+        return {
+          left: rect.left - navRect.left,
+          top: rect.top - navRect.top,
+          width: rect.width,
+          height: rect.height,
+          center: rect.left - navRect.left + rect.width / 2,
+        };
+      })
+    );
+  }
+
+  function getRelativePointerX(clientX: number) {
+    const navRect = navRef.current?.getBoundingClientRect();
+    if (!navRect) {
+      return 0;
+    }
+
+    return clamp(clientX - navRect.left, 0, navRect.width);
+  }
+
+  function getNearestItemIndex(pointerX: number) {
+    let nearestIndex = -1;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    itemMetrics.forEach((metric, index) => {
+      if (!metric) {
+        return;
+      }
+
+      const distance = Math.abs(metric.center - pointerX);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    return nearestIndex;
+  }
+
+  function handleAppNavPointerDown(index: number) {
+    return (event: PointerEvent<HTMLButtonElement>) => {
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
+
+      suppressClickRef.current = false;
+      event.currentTarget.setPointerCapture(event.pointerId);
+
+      const pointerX = getRelativePointerX(event.clientX);
+      updateDragState({
+        active: true,
+        startIndex: index,
+        targetIndex: index,
+        startX: pointerX,
+        currentX: pointerX,
+      });
+    };
+  }
+
+  function handleAppNavPointerMove(event: PointerEvent<HTMLElement>) {
+    const currentState = dragStateRef.current;
+    if (!currentState.active) {
+      return;
+    }
+
+    const pointerX = getRelativePointerX(event.clientX);
+    updateDragState({
+      ...currentState,
+      currentX: pointerX,
+      targetIndex: getNearestItemIndex(pointerX),
+    });
+  }
+
+  function handleAppNavPointerEnd() {
+    const currentState = dragStateRef.current;
+    if (!currentState.active) {
+      return;
+    }
+
+    updateDragState(createIdleDragState());
+
+    const travel = Math.abs(currentState.currentX - currentState.startX);
+    const targetIndex =
+      currentState.targetIndex >= 0 ? currentState.targetIndex : currentState.startIndex;
+
+    if (
+      travel > NAV_DRAG_THRESHOLD &&
+      targetIndex >= 0 &&
+      targetIndex !== currentState.startIndex
+    ) {
+      suppressClickRef.current = true;
+      if (!isItemActive(pathname, navItems[targetIndex].match)) {
+        router.push(navItems[targetIndex].href);
+      }
+    }
+  }
+
+  function handleAppNavClick(index: number, href: string) {
+    return (event: MouseEvent<HTMLButtonElement>) => {
+      if (suppressClickRef.current) {
+        suppressClickRef.current = false;
+        event.preventDefault();
+        return;
+      }
+
+      if (!isItemActive(pathname, navItems[index].match)) {
+        router.push(href);
+      }
+    };
+  }
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -103,11 +336,91 @@ export default function MobileNav() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!appMode) {
+      return;
+    }
+
+    let frameId = 0;
+    const scheduleMeasure = () => {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(() => {
+        measureItemMetrics();
+      });
+    };
+
+    scheduleMeasure();
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            scheduleMeasure();
+          })
+        : null;
+
+    if (resizeObserver) {
+      if (navRef.current) {
+        resizeObserver.observe(navRef.current);
+      }
+      itemRefs.current.forEach((item) => {
+        if (item) {
+          resizeObserver.observe(item);
+        }
+      });
+    }
+
+    window.addEventListener("resize", scheduleMeasure);
+    window.visualViewport?.addEventListener("resize", scheduleMeasure);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", scheduleMeasure);
+      window.visualViewport?.removeEventListener("resize", scheduleMeasure);
+    };
+  }, [appMode, pathname]);
+
+  const liquidBlobStyle = getLiquidBlobStyle(itemMetrics, activeIndex, dragState);
+
   return (
-    <nav className={`mobile-bottom-nav phone-only ${appMode ? "mobile-bottom-nav-app" : ""}`}>
-      {navItems.map((item) => {
-        const active =
-          pathname === item.match || pathname.startsWith(`${item.match}/`);
+    <nav
+      ref={navRef}
+      className={`mobile-bottom-nav phone-only ${appMode ? "mobile-bottom-nav-app" : ""} ${dragState.active ? "mobile-bottom-nav-app-dragging" : ""}`}
+      onPointerMove={appMode ? handleAppNavPointerMove : undefined}
+      onPointerUp={appMode ? handleAppNavPointerEnd : undefined}
+      onPointerCancel={appMode ? handleAppNavPointerEnd : undefined}
+    >
+      {appMode ? (
+        <span
+          aria-hidden="true"
+          className="mobile-bottom-nav-liquid-blob"
+          style={liquidBlobStyle}
+        />
+      ) : null}
+
+      {navItems.map((item, index) => {
+        const active = isItemActive(pathname, item.match);
+        const dragTarget = dragState.active && dragState.targetIndex === index;
+
+        if (appMode) {
+          return (
+            <button
+              key={item.href}
+              ref={(element) => {
+                itemRefs.current[index] = element;
+              }}
+              type="button"
+              aria-current={active ? "page" : undefined}
+              className={`mobile-bottom-nav-item ${active ? "mobile-bottom-nav-item-active" : ""} ${dragTarget ? "mobile-bottom-nav-item-drag-target" : ""}`}
+              onClick={handleAppNavClick(index, item.href)}
+              onPointerDown={handleAppNavPointerDown(index)}
+            >
+              {item.icon}
+              <span className="mobile-bottom-nav-label">{item.label}</span>
+            </button>
+          );
+        }
+
         return (
           <Link
             key={item.href}
