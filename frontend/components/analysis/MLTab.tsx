@@ -422,7 +422,7 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
     >
       <div className={guideTrackClassName}>
         {items.map((item) => (
-          <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
+          <div key={item.name} className="analysis-guide-card">
             <p className="font-medium text-white">{item.name}</p>
             <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
           </div>
