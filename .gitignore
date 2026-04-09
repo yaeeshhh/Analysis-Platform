@@ -75,3 +75,10 @@ src/__pycache__/
 # Logs
 *.log
 logs/
+
+# Xcode / Apple app artifacts
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+ios/build/

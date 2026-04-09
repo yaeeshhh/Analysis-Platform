@@ -10,7 +10,6 @@ type MobileHeaderProps = {
 export default function MobileHeader({ eyebrow, title }: MobileHeaderProps) {
   return (
     <header className="mobile-header phone-only">
-      <span className="mobile-header-glare" aria-hidden="true" />
       <BrandMark compact withCopy={false} />
       <div className="mobile-header-copy">
         {eyebrow ? <span className="mobile-header-kicker">{eyebrow}</span> : null}
