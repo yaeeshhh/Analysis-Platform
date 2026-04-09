@@ -94,7 +94,7 @@ export default function GlobalOverlays() {
 
     const intervalId = window.setInterval(() => {
       void revalidateSession();
-    }, 60000);
+    }, 120_000);
 
     window.addEventListener("focus", handleVisibility);
     document.addEventListener("visibilitychange", handleVisibility);

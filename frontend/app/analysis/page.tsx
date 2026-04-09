@@ -123,10 +123,13 @@ function AnalysisPageContent() {
       setLoading(true);
 
       const queryAnalysisId = parseAnalysisId(requestedAnalysisId);
+      const storedAnalysisId = queryAnalysisId ? null : getCurrentAnalysisSelection();
+      const speculativeId = queryAnalysisId ?? storedAnalysisId;
 
-      const [user, prefetchedItems] = await Promise.all([
+      const [user, prefetchedItems, speculativePayload] = await Promise.all([
         resolveAuthenticatedUser(),
         getAnalyses().catch(() => null as AnalysisListItem[] | null),
+        speculativeId ? getAnalysisById(speculativeId).catch(() => null) : null,
       ]);
       if (!active) return;
 
@@ -147,7 +150,6 @@ function AnalysisPageContent() {
         if (!active) return;
         setAnalyses(items);
 
-        const storedAnalysisId = queryAnalysisId ? null : getCurrentAnalysisSelection();
         const initialId = queryAnalysisId ?? storedAnalysisId;
 
         if (!initialId) {
@@ -174,7 +176,9 @@ function AnalysisPageContent() {
           return;
         }
 
-        const payload = await getAnalysisById(initialId);
+        const payload = speculativePayload && initialId === speculativeId
+          ? speculativePayload
+          : await getAnalysisById(initialId);
         if (!active) return;
         setCurrentAnalysisSelection(initialId);
         setSelectedAnalysisId(initialId);
