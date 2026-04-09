@@ -1,7 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+
+type NavigatorWithStandalone = Navigator & {
+  standalone?: boolean;
+};
 
 const navItems = [
   {
@@ -65,9 +70,41 @@ const navItems = [
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const [appMode, setAppMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const mediaQueries = [
+      window.matchMedia("(display-mode: standalone)"),
+      window.matchMedia("(display-mode: minimal-ui)"),
+      window.matchMedia("(display-mode: fullscreen)"),
+    ];
+
+    const syncAppMode = () => {
+      const standaloneNavigator = window.navigator as NavigatorWithStandalone;
+      const isStandalone =
+        mediaQueries.some((query) => query.matches) ||
+        Boolean(standaloneNavigator.standalone);
+      setAppMode(isStandalone);
+    };
+
+    syncAppMode();
+    mediaQueries.forEach((query) => query.addEventListener("change", syncAppMode));
+    window.addEventListener("appinstalled", syncAppMode);
+    window.addEventListener("focus", syncAppMode);
+
+    return () => {
+      mediaQueries.forEach((query) => query.removeEventListener("change", syncAppMode));
+      window.removeEventListener("appinstalled", syncAppMode);
+      window.removeEventListener("focus", syncAppMode);
+    };
+  }, []);
 
   return (
-    <nav className="mobile-bottom-nav phone-only">
+    <nav className={`mobile-bottom-nav phone-only ${appMode ? "mobile-bottom-nav-app" : ""}`}>
       {navItems.map((item) => {
         const active =
           pathname === item.match || pathname.startsWith(`${item.match}/`);
