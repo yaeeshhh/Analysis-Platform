@@ -130,8 +130,6 @@ const defaultChartInitialDimension = { width: 520, height: 288 };
 const normalizedRangeTicks = [0, 0.25, 0.5, 0.75, 1];
 const sliderTrackClassName =
   "grid min-w-max grid-flow-col auto-cols-[minmax(240px,82vw)] gap-3 sm:auto-cols-[minmax(260px,46vw)] xl:auto-cols-[18rem]";
-const guideTrackClassName =
-  "grid min-w-max grid-flow-col auto-cols-[minmax(240px,78vw)] gap-3 sm:auto-cols-[minmax(260px,22rem)]";
 const verticalBarChartMargin = { top: 12, right: 16, bottom: 12, left: 8 };
 const SUPERVISED_RESULTS_TARGET_ID = "ml-supervised-results-start";
 const UNSUPERVISED_RESULTS_TARGET_ID = "ml-unsupervised-results-start";
@@ -169,8 +167,8 @@ function formatClusterLabel(cluster: number) {
 
 function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
   return (
-    <div className="mt-4 overflow-x-auto pb-2" data-swipe-ignore="true">
-      <div className={guideTrackClassName}>
+    <div className="analysis-guide-scroll mt-4" data-swipe-ignore="true">
+      <div className="analysis-guide-track">
         {items.map((item) => (
           <div key={item.name} className="analysis-guide-card">
             <p className="font-medium text-white">{item.name}</p>
@@ -1014,7 +1012,7 @@ export default function MLTab({
                 <h3 className="font-[family:var(--font-display)] text-xl text-white">
                   Supported supervised models
                 </h3>
-                <span className="text-xs text-white/50">Slide to review the method cards</span>
+                <span className="phone-only text-xs text-white/50">Slide to review the method cards</span>
               </div>
               <GuideScroller items={methodGuideCards} />
             </div>
@@ -1484,7 +1482,7 @@ export default function MLTab({
           <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Unsupervised guide</p>
-              <span className="text-xs text-white/50">Slide to review the method cards</span>
+              <span className="phone-only text-xs text-white/50">Slide to review the method cards</span>
             </div>
             <GuideScroller items={unsupervisedGuide} />
           </article>

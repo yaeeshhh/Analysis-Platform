@@ -3,7 +3,6 @@ import { DM_Mono, Inter } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import GlobalOverlays from "@/components/ui/GlobalOverlays";
-import DesktopAccordionOpener from "@/components/ui/DesktopAccordionOpener";
 import { MobileSlideProvider } from "@/components/ui/MobileSlideProvider";
 import ViewportInsetManager from "@/components/ui/ViewportInsetManager";
 
@@ -67,7 +66,6 @@ export default function RootLayout({
         <MobileSlideProvider>
           {children}
         </MobileSlideProvider>
-        <DesktopAccordionOpener />
         <Suspense fallback={null}>
           <GlobalOverlays />
         </Suspense>
