@@ -157,6 +157,14 @@ type GuideScrollState = {
   startScrollLeft: number;
 };
 
+type GuideTouchState = {
+  active: boolean;
+  lockedAxis: "x" | "y" | null;
+  startX: number;
+  startY: number;
+  startScrollLeft: number;
+};
+
 function formatDisplayNumber(value: number, maximumFractionDigits = 2) {
   if (!Number.isFinite(value)) return "0";
   return new Intl.NumberFormat(undefined, {
@@ -191,8 +199,20 @@ function createGuideScrollState(): GuideScrollState {
   };
 }
 
+function createGuideTouchState(): GuideTouchState {
+  return {
+    active: false,
+    lockedAxis: null,
+    startX: 0,
+    startY: 0,
+    startScrollLeft: 0,
+  };
+}
+
 function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
   const dragStateRef = useRef<GuideScrollState>(createGuideScrollState());
+  const touchStateRef = useRef<GuideTouchState>(createGuideTouchState());
   const [dragging, setDragging] = useState(false);
 
   function resetGuideScrollState(element?: HTMLDivElement) {
@@ -211,7 +231,93 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
     setDragging(false);
   }
 
+  function resetGuideTouchState() {
+    touchStateRef.current = createGuideTouchState();
+    setDragging(false);
+  }
+
+  useEffect(() => {
+    const element = scrollerRef.current;
+    if (!element) {
+      return undefined;
+    }
+
+    const handleTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch) {
+        return;
+      }
+
+      touchStateRef.current = {
+        active: true,
+        lockedAxis: null,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startScrollLeft: element.scrollLeft,
+      };
+
+      event.stopPropagation();
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const currentState = touchStateRef.current;
+      if (!currentState.active) {
+        return;
+      }
+
+      const touch = event.touches[0];
+      if (!touch) {
+        return;
+      }
+
+      const deltaX = touch.clientX - currentState.startX;
+      const deltaY = touch.clientY - currentState.startY;
+
+      if (currentState.lockedAxis === null) {
+        if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
+          return;
+        }
+
+        if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+          currentState.lockedAxis = "x";
+          setDragging(true);
+        } else {
+          resetGuideTouchState();
+          return;
+        }
+      }
+
+      if (currentState.lockedAxis !== "x") {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      element.scrollLeft = currentState.startScrollLeft - deltaX;
+    };
+
+    const handleTouchEnd = () => {
+      resetGuideTouchState();
+    };
+
+    element.addEventListener("touchstart", handleTouchStart, { passive: true });
+    element.addEventListener("touchmove", handleTouchMove, { passive: false });
+    element.addEventListener("touchend", handleTouchEnd);
+    element.addEventListener("touchcancel", handleTouchEnd);
+
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, []);
+
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
     if (event.pointerType === "mouse" && event.button !== 0) {
       return;
     }
@@ -229,6 +335,10 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
     const currentState = dragStateRef.current;
     if (currentState.pointerId !== event.pointerId) {
       return;
@@ -265,6 +375,10 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
   }
 
   function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
     if (dragStateRef.current.pointerId !== event.pointerId) {
       return;
     }
@@ -274,6 +388,10 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
   }
 
   function handlePointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
     if (dragStateRef.current.pointerId !== event.pointerId) {
       return;
     }
@@ -284,12 +402,17 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
 
   return (
     <div
+      ref={scrollerRef}
       className={`analysis-guide-scroll mt-4 pb-2 ${dragging ? "analysis-guide-scroll-dragging" : ""}`}
       data-swipe-ignore="true"
-      onTouchStart={stopScrollGesturePropagation}
-      onTouchMove={stopScrollGesturePropagation}
-      onTouchEnd={stopScrollGesturePropagation}
-      onTouchCancel={stopScrollGesturePropagation}
+      onTouchStartCapture={stopScrollGesturePropagation}
+      onTouchMoveCapture={stopScrollGesturePropagation}
+      onTouchEndCapture={stopScrollGesturePropagation}
+      onTouchCancelCapture={stopScrollGesturePropagation}
+      onPointerDownCapture={stopScrollGesturePropagation}
+      onPointerMoveCapture={stopScrollGesturePropagation}
+      onPointerUpCapture={stopScrollGesturePropagation}
+      onPointerCancelCapture={stopScrollGesturePropagation}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
