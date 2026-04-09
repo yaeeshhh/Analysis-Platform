@@ -10,7 +10,7 @@ type BackToTopButtonProps = {
 };
 
 const defaultClassName =
-  "fixed bottom-24 right-4 z-[120] inline-flex items-center gap-2 rounded-full border border-[#7ad6ff]/28 bg-[#0a1623]/92 px-4 py-3 text-sm font-semibold text-[#dff7ff] shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-md transition hover:border-[#7ad6ff]/48 hover:bg-[#102033] sm:bottom-6 sm:right-6";
+  "fixed bottom-6 right-6 z-[120] inline-flex items-center gap-2 rounded-full border border-[#7ad6ff]/28 bg-[#0a1623]/92 px-4 py-3 text-sm font-semibold text-[#dff7ff] shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-md transition hover:border-[#7ad6ff]/48 hover:bg-[#102033] max-[959px]:bottom-[calc(env(safe-area-inset-bottom,0px)+5rem)] max-[959px]:right-4";
 
 export default function BackToTopButton({
   scrollContainerRef,

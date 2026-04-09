@@ -1770,9 +1770,12 @@ export default function MLTab({
 
           <article className="min-w-0 self-start border-b border-white/6 pb-4">
             <p className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Top anomaly candidates</p>
-            <div className="mt-4 grid items-start gap-3 xl:grid-cols-3">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {anomalies.map((item) => (
-                <div key={item.row} className="border-b border-white/6 pb-3 text-sm text-white/72">
+                <div
+                  key={item.row}
+                  className="w-full min-w-0 rounded-2xl border border-white/10 bg-black/10 px-4 py-4 text-sm text-white/72"
+                >
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium text-white">Row {item.row}</p>
                     <span className="rounded-lg border border-white/10 px-2 py-1 text-[11px] text-white/50">
@@ -1785,7 +1788,7 @@ export default function MLTab({
                 </div>
               ))}
               {!anomalies.length ? (
-                <div className="py-5 text-sm text-white/48 xl:col-span-3">
+                <div className="rounded-2xl border border-dashed border-white/10 px-4 py-5 text-sm text-white/48 sm:col-span-2 xl:col-span-3">
                   The strongest anomaly candidates will appear here after a scan completes.
                 </div>
               ) : null}
