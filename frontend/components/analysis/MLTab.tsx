@@ -989,7 +989,7 @@ export default function MLTab({
                 </h3>
                 <span className="text-xs text-white/50">Slide to review the method cards</span>
               </div>
-              <div className="analysis-guide-scroll mt-4 pb-2">
+              <div className="analysis-guide-scroll mt-4 pb-2" data-swipe-ignore="true">
                 <div className="analysis-guide-track">
                   {methodGuideCards.map((item) => (
                     <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
@@ -1468,7 +1468,7 @@ export default function MLTab({
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Unsupervised guide</p>
               <span className="text-xs text-white/50">Slide to review the method cards</span>
             </div>
-            <div className="analysis-guide-scroll mt-4 pb-2">
+            <div className="analysis-guide-scroll mt-4 pb-2" data-swipe-ignore="true">
               <div className="analysis-guide-track">
                 {unsupervisedGuide.map((item) => (
                   <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
