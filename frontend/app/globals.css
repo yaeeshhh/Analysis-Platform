@@ -3784,7 +3784,7 @@ a[class*="rounded"]:hover {
     scroll-padding-right: 1rem;
     scroll-snap-type: x proximity;
     scrollbar-width: none;
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-x pan-y pinch-zoom;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
     user-select: none;
