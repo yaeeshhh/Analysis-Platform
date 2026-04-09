@@ -188,30 +188,37 @@ export default function GlobalResetPasswordModal() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]"
+      className="modal-viewport-overlay fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-black/50 px-0 backdrop-blur-[2px] sm:items-center sm:px-4"
+      style={{
+        paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+      }}
       onClick={closeModal}
     >
       <div
-        className="w-full max-w-md rounded-xl border border-white/10 bg-[#15151a] p-6 text-white"
+        className="global-reset-modal-card modal-viewport-card w-full max-w-md rounded-t-2xl border border-white/10 bg-[#15151a] text-white sm:rounded-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-semibold tracking-tight text-white">Reset Password</h2>
-        <p className="mt-3 text-sm leading-7 text-white/65">
-          Create a new password for your account.
-        </p>
-
-        <div className="mt-3 rounded-[12px] border border-white/10 bg-[#111116] px-3 py-2 text-xs text-white/70">
-          {contextLoading ? (
-            <SurfaceLoadingIndicator label="Loading account details..." className="justify-start" />
-          ) : (
-            <>
-              <p>Email: {accountEmail || "Unavailable"}</p>
-              <p>Username: {accountUsername || "Unavailable"}</p>
-            </>
-          )}
+        <div className="border-b border-white/10 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
+          <h2 className="text-2xl font-semibold tracking-tight text-white">Reset Password</h2>
+          <p className="mt-3 text-sm leading-7 text-white/65">
+            Create a new password for your account.
+          </p>
         </div>
 
-        <div className="mt-5 space-y-3">
+        <div className="modal-viewport-scroll px-5 py-5 sm:px-6 sm:py-5">
+          <div className="rounded-[12px] border border-white/10 bg-[#111116] px-3 py-2 text-xs text-white/70">
+            {contextLoading ? (
+              <SurfaceLoadingIndicator label="Loading account details..." className="justify-start" />
+            ) : (
+              <>
+                <p>Email: {accountEmail || "Unavailable"}</p>
+                <p>Username: {accountUsername || "Unavailable"}</p>
+              </>
+            )}
+          </div>
+
+          <div className="mt-5 space-y-3">
           <>
             <div className="relative">
               <input
@@ -289,13 +296,15 @@ export default function GlobalResetPasswordModal() {
             </p>
           )}
         </div>
+        </div>
 
-        <div className="mt-6 flex items-center gap-3">
+        <div className="border-t border-white/10 bg-[#15151a]/96 px-5 py-4 backdrop-blur sm:px-6">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <button
             type="button"
             onClick={closeModal}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-50 sm:w-auto"
           >
             {loading ? (
               <>
@@ -316,7 +325,7 @@ export default function GlobalResetPasswordModal() {
               !confirmPassword ||
               !passwordsMatch
             }
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50 sm:w-auto"
           >
             {loading ? (
               <>
@@ -325,6 +334,7 @@ export default function GlobalResetPasswordModal() {
               </>
             ) : "Reset password"}
           </button>
+          </div>
         </div>
       </div>
     </div>
