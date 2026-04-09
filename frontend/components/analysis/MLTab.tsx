@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type SyntheticEvent,
+} from "react";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import {
   Bar,
@@ -136,6 +143,20 @@ type PendingDeleteExperiment = {
   experiment: MlExperimentSummary;
 };
 
+type GuideScrollerItem = {
+  name: string;
+  detail: string;
+};
+
+type GuideScrollState = {
+  pointerId: number | null;
+  captured: boolean;
+  lockedAxis: "x" | "y" | null;
+  startX: number;
+  startY: number;
+  startScrollLeft: number;
+};
+
 function formatDisplayNumber(value: number, maximumFractionDigits = 2) {
   if (!Number.isFinite(value)) return "0";
   return new Intl.NumberFormat(undefined, {
@@ -157,6 +178,133 @@ function formatClusterLabel(cluster: number) {
 
 function stopScrollGesturePropagation(event: SyntheticEvent<HTMLDivElement>) {
   event.stopPropagation();
+}
+
+function createGuideScrollState(): GuideScrollState {
+  return {
+    pointerId: null,
+    captured: false,
+    lockedAxis: null,
+    startX: 0,
+    startY: 0,
+    startScrollLeft: 0,
+  };
+}
+
+function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
+  const dragStateRef = useRef<GuideScrollState>(createGuideScrollState());
+  const [dragging, setDragging] = useState(false);
+
+  function resetGuideScrollState(element?: HTMLDivElement) {
+    const currentState = dragStateRef.current;
+
+    if (
+      element &&
+      currentState.pointerId !== null &&
+      currentState.captured &&
+      element.hasPointerCapture(currentState.pointerId)
+    ) {
+      element.releasePointerCapture(currentState.pointerId);
+    }
+
+    dragStateRef.current = createGuideScrollState();
+    setDragging(false);
+  }
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      captured: false,
+      lockedAxis: null,
+      startX: event.clientX,
+      startY: event.clientY,
+      startScrollLeft: event.currentTarget.scrollLeft,
+    };
+
+    event.stopPropagation();
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    const currentState = dragStateRef.current;
+    if (currentState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - currentState.startX;
+    const deltaY = event.clientY - currentState.startY;
+
+    if (currentState.lockedAxis === null) {
+      if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) {
+        return;
+      }
+
+      if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+        currentState.lockedAxis = "x";
+        if (!currentState.captured) {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          currentState.captured = true;
+        }
+        setDragging(true);
+      } else {
+        resetGuideScrollState();
+        return;
+      }
+    }
+
+    if (currentState.lockedAxis !== "x") {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.scrollLeft = currentState.startScrollLeft - deltaX;
+  }
+
+  function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (dragStateRef.current.pointerId !== event.pointerId) {
+      return;
+    }
+
+    resetGuideScrollState(event.currentTarget);
+    event.stopPropagation();
+  }
+
+  function handlePointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
+    if (dragStateRef.current.pointerId !== event.pointerId) {
+      return;
+    }
+
+    resetGuideScrollState(event.currentTarget);
+    event.stopPropagation();
+  }
+
+  return (
+    <div
+      className={`analysis-guide-scroll mt-4 pb-2 ${dragging ? "analysis-guide-scroll-dragging" : ""}`}
+      data-swipe-ignore="true"
+      onTouchStart={stopScrollGesturePropagation}
+      onTouchMove={stopScrollGesturePropagation}
+      onTouchEnd={stopScrollGesturePropagation}
+      onTouchCancel={stopScrollGesturePropagation}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+    >
+      <div className={`analysis-guide-track ${sliderTrackClassName}`}>
+        {items.map((item) => (
+          <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
+            <p className="font-medium text-white">{item.name}</p>
+            <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function truncateSummary(text: string, limit = 92) {
@@ -993,27 +1141,7 @@ export default function MLTab({
                 </h3>
                 <span className="text-xs text-white/50">Slide to review the method cards</span>
               </div>
-              <div
-                className="analysis-guide-scroll mt-4 pb-2"
-                data-swipe-ignore="true"
-                onTouchStart={stopScrollGesturePropagation}
-                onTouchMove={stopScrollGesturePropagation}
-                onTouchEnd={stopScrollGesturePropagation}
-                onTouchCancel={stopScrollGesturePropagation}
-                onPointerDown={stopScrollGesturePropagation}
-                onPointerMove={stopScrollGesturePropagation}
-                onPointerUp={stopScrollGesturePropagation}
-                onPointerCancel={stopScrollGesturePropagation}
-              >
-                <div className={sliderTrackClassName}>
-                  {methodGuideCards.map((item) => (
-                    <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
-                      <p className="font-medium text-white">{item.name}</p>
-                      <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <GuideScroller items={methodGuideCards} />
             </div>
           </details>
 
@@ -1483,27 +1611,7 @@ export default function MLTab({
               <p className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Unsupervised guide</p>
               <span className="text-xs text-white/50">Slide to review the method cards</span>
             </div>
-            <div
-              className="analysis-guide-scroll mt-4 pb-2"
-              data-swipe-ignore="true"
-              onTouchStart={stopScrollGesturePropagation}
-              onTouchMove={stopScrollGesturePropagation}
-              onTouchEnd={stopScrollGesturePropagation}
-              onTouchCancel={stopScrollGesturePropagation}
-              onPointerDown={stopScrollGesturePropagation}
-              onPointerMove={stopScrollGesturePropagation}
-              onPointerUp={stopScrollGesturePropagation}
-              onPointerCancel={stopScrollGesturePropagation}
-            >
-              <div className={sliderTrackClassName}>
-                {unsupervisedGuide.map((item) => (
-                  <div key={item.name} className="analysis-guide-card border-b border-white/6 pb-3">
-                    <p className="font-medium text-white">{item.name}</p>
-                    <p className="mt-2 text-sm leading-6 text-white/62">{item.detail}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <GuideScroller items={unsupervisedGuide} />
           </article>
 
           <article className="min-w-0 self-start border-b border-white/6 pb-4">
