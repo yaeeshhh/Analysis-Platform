@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileMenu from "@/components/ui/ProfileMenu";
 import BrandMark from "@/components/ui/BrandMark";
-
-const SIDEBAR_OPEN_DELAY_MS = 220;
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", match: "/dashboard", icon: "dashboard" },
@@ -62,54 +60,14 @@ function NavIcon({ kind }: { kind: (typeof navItems)[number]["icon"] }) {
 export default function TopNav() {
   const pathname = usePathname();
   const surfaceRef = useRef<HTMLDivElement | null>(null);
-  const interactiveTimerRef = useRef<number | null>(null);
-  const [collapsed, setCollapsed] = useState(true);
-  const [interactive, setInteractive] = useState(false);
-
-  const clearInteractiveTimer = () => {
-    if (interactiveTimerRef.current === null) {
-      return;
-    }
-
-    window.clearTimeout(interactiveTimerRef.current);
-    interactiveTimerRef.current = null;
-  };
-
-  const openNav = () => {
-    if (!collapsed && interactive) {
-      return;
-    }
-
-    setCollapsed(false);
-
-    if (interactive) {
-      return;
-    }
-
-    clearInteractiveTimer();
-    interactiveTimerRef.current = window.setTimeout(() => {
-      setInteractive(true);
-      interactiveTimerRef.current = null;
-    }, SIDEBAR_OPEN_DELAY_MS);
-  };
-
-  const closeNav = () => {
-    clearInteractiveTimer();
-    setInteractive(false);
-    setCollapsed(true);
-  };
-
-  useEffect(() => {
-    return () => {
-      clearInteractiveTimer();
-    };
-  }, []);
+  const collapsed = false;
+  const interactive = true;
 
   useLayoutEffect(() => {
     const sidebar = surfaceRef.current?.closest<HTMLElement>("[data-desktop-sidebar]");
     if (sidebar) {
-      sidebar.dataset.collapsed = collapsed ? "true" : "false";
-      sidebar.dataset.interactive = interactive ? "true" : "false";
+      sidebar.dataset.collapsed = "false";
+      sidebar.dataset.interactive = "true";
     }
 
     return () => {
@@ -135,25 +93,8 @@ export default function TopNav() {
       ref={surfaceRef}
       className={`nav-surface ${contentCollapsed ? "nav-surface-collapsed" : ""}`}
       data-interactive={navInteractive ? "true" : "false"}
-      tabIndex={navInteractive ? -1 : 0}
+      tabIndex={-1}
       aria-label="Workspace navigation"
-      onMouseEnter={openNav}
-      onMouseLeave={closeNav}
-      onFocusCapture={openNav}
-      onBlurCapture={(event) => {
-        const nextFocusTarget = event.relatedTarget as Node | null;
-        if (!nextFocusTarget || !event.currentTarget.contains(nextFocusTarget)) {
-          closeNav();
-        }
-      }}
-      onKeyDown={(event) => {
-        if (event.key !== "Escape") return;
-        closeNav();
-        const activeElement = document.activeElement;
-        if (activeElement instanceof HTMLElement && event.currentTarget.contains(activeElement)) {
-          activeElement.blur();
-        }
-      }}
     >
       <span className="nav-surface-glare" aria-hidden="true" />
 
@@ -190,7 +131,7 @@ export default function TopNav() {
       </div>
 
       <div className="desktop-sidebar-profile">
-        <ProfileMenu variant="sidebar" disabled={!navInteractive} onSidebarAction={closeNav} />
+        <ProfileMenu variant="sidebar" />
       </div>
     </div>
   );
