@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, type CSSProperties, type ReactNode } from "react";
+import { Suspense, useEffect, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import TopNav from "@/components/ui/TopNav";
@@ -24,6 +24,30 @@ type AppShellProps = {
   children: ReactNode;
 };
 
+function subscribeToAppleShellChanges(onStoreChange: () => void) {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  window.addEventListener("popstate", onStoreChange);
+
+  return () => {
+    window.removeEventListener("popstate", onStoreChange);
+  };
+}
+
+function getAppleShellSnapshot() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return new URLSearchParams(window.location.search).get("nativeShell") === "apple";
+}
+
+function getAppleShellServerSnapshot() {
+  return false;
+}
+
 export default function AppShell({
   eyebrow,
   title,
@@ -36,6 +60,11 @@ export default function AppShell({
 }: AppShellProps) {
   const TitleTag = titleTag;
   const pathname = usePathname();
+  const embeddedAppleShell = useSyncExternalStore(
+    subscribeToAppleShellChanges,
+    getAppleShellSnapshot,
+    getAppleShellServerSnapshot,
+  );
 
   useEffect(() => {
     if (typeof window === "undefined" || window.innerWidth >= 960) {
@@ -65,7 +94,7 @@ export default function AppShell({
   }, [pathname]);
 
   return (
-    <main className="app-shell min-h-screen text-white">
+    <main className={`app-shell min-h-screen text-white ${embeddedAppleShell ? "app-shell-native-apple" : ""}`}>
       <MobileHeader eyebrow={eyebrow} title={title} />
 
       <div className="desktop-shell">
@@ -118,7 +147,7 @@ export default function AppShell({
         </div>
       </div>
 
-      <MobileNav />
+      {!embeddedAppleShell ? <MobileNav /> : null}
       <BackToTopButton />
     </main>
   );
