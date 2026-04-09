@@ -16,7 +16,7 @@ import {
   moveInputCaretToEnd,
 } from "@/lib/helpers";
 import { setAccessToken } from "@/lib/api";
-import { setActiveAccountEmail } from "@/lib/session";
+import { broadcastLoggedInSession } from "@/lib/session";
 import {
   getPasswordStrengthState,
   validatePasswordPolicy,
@@ -339,7 +339,7 @@ function SignupPageContent() {
 
       setAccessToken(response.access_token);
       clearUserScopedFrontendState();
-      setActiveAccountEmail(response.user?.email || trimmedEmail);
+      broadcastLoggedInSession(response.user?.email || trimmedEmail);
 
       const redirect = searchParams.get("redirect") || "/dashboard";
       const safeRedirect = redirect.startsWith("/") ? redirect : "/dashboard";

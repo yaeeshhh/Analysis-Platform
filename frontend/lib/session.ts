@@ -2,6 +2,7 @@ import { clearAccessToken, getAccessToken, setAccessToken } from "./api";
 import { getCurrentUser, refreshAccessToken, User } from "./auth";
 
 const ACTIVE_ACCOUNT_EMAIL_SESSION_KEY = "auth:active-account-email";
+export const LOGIN_BROADCAST_KEY = "auth:login-broadcast";
 const PASSWORD_CHANGED_NOTICE_KEY = "auth:password-changed-notice";
 const LAST_SEEN_PASSWORD_CHANGED_NOTICE_KEY = "auth:last-password-changed-notice-id";
 const FORCED_PASSWORD_CHANGED_NOTICE_KEY = "auth:force-password-changed-notice-id";
@@ -28,10 +29,19 @@ export type PasswordChangedNoticePayload = {
   email: string;
 };
 
+type LoginBroadcastPayload = {
+  timestamp: number;
+  email?: string;
+};
+
+function normalizeAccountEmail(email: string | null | undefined): string {
+  return email?.trim().toLowerCase() || "";
+}
+
 export function setActiveAccountEmail(email: string | null): void {
   if (typeof window === "undefined") return;
 
-  const normalizedEmail = email?.trim().toLowerCase() || "";
+  const normalizedEmail = normalizeAccountEmail(email);
   if (normalizedEmail) {
     sessionStorage.setItem(ACTIVE_ACCOUNT_EMAIL_SESSION_KEY, normalizedEmail);
     return;
@@ -48,6 +58,43 @@ export function getActiveAccountEmail(): string | null {
 export function clearActiveAccountEmail(): void {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(ACTIVE_ACCOUNT_EMAIL_SESSION_KEY);
+}
+
+export function dispatchLoggedInEvent(email: string | null | undefined): void {
+  if (typeof window === "undefined") return;
+
+  const normalizedEmail = normalizeAccountEmail(email);
+  setActiveAccountEmail(normalizedEmail || null);
+  window.dispatchEvent(
+    new CustomEvent("auth:logged-in", {
+      detail: normalizedEmail ? { email: normalizedEmail } : undefined,
+    })
+  );
+}
+
+export function broadcastLoggedInSession(email: string | null | undefined): void {
+  if (typeof window === "undefined") return;
+
+  const normalizedEmail = normalizeAccountEmail(email);
+  dispatchLoggedInEvent(normalizedEmail || null);
+  localStorage.setItem(
+    LOGIN_BROADCAST_KEY,
+    JSON.stringify({
+      timestamp: Date.now(),
+      email: normalizedEmail || undefined,
+    } satisfies LoginBroadcastPayload)
+  );
+}
+
+export function readLoggedInBroadcastEmail(raw: string | null): string | null {
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<LoginBroadcastPayload>;
+    return normalizeAccountEmail(parsed.email ?? null) || null;
+  } catch {
+    return null;
+  }
 }
 
 function getAuthenticatedUserCacheKey(): string {
