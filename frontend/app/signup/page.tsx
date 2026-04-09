@@ -389,6 +389,7 @@ function SignupPageContent() {
                   <input
                     id="full-name"
                     type="text"
+                    enterKeyHint="done"
                     placeholder="Your full name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -405,6 +406,7 @@ function SignupPageContent() {
                   <input
                     id="username"
                     type="text"
+                    enterKeyHint="done"
                     placeholder="yourname"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -445,6 +447,7 @@ function SignupPageContent() {
                   <input
                     id="email"
                     type="email"
+                    enterKeyHint="done"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -486,6 +489,7 @@ function SignupPageContent() {
                     <input
                       id="password"
                       type={showPassword ? "text" : "password"}
+                      enterKeyHint="done"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -525,6 +529,7 @@ function SignupPageContent() {
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
+                      enterKeyHint="done"
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}

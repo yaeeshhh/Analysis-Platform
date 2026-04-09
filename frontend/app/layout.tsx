@@ -5,6 +5,7 @@ import "./globals.css";
 import GlobalOverlays from "@/components/ui/GlobalOverlays";
 import DesktopAccordionOpener from "@/components/ui/DesktopAccordionOpener";
 import { MobileSlideProvider } from "@/components/ui/MobileSlideProvider";
+import ViewportInsetManager from "@/components/ui/ViewportInsetManager";
 
 const bodyFont = Inter({
   subsets: ["latin"],
@@ -62,6 +63,7 @@ export default function RootLayout({
       className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`}
     >
       <body suppressHydrationWarning className="antialiased">
+        <ViewportInsetManager />
         <MobileSlideProvider>
           {children}
         </MobileSlideProvider>
