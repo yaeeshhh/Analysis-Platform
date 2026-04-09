@@ -6,6 +6,7 @@ import BackToTopButton from "@/components/ui/BackToTopButton";
 import TopNav from "@/components/ui/TopNav";
 import MobileHeader from "@/components/ui/MobileHeader";
 import MobileNav from "@/components/ui/MobileNav";
+import { isAppleNativeShell } from "@/lib/nativeShell";
 
 type AppShellStat = {
   label: string;
@@ -30,18 +31,16 @@ function subscribeToAppleShellChanges(onStoreChange: () => void) {
   }
 
   window.addEventListener("popstate", onStoreChange);
+  window.addEventListener("analysis-studio:native-ready", onStoreChange as EventListener);
 
   return () => {
     window.removeEventListener("popstate", onStoreChange);
+    window.removeEventListener("analysis-studio:native-ready", onStoreChange as EventListener);
   };
 }
 
 function getAppleShellSnapshot() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return new URLSearchParams(window.location.search).get("nativeShell") === "apple";
+  return isAppleNativeShell();
 }
 
 function getAppleShellServerSnapshot() {
