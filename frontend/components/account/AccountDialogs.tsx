@@ -35,7 +35,11 @@ import {
   getPasswordStrengthState,
   validatePasswordPolicy,
 } from "@/lib/passwordPolicy";
-import { clearActiveAccountEmail, queuePasswordChangedNotice } from "@/lib/session";
+import {
+  PASSWORD_CHANGED_QUERY_PARAM,
+  clearActiveAccountEmail,
+  queuePasswordChangedNotice,
+} from "@/lib/session";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
 import OtpCodeInput from "@/components/ui/OtpCodeInput";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
@@ -640,7 +644,7 @@ function PasswordChangeDialog({
       clearActiveAccountEmail();
       localStorage.setItem(LOGOUT_BROADCAST_KEY, Date.now().toString());
       onClose();
-      router.replace("/login");
+      router.replace(`/login?${PASSWORD_CHANGED_QUERY_PARAM}=1`);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Failed to update password.");
     } finally {

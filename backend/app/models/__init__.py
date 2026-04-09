@@ -3,6 +3,7 @@ from .analysis_run import AnalysisRunRecord
 from .refresh_token import RefreshToken
 from .password_reset_token import PasswordResetToken
 from .remember_login_token import RememberLoginToken
+from .user_security_state import UserSecurityState
 from .login_verification_code import LoginVerificationCode
 from .profile_update_verification_code import ProfileUpdateVerificationCode
 from .account_deletion_verification_code import AccountDeletionVerificationCode

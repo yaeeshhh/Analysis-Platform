@@ -15,7 +15,7 @@ import {
 } from "@/lib/passwordPolicy";
 import { clearUserScopedFrontendState, moveInputCaretToEnd } from "@/lib/helpers";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
-import { queuePasswordChangedNotice } from "@/lib/session";
+import { PASSWORD_CHANGED_QUERY_PARAM, queuePasswordChangedNotice } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
 import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
@@ -165,7 +165,16 @@ export default function GlobalResetPasswordModal() {
         "token",
         "login_prompt",
       ]);
-      window.location.replace(cleanPath);
+      const nextQuery = new URLSearchParams();
+      if (cleanPath.includes("?")) {
+        const [, query = ""] = cleanPath.split("?", 2);
+        const current = new URLSearchParams(query);
+        current.forEach((value, key) => nextQuery.set(key, value));
+      }
+      nextQuery.set(PASSWORD_CHANGED_QUERY_PARAM, "1");
+      const basePath = cleanPath.split("?", 1)[0] || pathname;
+      const nextSearch = nextQuery.toString();
+      window.location.replace(nextSearch ? `${basePath}?${nextSearch}` : basePath);
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "Unable to reset password."

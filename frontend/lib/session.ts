@@ -5,6 +5,8 @@ const ACTIVE_ACCOUNT_EMAIL_SESSION_KEY = "auth:active-account-email";
 const PASSWORD_CHANGED_NOTICE_KEY = "auth:password-changed-notice";
 const LAST_SEEN_PASSWORD_CHANGED_NOTICE_KEY = "auth:last-password-changed-notice-id";
 const FORCED_PASSWORD_CHANGED_NOTICE_KEY = "auth:force-password-changed-notice-id";
+const PASSWORD_CHANGED_REAUTH_DETAIL = "Your password was changed. Please log in again.";
+export const PASSWORD_CHANGED_QUERY_PARAM = "password_changed";
 
 export type PasswordChangedNoticePayload = {
   id: string;
@@ -75,6 +77,18 @@ export function queuePasswordChangedNotice(
   return notice;
 }
 
+export function isPasswordChangedReauthMessage(message: unknown): boolean {
+  return (
+    typeof message === "string" &&
+    message.trim().toLowerCase() === PASSWORD_CHANGED_REAUTH_DETAIL.toLowerCase()
+  );
+}
+
+function redirectToPasswordChangedLogin(): void {
+  if (typeof window === "undefined") return;
+  window.location.replace(`/login?${PASSWORD_CHANGED_QUERY_PARAM}=1`);
+}
+
 export function primePasswordChangedNoticeForCurrentTab(): void {
   if (typeof window === "undefined") return;
 
@@ -129,6 +143,10 @@ export function shouldSuppressDefaultLoginModal(): boolean {
     return true;
   }
 
+  if (params.get(PASSWORD_CHANGED_QUERY_PARAM) === "1") {
+    return true;
+  }
+
   return !!getPasswordChangedNoticeToShow();
 }
 
@@ -140,7 +158,14 @@ export async function resolveAuthenticatedUser(): Promise<User | null> {
       const user = await getCurrentUser(existingToken);
       setActiveAccountEmail(user.email);
       return user;
-    } catch {
+    } catch (error) {
+      if (isPasswordChangedReauthMessage(error instanceof Error ? error.message : "")) {
+        clearAccessToken();
+        clearActiveAccountEmail();
+        redirectToPasswordChangedLogin();
+        return null;
+      }
+
       // If the old access token is bad, I try refresh before giving up.
     }
   }
@@ -151,7 +176,14 @@ export async function resolveAuthenticatedUser(): Promise<User | null> {
     const user = await getCurrentUser(refreshResponse.access_token);
     setActiveAccountEmail(user.email);
     return user;
-  } catch {
+  } catch (error) {
+    if (isPasswordChangedReauthMessage(error instanceof Error ? error.message : "")) {
+      clearAccessToken();
+      clearActiveAccountEmail();
+      redirectToPasswordChangedLogin();
+      return null;
+    }
+
     clearAccessToken();
     clearActiveAccountEmail();
     return null;

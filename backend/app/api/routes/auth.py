@@ -384,10 +384,23 @@ def refresh(
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token required")
 
-    new_access_token, new_refresh_token = AuthService.refresh_access_token(
-        refresh_token,
-        db,
-    )
+    try:
+        new_access_token, new_refresh_token = AuthService.refresh_access_token(
+            refresh_token,
+            db,
+        )
+    except HTTPException as exc:
+        if exc.status_code != 401:
+            raise
+
+        json_response = JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+        json_response.delete_cookie(
+            key="refresh_token",
+            path="/",
+            samesite=settings.COOKIE_SAMESITE,
+            secure=settings.COOKIE_SECURE,
+        )
+        return json_response
 
     response_data = RefreshResponse(
         access_token=new_access_token,

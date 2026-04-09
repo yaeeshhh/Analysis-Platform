@@ -881,18 +881,20 @@ function BatchMobileSections({
             {(showAllUploads ? analyses : analyses.slice(0, 3)).map((analysis) => {
               const selected = analysis.id === selectedAnalysis?.id;
               return (
-                <div key={analysis.id} className={`mobile-batch-card${selected ? " mobile-batch-card-active" : ""}`}>
-                  <span className="mobile-batch-card-icon" aria-hidden="true">📄</span>
-                  <div className="mobile-batch-card-body">
-                    <p className="mobile-batch-card-label">{analysis.overview.dataset_name || analysis.source_filename}</p>
-                    <p className="mobile-batch-card-meta">
-                      {formatDate(analysis.saved_at)} · {analysis.overview.row_count.toLocaleString()} rows · {analysis.overview.column_count} cols
-                    </p>
+                <div key={analysis.id} className={`mobile-batch-card-shell${selected ? " mobile-batch-card-shell-active" : ""}`}>
+                  <div className="mobile-batch-card">
+                    <span className="mobile-batch-card-icon" aria-hidden="true">📄</span>
+                    <div className="mobile-batch-card-body">
+                      <p className="mobile-batch-card-label">{analysis.overview.dataset_name || analysis.source_filename}</p>
+                      <p className="mobile-batch-card-meta">
+                        {formatDate(analysis.saved_at)} · {analysis.overview.row_count.toLocaleString()} rows · {analysis.overview.column_count} cols
+                      </p>
+                    </div>
+                    <span className="mobile-batch-card-badge" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
+                      {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                    </span>
                   </div>
-                  <span className="mobile-batch-card-badge" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                    {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
-                  </span>
-                  <div className="mobile-batch-card-actions mobile-batch-card-actions-spread">
+                  <div className="mobile-batch-card-actions-block">
                     <button
                       type="button"
                       onClick={() => handleSelectSavedUpload(analysis.id)}
