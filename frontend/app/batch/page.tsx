@@ -888,26 +888,26 @@ function BatchMobileSections({
                     <p className="mobile-batch-card-meta">
                       {formatDate(analysis.saved_at)} · {analysis.overview.row_count.toLocaleString()} rows · {analysis.overview.column_count} cols
                     </p>
-                    <div className="mobile-batch-card-actions">
-                      <button
-                        type="button"
-                        onClick={() => handleSelectSavedUpload(analysis.id)}
-                        className="mobile-screen-button mobile-screen-button-secondary"
-                      >
-                        {selected ? "Selected" : "Set active"}
-                      </button>
-                      <ScrollIntentLink
-                        href={`/analysis?analysisId=${analysis.id}`}
-                        onClick={() => setSelection(analysis.id)}
-                        className="mobile-screen-button mobile-screen-button-primary"
-                      >
-                        Open analysis
-                      </ScrollIntentLink>
-                    </div>
                   </div>
                   <span className="mobile-batch-card-badge" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
                     {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
                   </span>
+                  <div className="mobile-batch-card-actions mobile-batch-card-actions-spread">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectSavedUpload(analysis.id)}
+                      className="mobile-screen-button mobile-screen-button-secondary"
+                    >
+                      {selected ? "Selected" : "Set active"}
+                    </button>
+                    <ScrollIntentLink
+                      href={`/analysis?analysisId=${analysis.id}`}
+                      onClick={() => setSelection(analysis.id)}
+                      className="mobile-screen-button mobile-screen-button-primary"
+                    >
+                      Open analysis
+                    </ScrollIntentLink>
+                  </div>
                 </div>
               );
             })}

@@ -701,22 +701,19 @@ function PopupMobileCards({ report, onCardOpenChange, onRunUnsupervised, onRunSu
             style={{ "--analysis-card-accent": accent, "--analysis-card-border": `${accent}44` } as React.CSSProperties}
           >
             {popupCardCovers[currentCard.key]}
-            {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
-              <div className="mobile-analysis-detail-subtabs">
-                {currentCard.subtabs.map((sub, idx) => (
-                  <button
-                    key={sub.label}
-                    type="button"
-                    onClick={() => setActiveSubIdx(idx)}
-                    className={`mobile-analysis-detail-subtab${activeSubIdx === idx ? " mobile-analysis-detail-subtab-active" : ""}`}
-                    style={{ "--subtab-accent": accent } as React.CSSProperties}
-                  >
-                    {sub.label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
           </div>
+
+          {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
+            <div className="mobile-analysis-detail-dropdown" style={{ "--analysis-card-accent": accent } as React.CSSProperties}>
+              <select value={String(activeSubIdx)} onChange={(event) => setActiveSubIdx(Number(event.target.value))}>
+                {currentCard.subtabs.map((sub, idx) => (
+                  <option key={sub.label} value={idx}>
+                    {sub.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
 
           {currentCard.subtabs && currentCard.subtabs.length > 1 ? (
             <p className="mobile-analysis-swipe-hint">Swipe left or right across this panel to switch views.</p>
