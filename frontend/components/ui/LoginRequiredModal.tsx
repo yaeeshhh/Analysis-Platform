@@ -35,7 +35,7 @@ import {
   moveInputCaretToEnd,
 } from "@/lib/helpers";
 import { setAccessToken } from "@/lib/api";
-import { setActiveAccountEmail, shouldSuppressDefaultLoginModal } from "@/lib/session";
+import { broadcastLoggedInSession, shouldSuppressDefaultLoginModal } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
 
@@ -385,11 +385,7 @@ export default function LoginRequiredModal({
 
   const finishAuth = async (emailValue?: string | null) => {
     clearUserScopedFrontendState();
-    setActiveAccountEmail(emailValue || null);
-
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("auth:logged-in"));
-    }
+    broadcastLoggedInSession(emailValue || null);
 
     await onLoginSuccess?.();
     onDismiss?.();

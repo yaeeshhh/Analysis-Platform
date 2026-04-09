@@ -26,7 +26,7 @@ import {
   moveInputCaretToEnd,
 } from "@/lib/helpers";
 import { setAccessToken } from "@/lib/api";
-import { setActiveAccountEmail } from "@/lib/session";
+import { broadcastLoggedInSession } from "@/lib/session";
 import Link from "next/link";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
 import AuthShell from "@/components/ui/AuthShell";
@@ -122,7 +122,7 @@ function LoginPageContent() {
   const finishAuth = (accessToken: string, email?: string | null) => {
     setAccessToken(accessToken);
     clearUserScopedFrontendState();
-    setActiveAccountEmail(email || null);
+    broadcastLoggedInSession(email || null);
 
     const redirect = searchParams.get("redirect") || "/dashboard";
     const safeRedirect = redirect.startsWith("/") ? redirect : "/dashboard";

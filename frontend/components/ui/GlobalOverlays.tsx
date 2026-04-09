@@ -6,12 +6,15 @@ import GlobalLoginPrompt from "@/components/ui/GlobalLoginPrompt";
 import GlobalResetPasswordModal from "@/components/ui/GlobalResetPasswordModal";
 import PasswordChangedNoticeModal from "@/components/ui/PasswordChangedNoticeModal";
 import {
+  LOGIN_BROADCAST_KEY,
   PASSWORD_CHANGED_QUERY_PARAM,
   type PasswordChangedNoticePayload,
+  dispatchLoggedInEvent,
   getActiveAccountEmail,
   getPasswordChangedNoticeToShow,
   markPasswordChangedNoticeSeen,
   primePasswordChangedNoticeForCurrentTab,
+  readLoggedInBroadcastEmail,
   resolveAuthenticatedUser,
 } from "@/lib/session";
 
@@ -64,14 +67,19 @@ export default function GlobalOverlays() {
   }, [mounted, pathname, searchParams]);
 
   useEffect(() => {
-    function handleStorageLogout(e: StorageEvent) {
+    function handleStorageAuth(e: StorageEvent) {
+      if (e.key === LOGIN_BROADCAST_KEY && e.newValue) {
+        dispatchLoggedInEvent(readLoggedInBroadcastEmail(e.newValue));
+        return;
+      }
+
       if (e.key === LOGOUT_BROADCAST_KEY && e.newValue) {
         primePasswordChangedNoticeForCurrentTab();
         window.location.reload();
       }
     }
-    window.addEventListener("storage", handleStorageLogout);
-    return () => window.removeEventListener("storage", handleStorageLogout);
+    window.addEventListener("storage", handleStorageAuth);
+    return () => window.removeEventListener("storage", handleStorageAuth);
   }, []);
 
   useEffect(() => {
