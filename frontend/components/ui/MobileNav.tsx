@@ -31,7 +31,15 @@ type LiquidDragState = {
   currentX: number;
 };
 
+type LiquidGlideState = {
+  active: boolean;
+  fromIndex: number;
+  targetIndex: number;
+  phase: "origin" | "target";
+};
+
 const NAV_DRAG_THRESHOLD = 12;
+const NAV_CLICK_GLIDE_MS = 168;
 
 function createIdleDragState(): LiquidDragState {
   return {
@@ -43,6 +51,15 @@ function createIdleDragState(): LiquidDragState {
   };
 }
 
+function createIdleGlideState(): LiquidGlideState {
+  return {
+    active: false,
+    fromIndex: -1,
+    targetIndex: -1,
+    phase: "origin",
+  };
+}
+
 function isItemActive(pathname: string, match: string) {
   return pathname === match || pathname.startsWith(`${match}/`);
 }
@@ -51,10 +68,57 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function getMetric(
+  metrics: Array<NavMetric | null>,
+  index: number,
+  fallbackMetric: NavMetric
+) {
+  return (index >= 0 ? metrics[index] : null) ?? fallbackMetric;
+}
+
+function buildLiquidBlobStyle({
+  left,
+  top,
+  width,
+  height,
+  distortion,
+  drift,
+}: {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  distortion: number;
+  drift: number;
+}): CSSProperties {
+  const scale = 1.014 + distortion * 0.05;
+  const baseRadius = Math.max(height * 0.48, 18);
+  const topLeft = baseRadius + distortion * 8 + Math.max(-drift, 0) * 4;
+  const topRight = baseRadius + distortion * 8 + Math.max(drift, 0) * 4;
+  const bottomRight = baseRadius + distortion * 5 + Math.max(-drift, 0) * 3;
+  const bottomLeft = baseRadius + distortion * 5 + Math.max(drift, 0) * 3;
+  const verticalTop = Math.max(baseRadius - distortion * 1.5, 16);
+  const verticalBottom = Math.max(baseRadius - distortion * 3.5, 14);
+
+  return {
+    transform: `translate3d(${left}px, ${top}px, 0) scale(${scale.toFixed(3)})`,
+    width: `${width}px`,
+    height: `${height}px`,
+    opacity: 1,
+    borderRadius: `${topLeft.toFixed(1)}px ${topRight.toFixed(1)}px ${bottomRight.toFixed(1)}px ${bottomLeft.toFixed(1)}px / ${verticalTop.toFixed(1)}px ${verticalTop.toFixed(1)}px ${verticalBottom.toFixed(1)}px ${verticalBottom.toFixed(1)}px`,
+    ["--liquid-sheen-x" as string]: `${50 + drift * 18}%`,
+    ["--liquid-distortion" as string]: distortion.toFixed(3),
+    ["--liquid-drift" as string]: drift.toFixed(3),
+    ["--liquid-edge-wave" as string]: `${(0.8 + distortion * 2.4).toFixed(2)}px`,
+    ["--liquid-edge-opacity" as string]: `${(0.055 + distortion * 0.09).toFixed(3)}`,
+  };
+}
+
 function getLiquidBlobStyle(
   metrics: Array<NavMetric | null>,
   activeIndex: number,
-  dragState: LiquidDragState
+  dragState: LiquidDragState,
+  glideState: LiquidGlideState
 ): CSSProperties {
   const fallbackMetric =
     (activeIndex >= 0 ? metrics[activeIndex] : null) ??
@@ -64,57 +128,78 @@ function getLiquidBlobStyle(
     return { opacity: 0 };
   }
 
-  if (!dragState.active) {
-    return {
-      opacity: 0,
-      ["--liquid-sheen-x" as string]: "50%",
-      ["--liquid-distortion" as string]: "0",
-      ["--liquid-drift" as string]: "0",
-    };
+  const measuredMetrics = metrics.filter((metric): metric is NavMetric => metric !== null);
+  if (dragState.active) {
+    const targetMetric = getMetric(metrics, dragState.targetIndex, fallbackMetric);
+    const minLeft = measuredMetrics.length
+      ? Math.min(...measuredMetrics.map((metric) => metric.left))
+      : targetMetric.left;
+    const maxRight = measuredMetrics.length
+      ? Math.max(...measuredMetrics.map((metric) => metric.left + metric.width))
+      : targetMetric.left + targetMetric.width;
+    const pointerCenter = clamp(
+      dragState.currentX,
+      minLeft + targetMetric.width / 2,
+      maxRight - targetMetric.width / 2
+    );
+    const distortion = Math.min(
+      1,
+      Math.abs(dragState.currentX - dragState.startX) /
+        Math.max(targetMetric.width * 0.85, 1)
+    );
+    const drift = clamp(
+      (pointerCenter - targetMetric.center) / Math.max(targetMetric.width * 0.55, 1),
+      -1,
+      1
+    );
+    const width = targetMetric.width;
+    const height = targetMetric.height + 4;
+    const left = clamp(pointerCenter - width / 2, minLeft, maxRight - width);
+    const top = targetMetric.top - 2;
+
+    return buildLiquidBlobStyle({
+      left,
+      top,
+      width,
+      height,
+      distortion,
+      drift,
+    });
   }
 
-  const targetMetric =
-    (dragState.targetIndex >= 0 ? metrics[dragState.targetIndex] : null) ??
-    (dragState.startIndex >= 0 ? metrics[dragState.startIndex] : null) ??
-    fallbackMetric;
-  const measuredMetrics = metrics.filter((metric): metric is NavMetric => metric !== null);
-  const minLeft = measuredMetrics.length
-    ? Math.min(...measuredMetrics.map((metric) => metric.left))
-    : targetMetric.left;
-  const maxRight = measuredMetrics.length
-    ? Math.max(...measuredMetrics.map((metric) => metric.left + metric.width))
-    : targetMetric.left + targetMetric.width;
-  const pointerCenter = clamp(
-    dragState.currentX,
-    minLeft + targetMetric.width / 2,
-    maxRight - targetMetric.width / 2
-  );
-  const distortion = Math.min(
-    1,
-    Math.abs(dragState.currentX - dragState.startX) /
-      Math.max(targetMetric.width * 0.85, 1)
-  );
-  const drift = clamp(
-    (pointerCenter - targetMetric.center) / Math.max(targetMetric.width * 0.55, 1),
-    -1,
-    1
-  );
-  const scale = (1.018 + distortion * 0.04).toFixed(3);
-  const width = targetMetric.width;
-  const height = targetMetric.height + 4;
-  const left = clamp(pointerCenter - width / 2, minLeft, maxRight - width);
-  const top = targetMetric.top - 2;
+  if (glideState.active) {
+    const fromMetric = getMetric(metrics, glideState.fromIndex, fallbackMetric);
+    const targetMetric = getMetric(metrics, glideState.targetIndex, fallbackMetric);
+    const activeMetric = glideState.phase === "target" ? targetMetric : fromMetric;
+    const travel = Math.abs(targetMetric.center - fromMetric.center);
+    const distortion = Math.min(
+      0.62,
+      0.16 + travel / Math.max(fromMetric.width + targetMetric.width, 1) / 5
+    );
+    const drift = clamp(
+      (targetMetric.center - fromMetric.center) / Math.max(activeMetric.width * 1.18, 1),
+      -1,
+      1
+    );
+
+    return buildLiquidBlobStyle({
+      left: activeMetric.left,
+      top: activeMetric.top - 2,
+      width: activeMetric.width,
+      height: activeMetric.height + 4,
+      distortion,
+      drift,
+    });
+  }
 
   return {
-    transform: `translate3d(${left}px, ${top}px, 0) scale(${scale})`,
-    width: `${width}px`,
-    height: `${height}px`,
-    opacity: 1,
-    ["--liquid-sheen-x" as string]: `${50 + drift * 18}%`,
-    ["--liquid-distortion" as string]: distortion.toFixed(3),
-    ["--liquid-drift" as string]: drift.toFixed(3),
+    opacity: 0,
+    ["--liquid-sheen-x" as string]: "50%",
+    ["--liquid-distortion" as string]: "0",
+    ["--liquid-drift" as string]: "0",
+    ["--liquid-edge-wave" as string]: "0px",
+    ["--liquid-edge-opacity" as string]: "0",
   };
-
 }
 
 const navItems = [
@@ -183,16 +268,33 @@ export default function MobileNav() {
   const navRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const suppressClickRef = useRef(false);
+  const clickGlideTimerRef = useRef<number | null>(null);
+  const clickGlideFrameRef = useRef<number | null>(null);
   const dragStateRef = useRef<LiquidDragState>(createIdleDragState());
   const [appMode, setAppMode] = useState(false);
   const [itemMetrics, setItemMetrics] = useState<Array<NavMetric | null>>([]);
   const [dragState, setDragState] = useState<LiquidDragState>(createIdleDragState());
+  const [glideState, setGlideState] = useState<LiquidGlideState>(createIdleGlideState());
 
   const activeIndex = navItems.findIndex((item) => isItemActive(pathname, item.match));
 
   function updateDragState(nextState: LiquidDragState) {
     dragStateRef.current = nextState;
     setDragState(nextState);
+  }
+
+  function clearClickGlide() {
+    if (clickGlideTimerRef.current !== null) {
+      window.clearTimeout(clickGlideTimerRef.current);
+      clickGlideTimerRef.current = null;
+    }
+
+    if (clickGlideFrameRef.current !== null) {
+      window.cancelAnimationFrame(clickGlideFrameRef.current);
+      clickGlideFrameRef.current = null;
+    }
+
+    setGlideState(createIdleGlideState());
   }
 
   function measureItemMetrics() {
@@ -255,6 +357,7 @@ export default function MobileNav() {
         return;
       }
 
+      clearClickGlide();
       suppressClickRef.current = false;
       event.currentTarget.setPointerCapture(event.pointerId);
 
@@ -315,9 +418,39 @@ export default function MobileNav() {
         return;
       }
 
-      if (!isItemActive(pathname, navItems[index].match)) {
-        router.push(href);
+      if (isItemActive(pathname, navItems[index].match)) {
+        return;
       }
+
+      if (!appMode || activeIndex < 0 || !itemMetrics[activeIndex] || !itemMetrics[index]) {
+        router.push(href);
+        return;
+      }
+
+      event.preventDefault();
+      clearClickGlide();
+
+      setGlideState({
+        active: true,
+        fromIndex: activeIndex,
+        targetIndex: index,
+        phase: "origin",
+      });
+
+      clickGlideFrameRef.current = window.requestAnimationFrame(() => {
+        setGlideState({
+          active: true,
+          fromIndex: activeIndex,
+          targetIndex: index,
+          phase: "target",
+        });
+      });
+
+      clickGlideTimerRef.current = window.setTimeout(() => {
+        clickGlideTimerRef.current = null;
+        setGlideState(createIdleGlideState());
+        router.push(href);
+      }, NAV_CLICK_GLIDE_MS);
     };
   }
 
@@ -349,6 +482,18 @@ export default function MobileNav() {
       mediaQueries.forEach((query) => query.removeEventListener("change", syncAppMode));
       window.removeEventListener("appinstalled", syncAppMode);
       window.removeEventListener("focus", syncAppMode);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (clickGlideTimerRef.current !== null) {
+        window.clearTimeout(clickGlideTimerRef.current);
+      }
+
+      if (clickGlideFrameRef.current !== null) {
+        window.cancelAnimationFrame(clickGlideFrameRef.current);
+      }
     };
   }, []);
 
@@ -396,12 +541,17 @@ export default function MobileNav() {
     };
   }, [appMode, pathname]);
 
-  const liquidBlobStyle = getLiquidBlobStyle(itemMetrics, activeIndex, dragState);
+  const liquidBlobStyle = getLiquidBlobStyle(itemMetrics, activeIndex, dragState, glideState);
+  const navInteractionClass = dragState.active
+    ? "mobile-bottom-nav-app-dragging"
+    : glideState.active
+      ? "mobile-bottom-nav-app-gliding"
+      : "";
 
   return (
     <nav
       ref={navRef}
-      className={`mobile-bottom-nav phone-only ${appMode ? "mobile-bottom-nav-app" : ""} ${dragState.active ? "mobile-bottom-nav-app-dragging" : ""}`}
+      className={`mobile-bottom-nav phone-only ${appMode ? "mobile-bottom-nav-app" : ""} ${navInteractionClass}`}
       onPointerMove={appMode ? handleAppNavPointerMove : undefined}
       onPointerUp={appMode ? handleAppNavPointerEnd : undefined}
       onPointerCancel={appMode ? handleAppNavPointerEnd : undefined}
@@ -417,6 +567,7 @@ export default function MobileNav() {
       {navItems.map((item, index) => {
         const active = isItemActive(pathname, item.match);
         const dragTarget = dragState.active && dragState.targetIndex === index;
+        const glideTarget = glideState.active && glideState.targetIndex === index;
 
         if (appMode) {
           return (
@@ -427,7 +578,7 @@ export default function MobileNav() {
               }}
               type="button"
               aria-current={active ? "page" : undefined}
-              className={`mobile-bottom-nav-item ${active ? "mobile-bottom-nav-item-active" : ""} ${dragTarget ? "mobile-bottom-nav-item-drag-target" : ""}`}
+              className={`mobile-bottom-nav-item ${active ? "mobile-bottom-nav-item-active" : ""} ${dragTarget ? "mobile-bottom-nav-item-drag-target" : ""} ${glideTarget ? "mobile-bottom-nav-item-glide-target" : ""}`}
               onClick={handleAppNavClick(index, item.href)}
               onPointerDown={handleAppNavPointerDown(index)}
             >
