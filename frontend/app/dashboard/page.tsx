@@ -206,29 +206,67 @@ export default function DashboardPage() {
       hint: "Persisted across analysis history",
     },
   ];
-  const studioFollowupItems = [
+  const studioMiniCards = [
     {
-      label: "Archive hand-off",
-      value: analyses.length ? `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}` : "First route still pending",
-      note: analyses.length
-        ? "Saved datasets keep the library and archive in sync once the report is worth keeping."
-        : "The archive starts filling in after the first CSV is processed.",
+      key: "archive",
+      label: "Saved runs",
+      value: analyses.length ? `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}` : "Archive waiting",
+      note: analyses.length ? "History keeps the finished reports close." : "The first saved dataset will start the archive lane.",
+      accent: "#4f6ef7",
+      art: (
+        <svg viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="48" cy="18" rx="24" ry="7" fill="none" stroke="#4f6ef7" strokeWidth="1.6" opacity="0.5" />
+          <ellipse cx="48" cy="30" rx="24" ry="7" fill="none" stroke="#4f6ef7" strokeWidth="1.6" opacity="0.72" />
+          <ellipse cx="48" cy="42" rx="24" ry="7" fill="none" stroke="#7ad6ff" strokeWidth="1.6" opacity="0.72" />
+          <line x1="24" y1="18" x2="24" y2="42" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" />
+          <line x1="72" y1="18" x2="72" y2="42" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" />
+        </svg>
+      ),
     },
     {
-      label: "Current focus",
-      value: latest ? (latest.insights.modeling_readiness.is_ready ? "Ready for ML" : "Stay in analysis") : "Upload first",
+      key: "focus",
+      label: "Active lane",
+      value: latest ? (latest.insights.modeling_readiness.is_ready ? "ML lane open" : "Analysis live") : "Upload first",
       note: latest
         ? latest.insights.modeling_readiness.is_ready
-          ? "The current run has cleared the explanation phase and can move into the red lab lane."
-          : "Use Findings, Quality, and Charts before pushing the run into experiments."
-        : "The active route appears after the first saved dataset is available.",
+          ? "The run has cleared the report surface and can move into experiments."
+          : "Keep the run in the report surface until the checks settle."
+        : "The active workspace appears after the first processed CSV.",
+      accent: latest?.insights.modeling_readiness.is_ready ? "#22c55e" : "#f59e0b",
+      art: (
+        <svg viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="14" width="26" height="16" rx="4" fill="none" stroke="#22c55e" strokeWidth="1.6" opacity="0.68" />
+          <rect x="56" y="14" width="26" height="16" rx="4" fill="none" stroke="#f59e0b" strokeWidth="1.6" opacity="0.7" />
+          <rect x="34" y="40" width="28" height="12" rx="4" fill="none" stroke="#f43f5e" strokeWidth="1.6" opacity="0.62" />
+          <path d="M40 22h16" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" />
+          <path d="M29 30l10 10" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" />
+          <path d="M67 30 57 40" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" />
+          <circle cx="27" cy="22" r="3" fill="#22c55e" opacity="0.78" />
+          <circle cx="69" cy="22" r="3" fill="#f59e0b" opacity="0.82" />
+          <circle cx="48" cy="46" r="3" fill="#f43f5e" opacity="0.78" />
+        </svg>
+      ),
     },
     {
+      key: "account",
       label: "Account tools",
-      value: dashUser ? "Profile shortcuts ready" : "Login tools",
-      note: dashUser
-        ? "Profile, cleanup, and remembered-session tools sit outside the reporting lane."
-        : "Once signed in, the account lane keeps the session and cleanup controls close by.",
+      value: dashUser ? "Shortcuts ready" : "Login tools",
+      note: dashUser ? "Profile and cleanup controls stay outside the report lane." : "Sign in to keep session and cleanup controls nearby.",
+      accent: "#a78bfa",
+      art: (
+        <svg viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="48" cy="32" r="12" fill="none" stroke="#a78bfa" strokeWidth="1.8" opacity="0.76" />
+          <circle cx="48" cy="32" r="4.5" fill="#a78bfa" opacity="0.28" />
+          <path d="M48 12v8" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M48 44v8" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M28 32h-8" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M76 32h-8" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="m34 18-5-5" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="m62 46 5 5" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="m62 18 5-5" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d="m34 46-5 5" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      ),
     },
   ];
   const breakdownSidecarTone = latest?.insights.modeling_readiness.is_ready ? "teal" : latest ? "amber" : "purple";
@@ -484,34 +522,25 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="desktop-studio-followup">
-                    <div className="desktop-studio-followup-art" aria-hidden="true">
-                      <svg viewBox="0 0 120 82" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="8" y="10" width="32" height="22" rx="4" fill="none" stroke="#4f6ef7" strokeWidth="1.4" opacity="0.72"/>
-                        <rect x="46" y="10" width="28" height="22" rx="4" fill="none" stroke="#22c55e" strokeWidth="1.4" opacity="0.6"/>
-                        <rect x="80" y="10" width="32" height="22" rx="4" fill="none" stroke="#a78bfa" strokeWidth="1.4" opacity="0.72"/>
-                        <rect x="25" y="48" width="28" height="18" rx="4" fill="none" stroke="#f59e0b" strokeWidth="1.4" opacity="0.58"/>
-                        <rect x="66" y="48" width="28" height="18" rx="4" fill="none" stroke="#f43f5e" strokeWidth="1.4" opacity="0.68"/>
-                        <line x1="40" y1="21" x2="46" y2="21" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
-                        <line x1="74" y1="21" x2="80" y2="21" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
-                        <line x1="31" y1="32" x2="39" y2="48" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
-                        <line x1="89" y1="32" x2="81" y2="48" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
-                        <circle cx="31" cy="21" r="3.5" fill="#4f6ef7" opacity="0.6"/>
-                        <circle cx="60" cy="21" r="3.5" fill="#22c55e" opacity="0.5"/>
-                        <circle cx="96" cy="21" r="3.5" fill="#a78bfa" opacity="0.58"/>
-                        <circle cx="39" cy="57" r="3.5" fill="#f59e0b" opacity="0.52"/>
-                        <circle cx="80" cy="57" r="3.5" fill="#f43f5e" opacity="0.62"/>
-                      </svg>
+                    <div className="desktop-studio-followup-head">
+                      <p className="desktop-studio-followup-kicker">Support cards</p>
+                      <p className="desktop-studio-followup-title">Three compact reads sit under the main route instead of another text block.</p>
                     </div>
-                    <div className="desktop-studio-followup-copy">
-                      <p className="desktop-studio-followup-kicker">Route support</p>
-                      <p className="desktop-studio-followup-title">The supporting lanes sit underneath the main route instead of interrupting it.</p>
-                    </div>
-                    <div className="desktop-studio-followup-grid">
-                      {studioFollowupItems.map((item) => (
-                        <article key={item.label} className="desktop-studio-route-card">
-                          <p className="desktop-studio-route-card-label">{item.label}</p>
-                          <p className="desktop-studio-route-card-value">{item.value}</p>
-                          <p className="desktop-studio-route-card-note">{item.note}</p>
+                    <div className="desktop-studio-mini-grid">
+                      {studioMiniCards.map((item) => (
+                        <article
+                          key={item.key}
+                          className="desktop-studio-mini-card"
+                          style={{ "--studio-card-accent": item.accent } as CSSProperties}
+                        >
+                          <div className="desktop-studio-mini-art" aria-hidden="true">
+                            {item.art}
+                          </div>
+                          <div className="desktop-studio-mini-copy-block">
+                            <p className="desktop-studio-mini-kicker">{item.label}</p>
+                            <p className="desktop-studio-mini-title">{item.value}</p>
+                            <p className="desktop-studio-mini-copy">{item.note}</p>
+                          </div>
                         </article>
                       ))}
                     </div>
@@ -561,24 +590,6 @@ export default function DashboardPage() {
                         </p>
                       </div>
                     </article>
-                  </div>
-                  <div className="analysis-breakdown-footer">
-                    <div className="analysis-breakdown-note">
-                      <p className="analysis-breakdown-note-title">One report spine, five coloured reading lanes.</p>
-                      <p className="analysis-breakdown-note-copy">Summary stays blue, quality stays green, schema keeps the violet structure pass, charts stay amber, and ML ends in the red lab surface.</p>
-                    </div>
-                    <div className="analysis-breakdown-legend">
-                      {analysisVisualCards.map((card) => (
-                        <div
-                          key={`analysis-breakdown-${card.key}`}
-                          className="analysis-breakdown-legend-item"
-                          style={{ "--analysis-card-accent": card.accent } as CSSProperties}
-                        >
-                          <span className="analysis-breakdown-legend-swatch" />
-                          <span>{card.label}</span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </section>
               </div>
