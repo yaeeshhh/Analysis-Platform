@@ -70,7 +70,10 @@ export default function BatchPage() {
       setLoading(true);
       setError("");
 
-      const user = await resolveAuthenticatedUser();
+      const [user, prefetchedItems] = await Promise.all([
+        resolveAuthenticatedUser(),
+        getAnalyses().catch(() => null as AnalysisListItem[] | null),
+      ]);
       if (!active) return;
 
       if (!user) {
@@ -84,7 +87,7 @@ export default function BatchPage() {
       setLoginRequired(false);
 
       try {
-        const items = await getAnalyses();
+        const items = prefetchedItems ?? await getAnalyses();
         if (!active) return;
 
         setAnalyses(items);

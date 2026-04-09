@@ -523,10 +523,8 @@ body::after {
     flex: 0 0 auto;
     height: 2.85rem;
     justify-content: center;
-    margin: 0 auto;
     min-height: 2.85rem;
     padding: 0.75rem 0;
-    width: 3.35rem;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-links-scroll-collapsed {
@@ -551,9 +549,8 @@ body::after {
   .desktop-sidebar[data-collapsed="true"] .nav-link-collapsed {
     flex: 0 0 auto;
     height: 2.85rem;
-    margin: 0 auto;
     min-height: 2.85rem;
-    width: 3.35rem;
+    width: 100%;
   }
 
   .desktop-sidebar[data-collapsed="true"] .nav-link:hover,

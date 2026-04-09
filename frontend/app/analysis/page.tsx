@@ -124,7 +124,10 @@ function AnalysisPageContent() {
 
       const queryAnalysisId = parseAnalysisId(requestedAnalysisId);
 
-      const user = await resolveAuthenticatedUser();
+      const [user, prefetchedItems] = await Promise.all([
+        resolveAuthenticatedUser(),
+        getAnalyses().catch(() => null as AnalysisListItem[] | null),
+      ]);
       if (!active) return;
 
       if (!user) {
@@ -140,7 +143,7 @@ function AnalysisPageContent() {
 
       try {
         setError("");
-        const items = await getAnalyses();
+        const items = prefetchedItems ?? await getAnalyses();
         if (!active) return;
         setAnalyses(items);
 

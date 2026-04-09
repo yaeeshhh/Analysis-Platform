@@ -173,7 +173,7 @@ function GuideScroller({ items }: { items: GuideScrollerItem[] }) {
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = scrollRef.current;
-    if (!el || e.button !== 0) return;
+    if (!el || e.button !== 0 || e.pointerType === "touch") return;
     dragging.current = true;
     startX.current = e.clientX;
     scrollStart.current = el.scrollLeft;
@@ -1077,10 +1077,10 @@ export default function MLTab({
                       type="button"
                       key={recommendation.column}
                       onClick={() => setTargetColumn(recommendation.column)}
-                      className={`border-b border-white/6 pb-3 text-left transition ${
+                      className={`rounded-2xl border p-4 text-left transition ${
                         targetColumn === recommendation.column
-                          ? "border-[#ffb079]/45 bg-[#ffb079]/10"
-                          : "border-white/10 bg-black/10 hover:bg-white/[0.06]"
+                          ? "border-[#ffb079]/55 bg-[#ffb079]/10 ring-1 ring-[#ffb079]/30 shadow-[0_0_18px_rgba(255,176,121,0.12)]"
+                          : "border-white/10 bg-black/10 hover:border-white/16 hover:bg-white/[0.06]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
