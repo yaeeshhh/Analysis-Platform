@@ -5,6 +5,7 @@ import {
   getSkewedFields,
   getStrongestCorrelations,
 } from "@/lib/analysisDerived";
+import { useDesktopAccordionsExpanded } from "@/lib/useDesktopAccordionsExpanded";
 
 type RelationshipsTabProps = {
   schema: AnalysisSchema;
@@ -18,11 +19,12 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
   const dominantCategories = getDominantCategories(statistics);
 
   const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
+  const accordionOpen = useDesktopAccordionsExpanded() || mobileSection !== undefined;
 
   return (
     <section className="analysis-tab-surface grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
       {show("strongest-relationships") ? (
-      <details className="mobile-accordion" open={!!mobileSection}>
+      <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Strongest relationships</span>
@@ -65,7 +67,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
 
       <div className="space-y-4">
         {show("skewed-numeric-fields") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Skewed numeric fields</span>
@@ -100,7 +102,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
         ) : null}
 
         {show("dominant-categories") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Dominant categories</span>
@@ -134,7 +136,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
         ) : null}
 
         {show("modeling-signals") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Modeling signals</span>

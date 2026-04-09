@@ -1,5 +1,6 @@
 import { AnalysisInsights, AnalysisOverview, AnalysisQuality, AnalysisSchema } from "@/lib/analysisTypes";
 import { getDatasetPosture, getTypeMix } from "@/lib/analysisDerived";
+import { useDesktopAccordionsExpanded } from "@/lib/useDesktopAccordionsExpanded";
 
 type OverviewTabProps = {
   overview: AnalysisOverview;
@@ -33,13 +34,14 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
   const posture = getDatasetPosture(overview, schema, quality, insights);
 
   const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
+  const accordionOpen = useDesktopAccordionsExpanded() || mobileSection !== undefined;
 
   return (
     <section className="analysis-tab-surface space-y-4">
       {show("what-the-data-says") || show("dataset-posture") ? (
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
         {show("what-the-data-says") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
@@ -70,7 +72,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
         ) : null}
 
         {show("dataset-posture") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</span>
@@ -114,7 +116,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
       {show("type-mix") || show("reading-order") ? (
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
         {show("type-mix") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</span>
@@ -148,7 +150,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
         ) : null}
 
         {show("reading-order") ? (
-        <details className="mobile-accordion" open={!!mobileSection}>
+        <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Reading order</span>
@@ -191,7 +193,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
       ) : null}
 
       {show("raw-data") ? (
-      <details className="mobile-accordion" open={!!mobileSection}>
+  <details className="mobile-accordion" open={accordionOpen ? true : undefined}>
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Raw data</span>
