@@ -66,39 +66,55 @@ function getLiquidBlobStyle(
 
   if (!dragState.active) {
     return {
-      transform: `translate3d(${fallbackMetric.left}px, ${fallbackMetric.top}px, 0)`,
-      width: `${fallbackMetric.width}px`,
-      height: `${fallbackMetric.height}px`,
-      opacity: 1,
+      opacity: 0,
       ["--liquid-sheen-x" as string]: "50%",
-      ["--liquid-stretch" as string]: "0",
+      ["--liquid-distortion" as string]: "0",
+      ["--liquid-drift" as string]: "0",
     };
   }
 
-  const startMetric = metrics[dragState.startIndex] ?? fallbackMetric;
-  const centers = metrics
-    .filter((metric): metric is NavMetric => metric !== null)
-    .map((metric) => metric.center);
-  const minCenter = centers.length ? Math.min(...centers) : startMetric.center;
-  const maxCenter = centers.length ? Math.max(...centers) : startMetric.center;
-  const pointerCenter = clamp(dragState.currentX, minCenter, maxCenter);
-  const left = Math.min(startMetric.center, pointerCenter) - startMetric.width / 2;
-  const right = Math.max(startMetric.center, pointerCenter) + startMetric.width / 2;
-  const width = right - left;
-  const stretch = Math.min(
-    1,
-    Math.abs(pointerCenter - startMetric.center) / Math.max(startMetric.width * 1.2, 1)
+  const targetMetric =
+    (dragState.targetIndex >= 0 ? metrics[dragState.targetIndex] : null) ??
+    (dragState.startIndex >= 0 ? metrics[dragState.startIndex] : null) ??
+    fallbackMetric;
+  const measuredMetrics = metrics.filter((metric): metric is NavMetric => metric !== null);
+  const minLeft = measuredMetrics.length
+    ? Math.min(...measuredMetrics.map((metric) => metric.left))
+    : targetMetric.left;
+  const maxRight = measuredMetrics.length
+    ? Math.max(...measuredMetrics.map((metric) => metric.left + metric.width))
+    : targetMetric.left + targetMetric.width;
+  const pointerCenter = clamp(
+    dragState.currentX,
+    minLeft + targetMetric.width / 2,
+    maxRight - targetMetric.width / 2
   );
-  const sheenPosition = width > 0 ? ((pointerCenter - left) / width) * 100 : 50;
+  const distortion = Math.min(
+    1,
+    Math.abs(dragState.currentX - dragState.startX) /
+      Math.max(targetMetric.width * 0.85, 1)
+  );
+  const drift = clamp(
+    (pointerCenter - targetMetric.center) / Math.max(targetMetric.width * 0.55, 1),
+    -1,
+    1
+  );
+  const scale = (1.018 + distortion * 0.04).toFixed(3);
+  const width = targetMetric.width;
+  const height = targetMetric.height + 4;
+  const left = clamp(pointerCenter - width / 2, minLeft, maxRight - width);
+  const top = targetMetric.top - 2;
 
   return {
-    transform: `translate3d(${left}px, ${startMetric.top}px, 0)`,
+    transform: `translate3d(${left}px, ${top}px, 0) scale(${scale})`,
     width: `${width}px`,
-    height: `${startMetric.height}px`,
+    height: `${height}px`,
     opacity: 1,
-    ["--liquid-sheen-x" as string]: `${sheenPosition}%`,
-    ["--liquid-stretch" as string]: stretch.toFixed(3),
+    ["--liquid-sheen-x" as string]: `${50 + drift * 18}%`,
+    ["--liquid-distortion" as string]: distortion.toFixed(3),
+    ["--liquid-drift" as string]: drift.toFixed(3),
   };
+
 }
 
 const navItems = [
