@@ -17,6 +17,41 @@ export function useSwipeTabs({
 }: UseSwipeTabsOptions) {
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const deltaRef = useRef({ x: 0, y: 0 });
+  const blockedRef = useRef(false);
+
+  function shouldIgnoreSwipe(target: EventTarget | null, boundary: HTMLElement) {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+
+    let current: Element | null = target;
+
+    while (current) {
+      if (current instanceof HTMLElement) {
+        if (current.dataset.swipeIgnore === "true") {
+          return true;
+        }
+
+        const style = window.getComputedStyle(current);
+        const overflowX = style.overflowX;
+        const canScrollHorizontally =
+          (overflowX === "auto" || overflowX === "scroll") &&
+          current.scrollWidth > current.clientWidth + 6;
+
+        if (canScrollHorizontally) {
+          return true;
+        }
+      }
+
+      if (current === boundary) {
+        break;
+      }
+
+      current = current.parentElement;
+    }
+
+    return false;
+  }
 
   function resetGesture() {
     startRef.current = null;
@@ -26,6 +61,12 @@ export function useSwipeTabs({
   const onTouchStart: TouchEventHandler<HTMLElement> = (event) => {
     if (disabled || length < 2) return;
 
+    blockedRef.current = shouldIgnoreSwipe(event.target, event.currentTarget);
+    if (blockedRef.current) {
+      resetGesture();
+      return;
+    }
+
     const touch = event.touches[0];
     if (!touch) return;
 
@@ -34,6 +75,7 @@ export function useSwipeTabs({
   };
 
   const onTouchMove: TouchEventHandler<HTMLElement> = (event) => {
+    if (blockedRef.current) return;
     if (!startRef.current) return;
 
     const touch = event.touches[0];
@@ -46,6 +88,12 @@ export function useSwipeTabs({
   };
 
   const onTouchEnd: TouchEventHandler<HTMLElement> = () => {
+    if (blockedRef.current) {
+      blockedRef.current = false;
+      resetGesture();
+      return;
+    }
+
     if (!startRef.current) return;
 
     const { x, y } = deltaRef.current;
@@ -63,6 +111,7 @@ export function useSwipeTabs({
   };
 
   const onTouchCancel: TouchEventHandler<HTMLElement> = () => {
+    blockedRef.current = false;
     resetGesture();
   };
 

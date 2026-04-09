@@ -282,7 +282,7 @@ export default function AnalysisResultPopup({
 
   return (
     <div
-      className="fixed inset-0 z-[135] bg-[#04090d]/82 backdrop-blur-md history-popup-overlay"
+      className="fixed inset-0 z-[135] history-popup-overlay"
       onMouseDown={onClose}
     >
       <div
