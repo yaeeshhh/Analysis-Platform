@@ -70,7 +70,10 @@ export default function HistoryPage() {
       setLoading(true);
       setError("");
 
-      const user = await resolveAuthenticatedUser();
+      const [user, prefetchedAnalyses] = await Promise.all([
+        resolveAuthenticatedUser(),
+        getAnalyses().catch(() => null as AnalysisListItem[] | null),
+      ]);
       if (!active) return;
       if (!user) {
         setAnalyses([]);
@@ -82,7 +85,7 @@ export default function HistoryPage() {
       setLoginRequired(false);
 
       try {
-        setAnalyses(await getAnalyses());
+        setAnalyses(prefetchedAnalyses ?? await getAnalyses());
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to load history.");
       } finally {

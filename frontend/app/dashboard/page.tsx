@@ -113,7 +113,10 @@ export default function DashboardPage() {
       setLoading(true);
       setError("");
 
-      const user = await resolveAuthenticatedUser();
+      const [user, prefetchedAnalyses] = await Promise.all([
+        resolveAuthenticatedUser(),
+        getAnalyses().catch(() => null as AnalysisListItem[] | null),
+      ]);
       if (!active) return;
       if (!user) {
         setDashUser(null);
@@ -127,7 +130,10 @@ export default function DashboardPage() {
       setLoginRequired(false);
 
       try {
-        await refreshAnalyses();
+        setAnalyses(prefetchedAnalyses ?? await getAnalyses());
+      } catch (err: unknown) {
+        if (!active) return;
+        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
       } finally {
         if (active) setLoading(false);
       }
