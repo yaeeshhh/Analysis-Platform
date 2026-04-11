@@ -348,7 +348,7 @@ export default function BatchPage() {
                       Drop your dataset here
                     </h2>
                     <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-white/45">
-                      Choose a CSV to create a saved run, inspect the first quality signals, and route the dataset directly into Analysis.
+                      Choose a CSV to create a saved run, preview your data quality, and open it in Analysis.
                     </p>
                     <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                       <span className="desktop-badge" data-tone="teal">
@@ -572,7 +572,7 @@ export default function BatchPage() {
                             data-tone={selectedAnalysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}
                           >
                             <span className="desktop-status-dot" />
-                            {selectedAnalysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                            {selectedAnalysis.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
                           </span>
                           <span className="desktop-badge" data-tone="purple">
                             {selectedAnalysis.overview.column_count} columns
@@ -735,7 +735,7 @@ function BatchMobileSections({
         </svg>
         <div className="mobile-screen-panel-header">
           <div>
-            <p className="mobile-screen-kicker">Dataset intake</p>
+            <p className="mobile-screen-kicker">Uploads</p>
             <h2 className="mobile-screen-title">Upload a dataset</h2>
             <p className="mobile-screen-lead">Choose a CSV, create a saved run, then open it in Analysis.</p>
           </div>
@@ -814,7 +814,7 @@ function BatchMobileSections({
                 {selectedAnalysis.overview.column_count} columns
               </span>
               <span className="mobile-screen-pill" data-tone={selectedAnalysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                {selectedAnalysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                {selectedAnalysis.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
               </span>
             </div>
             <div className="mobile-screen-progress-list">
@@ -894,7 +894,7 @@ function BatchMobileSections({
                       </p>
                     </div>
                     <span className="mobile-batch-card-badge" data-tone={selected ? "purple" : analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                      {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                      {selected ? "Active" : analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
                     </span>
                   </div>
                   <div className="mobile-batch-card-actions-block">

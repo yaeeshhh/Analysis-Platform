@@ -57,7 +57,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
             ))}
             {correlations.length === 0 ? (
               <div className="py-5 text-sm text-white/48">
-                Not enough numeric fields are available to surface strong correlation signals.
+                Not enough numeric columns to show correlations.
               </div>
             ) : null}
           </div>

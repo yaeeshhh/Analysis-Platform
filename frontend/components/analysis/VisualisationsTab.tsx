@@ -313,7 +313,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
               </p>
             </div>
           ))}
-          {boxplots.length === 0 ? <p className="text-sm text-white/50">No boxplot-ready numeric fields detected.</p> : null}
+          {boxplots.length === 0 ? <p className="text-sm text-white/50">No numeric columns available for a boxplot.</p> : null}
         </div>
         </div>
       </details>

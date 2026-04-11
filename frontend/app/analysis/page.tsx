@@ -345,7 +345,7 @@ function AnalysisPageContent() {
                   <div className="flex flex-wrap gap-2 xl:justify-end">
                     <span className="desktop-badge" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
                       <span className="desktop-status-dot" />
-                      {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                      {report.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
                     </span>
                     <span className="desktop-badge" data-tone="purple">Active dataset</span>
                     {report.schema.target_candidates.length > 0 ? (
@@ -672,7 +672,7 @@ const mobileAnalysisCards: MobileCard[] = [
   {
     key: "schema",
     label: "Schema",
-    description: "Column inventory, correlations, skew, dominance, and modeling signals.",
+    description: "Column types, relationships, and prediction targets.",
     icon: "🗂️",
     defaultTab: "schema",
     subtabs: [
@@ -1008,7 +1008,7 @@ function AnalysisMobileSections({
               <span className="mobile-analysis-hero-chip">{report.overview.column_count} cols</span>
               <span className="mobile-analysis-hero-chip">{qualityScore.toFixed(0)}% quality</span>
               <span className="mobile-analysis-hero-chip" data-tone={report.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                {report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                {report.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
               </span>
             </div>
           </div>

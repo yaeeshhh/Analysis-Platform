@@ -38,7 +38,7 @@ const sections = [
   { id: "statistics", label: "Statistics", note: "Numeric and categorical summaries" },
   { id: "relationships", label: "Patterns", note: "Correlations, skew, and targets" },
   { id: "visualisations", label: "Charts", note: "Distribution, heatmap, and drift views" },
-  { id: "ml", label: "ML Lab", note: "Saved experiments and benchmark outputs" },
+  { id: "ml", label: "ML Lab", note: "Saved experiments and results" },
 ] as const;
 
 type PopupSectionId = (typeof sections)[number]["id"];
@@ -91,7 +91,7 @@ const popupCards: PopupCard[] = [
   {
     key: "schema",
     label: "Schema",
-    description: "Column inventory, correlations, skew, dominance, and modeling signals.",
+    description: "Column types, relationships, and prediction targets.",
     icon: "🗂️",
     defaultTab: "schema",
     subtabs: [
@@ -116,7 +116,7 @@ const popupCards: PopupCard[] = [
   {
     key: "ml",
     label: "ML Lab",
-    description: "Saved experiments and benchmark outputs.",
+    description: "Saved experiments and results.",
     icon: "🧪",
     defaultTab: "ml",
   },
@@ -244,7 +244,7 @@ export default function AnalysisResultPopup({
         );
       case "relationships":
         return (
-          <SectionFrame id="relationships" title="Relationships" note="Correlation signals, skew, and modeling cues." accent="#f59e0b">
+          <SectionFrame id="relationships" title="Relationships" note="Correlations, distributions, and prediction clues." accent="#f59e0b">
             <RelationshipsTab schema={report.schema} statistics={report.statistics} />
           </SectionFrame>
         );
@@ -256,7 +256,7 @@ export default function AnalysisResultPopup({
         );
       case "ml":
         return (
-          <SectionFrame id="ml" title="ML Lab" note="Saved benchmarks, downloads, and experiment details." accent="#f43f5e">
+          <SectionFrame id="ml" title="ML Lab" note="Saved results, downloads, and experiment details." accent="#f43f5e">
             <MLTab
               key={`${report.analysis_id}:${report.ml_experiments.map((experiment) => experiment.id).join("|")}`}
               analysisId={report.analysis_id}
@@ -339,7 +339,7 @@ export default function AnalysisResultPopup({
                 </div>
                 <div className="history-popup-stat-card">
                   <p className="history-popup-stat-label">Readiness</p>
-                  <p className="history-popup-stat-value">{report.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}</p>
+                  <p className="history-popup-stat-value">{report.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}</p>
                 </div>
                 <div className="history-popup-stat-card">
                   <p className="history-popup-stat-label">ML runs</p>
@@ -394,7 +394,7 @@ export default function AnalysisResultPopup({
           {!loading && !error && report && ready ? (
             <section className="history-popup-visual-strip tablet-up">
               <div className="history-popup-visual-strip-head">
-                <p className="history-popup-select-label">Report map</p>
+                <p className="history-popup-select-label">Jump to section</p>
                 <p className="history-popup-section-note">Jump to any section of this saved report.</p>
               </div>
               <div className="analysis-visual-grid" data-layout="workspace">

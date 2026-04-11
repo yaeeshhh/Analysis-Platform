@@ -62,7 +62,7 @@ export default function InsightsTab({ insights, mobileSection }: InsightsTabProp
               ))}
               <div className="analysis-accordion-summary-chip-list">
                 <span className="analysis-accordion-summary-chip">
-                  {insights.modeling_readiness.is_ready ? "Ready for ML" : "EDA-first"}
+                  {insights.modeling_readiness.is_ready ? "Ready for ML" : "Review first"}
                 </span>
                 {insights.modeling_readiness.target_candidates[0] ? (
                   <span className="analysis-accordion-summary-chip">
@@ -84,7 +84,7 @@ export default function InsightsTab({ insights, mobileSection }: InsightsTabProp
           <div className="mt-5 border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.2em] text-white/45">Modeling readiness</p>
             <p className="mt-2 text-lg font-semibold text-white">
-              {insights.modeling_readiness.is_ready ? "Ready for optional ML" : "EDA-first recommended"}
+              {insights.modeling_readiness.is_ready ? "Ready for optional ML" : "Review recommended"}
             </p>
             <p className="mt-2 text-sm text-white/58">
               Target candidates: {insights.modeling_readiness.target_candidates.join(", ") || "none inferred"}

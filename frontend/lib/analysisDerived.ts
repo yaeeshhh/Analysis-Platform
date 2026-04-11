@@ -281,24 +281,24 @@ export function getVisualGuides(visualisations: AnalysisVisualisations) {
           description: `${story.missingColumns.length} plotted column${story.missingColumns.length === 1 ? "" : "s"} show missingness, led by ${topMissingColumn.column} with ${topMissingColumn.missing_count.toLocaleString()} empty cells (${formatPercent(topMissingColumn.missing_pct)}).${lightestMissingColumn && lightestMissingColumn.column !== topMissingColumn.column ? ` ${lightestMissingColumn.column} is the lightest plotted column at ${formatPercent(lightestMissingColumn.missing_pct)}.` : ""}`,
           reason:
             topMissingColumn.missing_pct >= 20
-              ? `${topMissingColumn.column} is missing often enough to change row usability, so it should be cleaned before trusting comparisons or downstream modeling.`
-              : `Missingness is visible but still localized, so cleanup can stay focused on ${topMissingColumn.column} instead of treating the whole dataset as incomplete.`,
+              ? `${topMissingColumn.column} is missing often enough to change row usability, so it should be cleaned before trusting comparisons or modeling.`
+              : `Missingness is visible but still localized, so cleanup only needs to focus on ${topMissingColumn.column} rather than the whole dataset.`,
         }
       : {
-          description: "The saved run did not surface any columns with missingness strong enough to render a missing-value chart.",
-          reason: "That usually means completeness is not the main source of risk in this dataset, so the next review should focus on spread, correlation, or outlier pressure instead.",
+          description: "No columns had enough missing values to show a chart.",
+          reason: "That usually means missing data isn't the main concern — focus on distributions, relationships, or outliers instead.",
         },
     histogram: densestBin && story.histogram && firstHistogramBin && lastHistogramBin
       ? {
           description: `${story.histogram.column} spans ${formatChartNumber(firstHistogramBin.start)} to ${formatChartNumber(lastHistogramBin.end)} across ${story.histogram.bins.length} buckets, with the busiest bucket holding ${densestBin.count.toLocaleString()} rows between ${formatChartNumber(densestBin.start)} and ${formatChartNumber(densestBin.end)}.`,
           reason:
             histogramTotal > 0 && densestBin.count / histogramTotal >= 0.3
-              ? `A large share of rows sit in one narrow band, so values outside that range will stand out quickly in comparisons and model inputs.`
-              : `The counts are spread across multiple buckets, which means this field varies materially across the dataset instead of clustering around one narrow band.`,
+              ? `A large share of rows sit in one narrow band, so values outside that range will stand out in comparisons.`
+              : `The counts are spread across multiple buckets, which means this field shows meaningful variation across the dataset.`,
         }
       : {
-          description: "This run did not produce a numeric histogram because no suitable numeric field was selected for that view.",
-          reason: "Without a histogram-ready numeric field, distribution shape is better inferred from summary statistics and boxplot spread than from a bucketed chart.",
+          description: "No numeric column was available to chart a histogram.",
+          reason: "Without a suitable numeric column, check the summary statistics and boxplot for distribution details.",
         },
     category: dominantCategory && story.category
       ? {
@@ -310,43 +310,43 @@ export function getVisualGuides(visualisations: AnalysisVisualisations) {
         }
       : {
           description: "No categorical distribution chart was generated for this run.",
-          reason: "That usually means the saved dataset did not expose a categorical field with enough structure to make a top-category chart useful.",
+          reason: "That usually means the dataset didn't have a categorical column with enough distinct values for a chart.",
         },
     boxplots: mostOutlierHeavy
       ? {
           description: `${mostOutlierHeavy.column} carries the most outliers at ${mostOutlierHeavy.outlier_count.toLocaleString()} points.${widestBoxplot ? ` ${widestBoxplot.column} also spans the widest visible range, from ${formatChartNumber(widestBoxplot.min)} to ${formatChartNumber(widestBoxplot.max)}.` : ""}`,
           reason:
             mostOutlierHeavy.outlier_count >= 20
-              ? `That amount of outlier pressure can pull averages and model weights away from the typical case, so robust scaling or closer row review is worth considering.`
-              : `Outliers are present but still relatively contained, so this chart mainly helps confirm which fields deserve closer spread checks before modeling.`,
+              ? `This many outliers can shift averages significantly — consider reviewing these rows or adjusting the data before modeling.`
+              : `Outliers are present but still relatively contained, so this chart highlights which columns to review before modeling.`,
         }
       : {
-          description: "No boxplot-ready numeric summaries were available in the saved visual set.",
-          reason: "Without boxplot summaries, numeric stability has to be inferred from the statistics and histogram views instead.",
+          description: "No numeric columns had enough data for a boxplot.",
+          reason: "Check the statistics and histogram sections for numeric detail instead.",
         },
     correlationHeatmap: strongestPositive || strongestNegative
       ? {
           description: `The heatmap compares ${heatmapColumns.length} numeric field${heatmapColumns.length === 1 ? "" : "s"}.${strongestPositive ? ` The strongest positive pair is ${strongestPositive.x} vs ${strongestPositive.y} at ${strongestPositive.value.toFixed(2)}.` : ""}${strongestNegative ? ` The strongest inverse pair is ${strongestNegative.x} vs ${strongestNegative.y} at ${strongestNegative.value.toFixed(2)}.` : ""}`,
           reason:
             Math.max(Math.abs(strongestPositive?.value || 0), Math.abs(strongestNegative?.value || 0)) >= 0.9
-              ? `At least one relationship is strong enough to suggest redundant signal, which is useful for explanation but can create duplicated weight in downstream models.`
-              : `The visible relationships are informative without being near-duplicates, so they help explain structure without automatically implying feature redundancy.`,
+              ? `At least one pair of columns is so closely related that it may add overlapping information to a model.`
+              : `The visible relationships are informative without being near-duplicates, so they reveal patterns without suggesting overlapping columns.`,
         }
       : {
           description: "Not enough numeric structure was available to generate a correlation heatmap.",
-          reason: "Correlation needs multiple numeric fields, so this dataset should be read through schema and categorical structure instead of pairwise numeric movement.",
+          reason: "This dataset doesn't have enough numeric columns for a correlation chart — review column types and categories instead.",
         },
     pairwiseScatter: strongestScatter
       ? {
           description: `${strongestScatter.x} vs ${strongestScatter.y} is the clearest scatter view, using ${strongestScatter.points.length.toLocaleString()} plotted rows with correlation ${strongestScatter.correlation.toFixed(3)}.`,
           reason:
             Math.abs(strongestScatter.correlation) >= 0.85
-              ? `That relationship is strong enough that the scatter plot can validate whether the signal is genuinely linear or mostly driven by a small number of edge cases.`
-              : `The relationship is present but not rigid, so the scatter plot is useful for spotting clusters, bends, and exceptions that a single correlation value would hide.`,
+              ? `That relationship is strong enough that the scatter plot can show whether the pattern is consistent or driven by a few unusual points.`
+              : `The relationship is present but not rigid, so the scatter plot is useful for spotting groupings and exceptions that a single number would miss.`,
         }
       : {
           description: "No pairwise scatter chart was available because the run did not find a usable numeric pair to plot.",
-          reason: "Without a strong numeric pair, scatter-based interpretation gives way to summaries, correlations, and category splits instead.",
+          reason: "Without a clear numeric pair, focus on the summaries, relationships, and category breakdowns instead.",
         },
     driftChecks: strongestDrift
       ? {
@@ -356,12 +356,12 @@ export function getVisualGuides(visualisations: AnalysisVisualisations) {
               : `${strongestDrift.column} shows the clearest ordered category change, shifting from ${strongestDrift.baseline_top} in ${strongestDrift.baseline_label} to ${strongestDrift.recent_top} in ${strongestDrift.recent_label}.`,
           reason:
             strongestDrift.change_score >= 0.25
-              ? `The earlier and later slices diverge enough to justify checking whether the file mixes different operating periods, segments, or collection regimes.`
-              : `The shift is noticeable but not extreme, so it is better treated as context for interpretation than as proof of a major regime change.`,
+              ? `The earlier and later slices diverge enough to warrant checking whether the file combines data from different time periods or sources.`
+              : `The shift is noticeable but not extreme, so it's worth noting for context but not strong enough to indicate a major change in the data.`,
         }
       : {
-          description: "The saved run did not produce a drift comparison between earlier and later slices of the dataset.",
-          reason: "That usually means the dataset was too short or too stable across its ordering for a meaningful drift check to stand out.",
+          description: "No time-based comparison was available for this dataset.",
+          reason: "That usually means the dataset is too small or too consistent for a meaningful comparison.",
         },
   };
 }
@@ -388,7 +388,7 @@ export function getUnsupervisedNarratives(result?: UnsupervisedResult) {
     return {
       summary: "Run an unsupervised scan to describe cluster balance, anomalies, and PCA coverage.",
       clusterChart: "Cluster distribution will be explained here once a scan is available.",
-      anomalies: "Top anomaly candidates will be described here once a scan is available.",
+      anomalies: "The most unusual rows will be described here after a scan.",
     };
   }
 
@@ -397,23 +397,23 @@ export function getUnsupervisedNarratives(result?: UnsupervisedResult) {
   const retainedVariance = result.pca_explained_variance.reduce((sum, value) => sum + value, 0) * 100;
 
   return {
-    summary: `${result.cluster_count} clusters were created from ${result.used_numeric_columns.length} numeric fields, and the first PCA projection retains ${retainedVariance.toFixed(1)}% of the visible variance.` ,
+    summary: `${result.cluster_count} clusters were created from ${result.used_numeric_columns.length} numeric columns, and the overview projection captures ${retainedVariance.toFixed(1)}% of the data's variation.` ,
     clusterChart: largestCluster
-      ? `Cluster ${largestCluster.cluster} is the largest segment with ${largestCluster.count.toLocaleString()} rows, so it represents the dominant behavior in the current scan.`
-      : "Cluster balance will appear here once a scan returns results.",
+      ? `Cluster ${largestCluster.cluster} is the largest group with ${largestCluster.count.toLocaleString()} rows — it's the most common pattern in this scan.`
+      : "Group sizes will appear here after a scan.",
     anomalies: topAnomaly
-      ? `Row ${topAnomaly.row} is the strongest anomaly candidate in the preview with score ${topAnomaly.anomaly_score.toFixed(4)}.`
-      : "Anomaly commentary will appear here once a scan returns results.",
+      ? `Row ${topAnomaly.row} is the most unusual row found, with a score of ${topAnomaly.anomaly_score.toFixed(4)}.`
+      : "Details about unusual rows will appear here after a scan.",
   };
 }
 
 export function getSupervisedNarratives(result?: SupervisedResult) {
   if (!result) {
     return {
-      summary: "Run a supervised benchmark to compare candidate models, surface the strongest drivers, and inspect held-out predictions.",
-      comparison: "Model comparison commentary will appear here once a benchmark completes.",
-      featureChart: "Feature-importance commentary will appear here once a benchmark completes.",
-      predictions: "Prediction preview commentary will appear here once a benchmark completes.",
+      summary: "Run a supervised experiment to compare models, find the most important columns, and preview predictions.",
+      comparison: "Model comparison details will appear here after an experiment.",
+      featureChart: "Column importance details will appear here after an experiment.",
+      predictions: "Prediction samples will appear here after an experiment.",
     };
   }
 
@@ -429,15 +429,15 @@ export function getSupervisedNarratives(result?: SupervisedResult) {
     : null;
 
   return {
-    summary: `${result.best_model} is the strongest current ${result.task_type} baseline using ${result.diagnostics.rows_used.toLocaleString()} sampled rows and ${result.diagnostics.numeric_features + result.diagnostics.categorical_features} engineered feature slots.` ,
+    summary: `${result.best_model} is the top-performing ${result.task_type} model using ${result.diagnostics.rows_used.toLocaleString()} rows and ${result.diagnostics.numeric_features + result.diagnostics.categorical_features} input columns.` ,
     comparison: primaryMetric && bestComparison
       ? `${bestComparison.model} leads this run with ${primaryMetric[0]} at ${primaryMetric[1].toFixed(3)}.`
-      : "Benchmark commentary will appear here once model scores are available.",
+      : "Model comparison will appear here once scores are available.",
     featureChart: topFeature
-      ? `${topFeature.feature} is the strongest visible driver in this run with importance ${topFeature.importance.toFixed(3)}.`
-      : "Feature-importance commentary will appear here once the benchmark exposes ranked drivers.",
+      ? `${topFeature.feature} is the most important column in this run with importance ${topFeature.importance.toFixed(3)}.`
+      : "Column importance will appear here after the experiment finishes.",
     predictions: previewCount > 0
-      ? `${exactMatches} of the ${previewCount} preview rows match the held-out actual value exactly in this sample view.`
-      : "Prediction preview commentary will appear here once the benchmark stores a held-out sample.",
+      ? `${exactMatches} of the ${previewCount} preview rows match the actual value exactly in this sample view.`
+      : "Prediction samples will appear here after the experiment finishes.",
   };
 }
