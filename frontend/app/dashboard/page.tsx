@@ -28,7 +28,7 @@ const destinationCards = [
     cta: "Open analysis",
   },
   {
-    title: "Run archive",
+    title: "Saved runs",
     detail: "Browse, search, and download your past analysis runs.",
     href: "/history",
     cta: "Open history",
@@ -43,7 +43,7 @@ const destinationCards = [
 
 const featureMechanics = [
   {
-    title: "Dataset intake",
+    title: "Uploads",
     accent: "#7ad6ff",
     detail: "Upload CSVs, manage your library, and check the initial quality before opening the full report.",
     flow: "Start here, then open Analysis for the full report.",
@@ -55,7 +55,7 @@ const featureMechanics = [
     flow: "Use the tabs to navigate between sections.",
   },
   {
-    title: "Run archive",
+    title: "Saved runs",
     accent: "#8bf1a8",
     detail: "Each dataset and ML scan is saved so you can reopen it later from History.",
     flow: "Keep working in Analysis, or reopen older runs from History.",
@@ -67,15 +67,15 @@ const featureMechanics = [
     flow: "Open Charts when you want to see the data visually.",
   },
   {
-    title: "ML experiment lanes",
+    title: "ML experiments",
     accent: "#bfb8ff",
     detail: "Run supervised or unsupervised ML scans and revisit saved experiments.",
     flow: "Download results from your active run, or find older experiments in your saved list.",
   },
   {
-    title: "Account cleanup",
+    title: "Account settings",
     accent: "#f59ea7",
-    detail: "Profile, security, and data cleanup in one place.",
+    detail: "Profile, security, and data management in one place.",
     flow: "Use the profile menu for quick access to your account, uploads, or history.",
   },
 ];
@@ -231,8 +231,8 @@ export default function DashboardPage() {
     },
     {
       key: "focus",
-      label: "Active lane",
-      value: latest ? (latest.insights.modeling_readiness.is_ready ? "ML lane open" : "Analysis live") : "Upload first",
+      label: "Current status",
+      value: latest ? (latest.insights.modeling_readiness.is_ready ? "Ready for ML" : "Analysis live") : "Upload first",
       note: latest
         ? latest.insights.modeling_readiness.is_ready
           ? "This dataset is ready — you can run ML experiments on it."
@@ -279,8 +279,8 @@ export default function DashboardPage() {
   const breakdownSidecarLabel = latest
     ? latest.insights.modeling_readiness.is_ready
       ? "ML-ready"
-      : "EDA-first"
-    : "Standby";
+      : "Review first"
+    : "No data yet";
   const breakdownSidecarCopy = latest
     ? latest.insights.modeling_readiness.is_ready
       ? "This dataset passed all checks and is ready for ML experiments."
@@ -415,7 +415,7 @@ export default function DashboardPage() {
                               <td>
                                 <span className="desktop-badge" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
                                   <span className="desktop-status-dot" />
-                                  {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                                  {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
                                 </span>
                               </td>
                               <td>
@@ -730,7 +730,7 @@ function DashboardMobileSections({
             {latest ? `${latest.overview.column_count} columns` : "Open Analysis fast"}
           </span>
           <span className="mobile-screen-pill" data-tone={latest?.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-            {latest ? (latest.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first") : "History saved"}
+            {latest ? (latest.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first") : "History saved"}
           </span>
         </div>
         <div className="mobile-screen-actions">
@@ -783,7 +783,7 @@ function DashboardMobileSections({
                     <p className="mobile-screen-row-meta">{analysis.source_filename}</p>
                   </div>
                   <span className="mobile-screen-pill" data-tone={analysis.insights.modeling_readiness.is_ready ? "teal" : "amber"}>
-                    {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                    {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
                   </span>
                 </div>
                 <p className="mobile-screen-row-copy">{truncateText(analysis.insights.summary, 80)}</p>
@@ -845,7 +845,7 @@ function DashboardMobileSections({
           <summary>
             <div>
               <p className="mobile-screen-row-title">How features work</p>
-              <p className="mobile-accordion-hint">Review how uploads, report reading, charts, ML, and account cleanup fit together.</p>
+              <p className="mobile-accordion-hint">See how uploads, reports, charts, ML, and your account work together.</p>
             </div>
           </summary>
           <div className="mobile-accordion-body">

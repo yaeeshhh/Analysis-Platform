@@ -370,20 +370,20 @@ function getSupervisedFailureFactors(
         balanceWarning ||
         recommendation?.reasons?.[0] ||
         (taskType === "classification"
-          ? "Uneven classes make minority cases harder to learn and can make plain accuracy look healthier than the model really is."
-          : "A numeric target with low spread or weak business signal gives the model very little structure to learn from."),
+          ? "Imbalanced categories can make accuracy misleading — less common outcomes may be harder to predict."
+          : "A target with very little variation gives the model less to work with."),
     },
     {
-      title: "Held-out reliability",
+      title: "Test reliability",
       detail:
         result?.diagnostics.test_rows
-          ? `${result.diagnostics.test_rows.toLocaleString()} rows are held out for testing, so smaller or noisier test slices make benchmark scores swing more between runs.`
-          : "Every supervised run is scored on held-out rows, so small test slices make results less stable.",
+          ? `${result.diagnostics.test_rows.toLocaleString()} rows are held out for testing, so a smaller test set can make scores less stable between runs.`
+          : "Every run is scored on a separate test portion, so smaller datasets make scores less stable.",
     },
     {
       title: "Model assumptions",
       detail:
-        "Linear models miss nonlinear patterns, while tree ensembles can still struggle when the target is sparse, noisy, or only loosely tied to the available features.",
+        "Simple models may miss complex patterns, while advanced models can still struggle if the target is noisy or weakly connected to the other columns.",
     },
   ];
 }
@@ -485,9 +485,9 @@ export default function MLTab({
   const readinessWarning = shouldWarnAboutReadiness ? getLabReviewWarning(readiness) : "";
   const busyMessage =
     busy === "supervised"
-      ? "Benchmarking candidate models, compressing rare categories, and saving the experiment into history."
+      ? "Comparing models, preparing categories, and saving the experiment."
       : busy === "unsupervised"
-        ? "Clustering numeric features, running anomaly detection, and projecting the result into PCA space."
+        ? "Grouping similar rows, detecting anomalies, and building the overview."
         : "";
 
   const clusterTotal = clusters.reduce((sum, item) => sum + item.count, 0);
@@ -1344,7 +1344,7 @@ export default function MLTab({
                 ))}
                 {!supervised?.predictions_preview?.length ? (
                   <div className="py-5 text-sm text-white/48">
-                    Held-out prediction samples appear here after a supervised benchmark completes.
+                    Prediction samples will appear here after you run a supervised experiment.
                   </div>
                 ) : null}
               </div>
@@ -1791,7 +1791,7 @@ export default function MLTab({
               ))}
               {!anomalies.length ? (
                 <div className="rounded-2xl border border-dashed border-white/10 px-4 py-5 text-sm text-white/48 sm:col-span-2 xl:col-span-3">
-                  The strongest anomaly candidates will appear here after a scan completes.
+                  The most unusual rows will appear here after you run a scan.
                 </div>
               ) : null}
             </div>

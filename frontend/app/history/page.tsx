@@ -252,9 +252,9 @@ export default function HistoryPage() {
   return (
     <>
       <AppShell
-        eyebrow="Run archive"
+        eyebrow="Saved runs"
         title="History"
-        description="Search, reopen, download, and retire saved runs."
+        description="Search, reopen, download, and delete saved runs."
         mobileDescription="Search, reopen, and manage saved runs."
         stats={stats}
       >
@@ -317,7 +317,7 @@ export default function HistoryPage() {
                 >
                   <option value="all">All readiness</option>
                   <option value="ml-ready">ML-ready only</option>
-                  <option value="eda-first">EDA-first only</option>
+                  <option value="eda-first">Review first only</option>
                 </select>
 
                 <select
@@ -428,7 +428,7 @@ export default function HistoryPage() {
                                 <div className="desktop-history-metric">
                                   <span className="desktop-badge" data-tone={readinessTone}>
                                     <span className="desktop-status-dot" />
-                                    {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "EDA-first"}
+                                    {analysis.insights.modeling_readiness.is_ready ? "ML-ready" : "Review first"}
                                   </span>
                                   <div className="desktop-history-metric-note">
                                     {analysis.experiment_count} ML experiment{analysis.experiment_count === 1 ? "" : "s"}
@@ -676,7 +676,7 @@ function HistoryMobileSections({
         </svg>
         <div className="mobile-screen-panel-header">
           <div>
-            <p className="mobile-screen-kicker">Run archive</p>
+            <p className="mobile-screen-kicker">Saved runs</p>
             <h2 className="mobile-screen-title">Past analyses</h2>
             <p className="mobile-screen-lead">Search, filter, and revisit every dataset run.</p>
           </div>
@@ -704,7 +704,7 @@ function HistoryMobileSections({
         >
           <option value="all">All readiness</option>
           <option value="ml-ready">ML-ready</option>
-          <option value="eda-first">EDA-first</option>
+          <option value="eda-first">Review first</option>
         </select>
         <select
           value={mlFilter}
@@ -751,7 +751,7 @@ function HistoryMobileSections({
                     <p className="mobile-history-card-snippet">{truncateHistorySummary(analysis.insights.summary, 120)}</p>
                     <div className="mobile-history-card-tags">
                       <span className="mobile-history-tag">{analysis.overview.row_count.toLocaleString()} × {analysis.overview.column_count}</span>
-                      <span className="mobile-history-tag" data-tone={isReady ? "teal" : "amber"}>{isReady ? "ML-ready" : "EDA-first"}</span>
+                      <span className="mobile-history-tag" data-tone={isReady ? "teal" : "amber"}>{isReady ? "ML-ready" : "Review first"}</span>
                       {analysis.experiment_count > 0 ? (
                         <span className="mobile-history-tag" data-tone="purple">{analysis.experiment_count} ML</span>
                       ) : null}

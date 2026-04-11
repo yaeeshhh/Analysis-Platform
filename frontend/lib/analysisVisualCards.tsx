@@ -70,7 +70,7 @@ export const analysisVisualCards: AnalysisVisualCard[] = [
   {
     key: "schema",
     label: "Schema",
-    description: "Column inventory, correlations, skew, dominance, and modeling signals.",
+    description: "Column types, relationships, and prediction targets.",
     defaultTab: "schema",
     accent: "#a78bfa",
     tabKeys: ["schema"],
