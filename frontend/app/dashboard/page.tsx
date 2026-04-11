@@ -46,37 +46,37 @@ const featureMechanics = [
     title: "Dataset intake",
     accent: "#7ad6ff",
     detail: "Upload CSVs, manage your library, and check the initial quality before opening the full report.",
-    flow: "Start there, then open Analysis when you want the deeper report.",
+    flow: "Start here, then open Analysis for the full report.",
   },
   {
     title: "Analysis report",
     accent: "#9db8ff",
     detail: "Start with summary and findings, then move into health, fields, patterns, and ML when you need more depth.",
-    flow: "Use the report map to navigate between sections.",
+    flow: "Use the tabs to navigate between sections.",
   },
   {
     title: "Run archive",
     accent: "#8bf1a8",
     detail: "Each dataset and ML scan is saved so you can reopen it later from History.",
-    flow: "Keep the current dataset in Analysis, or open older runs separately from History.",
+    flow: "Keep working in Analysis, or reopen older runs from History.",
   },
   {
     title: "Charts and stories",
     accent: "#d7b7ff",
     detail: "Charts give you a visual snapshot of missing values, distributions, correlations, and change patterns.",
-    flow: "Use Charts when you want the visuals behind the written summary.",
+    flow: "Open Charts when you want to see the data visually.",
   },
   {
     title: "ML experiment lanes",
     accent: "#bfb8ff",
     detail: "Run supervised or unsupervised ML scans and revisit saved experiments.",
-    flow: "Downloads stay next to the active run, while older runs stay in the saved strips.",
+    flow: "Download results from your active run, or find older experiments in your saved list.",
   },
   {
     title: "Account cleanup",
     accent: "#f59ea7",
     detail: "Profile, security, and data cleanup in one place.",
-    flow: "Use the profile menu when you need account, uploads, or history shortcuts.",
+    flow: "Use the profile menu for quick access to your account, uploads, or history.",
   },
 ];
 
@@ -217,7 +217,7 @@ export default function DashboardPage() {
       key: "archive",
       label: "Saved runs",
       value: analyses.length ? `${analyses.length} saved run${analyses.length === 1 ? "" : "s"}` : "Archive waiting",
-      note: analyses.length ? "History keeps the finished reports close." : "The first saved dataset will start the archive lane.",
+      note: analyses.length ? "Your finished reports are always saved in history." : "Your first upload will start building your report history.",
       accent: "#4f6ef7",
       art: (
         <svg viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
@@ -235,9 +235,9 @@ export default function DashboardPage() {
       value: latest ? (latest.insights.modeling_readiness.is_ready ? "ML lane open" : "Analysis live") : "Upload first",
       note: latest
         ? latest.insights.modeling_readiness.is_ready
-          ? "The run has cleared the report surface and can move into experiments."
-          : "Keep the run in the report surface until the checks settle."
-        : "The active workspace appears after the first processed CSV.",
+          ? "This dataset is ready — you can run ML experiments on it."
+          : "Review the analysis report before moving to ML."
+        : "Upload a CSV to see your active workspace here.",
       accent: latest?.insights.modeling_readiness.is_ready ? "#22c55e" : "#f59e0b",
       art: (
         <svg viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
@@ -257,7 +257,7 @@ export default function DashboardPage() {
       key: "account",
       label: "Account tools",
       value: dashUser ? "Shortcuts ready" : "Login tools",
-      note: dashUser ? "Profile and cleanup controls stay outside the report lane." : "Sign in to keep session and cleanup controls nearby.",
+      note: dashUser ? "Manage your profile, security, and stored data." : "Sign in to access profile and data management.",
       accent: "#a78bfa",
       art: (
         <svg viewBox="0 0 96 64" xmlns="http://www.w3.org/2000/svg">
@@ -283,9 +283,9 @@ export default function DashboardPage() {
     : "Standby";
   const breakdownSidecarCopy = latest
     ? latest.insights.modeling_readiness.is_ready
-      ? "This run has cleared the earlier lanes, so the red lab card can act as the final hand-off."
-      : "The ML lane stays muted until the report has been checked through the summary, health, and charts stages."
-    : "Once a dataset is uploaded, the right lane wakes up as the last step in the report map.";
+      ? "This dataset passed all checks and is ready for ML experiments."
+      : "Review the summary, health, and charts sections before running ML."
+    : "Upload a dataset to unlock the ML section of your analysis.";
 
   return (
     <>
@@ -515,7 +515,7 @@ export default function DashboardPage() {
                   <div className="desktop-studio-followup">
                     <div className="desktop-studio-followup-head">
                       <p className="desktop-studio-followup-kicker">Support cards</p>
-                      <p className="desktop-studio-followup-title">Three compact reads sit under the main route instead of another text block.</p>
+                      <p className="desktop-studio-followup-title">Quick status cards for your workspace.</p>
                     </div>
                     <div className="desktop-studio-mini-grid">
                       {studioMiniCards.map((item) => (
@@ -568,8 +568,8 @@ export default function DashboardPage() {
                       </article>
                     ))}
                     <article className="analysis-breakdown-sidecar">
-                      <p className="analysis-breakdown-sidecar-kicker">Right lane</p>
-                      <p className="analysis-breakdown-sidecar-title">ML closes the report only after the earlier lanes settle.</p>
+                      <p className="analysis-breakdown-sidecar-kicker">Status</p>
+                      <p className="analysis-breakdown-sidecar-title">ML is the final step after reviewing earlier sections.</p>
                       <p className="analysis-breakdown-sidecar-copy">{breakdownSidecarCopy}</p>
                       <div className="analysis-breakdown-sidecar-mini">
                         <span className="desktop-badge" data-tone={breakdownSidecarTone}>
