@@ -175,9 +175,7 @@ private struct NativeLoginView: View {
                         .font(.system(size: 34, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
 
-                    Text(sessionStore.loginChallenge == nil
-                         ? "This is the first native iPhone slice. Sign in against the existing backend and load your saved analyses directly."
-                         : "Enter the 6-digit code for \(sessionStore.loginChallenge?.email ?? "your account") to finish signing in.")
+                    Text(challengeDescription)
                         .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.white.opacity(0.68))
                         .fixedSize(horizontal: false, vertical: true)
@@ -253,14 +251,18 @@ private struct NativeLoginView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }
                         .buttonStyle(.plain)
-                        .disabled(sessionStore.isBusy || code.trimmingCharacters(in: .whitespacesAndNewlines).count != 6)
+                        .disabled(
+                            sessionStore.isBusy
+                                || sessionStore.loginChallenge?.codeSent != true
+                                || code.trimmingCharacters(in: .whitespacesAndNewlines).count != 6
+                        )
 
                         Button {
                             Task {
                                 await sessionStore.resendLoginCode()
                             }
                         } label: {
-                            Text(sessionStore.isBusy ? "Working..." : "Resend code")
+                            Text(sessionStore.isBusy ? "Working..." : (sessionStore.loginChallenge?.codeSent == true ? "Resend code" : "Send code"))
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
                                 .foregroundStyle(Color.white.opacity(0.82))
                                 .frame(maxWidth: .infinity)
@@ -286,6 +288,18 @@ private struct NativeLoginView: View {
             }
             .padding(20)
         }
+    }
+
+    private var challengeDescription: String {
+        guard let challenge = sessionStore.loginChallenge else {
+            return "This is the first native iPhone slice. Sign in against the existing backend and load your saved analyses directly."
+        }
+
+        if challenge.codeSent {
+            return "Enter the 6-digit code sent to \(challenge.email) to finish signing in."
+        }
+
+        return "Your account needs verification before sign-in completes. Tap Send code to deliver a 6-digit code to \(challenge.email)."
     }
 }
 
@@ -784,6 +798,7 @@ private final class NativeSessionStore: ObservableObject {
                 persist(accessToken: payload.accessToken, user: payload.user)
             case .challenge(let challenge):
                 loginChallenge = challenge
+                await requestLoginCode(for: challenge)
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -819,6 +834,10 @@ private final class NativeSessionStore: ObservableObject {
             return
         }
 
+        await requestLoginCode(for: challenge)
+    }
+
+    private func requestLoginCode(for challenge: NativeLoginChallenge) async {
         isBusy = true
         errorMessage = nil
         defer { isBusy = false }
@@ -827,6 +846,7 @@ private final class NativeSessionStore: ObservableObject {
             let refreshedChallenge = try await NativeAuthService.sendLoginCode(challengeToken: challenge.challengeToken)
             loginChallenge = refreshedChallenge
         } catch {
+            loginChallenge = challenge
             errorMessage = error.localizedDescription
         }
     }
