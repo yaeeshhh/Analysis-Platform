@@ -34,9 +34,8 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
       </div>
 
       <article className="border-b border-white/6 pb-3 text-sm leading-6 text-white/68">
-        Quality score is a weighted estimate of overall dataset health. It drops for severe missingness, duplicate rows,
-        constant or near-constant fields, parsing issues, strong correlations, and widespread outlier-heavy columns.
-        Higher scores indicate cleaner data.
+        Quality score reflects how clean the dataset is. It drops when there are lots of missing values, duplicates, constant fields,
+        parsing issues, or outliers. A higher score means less cleanup needed.
       </article>
       </>
       ) : null}
@@ -47,7 +46,7 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Missingness</span>
-              <p className="mobile-accordion-hint">How many values are missing per column, shown as a percentage and fill bar</p>
+              <p className="mobile-accordion-hint">Missing values per column</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 {quality.missing_by_column.slice(0, 3).map((item) => (
                   <div key={item.column} className="analysis-accordion-summary-row">
@@ -90,7 +89,7 @@ export default function DataQualityTab({ overview, quality, mobileSection }: Dat
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Recommendations</span>
-              <p className="mobile-accordion-hint">Suggested actions to clean and improve overall dataset quality</p>
+              <p className="mobile-accordion-hint">Steps to clean up and improve this dataset</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 {quality.recommendations.slice(0, 3).map((item) => (
                   <p key={item} className="analysis-accordion-summary-text">{item}</p>

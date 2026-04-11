@@ -370,9 +370,9 @@ export default function AnalysisResultPopup({
 
           {!loading && !error && report && !ready ? (
             <div className="border-l-2 border-[#ffb079]/40 pl-4 text-sm text-[#ffe7d7]">
-              <p className="font-semibold text-white">This saved run is missing part of the report.</p>
+              <p className="font-semibold text-white">This saved run is missing some report data.</p>
               <p className="mt-2 leading-6 text-white/72">
-                The history popup loaded the record, but the full report surface is not available for this run. Download the saved report to view the readable text summary.
+                Download the report file to see the full text summary.
               </p>
             </div>
           ) : null}
@@ -395,7 +395,7 @@ export default function AnalysisResultPopup({
             <section className="history-popup-visual-strip tablet-up">
               <div className="history-popup-visual-strip-head">
                 <p className="history-popup-select-label">Report map</p>
-                <p className="history-popup-section-note">Switch between saved report surfaces without dragging through the entire archive view.</p>
+                <p className="history-popup-section-note">Jump to any section of this saved report.</p>
               </div>
               <div className="analysis-visual-grid" data-layout="workspace">
                 {analysisVisualCards.map((card) => {

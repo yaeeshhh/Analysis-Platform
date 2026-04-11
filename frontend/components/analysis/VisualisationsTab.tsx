@@ -171,7 +171,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Distribution</span>
-            <p className="mobile-accordion-hint">Value distribution histogram for the most numeric-dense column</p>
+            <p className="mobile-accordion-hint">How values are spread for the most active numeric column</p>
             {histogramPreview.length > 0 ? (
               <div className="phone-only analysis-accordion-summary-preview">
                 {histogramPreview.map((bin) => (
@@ -230,7 +230,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Top categories</span>
-            <p className="mobile-accordion-hint">Most frequent category values for the highest-cardinality column</p>
+            <p className="mobile-accordion-hint">Top values from the categorical column with the most variety</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {categories?.values.slice(0, 3).map((item) => (
                 <div key={item.label} className="analysis-accordion-summary-row">
@@ -284,7 +284,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Boxplot summary</span>
-            <p className="mobile-accordion-hint">Quartiles, median, and outlier counts for each numeric column</p>
+            <p className="mobile-accordion-hint">Spread, median, and outliers for each numeric column</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {boxplots.slice(0, 3).map((item) => (
                 <div key={item.column} className="analysis-accordion-summary-row">
@@ -324,7 +324,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Correlation heatmap</span>
-            <p className="mobile-accordion-hint">Pearson correlations between all numeric column pairs</p>
+            <p className="mobile-accordion-hint">How strongly each pair of numeric columns are related</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {heatmapPreview.slice(0, 3).map((item) => (
                 <div key={`${item.x}-${item.y}`} className="analysis-accordion-summary-row">
@@ -394,7 +394,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Pairwise scatter</span>
-            <p className="mobile-accordion-hint">Scatter plots for the most strongly correlated numeric pairs</p>
+            <p className="mobile-accordion-hint">Scatter views of the numeric columns that move together most</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {pairwiseScatter.slice(0, 3).map((plot) => (
                 <div key={`${plot.x}-${plot.y}`} className="analysis-accordion-summary-row">
@@ -458,7 +458,7 @@ export default function VisualisationsTab({ visualisations, mobileSection }: Vis
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Drift checks</span>
-            <p className="mobile-accordion-hint">Early-vs-late row slice comparison to flag distributional drift</p>
+            <p className="mobile-accordion-hint">Did the data shift between the first and second half of the file?</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {driftChecks.slice(0, 3).map((item) => (
                 <div key={`${item.kind}-${item.column}`} className="analysis-accordion-summary-row">

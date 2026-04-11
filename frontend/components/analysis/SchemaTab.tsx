@@ -13,25 +13,25 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
   const groups = [
     {
       title: "Identifiers",
-      detail: "Likely row keys or one-value-per-record fields.",
+      detail: "Columns that look like unique row IDs.",
       columns: schema.identifier_columns,
       tone: "#9db8ff",
     },
     {
       title: "Target candidates",
-      detail: "Fields that look plausible for supervised learning.",
+      detail: "Fields that could work as prediction targets.",
       columns: schema.target_candidates,
       tone: "#8bf1a8",
     },
     {
       title: "Numeric fields",
-      detail: "Measures and counts used in summaries, charts, and many models.",
+      detail: "Numbers, measurements, and counts.",
       columns: collectColumns("numeric"),
       tone: "#7ad6ff",
     },
     {
       title: "Categorical fields",
-      detail: "Discrete values such as plan, status, region, or segment labels.",
+      detail: "Text labels like plan, status, region, or segment.",
       columns: collectColumns("categorical"),
       tone: "#bfb8ff",
     },
@@ -133,7 +133,7 @@ export default function SchemaTab({ schema }: SchemaTabProps) {
             <summary>
               <div className="min-w-0">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">More profiled columns</span>
-                <p className="mobile-accordion-hint">Review the remaining {remainingColumns.length} columns when you need the full column-by-column schema scan.</p>
+                <p className="mobile-accordion-hint">See all {remainingColumns.length} remaining columns</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {remainingColumns.slice(0, 3).map((column) => (
                     <span key={`schema-preview-${column.name}`} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/72">

@@ -77,6 +77,7 @@ src/__pycache__/
 logs/
 
 # Xcode / Apple app artifacts
+xcode/
 DerivedData/
 *.xcuserstate
 *.xcworkspace/xcuserdata/
@@ -84,3 +85,16 @@ DerivedData/
 **/*.xcworkspace/xcuserdata/
 **/*.xcodeproj/xcuserdata/
 ios/build/
+
+# Design assets (not part of the app)
+design/
+
+# Test results
+test-results/
+frontend/test-results/
+
+# Rework tracker (dev-only)
+frontend/_REWORK_TRACKER.md
+
+# Claude config
+.claude/

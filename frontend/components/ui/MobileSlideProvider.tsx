@@ -77,7 +77,6 @@ export function MobileSlideProvider({ children }: { children: ReactNode }) {
     popOne();
   }, [popOne]);
 
-  // Close all slides on route change
   useEffect(() => {
     if (stack.length > 0) {
       setStack([]);

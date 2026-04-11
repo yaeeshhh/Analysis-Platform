@@ -17,9 +17,9 @@ type AuthShellProps = {
 };
 
 const DEFAULT_SIGNALS: AuthShellSignal[] = [
-  { label: "Model", value: "Live scoring" },
-  { label: "Flow", value: "Protected actions" },
-  { label: "Mode", value: "Analysis-ready" },
+  { label: "Scoring", value: "Live" },
+  { label: "Actions", value: "Secured" },
+  { label: "Status", value: "Ready" },
 ];
 
 export default function AuthShell({

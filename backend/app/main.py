@@ -7,7 +7,6 @@ from .core.database import Base, SessionLocal, engine, ensure_runtime_schema_com
 from .core.config import settings
 from . import models
 
-# Create all tables
 Base.metadata.create_all(bind=engine)
 ensure_runtime_schema_compatibility()
 
@@ -19,7 +18,6 @@ with SessionLocal() as db:
 
 app = FastAPI(title="Universal Data Analysis API")
 
-# Configure CORS with settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,

@@ -34,44 +34,44 @@ export const analysisFocusAreas: Array<{
   {
     key: "summary",
     label: "Summary",
-    description: "Start with the plain-language summary and findings before moving deeper.",
+    description: "Summary and key findings from the scan.",
     tabKeys: ["overview", "insights"],
   },
   {
     key: "health",
     label: "Health",
-    description: "Check quality issues and the main numeric or categorical measures.",
+    description: "Missing values, duplicates, and key statistics.",
     tabKeys: ["quality", "statistics"],
   },
   {
     key: "fields",
     label: "Fields",
-    description: "Inspect field roles, inferred types, identifiers, and target candidates.",
+    description: "Column types, roles, and likely prediction targets.",
     tabKeys: ["schema"],
   },
   {
     key: "patterns",
     label: "Patterns",
-    description: "Use relationships and charts to understand structure, spread, and drift.",
+    description: "Correlations, distributions, and change patterns.",
     tabKeys: ["relationships", "visualisations"],
   },
   {
     key: "ml",
     label: "ML",
-    description: "Run or reopen supervised and unsupervised experiment lanes.",
+    description: "Run or revisit ML experiments.",
     tabKeys: ["ml"],
   },
 ];
 
 export const analysisTabDescriptions: Record<AnalysisTabKey, string> = {
-  overview: "Start here for the dataset summary, posture, and first explanation of what the run is saying.",
-  insights: "Plain-language findings, modeling readiness, and the next actions worth taking after the upload.",
-  schema: "Field roles, inferred types, identifiers, targets, and the full column inventory.",
+  overview: "Dataset summary, shape, and initial findings.",
+  insights: "Key findings, ML readiness, and suggested next steps.",
+  schema: "Column types, roles, IDs, targets, and the full field list.",
   quality: "Missingness, duplicates, constants, correlations, outliers, and cleanup direction.",
-  statistics: "Numeric, categorical, and datetime measures for the saved run.",
-  relationships: "Stronger pairwise signals, skew, and modeling cues across the dataset.",
+  statistics: "Numeric and categorical breakdowns.",
+  relationships: "Correlations, skewed fields, and patterns worth noting.",
   visualisations: "Charts for missingness, distributions, category spread, heatmaps, scatter, and drift.",
-  ml: "Saved supervised and unsupervised experiment lanes with downloads and deletion.",
+  ml: "Your saved ML experiments with download and management options.",
 };
 
 export function resolveRequestedTab(requestedTab: string | null): AnalysisTabKey | null {

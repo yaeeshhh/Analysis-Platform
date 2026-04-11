@@ -711,7 +711,6 @@ class AuthService:
         except Exception:
             raise HTTPException(status_code=401, detail="Invalid refresh token")
 
-        # Verify token type
         if not verify_token_type(payload, "refresh"):
             raise HTTPException(status_code=401, detail="Invalid token type")
 
@@ -739,7 +738,6 @@ class AuthService:
         if security_state and was_token_issued_before(payload, security_state.password_changed_at):
             raise HTTPException(status_code=401, detail=PASSWORD_CHANGED_REAUTH_DETAIL)
 
-        # Check if token exists and is not revoked
         db_token = (
             db.query(RefreshToken)
             .filter(
@@ -753,19 +751,15 @@ class AuthService:
         if not db_token:
             raise HTTPException(status_code=401, detail="Refresh token not found or revoked")
 
-        # Check if token is expired
         if AuthService._is_expired(db_token.expires_at):
             raise HTTPException(status_code=401, detail="Refresh token expired")
 
-        # Update last used timestamp
         db_token.last_used_at = datetime.now(timezone.utc)
         db.commit()
 
-        # Create new tokens
         new_access_token = create_access_token({"sub": str(user.id)})
         new_refresh_token, new_jti = create_refresh_token({"sub": str(user.id)})
 
-        # Replace old refresh token with new one
         db_token.revoked = True
         new_db_token = RefreshToken(
             user_id=user.id,

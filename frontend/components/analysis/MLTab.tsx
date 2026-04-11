@@ -58,49 +58,49 @@ const supervisedModelGuide = [
     name: "Logistic Regression",
     appliesTo: "classification",
     detail:
-      "A regularized linear baseline with class balancing. It is fast, interpretable, and still useful for checking whether the target is learnable at all.",
+      "A simple, fast starting point that balances classes and shows whether the target can be predicted at all.",
   },
   {
     name: "Random Forest",
     appliesTo: "classification",
     detail:
-      "An ensemble of decision trees. It captures nonlinear interactions and mixed feature behavior better than a linear baseline, especially when numeric and categorical fields interact.",
+      "A set of decision trees that picks up on complex patterns across numeric and category columns.",
   },
   {
     name: "Extra Trees",
     appliesTo: "classification",
     detail:
-      "A more randomized tree ensemble. It often gives a stronger benchmark on noisy tabular data by exploring more aggressive split patterns than a standard forest.",
+      "A more randomized tree approach that often handles messy data better than a standard forest.",
   },
   {
     name: "Linear Regression",
     appliesTo: "regression",
     detail:
-      "A linear baseline for continuous targets. It estimates how the target moves as features change and is useful for a fast directional benchmark.",
+      "A simple linear fit for numeric targets. Quick way to see whether features explain the target.",
   },
   {
     name: "Random Forest",
     appliesTo: "regression",
     detail:
-      "A nonlinear tree ensemble for continuous targets. It handles complex interactions and uneven feature effects better than a purely linear fit.",
+      "A tree-based model for numeric targets. Handles complex patterns that simple regression would miss.",
   },
   {
     name: "Extra Trees",
     appliesTo: "regression",
     detail:
-      "A randomized tree ensemble that can outperform a standard forest when the target depends on many uneven or noisy interactions across the feature set.",
+      "A more randomized tree ensemble that can outperform Random Forest when the data is messy or has many uneven patterns.",
   },
   {
     name: "Train/test holdout",
     appliesTo: "all",
     detail:
-      "Each supervised benchmark keeps a held-out test slice so the score lane reflects how well the models generalize instead of memorizing the full dataset.",
+      "Part of the data is held back for testing, so scores show real-world accuracy instead of memorisation.",
   },
   {
     name: "Category compression",
     appliesTo: "all",
     detail:
-      "Rare categories are compressed before the benchmark so wide datasets stay stable and high-cardinality columns do not overwhelm the run.",
+      "Rare categories are grouped together so columns with lots of unique values don't slow down the run.",
   },
 ];
 
@@ -108,22 +108,22 @@ const unsupervisedGuide = [
   {
     name: "KMeans clustering",
     detail:
-      "Groups rows into clusters by placing them near learned centroids in standardized numeric feature space.",
+      "Groups similar rows together based on numeric patterns.",
   },
   {
     name: "Isolation Forest",
     detail:
-      "Flags unusual rows by measuring how quickly random tree partitions isolate them compared with the rest of the data.",
+      "Flags unusual rows by checking how different they are from the rest of the data.",
   },
   {
     name: "PCA projection",
     detail:
-      "Compresses many numeric dimensions into two principal components so segment structure and anomalies are easier to visualize.",
+      "Compresses the numeric data into a 2D view so clusters and outliers are easier to see.",
   },
   {
     name: "Normalized result scale",
     detail:
-      "Every ML chart is rescaled to the same 0% to 100% range so wide raw values stay readable while the original value range remains visible in the notes.",
+      "All ML charts use a 0%–100% scale so different metrics are easy to compare. Original values are shown in the notes.",
   },
 ];
 
@@ -933,7 +933,7 @@ export default function MLTab({
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Lab overview</span>
-            <p className="mobile-accordion-hint">Modes, runtime guardrails, and what this ML lab runs on</p>
+            <p className="mobile-accordion-hint">How the ML lab works and what limits are in place</p>
             <div className="phone-only analysis-accordion-summary-preview">
               <div className="analysis-accordion-summary-row">
                 <strong>Saved runs</strong>
@@ -963,13 +963,13 @@ export default function MLTab({
           <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#7ad6ff]">ML Lab</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
-              This lab runs only on the dataset you uploaded for this report.
+              ML runs use only the dataset from this report.
             </p>
           </div>
           <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#ffb079]">Unsupervised mode</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
-              Use clustering and anomaly detection when you want patterns without picking a target column.
+              Find patterns and outliers without choosing a target column.
             </p>
           </div>
           <div className="border-b border-white/6 pb-3">
@@ -981,7 +981,7 @@ export default function MLTab({
           <div className="border-b border-white/6 pb-3">
             <p className="text-xs uppercase tracking-[0.16em] text-[#d7b7ff]">Runtime guardrails</p>
             <p className="mt-2 text-sm leading-6 text-white/66">
-              Sampling and rare-category compression help wide datasets stay responsive.
+              Sampling and grouping keep large datasets running smoothly.
             </p>
           </div>
         </div>
@@ -1033,7 +1033,7 @@ export default function MLTab({
             <summary>
               <div className="min-w-0">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Method guide</span>
-                <p className="mobile-accordion-hint">Supported supervised models and what each one is best for</p>
+                <p className="mobile-accordion-hint">Models used in the benchmark and when each works best</p>
                 <div className="phone-only analysis-accordion-summary-preview">
                   {methodGuideCards.slice(0, 3).map((item) => (
                     <div key={`method-${item.name}`} className="analysis-accordion-summary-row">
@@ -1069,7 +1069,7 @@ export default function MLTab({
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-white/65">
-                Ranked from profiling signals such as missing values, class balance, rows per class, numeric spread, near-identifier risk, inferred column role, and a small outcome-name bonus.
+                Ranked by how well each column fits as a prediction target, based on completeness, balance, and column type.
               </p>
 
               <div className="mt-5 overflow-x-auto pb-2">
