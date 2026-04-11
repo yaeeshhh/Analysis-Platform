@@ -28,7 +28,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Strongest relationships</span>
-            <p className="mobile-accordion-hint">Pairs of numeric columns with the highest linear correlation</p>
+            <p className="mobile-accordion-hint">Numeric columns that move together the most</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {correlations.slice(0, 3).map((item) => (
                 <div key={`${item.x}-${item.y}`} className="analysis-accordion-summary-row">
@@ -71,7 +71,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Skewed numeric fields</span>
-              <p className="mobile-accordion-hint">Columns with non-symmetric distributions that may need transformation</p>
+              <p className="mobile-accordion-hint">Numeric fields with lopsided distributions</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 {skewedFields.slice(0, 3).map((item) => (
                   <div key={item.column} className="analysis-accordion-summary-row">
@@ -106,7 +106,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Dominant categories</span>
-              <p className="mobile-accordion-hint">Categorical columns where one value appears far more than others</p>
+              <p className="mobile-accordion-hint">Categories dominated by a single value</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 {dominantCategories.slice(0, 3).map((item) => (
                   <div key={item.column} className="analysis-accordion-summary-row">
@@ -140,7 +140,7 @@ export default function RelationshipsTab({ schema, statistics, mobileSection }: 
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#d7b7ff]">Modeling signals</span>
-              <p className="mobile-accordion-hint">Inferred identifier and target columns for supervised modeling</p>
+              <p className="mobile-accordion-hint">Which columns look like IDs or prediction targets</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 <div className="analysis-accordion-summary-row">
                   <strong>Identifiers</strong>

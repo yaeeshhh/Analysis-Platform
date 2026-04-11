@@ -70,7 +70,7 @@ function resolvePostLoginPath(loginHref: string): string | null {
 export default function LoginRequiredModal({
   open,
   title = "Login to continue",
-  message = "You need to be logged in to access this page.",
+  message = "Sign in to continue.",
   loginHref = "/login",
   bypassFlowSuppression = false,
   onDismiss,
@@ -95,7 +95,6 @@ export default function LoginRequiredModal({
 
   const [mode, setMode] = useState<"login" | "signup">("login");
 
-  // I keep the login flow state together so it is easier to reset step by step.
   const [identifier, setIdentifier] = useState("");
   const [resolvedLoginEmail, setResolvedLoginEmail] = useState<string | null>(null);
   const [loginStep, setLoginStep] = useState<"identifier" | "password" | "otp">("identifier");
@@ -106,13 +105,11 @@ export default function LoginRequiredModal({
   const [forgotMessage, setForgotMessage] = useState("");
   const [forgotResetLink, setForgotResetLink] = useState<string | null>(null);
 
-  // These form fields get reused by both auth modes.
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // This block is just for the login verification-code step.
   const [otpCode, setOtpCode] = useState("");
   const [otpEmail, setOtpEmail] = useState("");
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
@@ -121,7 +118,6 @@ export default function LoginRequiredModal({
   const [otpMessage, setOtpMessage] = useState("");
   const [otpFormatValid, setOtpFormatValid] = useState(true);
 
-  // This block is just for the signup verification-code step.
   const [signupChallengeToken, setSignupChallengeToken] = useState<string | null>(null);
   const [signupOtpCode, setSignupOtpCode] = useState("");
   const [signupOtpEmail, setSignupOtpEmail] = useState("");
@@ -131,7 +127,6 @@ export default function LoginRequiredModal({
   const [signupOtpFormatValid, setSignupOtpFormatValid] = useState(true);
   const [signupVerifying, setSignupVerifying] = useState(false);
 
-  // The simple show/hide and focus toggles live here.
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);

@@ -23,7 +23,6 @@ export default function DesktopAccordionOpener() {
       });
     };
 
-    // Open everything currently in the DOM
     openAll();
 
     // Watch for new details elements added after initial render

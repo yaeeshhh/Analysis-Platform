@@ -3,13 +3,11 @@ from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env from backend directory
 env_path = Path(__file__).parent.parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
 
 class Settings:
-    # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
         "postgresql+psycopg://postgres:postgres@localhost:5432/analysis_platform",
@@ -22,10 +20,8 @@ class Settings:
     )
     ALGORITHM: str = "HS256"
 
-    # Access Token: Short-lived (15 minutes)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
 
-    # Refresh Token: Long-lived (7 days)
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     REFRESH_TOKEN_EXPIRE_SECONDS: int = 7 * 24 * 60 * 60
 
@@ -37,10 +33,8 @@ class Settings:
         os.getenv("INVALIDATE_TOKENS_ON_RESTART", "false").lower() == "true"
     )
 
-    # Frontend URL for links in auth emails
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-    # Forgot password and remember-me windows
     PASSWORD_RESET_EXPIRE_MINUTES: int = int(
         os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "30")
     )
@@ -57,7 +51,6 @@ class Settings:
         os.getenv("LOGIN_VERIFICATION_RESEND_COOLDOWN_SECONDS", "30")
     )
 
-    # Optional SMTP settings for password reset emails
     EMAIL_HTTP_ENDPOINT: str | None = os.getenv("EMAIL_HTTP_ENDPOINT")
     EMAIL_HTTP_AUTH_NAME: str = os.getenv("EMAIL_HTTP_AUTH_NAME", "api")
     EMAIL_HTTP_AUTH_VALUE: str | None = os.getenv("EMAIL_HTTP_AUTH_VALUE")
@@ -66,7 +59,6 @@ class Settings:
     )
     EMAIL_FROM: str = os.getenv("EMAIL_FROM", "no-reply@analysis-platform.local")
 
-    # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
@@ -78,7 +70,6 @@ class Settings:
     if _custom_origins:
         CORS_ORIGINS.extend([origin.strip() for origin in _custom_origins.split(",")])
 
-    # Cookies
     COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"
     COOKIE_SAMESITE: str = os.getenv("COOKIE_SAMESITE", "lax")
 

@@ -142,15 +142,15 @@ def analyze_data_quality(frame: pd.DataFrame) -> dict[str, Any]:
 
     recommendations: list[str] = []
     if missing_by_column:
-        recommendations.append("Review columns with missing values above 20% before modeling or downstream reporting.")
+        recommendations.append("Review columns with more than 20% missing values before running models or reports.")
     if constant_columns:
-        recommendations.append("Drop constant columns because they do not add analytical signal.")
+        recommendations.append("Drop constant columns — they don't carry useful information.")
     if high_correlations:
-        recommendations.append("Consider removing one variable from highly correlated numeric pairs to reduce redundancy.")
+        recommendations.append("Consider dropping one column from highly correlated pairs to reduce overlap.")
     if outlier_columns:
-        recommendations.append("Inspect numeric outliers to distinguish data entry errors from meaningful rare cases.")
+        recommendations.append("Check numeric outliers to separate data entry mistakes from genuinely unusual values.")
     if not recommendations:
-        recommendations.append("Dataset quality looks usable for exploratory analysis without major cleaning blockers.")
+        recommendations.append("Quality looks good — no major cleanup needed before exploring the data.")
 
     return {
         "duplicate_row_count": duplicate_row_count,

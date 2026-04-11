@@ -23,7 +23,7 @@ export default function InsightsTab({ insights, mobileSection }: InsightsTabProp
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Findings</span>
-            <p className="mobile-accordion-hint">Key findings extracted from the dataset scan</p>
+            <p className="mobile-accordion-hint">What stood out in this dataset</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {insights.findings.slice(0, 2).map((finding) => (
                 <p key={finding} className="analysis-accordion-summary-text">{truncatePreview(finding, 92)}</p>
@@ -55,7 +55,7 @@ export default function InsightsTab({ insights, mobileSection }: InsightsTabProp
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">What to do next</span>
-            <p className="mobile-accordion-hint">Recommended cleanup steps and modeling readiness assessment</p>
+            <p className="mobile-accordion-hint">Cleanup suggestions and whether the data is ready for ML</p>
             <div className="phone-only analysis-accordion-summary-preview">
               {insights.recommended_next_steps.slice(0, 3).map((item) => (
                 <p key={item} className="analysis-accordion-summary-text">{truncatePreview(item, 92)}</p>

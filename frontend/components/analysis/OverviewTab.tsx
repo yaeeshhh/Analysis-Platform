@@ -44,7 +44,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
-              <p className="mobile-accordion-hint">AI-generated narrative summary of the uploaded dataset</p>
+              <p className="mobile-accordion-hint">Plain-language summary of what your data shows</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary, 110)}</p>
               </div>
@@ -61,7 +61,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#ffb079]">Dataset posture</span>
-              <p className="mobile-accordion-hint">Shape, size, type mix, and structural character of the dataset</p>
+              <p className="mobile-accordion-hint">Size, shape, and column types at a glance</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 {posture.slice(0, 3).map((item) => (
                   <div key={item.title} className="analysis-accordion-summary-row">
@@ -105,7 +105,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Type mix</span>
-              <p className="mobile-accordion-hint">Proportion of numeric, categorical, and other column types</p>
+              <p className="mobile-accordion-hint">How the columns break down by type</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 {typeMix.slice(0, 3).map((item) => (
                   <div key={item.label} className="analysis-accordion-summary-row">
@@ -139,7 +139,7 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#8bf1a8]">Reading order</span>
-              <p className="mobile-accordion-hint">Recommended tab order from plain-language summary through to ML Lab</p>
+              <p className="mobile-accordion-hint">Where to start and how to work through the report</p>
               <div className="phone-only analysis-accordion-summary-chip-list">
                 {[
                   "Overview first",
@@ -156,19 +156,19 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">Overview and Insights</p>
-              <p className="mt-2 text-sm leading-6 text-white/62">Start here to understand the dataset in plain language before moving into technical detail.</p>
+              <p className="mt-2 text-sm leading-6 text-white/62">Start here for the quick summary before diving deeper.</p>
             </div>
             <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">Schema and Quality</p>
-              <p className="mt-2 text-sm leading-6 text-white/62">Use these tabs to validate types, roles, missingness, and cleanup work before trusting conclusions.</p>
+              <p className="mt-2 text-sm leading-6 text-white/62">Check column types, missing values, and cleanup flags before drawing conclusions.</p>
             </div>
             <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">Statistics and Relationships</p>
-              <p className="mt-2 text-sm leading-6 text-white/62">Move here when you want detailed summaries, patterns, and stronger structural signals.</p>
+              <p className="mt-2 text-sm leading-6 text-white/62">Go here for deeper patterns, correlations, and numeric detail.</p>
             </div>
             <div className="border-b border-white/6 pb-3">
               <p className="text-sm font-medium text-white">ML Lab</p>
-              <p className="mt-2 text-sm leading-6 text-white/62">Use ML last, after the data looks clean enough and the target or exploration goal is clear.</p>
+              <p className="mt-2 text-sm leading-6 text-white/62">Try ML once the data looks clean and you know what you want to predict or explore.</p>
             </div>
             </div>
           </div>

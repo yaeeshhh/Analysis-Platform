@@ -93,7 +93,7 @@ export function getDatasetPosture(
     },
     {
       title: targetLabel,
-      detail: insights.modeling_readiness.is_ready ? "Dataset is structurally suitable for optional ML." : "Start with cleanup and exploratory analysis.",
+      detail: insights.modeling_readiness.is_ready ? "Looks ready for ML if you want to try it." : "Start by reviewing and cleaning the data.",
     },
     {
       title: `Quality score ${qualityScore.toFixed(1)}`,

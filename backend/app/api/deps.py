@@ -25,7 +25,6 @@ def get_current_user(
     if not authorization:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    # Parse Bearer token
     parts = authorization.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
         raise HTTPException(status_code=401, detail="Invalid authorization header")
@@ -35,7 +34,6 @@ def get_current_user(
     try:
         payload = decode_token(token)
 
-        # Verify token type is access token
         if not verify_token_type(payload, "access"):
             raise HTTPException(status_code=401, detail="Invalid token type")
 

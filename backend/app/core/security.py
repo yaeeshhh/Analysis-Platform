@@ -53,7 +53,6 @@ def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> 
             seconds=settings.REFRESH_TOKEN_EXPIRE_SECONDS
         )
 
-    # Generate unique token JTI for database tracking
     jti = str(uuid.uuid4())
     issued_at = datetime.now(timezone.utc).timestamp()
     to_encode.update(

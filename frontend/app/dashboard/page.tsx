@@ -17,25 +17,25 @@ import type { User } from "@/lib/auth";
 const destinationCards = [
   {
     title: "Dataset library",
-    detail: "Upload CSVs, keep saved datasets in the reusable library, choose the active run, and route it into Analysis.",
+    detail: "Upload CSVs, manage your saved datasets, and choose one to analyse.",
     href: "/batch",
     cta: "Open library",
   },
   {
     title: "Analysis workspace",
-    detail: "Grouped report flow with Summary, Health, Fields, Patterns, and ML once a dataset is selected.",
+    detail: "Full analysis report: summary, quality, fields, patterns, and ML.",
     href: "/analysis",
     cta: "Open analysis",
   },
   {
     title: "Run archive",
-    detail: "Review older runs, search the archive, filter the list, and download reports when needed.",
+    detail: "Browse, search, and download your past analysis runs.",
     href: "/history",
     cta: "Open history",
   },
   {
     title: "Account",
-    detail: "Manage login details, remembered sessions, and saved-upload cleanup tools.",
+    detail: "Profile, security, and saved data management.",
     href: "/account",
     cta: "Open account",
   },
@@ -45,14 +45,14 @@ const featureMechanics = [
   {
     title: "Dataset intake",
     accent: "#7ad6ff",
-    detail: "Upload CSVs, keep them in the library, choose the active dataset, and check the first quality signals before opening the full report.",
+    detail: "Upload CSVs, manage your library, and check the initial quality before opening the full report.",
     flow: "Start there, then open Analysis when you want the deeper report.",
   },
   {
     title: "Analysis report",
     accent: "#9db8ff",
     detail: "Start with summary and findings, then move into health, fields, patterns, and ML when you need more depth.",
-    flow: "Use the grouped map to move from summary into the deeper report surfaces.",
+    flow: "Use the report map to navigate between sections.",
   },
   {
     title: "Run archive",
@@ -63,19 +63,19 @@ const featureMechanics = [
   {
     title: "Charts and stories",
     accent: "#d7b7ff",
-    detail: "Charts turn the report into quick visual checks for missingness, distributions, relationships, and drift.",
+    detail: "Charts give you a visual snapshot of missing values, distributions, correlations, and change patterns.",
     flow: "Use Charts when you want the visuals behind the written summary.",
   },
   {
     title: "ML experiment lanes",
     accent: "#bfb8ff",
-    detail: "Run supervised and unsupervised scans, then reopen saved experiments from the same dataset.",
+    detail: "Run supervised or unsupervised ML scans and revisit saved experiments.",
     flow: "Downloads stay next to the active run, while older runs stay in the saved strips.",
   },
   {
     title: "Account cleanup",
     accent: "#f59ea7",
-    detail: "Manage profile info, remembered login, library cleanup, and deletion tools from one place.",
+    detail: "Profile, security, and data cleanup in one place.",
     flow: "Use the profile menu when you need account, uploads, or history shortcuts.",
   },
 ];
@@ -598,7 +598,6 @@ export default function DashboardPage() {
                       {/* Per-card decorative SVG corner */}
                       <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ position: "absolute", right: "0.6rem", top: "0.6rem", width: "44px", height: "44px", opacity: 0.45, pointerEvents: "none" }}>
                         {idx % 6 === 0 && (
-                          // Dataset intake — upload arrows
                           <>
                             <circle cx="32" cy="32" r="22" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.4"/>
                             <path d="M32 42V22" stroke={item.accent} strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
@@ -607,7 +606,6 @@ export default function DashboardPage() {
                           </>
                         )}
                         {idx % 6 === 1 && (
-                          // Analysis report — document with chart
                           <>
                             <rect x="16" y="10" width="32" height="44" rx="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.4"/>
                             <rect x="22" y="20" width="20" height="2.5" rx="1" fill={item.accent} opacity="0.5"/>
@@ -617,7 +615,6 @@ export default function DashboardPage() {
                           </>
                         )}
                         {idx % 6 === 2 && (
-                          // Run archive — stacked layers
                           <>
                             <ellipse cx="32" cy="24" rx="18" ry="6" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.35"/>
                             <ellipse cx="32" cy="32" rx="18" ry="6" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.5"/>
@@ -627,7 +624,6 @@ export default function DashboardPage() {
                           </>
                         )}
                         {idx % 6 === 3 && (
-                          // Charts — bar + trend line
                           <>
                             <line x1="12" y1="52" x2="52" y2="52" stroke={item.accent} strokeWidth="1" opacity="0.3"/>
                             <rect x="14" y="38" width="8" height="14" rx="1.5" fill={item.accent} opacity="0.35"/>
@@ -637,7 +633,6 @@ export default function DashboardPage() {
                           </>
                         )}
                         {idx % 6 === 4 && (
-                          // ML lanes — neural network
                           <>
                             <circle cx="14" cy="22" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.7"/>
                             <circle cx="14" cy="42" r="4" fill="none" stroke={item.accent} strokeWidth="1.2" opacity="0.7"/>
@@ -655,7 +650,6 @@ export default function DashboardPage() {
                           </>
                         )}
                         {idx % 6 === 5 && (
-                          // Account cleanup — settings gear
                           <>
                             <circle cx="32" cy="32" r="10" fill="none" stroke={item.accent} strokeWidth="1.5" opacity="0.65"/>
                             <circle cx="32" cy="32" r="4" fill={item.accent} opacity="0.35"/>

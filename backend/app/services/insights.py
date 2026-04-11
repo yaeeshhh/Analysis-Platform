@@ -28,11 +28,11 @@ def generate_insights(
         findings.append(
             f"The highest missingness is in {top_missing['column']} at {float(top_missing['missing_pct']) * 100:.1f}% missing values."
         )
-        next_steps.append("Prioritize imputation or removal decisions for heavily missing columns before modeling.")
+        next_steps.append("Decide whether to fill in or remove heavily missing columns before running models.")
 
     if duplicate_rows > 0:
         findings.append(f"The dataset includes {duplicate_rows:,} duplicate rows that may skew summaries or downstream models.")
-        next_steps.append("Deduplicate rows before producing final analytical or modeling outputs.")
+        next_steps.append("Remove duplicate rows before running final analysis or models.")
 
     if quality.get("constant_columns"):
         findings.append(
@@ -45,25 +45,25 @@ def generate_insights(
         findings.append(
             f"Strong correlation detected between {sample['column_a']} and {sample['column_b']} ({sample['correlation']})."
         )
-        next_steps.append("Review highly correlated numeric features for redundancy before supervised learning.")
+        next_steps.append("Check highly correlated columns for overlap before running ML.")
 
     numeric_summary = statistics.get("numeric_summary", []) or []
     skewed = [item for item in numeric_summary if abs(float(item.get("skew", 0.0))) >= 1.0]
     if skewed:
         findings.append(
-            f"{len(skewed)} numeric fields are heavily skewed, which may benefit from transformation or robust modeling approaches."
+            f"{len(skewed)} numeric fields are heavily skewed, which may need transformation before modeling."
         )
 
     target_candidates = schema.get("target_candidates", []) or []
     modeling_ready = bool(target_candidates or int(type_counts.get("numeric", 0)) >= 2)
     next_steps.append(
-        "Dataset appears suitable for optional machine learning workflows."
+        "This dataset looks ready for ML if you want to explore it."
         if modeling_ready
-        else "Use exploratory analysis first; the dataset currently shows limited structure for machine learning."
+        else "Review and clean the data first — there isn't enough structure for ML yet."
     )
 
     return {
-        "summary": " ".join(findings[:3]) if findings else "Dataset analyzed successfully.",
+        "summary": " ".join(findings[:3]) if findings else "Analysis complete.",
         "findings": findings,
         "recommended_next_steps": next_steps,
         "modeling_readiness": {

@@ -3751,6 +3751,10 @@ a[class*="rounded"]:hover {
     width: 100vw;
   }
 
+  .app-shell-native-apple .mobile-shell-body .mobile-analysis-fullpage {
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .mobile-analysis-fullpage-topbar {
     align-items: center;
     background: linear-gradient(180deg, rgba(8, 12, 22, 0.84), rgba(8, 12, 22, 0.52) 72%, transparent);
