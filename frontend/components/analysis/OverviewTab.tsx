@@ -23,7 +23,6 @@ function truncatePreview(text: string, limit = 96) {
 
 export default function OverviewTab({ overview, schema, quality, insights, mobileSection }: OverviewTabProps) {
   const previewColumns = Object.keys(overview.preview_rows?.[0] ?? {});
-  const headlineFindings = insights.findings.slice(0, 3);
   const stats = [
     { label: "Rows", value: overview.row_count.toLocaleString() },
     { label: "Columns", value: overview.column_count.toLocaleString() },
@@ -45,28 +44,14 @@ export default function OverviewTab({ overview, schema, quality, insights, mobil
           <summary>
             <div className="min-w-0">
               <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">What the data says</span>
-              <p className="mobile-accordion-hint">AI-generated summary and top findings for this dataset</p>
+              <p className="mobile-accordion-hint">AI-generated narrative summary of the uploaded dataset</p>
               <div className="phone-only analysis-accordion-summary-preview">
                 <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary, 110)}</p>
-                {headlineFindings.slice(0, 2).map((finding) => (
-                  <p key={finding} className="analysis-accordion-summary-text">
-                    {truncatePreview(finding)}
-                  </p>
-                ))}
               </div>
             </div>
           </summary>
           <div className="mobile-accordion-body">
             <p className="mt-3 text-base leading-7 text-white/82">{insights.summary}</p>
-            {headlineFindings.length > 0 ? (
-              <div className="mt-4 space-y-3">
-                {headlineFindings.map((finding) => (
-                  <div key={finding} className="border-b border-white/6 pb-3 text-sm leading-6 text-white/72">
-                    {finding}
-                  </div>
-                ))}
-              </div>
-            ) : null}
           </div>
         </details>
         ) : null}

@@ -12,6 +12,7 @@ function truncatePreview(text: string, limit = 108) {
 }
 
 export default function InsightsTab({ insights, mobileSection }: InsightsTabProps) {
+  const hasFindings = insights.findings.length > 0;
   const show = (section: string) => !mobileSection || (Array.isArray(mobileSection) ? mobileSection.includes(section) : mobileSection === section);
   const accordionOpen = useDesktopAccordionsExpanded() || mobileSection !== undefined;
 
@@ -22,24 +23,29 @@ export default function InsightsTab({ insights, mobileSection }: InsightsTabProp
         <summary>
           <div className="min-w-0">
             <span className="text-xs uppercase tracking-[0.24em] text-[#7ad6ff]">Findings</span>
-            <p className="mobile-accordion-hint">Plain-language summary and key findings from the dataset scan</p>
+            <p className="mobile-accordion-hint">Key findings extracted from the dataset scan</p>
             <div className="phone-only analysis-accordion-summary-preview">
-              <p className="analysis-accordion-summary-text">{truncatePreview(insights.summary)}</p>
               {insights.findings.slice(0, 2).map((finding) => (
                 <p key={finding} className="analysis-accordion-summary-text">{truncatePreview(finding, 92)}</p>
               ))}
+              {!hasFindings ? (
+                <p className="analysis-accordion-summary-text">No findings were generated for this dataset yet.</p>
+              ) : null}
             </div>
           </div>
         </summary>
         <div className="mobile-accordion-body">
-          <p className="mt-3 text-base leading-7 text-white/82">{insights.summary}</p>
-          <div className="mt-5 space-y-3">
-            {insights.findings.map((finding) => (
-              <div key={finding} className="border-b border-white/6 pb-3 text-sm leading-6 text-white/74">
-                {finding}
-              </div>
-            ))}
-          </div>
+          {hasFindings ? (
+            <div className="mt-3 space-y-3">
+              {insights.findings.map((finding) => (
+                <div key={finding} className="border-b border-white/6 pb-3 text-sm leading-6 text-white/74">
+                  {finding}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm leading-6 text-white/62">No findings were generated for this dataset yet.</p>
+          )}
         </div>
       </details>
       ) : null}

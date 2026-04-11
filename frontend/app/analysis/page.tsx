@@ -648,10 +648,11 @@ const mobileAnalysisCards: MobileCard[] = [
   {
     key: "overview",
     label: "Overview",
-    description: "Findings, dataset profile, next steps, and raw data preview.",
+    description: "Summary, findings, dataset profile, next steps, and raw data preview.",
     icon: "📊",
     defaultTab: "overview",
     subtabs: [
+      { section: "findings", label: "Findings", tab: "insights" },
       { section: ["dataset-posture", "type-mix"], label: "Profile" },
       { section: "what-to-do-next", label: "Next steps", tab: "insights" },
       { section: "raw-data", label: "Raw data" },
