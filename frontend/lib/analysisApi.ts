@@ -15,7 +15,7 @@ import {
   SupervisedResult,
   UnsupervisedResult,
 } from "./analysisTypes";
-import { tryNativeTextDownload } from "./nativeShell";
+
 
 const API_BASE_URL = getApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL);
 
@@ -486,10 +486,6 @@ async function downloadBlob(url: string, filename: string) {
   }
 
   const blob = await response.blob();
-  if (await tryNativeTextDownload(filename, blob)) {
-    return;
-  }
-
   const objectUrl = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = objectUrl;

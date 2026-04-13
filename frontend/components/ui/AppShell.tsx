@@ -1,12 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import { Suspense, useEffect, type CSSProperties, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import TopNav from "@/components/ui/TopNav";
 import MobileHeader from "@/components/ui/MobileHeader";
 import MobileNav from "@/components/ui/MobileNav";
-import { isAppleNativeShell } from "@/lib/nativeShell";
 
 type AppShellStat = {
   label: string;
@@ -25,28 +24,6 @@ type AppShellProps = {
   children: ReactNode;
 };
 
-function subscribeToAppleShellChanges(onStoreChange: () => void) {
-  if (typeof window === "undefined") {
-    return () => undefined;
-  }
-
-  window.addEventListener("popstate", onStoreChange);
-  window.addEventListener("analysis-studio:native-ready", onStoreChange as EventListener);
-
-  return () => {
-    window.removeEventListener("popstate", onStoreChange);
-    window.removeEventListener("analysis-studio:native-ready", onStoreChange as EventListener);
-  };
-}
-
-function getAppleShellSnapshot() {
-  return isAppleNativeShell();
-}
-
-function getAppleShellServerSnapshot() {
-  return false;
-}
-
 export default function AppShell({
   eyebrow,
   title,
@@ -59,11 +36,6 @@ export default function AppShell({
 }: AppShellProps) {
   const TitleTag = titleTag;
   const pathname = usePathname();
-  const embeddedAppleShell = useSyncExternalStore(
-    subscribeToAppleShellChanges,
-    getAppleShellSnapshot,
-    getAppleShellServerSnapshot,
-  );
 
   useEffect(() => {
     if (typeof window === "undefined" || window.innerWidth >= 960) {
@@ -93,7 +65,7 @@ export default function AppShell({
   }, [pathname]);
 
   return (
-    <main className={`app-shell min-h-screen text-white ${embeddedAppleShell ? "app-shell-native-apple" : ""}`}>
+    <main className="app-shell min-h-screen text-white">
       <MobileHeader eyebrow={eyebrow} title={title} />
 
       <div className="desktop-shell">
@@ -146,7 +118,7 @@ export default function AppShell({
         </div>
       </div>
 
-      {!embeddedAppleShell ? <MobileNav /> : null}
+      <MobileNav />
       <BackToTopButton />
     </main>
   );

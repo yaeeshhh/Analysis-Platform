@@ -76,16 +76,6 @@ src/__pycache__/
 *.log
 logs/
 
-# Xcode / Apple app artifacts
-xcode/
-DerivedData/
-*.xcuserstate
-*.xcworkspace/xcuserdata/
-*.xcodeproj/xcuserdata/
-**/*.xcworkspace/xcuserdata/
-**/*.xcodeproj/xcuserdata/
-ios/build/
-
 # Design assets (not part of the app)
 design/
 
