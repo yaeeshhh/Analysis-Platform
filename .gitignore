@@ -76,6 +76,9 @@ src/__pycache__/
 *.log
 logs/
 
+# Xcode / iOS app
+xcode/
+
 # Design assets (not part of the app)
 design/
 
