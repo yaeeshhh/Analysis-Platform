@@ -208,10 +208,22 @@ export default function GlobalResetPasswordModal() {
         onKeyDownCapture={commitMobileTextFieldAndCloseKeyboard}
       >
         <div className="border-b border-white/10 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-white">Reset Password</h2>
-          <p className="mt-3 text-sm leading-7 text-white/65">
-            Create a new password for your account.
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight text-white">Reset Password</h2>
+              <p className="mt-3 text-sm leading-7 text-white/65">
+                Create a new password for your account.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={closeModal}
+              aria-label="Close"
+              className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white/80"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+            </button>
+          </div>
         </div>
 
         <div className="modal-viewport-scroll px-5 py-5 sm:px-6 sm:py-5">
