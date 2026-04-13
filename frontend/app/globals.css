@@ -1862,10 +1862,6 @@ a[class*="rounded"]:hover {
     padding-top: 1rem;
   }
 
-  .app-shell-native-apple .mobile-shell-body {
-    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
-  }
-
   .app-shell::before {
     content: "";
     position: fixed;
@@ -3749,10 +3745,6 @@ a[class*="rounded"]:hover {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
     min-height: calc(var(--app-viewport-height, 100vh) - var(--app-mobile-header-height, 0px));
     width: 100vw;
-  }
-
-  .app-shell-native-apple .mobile-shell-body .mobile-analysis-fullpage {
-    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   }
 
   .mobile-analysis-fullpage-topbar {
