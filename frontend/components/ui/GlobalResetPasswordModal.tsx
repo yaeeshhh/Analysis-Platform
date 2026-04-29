@@ -19,7 +19,7 @@ import {
   moveInputCaretToEnd,
 } from "@/lib/helpers";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
-import { PASSWORD_CHANGED_QUERY_PARAM, queuePasswordChangedNotice } from "@/lib/session";
+import { queuePasswordChangedNotice } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
 import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
@@ -154,7 +154,7 @@ export default function GlobalResetPasswordModal() {
     try {
       setLoading(true);
       await resetPassword(token, newPassword);
-      queuePasswordChangedNotice(accountEmail);
+      queuePasswordChangedNotice(accountEmail, { forceCurrentTab: false });
       clearAccessToken();
       clearUserScopedFrontendState();
       if (accountEmail) {
@@ -175,7 +175,7 @@ export default function GlobalResetPasswordModal() {
         const current = new URLSearchParams(query);
         current.forEach((value, key) => nextQuery.set(key, value));
       }
-      nextQuery.set(PASSWORD_CHANGED_QUERY_PARAM, "1");
+      nextQuery.set("login_prompt", "1");
       const basePath = cleanPath.split("?", 1)[0] || pathname;
       const nextSearch = nextQuery.toString();
       window.location.replace(nextSearch ? `${basePath}?${nextSearch}` : basePath);

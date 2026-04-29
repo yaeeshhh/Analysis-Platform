@@ -29,6 +29,10 @@ export type PasswordChangedNoticePayload = {
   email: string;
 };
 
+type QueuePasswordChangedNoticeOptions = {
+  forceCurrentTab?: boolean;
+};
+
 type LoginBroadcastPayload = {
   timestamp: number;
   email?: string;
@@ -156,7 +160,8 @@ function getForcedPasswordChangedNoticeId(): string | null {
 }
 
 export function queuePasswordChangedNotice(
-  email: string | null | undefined
+  email: string | null | undefined,
+  options: QueuePasswordChangedNoticeOptions = {}
 ): PasswordChangedNoticePayload | null {
   if (typeof window === "undefined") return null;
 
@@ -169,7 +174,13 @@ export function queuePasswordChangedNotice(
   };
 
   localStorage.setItem(PASSWORD_CHANGED_NOTICE_KEY, JSON.stringify(notice));
-  sessionStorage.setItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY, notice.id);
+
+  if (options.forceCurrentTab === false) {
+    sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
+  } else {
+    sessionStorage.setItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY, notice.id);
+  }
+
   return notice;
 }
 
