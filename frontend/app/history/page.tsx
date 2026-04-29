@@ -5,6 +5,7 @@ import AppShell from "@/components/ui/AppShell";
 import AnalysisResultPopup from "@/components/history/AnalysisResultPopup";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
+import { REAUTH_PROMPT_EVENT } from "@/components/ui/GlobalOverlays";
 import {
   deleteAnalysis,
   deleteMlExperiment,
@@ -100,6 +101,11 @@ export default function HistoryPage() {
       void bootstrap();
     };
 
+    const handleReauthPrompt = () => {
+      if (!active) return;
+      setLoginRequired(false);
+    };
+
     const unsubscribeAnalysisState = subscribeToAnalysisStateChanges(() => {
       if (!active) return;
       void refreshHistoryList();
@@ -107,11 +113,13 @@ export default function HistoryPage() {
 
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
+    window.addEventListener(REAUTH_PROMPT_EVENT, handleReauthPrompt);
 
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
+      window.removeEventListener(REAUTH_PROMPT_EVENT, handleReauthPrompt);
       unsubscribeAnalysisState();
     };
   }, []);

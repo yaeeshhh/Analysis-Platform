@@ -7,7 +7,7 @@ import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
-import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
+import { LOGOUT_BROADCAST_KEY, REAUTH_PROMPT_EVENT } from "@/components/ui/GlobalOverlays";
 import {
   getRememberStatus,
   REMEMBER_LOGIN_STORAGE_KEY,
@@ -189,13 +189,20 @@ function AccountPageContent() {
       void bootstrap();
     };
 
+    const handleReauthPrompt = () => {
+      if (!active) return;
+      setLoginRequired(false);
+    };
+
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
+    window.addEventListener(REAUTH_PROMPT_EVENT, handleReauthPrompt);
 
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
+      window.removeEventListener(REAUTH_PROMPT_EVENT, handleReauthPrompt);
     };
   }, []);
 

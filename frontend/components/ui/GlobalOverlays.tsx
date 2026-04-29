@@ -19,6 +19,7 @@ import {
 } from "@/lib/session";
 
 export const LOGOUT_BROADCAST_KEY = "auth:logout-broadcast";
+export const REAUTH_PROMPT_EVENT = "auth:reauth-prompt";
 
 function withLoginPrompt(pathname: string, query: URLSearchParams): string {
   const next = new URLSearchParams(query.toString());
@@ -26,6 +27,16 @@ function withLoginPrompt(pathname: string, query: URLSearchParams): string {
   next.delete("token");
   next.delete(PASSWORD_CHANGED_QUERY_PARAM);
   next.set("login_prompt", "1");
+  const qs = next.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
+}
+
+function withoutAuthFlowParams(pathname: string, query: URLSearchParams): string {
+  const next = new URLSearchParams(query.toString());
+  next.delete("reset_token");
+  next.delete("token");
+  next.delete(PASSWORD_CHANGED_QUERY_PARAM);
+  next.delete("login_prompt");
   const qs = next.toString();
   return qs ? `${pathname}?${qs}` : pathname;
 }
@@ -97,6 +108,27 @@ export default function GlobalOverlays() {
   }, []);
 
   useEffect(() => {
+    const handleLoggedIn = () => {
+      dismissedPasswordChangedNoticeIdRef.current = null;
+      setPasswordChangedNotice(null);
+
+      if (
+        searchParams.get("reset_token") ||
+        searchParams.get("token") ||
+        searchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1" ||
+        searchParams.get("login_prompt") === "1"
+      ) {
+        router.replace(withoutAuthFlowParams(pathname, searchParams), { scroll: false });
+      }
+    };
+
+    window.addEventListener("auth:logged-in", handleLoggedIn);
+    return () => {
+      window.removeEventListener("auth:logged-in", handleLoggedIn);
+    };
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
     if (!mounted) return;
     if (["/login", "/signup", "/reset-password"].includes(pathname)) return;
 
@@ -151,6 +183,7 @@ export default function GlobalOverlays() {
             markPasswordChangedNoticeSeen(passwordChangedNotice.id);
           }
           setPasswordChangedNotice(null);
+          window.dispatchEvent(new CustomEvent(REAUTH_PROMPT_EVENT));
           router.replace(withLoginPrompt(pathname, searchParams), { scroll: false });
         }}
       />

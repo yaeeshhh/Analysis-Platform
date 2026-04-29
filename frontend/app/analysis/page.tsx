@@ -3,6 +3,7 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
+import { REAUTH_PROMPT_EVENT } from "@/components/ui/GlobalOverlays";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import ScrollIntentLink from "@/components/ui/ScrollIntentLink";
 import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
@@ -199,6 +200,11 @@ function AnalysisPageContent() {
       void bootstrap();
     };
 
+    const handleReauthPrompt = () => {
+      if (!active) return;
+      setLoginRequired(false);
+    };
+
     const unsubscribeAnalysisState = subscribeToAnalysisStateChanges(() => {
       if (!active) return;
       const nextId = getCurrentAnalysisSelection() ?? selectedAnalysisIdRef.current;
@@ -208,11 +214,13 @@ function AnalysisPageContent() {
     window.addEventListener("auth:logged-in", handleAuthChange);
     window.addEventListener("auth:logged-out", handleAuthChange);
 
+    window.addEventListener(REAUTH_PROMPT_EVENT, handleReauthPrompt);
     return () => {
       active = false;
       window.removeEventListener("auth:logged-in", handleAuthChange);
       window.removeEventListener("auth:logged-out", handleAuthChange);
       unsubscribeAnalysisState();
+      window.removeEventListener(REAUTH_PROMPT_EVENT, handleReauthPrompt);
     };
   }, [requestedAnalysisId, refreshAnalyses, router]);
 
