@@ -6,9 +6,11 @@ export const LOGIN_BROADCAST_KEY = "auth:login-broadcast";
 const PASSWORD_CHANGED_NOTICE_KEY = "auth:password-changed-notice";
 const LAST_SEEN_PASSWORD_CHANGED_NOTICE_KEY = "auth:last-password-changed-notice-id";
 const FORCED_PASSWORD_CHANGED_NOTICE_KEY = "auth:force-password-changed-notice-id";
+const REAUTH_PROMPT_SESSION_KEY = "auth:reauth-prompt";
 const PASSWORD_CHANGED_REAUTH_DETAIL = "Your password was changed. Please log in again.";
 const AUTHENTICATED_USER_CACHE_WINDOW_MS = 30000;
 export const PASSWORD_CHANGED_QUERY_PARAM = "password_changed";
+export const REAUTH_PROMPT_STATE_EVENT = "auth:reauth-prompt-state";
 
 type CachedAuthenticatedUser = {
   cacheKey: string;
@@ -49,6 +51,30 @@ function clearPendingPasswordChangedNotice(): void {
   sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
 }
 
+function dispatchReauthPromptStateEvent(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(REAUTH_PROMPT_STATE_EVENT));
+}
+
+export function armReauthPrompt(): void {
+  if (typeof window === "undefined") return;
+
+  sessionStorage.setItem(REAUTH_PROMPT_SESSION_KEY, "1");
+  dispatchReauthPromptStateEvent();
+}
+
+export function clearReauthPrompt(): void {
+  if (typeof window === "undefined") return;
+
+  sessionStorage.removeItem(REAUTH_PROMPT_SESSION_KEY);
+  dispatchReauthPromptStateEvent();
+}
+
+export function hasPendingReauthPrompt(): boolean {
+  if (typeof window === "undefined") return false;
+  return sessionStorage.getItem(REAUTH_PROMPT_SESSION_KEY) === "1";
+}
+
 export function setActiveAccountEmail(email: string | null): void {
   if (typeof window === "undefined") return;
 
@@ -76,6 +102,7 @@ export function dispatchLoggedInEvent(email: string | null | undefined): void {
 
   const normalizedEmail = normalizeAccountEmail(email);
   clearPendingPasswordChangedNotice();
+  clearReauthPrompt();
   setActiveAccountEmail(normalizedEmail || null);
   window.dispatchEvent(
     new CustomEvent("auth:logged-in", {
@@ -268,6 +295,10 @@ export function shouldSuppressDefaultLoginModal(): boolean {
   }
 
   if (params.get(PASSWORD_CHANGED_QUERY_PARAM) === "1") {
+    return true;
+  }
+
+  if (hasPendingReauthPrompt()) {
     return true;
   }
 

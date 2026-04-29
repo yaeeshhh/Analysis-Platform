@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import GlobalLoginPrompt from "@/components/ui/GlobalLoginPrompt";
 import GlobalResetPasswordModal from "@/components/ui/GlobalResetPasswordModal";
 import PasswordChangedNoticeModal from "@/components/ui/PasswordChangedNoticeModal";
 import {
+  armReauthPrompt,
   LOGIN_BROADCAST_KEY,
   PASSWORD_CHANGED_QUERY_PARAM,
   type PasswordChangedNoticePayload,
@@ -21,16 +22,6 @@ import {
 export const LOGOUT_BROADCAST_KEY = "auth:logout-broadcast";
 export const REAUTH_PROMPT_EVENT = "auth:reauth-prompt";
 
-function withLoginPrompt(pathname: string, query: URLSearchParams): string {
-  const next = new URLSearchParams(query.toString());
-  next.delete("reset_token");
-  next.delete("token");
-  next.delete(PASSWORD_CHANGED_QUERY_PARAM);
-  next.set("login_prompt", "1");
-  const qs = next.toString();
-  return qs ? `${pathname}?${qs}` : pathname;
-}
-
 function withoutAuthFlowParams(pathname: string, query: URLSearchParams): string {
   const next = new URLSearchParams(query.toString());
   next.delete("reset_token");
@@ -42,7 +33,6 @@ function withoutAuthFlowParams(pathname: string, query: URLSearchParams): string
 }
 
 export default function GlobalOverlays() {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
@@ -118,7 +108,11 @@ export default function GlobalOverlays() {
         searchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1" ||
         searchParams.get("login_prompt") === "1"
       ) {
-        router.replace(withoutAuthFlowParams(pathname, searchParams), { scroll: false });
+        window.history.replaceState(
+          null,
+          "",
+          withoutAuthFlowParams(pathname, searchParams)
+        );
       }
     };
 
@@ -126,7 +120,7 @@ export default function GlobalOverlays() {
     return () => {
       window.removeEventListener("auth:logged-in", handleLoggedIn);
     };
-  }, [pathname, router, searchParams]);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -171,6 +165,9 @@ export default function GlobalOverlays() {
       <PasswordChangedNoticeModal
         open={!!passwordChangedNotice}
         onContinue={() => {
+          const nextPath = withoutAuthFlowParams(pathname, searchParams);
+          const nextBasePath = nextPath.split("?", 1)[0] || pathname;
+
           const dismissedNoticeId = searchParams.get(PASSWORD_CHANGED_QUERY_PARAM)
             ? "password-changed-query"
             : passwordChangedNotice?.id ?? null;
@@ -183,8 +180,11 @@ export default function GlobalOverlays() {
             markPasswordChangedNoticeSeen(passwordChangedNotice.id);
           }
           setPasswordChangedNotice(null);
+          if (!["/login", "/signup", "/reset-password"].includes(nextBasePath)) {
+            armReauthPrompt();
+          }
           window.dispatchEvent(new CustomEvent(REAUTH_PROMPT_EVENT));
-          router.replace(withLoginPrompt(pathname, searchParams), { scroll: false });
+          window.history.replaceState(null, "", nextPath);
         }}
       />
     </>

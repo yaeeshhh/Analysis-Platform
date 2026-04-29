@@ -1,9 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
-import { PASSWORD_CHANGED_QUERY_PARAM } from "@/lib/session";
+import {
+  PASSWORD_CHANGED_QUERY_PARAM,
+  REAUTH_PROMPT_STATE_EVENT,
+  clearReauthPrompt,
+  hasPendingReauthPrompt,
+} from "@/lib/session";
 
 function removeLoginPrompt(pathname: string, searchParams: URLSearchParams): string {
   const next = new URLSearchParams(searchParams.toString());
@@ -14,14 +19,34 @@ function removeLoginPrompt(pathname: string, searchParams: URLSearchParams): str
 }
 
 export default function GlobalLoginPrompt() {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [promptArmed, setPromptArmed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const syncPromptState = () => {
+      setPromptArmed(hasPendingReauthPrompt());
+    };
+
+    syncPromptState();
+    window.addEventListener(REAUTH_PROMPT_STATE_EVENT, syncPromptState);
+
+    return () => {
+      window.removeEventListener(REAUTH_PROMPT_STATE_EVENT, syncPromptState);
+    };
+  }, []);
+
+  const onAuthPage = ["/login", "/signup", "/reset-password"].includes(pathname);
+  const hasLoginPromptQuery = searchParams.get("login_prompt") === "1";
+  const hasPasswordChangedQuery = searchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1";
 
   const open =
+    !onAuthPage &&
     !searchParams.get("reset_token") &&
     !searchParams.get("token") &&
-    searchParams.get("login_prompt") === "1";
+    (hasLoginPromptQuery || promptArmed);
 
   const loginHref = useMemo(() => {
     const next = new URLSearchParams(searchParams.toString());
@@ -38,7 +63,15 @@ export default function GlobalLoginPrompt() {
   }, [pathname, searchParams]);
 
   const close = () => {
-    router.replace(removeLoginPrompt(pathname, searchParams), { scroll: false });
+    clearReauthPrompt();
+
+    if (hasLoginPromptQuery || hasPasswordChangedQuery) {
+      window.history.replaceState(
+        null,
+        "",
+        removeLoginPrompt(pathname, searchParams)
+      );
+    }
   };
 
   if (!open) return null;

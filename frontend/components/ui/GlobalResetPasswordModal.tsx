@@ -19,7 +19,7 @@ import {
   moveInputCaretToEnd,
 } from "@/lib/helpers";
 import { LOGOUT_BROADCAST_KEY } from "@/components/ui/GlobalOverlays";
-import { queuePasswordChangedNotice } from "@/lib/session";
+import { armReauthPrompt, queuePasswordChangedNotice } from "@/lib/session";
 import PasswordToggleButton from "@/components/ui/PasswordToggleButton";
 import PasswordStrengthBar from "@/components/ui/PasswordStrengthBar";
 import SurfaceLoadingIndicator from "@/components/ui/SurfaceLoadingIndicator";
@@ -169,16 +169,16 @@ export default function GlobalResetPasswordModal() {
         "token",
         "login_prompt",
       ]);
-      const nextQuery = new URLSearchParams();
-      if (cleanPath.includes("?")) {
-        const [, query = ""] = cleanPath.split("?", 2);
-        const current = new URLSearchParams(query);
-        current.forEach((value, key) => nextQuery.set(key, value));
-      }
-      nextQuery.set("login_prompt", "1");
       const basePath = cleanPath.split("?", 1)[0] || pathname;
-      const nextSearch = nextQuery.toString();
-      window.location.replace(nextSearch ? `${basePath}?${nextSearch}` : basePath);
+      const destinationPath = ["/login", "/signup", "/reset-password"].includes(basePath)
+        ? "/login"
+        : cleanPath;
+
+      if (destinationPath !== "/login") {
+        armReauthPrompt();
+      }
+
+      window.location.replace(destinationPath);
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "Unable to reset password."
