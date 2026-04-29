@@ -277,8 +277,6 @@ export function markPasswordChangedNoticeSeen(noticeId: string): void {
   if (sessionStorage.getItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY) === noticeId) {
     sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
   }
-
-  clearPendingPasswordChangedNotice();
 }
 
 export function shouldSuppressDefaultLoginModal(): boolean {
