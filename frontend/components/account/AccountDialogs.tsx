@@ -557,7 +557,6 @@ function PasswordChangeDialog({
   onClose: () => void;
   user: User;
 }) {
-  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [nextPassword, setNextPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -652,7 +651,12 @@ function PasswordChangeDialog({
       clearActiveAccountEmail();
       localStorage.setItem(LOGOUT_BROADCAST_KEY, Date.now().toString());
       onClose();
-      router.replace(`/login?${PASSWORD_CHANGED_QUERY_PARAM}=1`);
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.delete("reset_token");
+      nextUrl.searchParams.delete("token");
+      nextUrl.searchParams.delete("login_prompt");
+      nextUrl.searchParams.set(PASSWORD_CHANGED_QUERY_PARAM, "1");
+      window.location.replace(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Failed to update password.");
     } finally {

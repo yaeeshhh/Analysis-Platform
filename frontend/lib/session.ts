@@ -193,6 +193,21 @@ export function isPasswordChangedReauthMessage(message: unknown): boolean {
 
 function redirectToPasswordChangedLogin(): void {
   if (typeof window === "undefined") return;
+
+  const currentUrl = new URL(window.location.href);
+  const shouldStayOnCurrentPage =
+    currentUrl.searchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1" ||
+    !!getPasswordChangedNoticeToShow();
+
+  if (shouldStayOnCurrentPage) {
+    currentUrl.searchParams.delete("reset_token");
+    currentUrl.searchParams.delete("token");
+    currentUrl.searchParams.delete("login_prompt");
+    currentUrl.searchParams.set(PASSWORD_CHANGED_QUERY_PARAM, "1");
+    window.location.replace(`${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+    return;
+  }
+
   window.location.replace(`/login?${PASSWORD_CHANGED_QUERY_PARAM}=1`);
 }
 
