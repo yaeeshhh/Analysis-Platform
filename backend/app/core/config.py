@@ -59,6 +59,10 @@ class Settings:
     )
     EMAIL_FROM: str = os.getenv("EMAIL_FROM", "no-reply@analysis-platform.local")
 
+    # Mailgun settings
+    MAILGUN_API_KEY: str | None = os.getenv("MAILGUN_API_KEY")
+    MAILGUN_DOMAIN: str | None = os.getenv("MAILGUN_DOMAIN")
+
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",

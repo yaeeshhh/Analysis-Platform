@@ -8,15 +8,46 @@ from .config import settings
 logger = logging.getLogger(__name__)
 
 
-def _http_delivery_ready() -> bool:
+def _mailgun_delivery_ready() -> bool:
     return bool(
-        settings.EMAIL_HTTP_ENDPOINT
-        and settings.EMAIL_HTTP_AUTH_VALUE
+        settings.MAILGUN_API_KEY
+        and settings.MAILGUN_DOMAIN
         and settings.EMAIL_FROM
     )
 
 
-def _send_email_via_http_delivery(message: EmailMessage) -> tuple[bool, str | None]:
+def _send_email_via_mailgun(message: EmailMessage) -> tuple[bool, str | None]:
+    if not _mailgun_delivery_ready():
+        return False, "Mailgun delivery is not configured"
+
+    to_email = message["To"]
+    subject = message["Subject"]
+
+    plain_body = message.get_body(preferencelist=("plain",))
+    text = plain_body.get_content() if plain_body else message.as_string()
+
+    try:
+        response = requests.post(
+            f"https://api.mailgun.net/v3/{settings.MAILGUN_DOMAIN}/messages",
+            auth=("api", settings.MAILGUN_API_KEY),
+            data={
+                "from": settings.EMAIL_FROM,
+                "to": [to_email],
+                "subject": subject,
+                "text": text,
+            },
+            timeout=10,  # Mailgun timeout
+        )
+
+        if response.status_code == 200:
+            return True, None
+
+        logger.error("Mailgun email request failed: %s", response.text)
+        return False, f"Mailgun request failed with HTTP {response.status_code}"
+
+    except Exception as exc:
+        logger.exception("Mailgun email error while sending to %s", to_email)
+        return False, str(exc)
     if not _http_delivery_ready():
         return False, "Outbound email delivery is not configured"
 
@@ -51,13 +82,15 @@ def _send_email_via_http_delivery(message: EmailMessage) -> tuple[bool, str | No
 
 
 def _send_email(message: EmailMessage) -> tuple[bool, str | None]:
+    if _mailgun_delivery_ready():
+        return _send_email_via_mailgun(message)
     if _http_delivery_ready():
         return _send_email_via_http_delivery(message)
     return False, "Email delivery is not configured"
 
 
 def email_delivery_is_configured() -> bool:
-    return _http_delivery_ready()
+    return _mailgun_delivery_ready() or _http_delivery_ready()
 
 
 def _greeting(name: str | None) -> str:
@@ -71,7 +104,7 @@ def send_password_reset_email(to_email: str, reset_link: str, recipient_name: st
 
     Returns True when email is sent, False when delivery is not configured.
     """
-    if not _http_delivery_ready():
+    if not email_delivery_is_configured():
         logger.warning(
             "Email delivery not configured. Password reset link for %s: %s",
             to_email,
@@ -109,7 +142,7 @@ def send_login_verification_email(
     expires_in_minutes: int,
     recipient_name: str | None = None,
 ) -> tuple[bool, str | None]:
-    if not _http_delivery_ready():
+    if not email_delivery_is_configured():
         logger.warning(
             "Email delivery not configured. Login verification code for %s: %s",
             to_email,
@@ -148,7 +181,7 @@ def send_profile_update_verification_email(
     expires_in_minutes: int,
     recipient_name: str | None = None,
 ) -> bool:
-    if not _http_delivery_ready():
+    if not email_delivery_is_configured():
         logger.warning(
             "Email delivery not configured. Profile update verification code for %s: %s",
             to_email,
@@ -186,7 +219,7 @@ def send_account_deletion_verification_email(
     expires_in_minutes: int,
     recipient_name: str | None = None,
 ) -> bool:
-    if not _http_delivery_ready():
+    if not email_delivery_is_configured():
         logger.warning(
             "Email delivery not configured. Account deletion verification code for %s: %s",
             to_email,
