@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
@@ -133,7 +133,7 @@ function AccountSlideToggle({
   );
 }
 
-export default function AccountPage() {
+function AccountPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const suppressLoginRequiredRef = useRef(false);
@@ -918,6 +918,14 @@ export default function AccountPage() {
         onLoginSuccess={() => setLoginRequired(false)}
       />
     </>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccountPageContent />
+    </Suspense>
   );
 }
 
