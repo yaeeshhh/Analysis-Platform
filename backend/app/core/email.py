@@ -146,9 +146,8 @@ def send_password_reset_email(to_email: str, reset_link: str, recipient_name: st
     """
     if not email_delivery_is_configured():
         logger.warning(
-            "Email delivery not configured. Password reset link for %s: %s",
+            "Email delivery not configured. Password reset requested for %s",
             to_email,
-            reset_link,
         )
         return False
 
@@ -169,10 +168,9 @@ def send_password_reset_email(to_email: str, reset_link: str, recipient_name: st
         return True
 
     logger.warning(
-        "Failed to send password reset email to %s. Falling back to dev link.",
+        "Failed to send password reset email to %s",
         to_email,
     )
-    logger.warning("Password reset link for %s: %s", to_email, reset_link)
     return False
 
 
@@ -184,9 +182,8 @@ def send_login_verification_email(
 ) -> tuple[bool, str | None]:
     if not email_delivery_is_configured():
         logger.warning(
-            "Email delivery not configured. Login verification code for %s: %s",
+            "Email delivery not configured. Login verification code requested for %s",
             to_email,
-            code,
         )
         return False, "Email delivery is not configured"
 
@@ -207,9 +204,8 @@ def send_login_verification_email(
         return True, None
 
     logger.warning(
-        "Login verification code for %s: %s (%s)",
+        "Failed to send login verification code to %s: %s",
         to_email,
-        code,
         reason or "unknown reason",
     )
     return False, reason
@@ -223,9 +219,8 @@ def send_profile_update_verification_email(
 ) -> bool:
     if not email_delivery_is_configured():
         logger.warning(
-            "Email delivery not configured. Profile update verification code for %s: %s",
+            "Email delivery not configured. Profile update verification code requested for %s",
             to_email,
-            code,
         )
         return False
 
@@ -246,9 +241,8 @@ def send_profile_update_verification_email(
         return True
 
     logger.warning(
-        "Profile update verification code for %s: %s",
+        "Failed to send profile update verification code to %s",
         to_email,
-        code,
     )
     return False
 
@@ -261,9 +255,8 @@ def send_account_deletion_verification_email(
 ) -> bool:
     if not email_delivery_is_configured():
         logger.warning(
-            "Email delivery not configured. Account deletion verification code for %s: %s",
+            "Email delivery not configured. Account deletion verification code requested for %s",
             to_email,
-            code,
         )
         return False
 
@@ -284,8 +277,7 @@ def send_account_deletion_verification_email(
         return True
 
     logger.warning(
-        "Account deletion verification code for %s: %s",
+        "Failed to send account deletion verification code to %s",
         to_email,
-        code,
     )
     return False
