@@ -3,10 +3,12 @@
 import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
+import { PASSWORD_CHANGED_QUERY_PARAM } from "@/lib/session";
 
 function removeLoginPrompt(pathname: string, searchParams: URLSearchParams): string {
   const next = new URLSearchParams(searchParams.toString());
   next.delete("login_prompt");
+  next.delete(PASSWORD_CHANGED_QUERY_PARAM);
   const qs = next.toString();
   return qs ? `${pathname}?${qs}` : pathname;
 }
@@ -24,6 +26,7 @@ export default function GlobalLoginPrompt() {
   const loginHref = useMemo(() => {
     const next = new URLSearchParams(searchParams.toString());
     next.delete("login_prompt");
+    next.delete(PASSWORD_CHANGED_QUERY_PARAM);
     const redirect = next.get("redirect");
 
     if (pathname === "/login" && (!redirect || !redirect.startsWith("/"))) {

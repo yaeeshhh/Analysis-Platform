@@ -335,7 +335,7 @@ def forgot_password(
     payload: ForgotPasswordRequest,
     db: Session = Depends(get_db),
 ):
-    reset_link = AuthService.request_password_reset(
+    AuthService.request_password_reset(
         payload.email,
         db,
         redirect_path=payload.redirect_path,
@@ -343,7 +343,6 @@ def forgot_password(
     )
     return ForgotPasswordResponse(
         message="If an account exists for this email, a reset link has been sent.",
-        reset_link=reset_link,
     )
 
 

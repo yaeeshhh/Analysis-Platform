@@ -32,7 +32,6 @@ import {
   moveInputCaretToEnd,
 } from "@/lib/helpers";
 import {
-  getFirstUnmetPasswordRequirement,
   getPasswordStrengthState,
   validatePasswordPolicy,
 } from "@/lib/passwordPolicy";
@@ -569,12 +568,10 @@ function PasswordChangeDialog({
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotCountdown, setForgotCountdown] = useState(0);
   const [forgotMessage, setForgotMessage] = useState("");
-  const [forgotResetLink, setForgotResetLink] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const passwordsMatch = nextPassword.length > 0 && nextPassword === confirmPassword;
-  const passwordRequirementMessage = getFirstUnmetPasswordRequirement(nextPassword);
   const passwordStrength = getPasswordStrengthState(nextPassword);
 
   useEffect(() => {
@@ -589,7 +586,6 @@ function PasswordChangeDialog({
       setForgotLoading(false);
       setForgotCountdown(0);
       setForgotMessage("");
-      setForgotResetLink(null);
       setLoading(false);
       setError("");
     }
@@ -609,12 +605,10 @@ function PasswordChangeDialog({
       setForgotLoading(true);
       setError("");
       setForgotMessage("");
-      setForgotResetLink(null);
 
-      const result = await forgotPassword(user.email, "/account");
+      await forgotPassword(user.email, "/account");
       setForgotCountdown(30);
-      setForgotMessage(`Current action: open the reset link sent to ${maskEmailAddress(user.email)} and choose a new password.`);
-      setForgotResetLink(result.reset_link || null);
+      setForgotMessage(`Check ${maskEmailAddress(user.email)} for the password reset email and use the link there to choose a new password.`);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Unable to request password reset.");
     } finally {
@@ -722,9 +716,6 @@ function PasswordChangeDialog({
             textClassName={passwordStrength.textClassName}
             smallText
           />
-          {passwordRequirementMessage && nextPassword.length > 0 ? (
-            <p className="text-[11px] text-red-300">{passwordRequirementMessage}</p>
-          ) : null}
           <div className="relative">
             <input
               type={showConfirmPassword ? "text" : "password"}
@@ -764,11 +755,6 @@ function PasswordChangeDialog({
           {forgotMessage ? (
             <div className="rounded-[16px] border border-[#224c37] bg-[#13241c] px-4 py-3 text-xs text-[#9ff4c0]">
               <p>{forgotMessage}</p>
-              {forgotResetLink ? (
-                <a href={forgotResetLink} className="mt-2 inline-flex underline underline-offset-4">
-                  Open reset link
-                </a>
-              ) : null}
             </div>
           ) : null}
         </div>

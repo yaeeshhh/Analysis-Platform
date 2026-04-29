@@ -180,7 +180,6 @@ interface RefreshResponse {
 
 interface GenericMessageResponse {
   message: string;
-  reset_link?: string | null;
 }
 
 interface ResetPasswordContextResponse {

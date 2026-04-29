@@ -49,7 +49,6 @@ function LoginPageContent() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotCountdown, setForgotCountdown] = useState(0);
   const [forgotMessage, setForgotMessage] = useState("");
-  const [forgotResetLink, setForgotResetLink] = useState<string | null>(null);
   const [invalidPasswordAttempts, setInvalidPasswordAttempts] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -274,7 +273,6 @@ function LoginPageContent() {
   const handleForgotPassword = async () => {
     setError("");
     setForgotMessage("");
-    setForgotResetLink(null);
 
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail || !normalizedEmail.includes("@")) {
@@ -285,10 +283,9 @@ function LoginPageContent() {
     try {
       setForgotLoading(true);
       const currentPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-      const result = await forgotPassword(normalizedEmail, currentPath);
+      await forgotPassword(normalizedEmail, currentPath);
       setForgotCountdown(30);
-      setForgotResetLink(result.reset_link || null);
-      setForgotMessage(`Reset link sent to ${maskEmailAddress(normalizedEmail)}. Open it to choose a new password.`);
+      setForgotMessage(`Check ${maskEmailAddress(normalizedEmail)} for the password reset email and use the link there to choose a new password.`);
     } catch (err: unknown) {
       setError(
         err instanceof Error
@@ -474,11 +471,6 @@ function LoginPageContent() {
           {forgotMessage && (
             <div className="bg-emerald-900/25 border border-emerald-700 text-emerald-200 text-sm p-3 rounded-lg">
               <p>{forgotMessage}</p>
-              {forgotResetLink && (
-                <a href={forgotResetLink} className="mt-2 inline-flex underline underline-offset-4">
-                  Open reset link
-                </a>
-              )}
             </div>
           )}
 

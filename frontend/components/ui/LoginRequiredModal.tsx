@@ -103,7 +103,6 @@ export default function LoginRequiredModal({
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotCountdown, setForgotCountdown] = useState(0);
   const [forgotMessage, setForgotMessage] = useState("");
-  const [forgotResetLink, setForgotResetLink] = useState<string | null>(null);
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -239,7 +238,6 @@ export default function LoginRequiredModal({
     setForgotLoading(false);
     setForgotCountdown(0);
     setForgotMessage("");
-    setForgotResetLink(null);
 
     setEmail("");
     setUsername("");
@@ -437,7 +435,6 @@ export default function LoginRequiredModal({
       setLoading(true);
       setError("");
       setForgotMessage("");
-      setForgotResetLink(null);
       setInvalidPasswordAttempts(0);
 
       const check = await checkLoginIdentifier(identifier.trim());
@@ -489,7 +486,6 @@ export default function LoginRequiredModal({
       setLoading(true);
       setError("");
       setForgotMessage("");
-      setForgotResetLink(null);
 
       const response = await login(identifier.trim(), password, rememberMe);
       if (isLoginChallengeResponse(response)) {
@@ -571,7 +567,6 @@ export default function LoginRequiredModal({
   const handleForgotPassword = async () => {
     setError("");
     setForgotMessage("");
-    setForgotResetLink(null);
 
     const normalizedEmail =
       resolvedLoginEmail ||
@@ -588,10 +583,9 @@ export default function LoginRequiredModal({
         typeof window !== "undefined"
           ? `${window.location.pathname}${window.location.search}`
           : "/login";
-      const result = await forgotPassword(normalizedEmail, currentPath);
+      await forgotPassword(normalizedEmail, currentPath);
       setForgotCountdown(30);
-      setForgotMessage(`Current action: open the reset link sent to ${maskEmailAddress(normalizedEmail)} and choose a new password.`);
-      setForgotResetLink(result.reset_link || null);
+      setForgotMessage(`Check ${maskEmailAddress(normalizedEmail)} for the password reset email and use the link there to choose a new password.`);
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "Unable to request password reset."
@@ -744,7 +738,6 @@ export default function LoginRequiredModal({
     setInvalidPasswordAttempts(0);
     setForgotCountdown(0);
     setForgotMessage("");
-    setForgotResetLink(null);
     setError("");
     setEmailAvailability("idle");
     setUsernameAvailability("idle");
@@ -1181,14 +1174,6 @@ export default function LoginRequiredModal({
           {forgotMessage && (
             <p className="rounded-[12px] border border-[#224c37] bg-[#13241c] px-3 py-2 text-xs text-[#6ee7a8]">
               {forgotMessage}
-              {forgotResetLink && (
-                <a
-                  href={forgotResetLink}
-                  className="mt-2 inline-flex underline underline-offset-4"
-                >
-                  Open reset link
-                </a>
-              )}
             </p>
           )}
 
@@ -1220,7 +1205,6 @@ export default function LoginRequiredModal({
                 setOtpFormatValid(true);
                 setError("");
                 setForgotMessage("");
-                setForgotResetLink(null);
                 setInvalidPasswordAttempts(0);
               }}
               disabled={loading}

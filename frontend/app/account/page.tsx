@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AppShell from "@/components/ui/AppShell";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import AccountDialogs, { type AccountDialogKey } from "@/components/account/AccountDialogs";
@@ -20,7 +20,11 @@ import {
 import { clearAccessToken, getAccessToken, setAccessToken } from "@/lib/api";
 import { clearCurrentAnalysisSelection, notifyAnalysesChanged } from "@/lib/currentAnalysis";
 import { clearUserScopedFrontendState, formatDate } from "@/lib/helpers";
-import { clearActiveAccountEmail, resolveAuthenticatedUser } from "@/lib/session";
+import {
+  PASSWORD_CHANGED_QUERY_PARAM,
+  clearActiveAccountEmail,
+  resolveAuthenticatedUser,
+} from "@/lib/session";
 
 const emptyRememberStatus: RememberStatus = {
   enabled: false,
@@ -131,6 +135,7 @@ function AccountSlideToggle({
 
 export default function AccountPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const suppressLoginRequiredRef = useRef(false);
   const [activeDialog, setActiveDialog] = useState<AccountDialogKey | null>(null);
   const [loginRequired, setLoginRequired] = useState(false);
@@ -204,6 +209,25 @@ export default function AccountPage() {
       window.removeEventListener("storage", handleStorage);
     };
   }, [user?.email]);
+
+  useEffect(() => {
+    if (!activeDialog) return;
+
+    if (
+      searchParams.get("reset_token") ||
+      searchParams.get("token") ||
+      searchParams.get("login_prompt") === "1" ||
+      searchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1"
+    ) {
+      setActiveDialog(null);
+    }
+  }, [activeDialog, searchParams]);
+
+  useEffect(() => {
+    if (!loading && !user && activeDialog) {
+      setActiveDialog(null);
+    }
+  }, [activeDialog, loading, user]);
 
   async function withAuthRetry<T>(request: (token: string) => Promise<T>) {
     let token = getAccessToken();
