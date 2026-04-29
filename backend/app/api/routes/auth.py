@@ -122,6 +122,7 @@ def verify_signup_code(
         email=pending.email,
         username=pending.username,
         full_name=pending.full_name,
+        two_factor_enabled=True,
         password_hash=pending.password_hash,
     )
     db.add(user)
@@ -131,7 +132,7 @@ def verify_signup_code(
     access_token, refresh_token, remember_token = AuthService._issue_login_artifacts(
         user,
         db,
-        remember_me=True,
+        remember_me=False,
     )
 
     PendingSignupService.delete_pending_signup_by_challenge(

@@ -213,6 +213,7 @@ export default function ProfileMenu({ variant = "default", onSidebarAction, disa
         title="Login to continue"
         message="Log in to access your account, saved runs, and history."
         loginHref={currentPath}
+        bypassFlowSuppression
         onDismiss={() => setShowLoginModal(false)}
         onLoginSuccess={() => {
           void handleLoginSuccess();

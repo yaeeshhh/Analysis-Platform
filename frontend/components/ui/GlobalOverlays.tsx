@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import GlobalLoginPrompt from "@/components/ui/GlobalLoginPrompt";
 import GlobalResetPasswordModal from "@/components/ui/GlobalResetPasswordModal";
@@ -36,6 +36,8 @@ export default function GlobalOverlays() {
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
   const [passwordChangedNotice, setPasswordChangedNotice] = useState<PasswordChangedNoticePayload | null>(null);
+  const dismissedPasswordChangedNoticeIdRef = useRef<string | null>(null);
+  const searchParamsKey = searchParams.toString();
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -50,12 +52,22 @@ export default function GlobalOverlays() {
   useEffect(() => {
     if (!mounted) return;
 
+    const currentSearchParams = new URLSearchParams(searchParamsKey);
+
     const notice =
       getPasswordChangedNoticeToShow() ??
-      (searchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1"
+      (currentSearchParams.get(PASSWORD_CHANGED_QUERY_PARAM) === "1"
         ? { id: "password-changed-query", email: "" }
         : null);
-    if (!notice) return;
+
+    if (!notice) {
+      dismissedPasswordChangedNoticeIdRef.current = null;
+      return;
+    }
+
+    if (dismissedPasswordChangedNoticeIdRef.current === notice.id) {
+      return;
+    }
 
     const frame = window.requestAnimationFrame(() => {
       setPasswordChangedNotice(notice);
@@ -64,7 +76,7 @@ export default function GlobalOverlays() {
     return () => {
       window.cancelAnimationFrame(frame);
     };
-  }, [mounted, pathname, searchParams]);
+  }, [mounted, pathname, searchParamsKey]);
 
   useEffect(() => {
     function handleStorageAuth(e: StorageEvent) {
@@ -126,6 +138,7 @@ export default function GlobalOverlays() {
         open={!!passwordChangedNotice}
         onContinue={() => {
           if (passwordChangedNotice) {
+            dismissedPasswordChangedNoticeIdRef.current = passwordChangedNotice.id;
             markPasswordChangedNoticeSeen(passwordChangedNotice.id);
           }
           setPasswordChangedNotice(null);

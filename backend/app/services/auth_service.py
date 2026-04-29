@@ -98,6 +98,27 @@ class AuthService:
         )
 
     @staticmethod
+    def _reset_auth_state_after_password_change(user: User, db: Session) -> None:
+        user.two_factor_enabled = True
+
+        db.query(RefreshToken).filter(
+            RefreshToken.user_id == user.id,
+            RefreshToken.revoked == False,
+        ).update({"revoked": True})
+
+        db.query(RememberLoginToken).filter(
+            RememberLoginToken.user_id == user.id,
+            RememberLoginToken.revoked == False,
+        ).update({"revoked": True})
+
+        db.query(LoginVerificationCode).filter(
+            LoginVerificationCode.user_id == user.id,
+            LoginVerificationCode.used == False,
+        ).update({"used": True})
+
+        AuthService._mark_password_changed(user.id, db)
+
+    @staticmethod
     def _normalize_identifier(value: str) -> str:
         return value.strip().lower()
 
@@ -657,17 +678,7 @@ class AuthService:
         user.password_hash = hash_password(new_password)
         db_token.used = True
 
-        db.query(RefreshToken).filter(
-            RefreshToken.user_id == user.id,
-            RefreshToken.revoked == False,
-        ).update({"revoked": True})
-
-        db.query(RememberLoginToken).filter(
-            RememberLoginToken.user_id == user.id,
-            RememberLoginToken.revoked == False,
-        ).update({"revoked": True})
-
-        AuthService._mark_password_changed(user.id, db)
+        AuthService._reset_auth_state_after_password_change(user, db)
         db.add(user)
         db.commit()
 
@@ -897,15 +908,7 @@ class AuthService:
             raise HTTPException(status_code=400, detail="No profile changes provided")
 
         if password_changed:
-            db.query(RefreshToken).filter(
-                RefreshToken.user_id == user.id,
-                RefreshToken.revoked == False,
-            ).update({"revoked": True})
-            db.query(RememberLoginToken).filter(
-                RememberLoginToken.user_id == user.id,
-                RememberLoginToken.revoked == False,
-            ).update({"revoked": True})
-            AuthService._mark_password_changed(user.id, db)
+            AuthService._reset_auth_state_after_password_change(user, db)
 
         db.add(user)
         db.commit()
