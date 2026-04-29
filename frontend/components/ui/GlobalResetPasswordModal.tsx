@@ -154,7 +154,7 @@ export default function GlobalResetPasswordModal() {
     try {
       setLoading(true);
       await resetPassword(token, newPassword);
-      queuePasswordChangedNotice(accountEmail, { forceCurrentTab: false });
+      queuePasswordChangedNotice(accountEmail);
       clearAccessToken();
       clearUserScopedFrontendState();
       if (accountEmail) {
