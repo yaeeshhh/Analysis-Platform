@@ -81,6 +81,8 @@ export default function GlobalOverlays() {
   useEffect(() => {
     function handleStorageAuth(e: StorageEvent) {
       if (e.key === LOGIN_BROADCAST_KEY && e.newValue) {
+        dismissedPasswordChangedNoticeIdRef.current = null;
+        setPasswordChangedNotice(null);
         dispatchLoggedInEvent(readLoggedInBroadcastEmail(e.newValue));
         return;
       }

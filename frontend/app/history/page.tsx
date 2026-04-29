@@ -24,7 +24,7 @@ import {
   subscribeToAnalysisStateChanges,
 } from "@/lib/currentAnalysis";
 import { formatDate } from "@/lib/helpers";
-import { resolveAuthenticatedUser } from "@/lib/session";
+import { resolveAuthenticatedUser, shouldSuppressDefaultLoginModal } from "@/lib/session";
 
 type ReadinessFilter = "all" | "ml-ready" | "eda-first";
 type MlFilter = "all" | "with-ml" | "without-ml";
@@ -77,7 +77,7 @@ export default function HistoryPage() {
       if (!active) return;
       if (!user) {
         setAnalyses([]);
-        setLoginRequired(true);
+        setLoginRequired(!shouldSuppressDefaultLoginModal());
         setLoading(false);
         return;
       }

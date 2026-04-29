@@ -24,6 +24,7 @@ import {
   PASSWORD_CHANGED_QUERY_PARAM,
   clearActiveAccountEmail,
   resolveAuthenticatedUser,
+  shouldSuppressDefaultLoginModal,
 } from "@/lib/session";
 
 const emptyRememberStatus: RememberStatus = {
@@ -163,8 +164,10 @@ function AccountPageContent() {
       if (!authenticatedUser) {
         setUser(null);
         setRememberStatus(emptyRememberStatus);
-        if (!suppressLoginRequiredRef.current) {
+        if (!suppressLoginRequiredRef.current && !shouldSuppressDefaultLoginModal()) {
           setLoginRequired(true);
+        } else {
+          setLoginRequired(false);
         }
         setLoading(false);
         return;

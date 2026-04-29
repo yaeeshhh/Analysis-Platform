@@ -30,6 +30,7 @@ import {
   subscribeToAnalysisStateChanges,
   setCurrentAnalysisSelection,
 } from "@/lib/currentAnalysis";
+import { shouldSuppressDefaultLoginModal } from "@/lib/session";
 import { calculateQualityScore } from "@/lib/analysisDerived";
 import {
   type AnalysisTabKey,
@@ -137,7 +138,7 @@ function AnalysisPageContent() {
         setAnalyses([]);
         setSelectedAnalysisId(null);
         setReport(null);
-        setLoginRequired(true);
+        setLoginRequired(!shouldSuppressDefaultLoginModal());
         setLoading(false);
         return;
       }

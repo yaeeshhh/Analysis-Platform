@@ -38,6 +38,18 @@ function normalizeAccountEmail(email: string | null | undefined): string {
   return email?.trim().toLowerCase() || "";
 }
 
+function clearPendingPasswordChangedNotice(expectedNoticeId?: string): void {
+  if (typeof window === "undefined") return;
+
+  const pendingNotice = getPendingPasswordChangedNotice();
+  if (expectedNoticeId && pendingNotice?.id && pendingNotice.id !== expectedNoticeId) {
+    return;
+  }
+
+  localStorage.removeItem(PASSWORD_CHANGED_NOTICE_KEY);
+  sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
+}
+
 export function setActiveAccountEmail(email: string | null): void {
   if (typeof window === "undefined") return;
 
@@ -64,6 +76,7 @@ export function dispatchLoggedInEvent(email: string | null | undefined): void {
   if (typeof window === "undefined") return;
 
   const normalizedEmail = normalizeAccountEmail(email);
+  clearPendingPasswordChangedNotice();
   setActiveAccountEmail(normalizedEmail || null);
   window.dispatchEvent(
     new CustomEvent("auth:logged-in", {
@@ -216,6 +229,8 @@ export function markPasswordChangedNoticeSeen(noticeId: string): void {
   if (sessionStorage.getItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY) === noticeId) {
     sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
   }
+
+  clearPendingPasswordChangedNotice(noticeId);
 }
 
 export function shouldSuppressDefaultLoginModal(): boolean {
