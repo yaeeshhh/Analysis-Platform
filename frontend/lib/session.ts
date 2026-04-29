@@ -38,13 +38,8 @@ function normalizeAccountEmail(email: string | null | undefined): string {
   return email?.trim().toLowerCase() || "";
 }
 
-function clearPendingPasswordChangedNotice(expectedNoticeId?: string): void {
+function clearPendingPasswordChangedNotice(): void {
   if (typeof window === "undefined") return;
-
-  const pendingNotice = getPendingPasswordChangedNotice();
-  if (expectedNoticeId && pendingNotice?.id && pendingNotice.id !== expectedNoticeId) {
-    return;
-  }
 
   localStorage.removeItem(PASSWORD_CHANGED_NOTICE_KEY);
   sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
@@ -230,7 +225,7 @@ export function markPasswordChangedNoticeSeen(noticeId: string): void {
     sessionStorage.removeItem(FORCED_PASSWORD_CHANGED_NOTICE_KEY);
   }
 
-  clearPendingPasswordChangedNotice(noticeId);
+  clearPendingPasswordChangedNotice();
 }
 
 export function shouldSuppressDefaultLoginModal(): boolean {

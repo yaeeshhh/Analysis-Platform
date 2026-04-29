@@ -139,8 +139,15 @@ export default function GlobalOverlays() {
       <PasswordChangedNoticeModal
         open={!!passwordChangedNotice}
         onContinue={() => {
+          const dismissedNoticeId = searchParams.get(PASSWORD_CHANGED_QUERY_PARAM)
+            ? "password-changed-query"
+            : passwordChangedNotice?.id ?? null;
+
+          if (dismissedNoticeId) {
+            dismissedPasswordChangedNoticeIdRef.current = dismissedNoticeId;
+          }
+
           if (passwordChangedNotice) {
-            dismissedPasswordChangedNoticeIdRef.current = passwordChangedNotice.id;
             markPasswordChangedNoticeSeen(passwordChangedNotice.id);
           }
           setPasswordChangedNotice(null);
