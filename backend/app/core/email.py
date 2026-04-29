@@ -80,6 +80,46 @@ def _send_email_via_mailgun(message: EmailMessage) -> tuple[bool, str | None]:
         logger.exception("Outbound email error while sending to %s", to_email)
         return False, str(exc)
 
+def _http_delivery_ready() -> bool:
+    return bool(
+        settings.EMAIL_HTTP_ENDPOINT
+        and settings.EMAIL_HTTP_AUTH_VALUE
+        and settings.EMAIL_FROM
+    )
+
+
+def _send_email_via_http_delivery(message: EmailMessage) -> tuple[bool, str | None]:
+    if not _http_delivery_ready():
+        return False, "Outbound email delivery is not configured"
+
+    to_email = message["To"]
+    subject = message["Subject"]
+
+    plain_body = message.get_body(preferencelist=("plain",))
+    text = plain_body.get_content() if plain_body else message.as_string()
+
+    try:
+        response = requests.post(
+            settings.EMAIL_HTTP_ENDPOINT,
+            auth=(settings.EMAIL_HTTP_AUTH_NAME, settings.EMAIL_HTTP_AUTH_VALUE),
+            data={
+                "from": settings.EMAIL_FROM,
+                "to": [to_email],
+                "subject": subject,
+                "text": text,
+            },
+            timeout=settings.EMAIL_HTTP_TIMEOUT_SECONDS,
+        )
+
+        if response.status_code in {200, 201, 202}:
+            return True, None
+
+        logger.error("Outbound email request failed: %s", response.text)
+        return False, f"Outbound email request failed with HTTP {response.status_code}"
+
+    except Exception as exc:
+        logger.exception("Outbound email error while sending to %s", to_email)
+        return False, str(exc)
 
 def _send_email(message: EmailMessage) -> tuple[bool, str | None]:
     if _mailgun_delivery_ready():
