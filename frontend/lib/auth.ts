@@ -837,11 +837,12 @@ export async function getResetPasswordContext(
   token: string
 ): Promise<ResetPasswordContextResponse> {
   const response = await fetch(
-    `${API_BASE_URL}/auth/reset-password-context?token=${encodeURIComponent(token)}`,
+    `${API_BASE_URL}/auth/reset-password-context`,
     {
-      method: "GET",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
+      body: JSON.stringify({ token }),
     }
   );
 

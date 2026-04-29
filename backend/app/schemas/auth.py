@@ -185,6 +185,10 @@ class ResetPasswordResponse(BaseModel):
     message: str
 
 
+class ResetPasswordContextRequest(BaseModel):
+    token: str
+
+
 class ResetPasswordContextResponse(BaseModel):
     email: EmailStr
     username: str | None = None

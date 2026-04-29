@@ -24,6 +24,7 @@ from ...schemas.auth import (
     RequestAccountDeletionCodeResponse,
     RequestProfileIdentityUpdateCodeRequest,
     RequestProfileIdentityUpdateCodeResponse,
+    ResetPasswordContextRequest,
     ResetPasswordContextResponse,
     ResetPasswordRequest,
     ResetPasswordResponse,
@@ -362,12 +363,12 @@ def reset_password(
     return ResetPasswordResponse(message="Password reset successful")
 
 
-@router.get("/reset-password-context", response_model=ResetPasswordContextResponse)
+@router.post("/reset-password-context", response_model=ResetPasswordContextResponse)
 def reset_password_context(
-    token: str,
+    payload: ResetPasswordContextRequest,
     db: Session = Depends(get_db),
 ):
-    email, username = AuthService.get_password_reset_context(token, db)
+    email, username = AuthService.get_password_reset_context(payload.token, db)
     return ResetPasswordContextResponse(email=email, username=username)
 
 
