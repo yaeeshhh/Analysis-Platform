@@ -6985,8 +6985,6 @@ details.mobile-accordion > .mobile-accordion-body {
   .analysis-visual-card,
   .analysis-visual-tabrail-group,
   .analysis-subnav-link,
-  .surface-loading-spinner,
-  .button-live-loader,
   .history-popup-container,
   .history-popup-overlay,
   .analysis-content-stage,
@@ -6997,6 +6995,11 @@ details.mobile-accordion > .mobile-accordion-body {
     animation: none !important;
     transition: none !important;
     transform: none !important;
+  }
+
+  .surface-loading-spinner,
+  .button-live-loader {
+    animation: surface-spin 1.4s linear infinite !important;
   }
 }
 
